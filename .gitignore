@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+kvp10k_env/
+
+# PyCharm
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+.vscode-server/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Data
+data/prepared/
+data/outputs/
+data/raw/
+hf_cache/
+
+# Logs
+logs/*.out
+logs/*.log
+*.err
+
+# GPU outputs
+*.o
+slurm-*.out
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.pdf
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.bak
+.~*
+
+# HuggingFace cache
+.cache/
+huggingface/
+
+# Large files (over 100MB)
+*.tar.gz
+*.zip
