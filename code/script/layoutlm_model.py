@@ -427,11 +427,6 @@ class LayoutLMv3KVPModel(nn.Module):
             
             entity_logits = outputs['entity_logits']
             link_scores = outputs['link_scores']
-            
-            # Get entity predictions
-            entity_preds = torch.argmax(entity_logits, dim=-1)  # [batch, seq_len]
-            
-            # Extract indices from outputs
             key_indices = outputs.get('key_indices')
             value_indices = outputs.get('value_indices')
             
@@ -439,7 +434,8 @@ class LayoutLMv3KVPModel(nn.Module):
             batch_size = input_ids.size(0)
 
             for b in range(batch_size):
-                entity_preds = torch.argmax(entity_logits[b], dim=-1)
+                # Compute entity predictions per-sample (no outer shadowed variable)
+                entity_preds_b = torch.argmax(entity_logits[b], dim=-1)
                 batch_preds = []
 
                 if self.use_linker and link_scores is not None and link_scores[b] is not None:
@@ -468,8 +464,7 @@ class LayoutLMv3KVPModel(nn.Module):
                         })
                 else:
                     # Stage 4a: no linker — return detected keys/values individually
-                    key_positions = (entity_preds == 1).nonzero(as_tuple=True)[0]
-                    val_positions = (entity_preds == 2).nonzero(as_tuple=True)[0]
+                    key_positions = (entity_preds_b == 1).nonzero(as_tuple=True)[0]
 
                     for ki in key_positions:
                         key_word = words[b][ki] if words else str(ki.item())
