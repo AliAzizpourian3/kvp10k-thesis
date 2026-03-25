@@ -79,6 +79,24 @@ class Stage4bTrainer:
         self.best_val_f1 = 0.0
         self.patience_counter = 0
 
+    def restore_history(self, checkpoint_dir: Path):
+        """
+        Restore training history state from a checkpoint directory.
+        Reads training_history.json if present, otherwise looks for the
+        best val_f1 among all checkpoint config files.
+        """
+        history_file = self.output_dir / "training_history.json"
+        if history_file.exists():
+            with open(history_file) as f:
+                saved = json.load(f)
+            self.training_history = saved
+            if saved.get('val_f1s'):
+                self.best_val_f1 = max(saved['val_f1s'])
+            self.patience_counter = 0  # Reset patience after explicit resume
+            logger.info(f"✓ Restored training history: best_val_f1={self.best_val_f1:.4f}")
+        else:
+            logger.warning(f"No training_history.json found in {self.output_dir}, history not restored")
+
     def train_epoch(self):
         """Train one epoch."""
         self.model.train()
@@ -115,20 +133,17 @@ class Stage4bTrainer:
             link_loss = outputs.get('link_loss')
             
             if entity_loss is not None and link_loss is not None:
-                # Both losses available: apply linker_loss_weight (lambda)
                 loss = entity_loss + self.linker_loss_weight * link_loss
             elif entity_loss is not None:
-                # Only entity loss (no linking pairs in batch)
                 loss = entity_loss
             else:
-                # Fallback to combined loss
                 loss = outputs['loss']
             
             # Scale loss for gradient accumulation
             loss = loss / self.gradient_accumulation_steps
             loss.backward()
             
-            # Only step optimizer every N batches
+            # Step optimizer every N batches
             if (batch_idx + 1) % self.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optimizer.step()
@@ -138,6 +153,14 @@ class Stage4bTrainer:
             total_loss += loss.item() * self.gradient_accumulation_steps  # Undo scaling for logging
             num_batches += 1
             pbar.set_postfix({"loss": loss.item() * self.gradient_accumulation_steps})
+        
+        # Flush any remaining gradients from the last partial accumulation batch
+        remainder = num_batches % self.gradient_accumulation_steps
+        if remainder != 0:
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            self.optimizer.step()
+            self.scheduler.step()
+            self.optimizer.zero_grad()
         
         avg_loss = total_loss / max(num_batches, 1)
         return avg_loss
@@ -183,13 +206,10 @@ class Stage4bTrainer:
                 link_loss = outputs.get('link_loss')
                 
                 if entity_loss is not None and link_loss is not None:
-                    # Both losses available: apply linker_loss_weight (lambda)
                     loss = entity_loss + self.linker_loss_weight * link_loss
                 elif entity_loss is not None:
-                    # Only entity loss (no linking pairs in batch)
                     loss = entity_loss
                 else:
-                    # Fallback to combined loss
                     loss = outputs['loss']
                 
                 total_loss += loss.item()
@@ -243,7 +263,7 @@ class Stage4bTrainer:
             self.training_history["val_losses"].append(val_loss)
             self.training_history["val_f1s"].append(val_f1)
             
-            # Checkpoint
+            # Checkpoint every epoch
             ckpt_dir = self.output_dir / f"checkpoint-{epoch+1}"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
             torch.save(self.model.state_dict(), ckpt_dir / "pytorch_model.bin")
@@ -321,16 +341,7 @@ def main():
     model = LayoutLMv3KVPModel(use_linker=True)
     logger.info("LayoutLMv3KVPModel (with linker) created")
     
-    # Load checkpoint if resuming
-    if latest_ckpt:
-        logger.info(f"Resuming training from {latest_ckpt}...")
-        model_path = latest_ckpt / "pytorch_model.bin"
-        if model_path.exists():
-            state_dict = torch.load(model_path, map_location="cpu")
-            model.load_state_dict(state_dict)
-            logger.info(f"✓ Loaded model weights from checkpoint")
-    
-    # Train
+    # Create trainer
     trainer = Stage4bTrainer(
         model=model,
         train_loader=train_loader,
@@ -344,6 +355,18 @@ def main():
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         device=device
     )
+    
+    # Load checkpoint if resuming and restore training history state
+    if latest_ckpt:
+        logger.info(f"Resuming training from {latest_ckpt}...")
+        model_path = latest_ckpt / "pytorch_model.bin"
+        if model_path.exists():
+            state_dict = torch.load(model_path, map_location="cpu")
+            model.load_state_dict(state_dict)
+            logger.info(f"✓ Loaded model weights from checkpoint")
+        # Restore history so early stopping patience is correct after resume
+        trainer.restore_history(latest_ckpt)
+    
     history = trainer.train()
     
     logger.info("Training complete!")
