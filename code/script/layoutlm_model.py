@@ -357,9 +357,10 @@ class LayoutLMv3KVPModel(nn.Module):
             loss_fct = nn.CrossEntropyLoss()
             
             # Compute loss only on non-padding tokens (attention_mask == 1)
-            active_loss = attention_mask.view(-1) == 1
-            active_logits = entity_logits.view(-1, self.num_labels)[active_loss]
-            active_labels = entity_labels.view(-1)[active_loss]
+            # Use reshape() instead of view() to handle non-contiguous tensors from truncation
+            active_loss = attention_mask.reshape(-1) == 1
+            active_logits = entity_logits.reshape(-1, self.num_labels)[active_loss]
+            active_labels = entity_labels.reshape(-1)[active_loss]
             
             entity_loss = loss_fct(active_logits, active_labels)
             
