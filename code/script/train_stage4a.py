@@ -97,6 +97,23 @@ class Stage4aTrainer:
         logger.info(f"  Device: {self.device}")
         logger.info(f"  Output dir: {output_dir}")
     
+    def restore_history(self, checkpoint_dir: Path):
+        """
+        Restore training history state from a checkpoint directory.
+        Reads config.json saved alongside model weights.
+        """
+        config_file = checkpoint_dir / "config.json"
+        if not config_file.exists():
+            logger.warning(f"No config.json found in {checkpoint_dir}, history not restored")
+            return
+        with open(config_file) as f:
+            ckpt_config = json.load(f)
+        epoch = ckpt_config.get('epoch', 0)
+        self.history['best_val_f1'] = ckpt_config.get('val_f1', 0.0)
+        self.history['best_epoch'] = epoch
+        self.history['epochs_no_improve'] = 0  # Reset patience after explicit resume
+        logger.info(f"✓ Restored history: best_val_f1={self.history['best_val_f1']:.4f} at epoch {epoch}")
+    
     def train_epoch(self):
         """Single training epoch."""
         self.model.train()
@@ -125,7 +142,7 @@ class Stage4aTrainer:
             loss = loss / self.gradient_accumulation_steps
             loss.backward()
             
-            # Only step optimizer every N batches
+            # Step optimizer every N batches
             if (batch_idx + 1) % self.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
                 self.optimizer.step()
@@ -136,6 +153,14 @@ class Stage4aTrainer:
             num_batches += 1
             
             pbar.set_postfix({'loss': loss.item() * self.gradient_accumulation_steps})
+        
+        # Flush any remaining gradients from the last partial accumulation batch
+        remainder = num_batches % self.gradient_accumulation_steps
+        if remainder != 0:
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+            self.optimizer.step()
+            self.scheduler.step()
+            self.optimizer.zero_grad()
         
         avg_loss = total_loss / max(num_batches, 1)
         return avg_loss
@@ -369,16 +394,7 @@ def main():
         device=device
     )
     
-    # Load checkpoint if resuming
-    if latest_ckpt:
-        logger.info(f"\nResuming training from {latest_ckpt}...")
-        model_path = latest_ckpt / "model.pt"
-        if model_path.exists():
-            state_dict = torch.load(model_path, map_location="cpu")
-            model.load_state_dict(state_dict)
-            logger.info(f"✓ Loaded model weights from checkpoint")
-    
-    # Create trainer
+    # Create trainer first (so restore_history can be called on it)
     trainer = Stage4aTrainer(
         model=model,
         train_loader=train_loader,
@@ -390,6 +406,17 @@ def main():
         output_dir=args.output_dir,
         device=device
     )
+    
+    # Load checkpoint if resuming, and restore training history state
+    if latest_ckpt:
+        logger.info(f"\nResuming training from {latest_ckpt}...")
+        model_path = latest_ckpt / "model.pt"
+        if model_path.exists():
+            state_dict = torch.load(model_path, map_location="cpu")
+            model.load_state_dict(state_dict)
+            logger.info(f"✓ Loaded model weights from checkpoint")
+        # Restore history so early stopping patience is correct after resume
+        trainer.restore_history(latest_ckpt)
     
     # Train
     history = trainer.train()
