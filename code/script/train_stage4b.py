@@ -4,6 +4,7 @@ Stage 4b Training: LayoutLMv3 KVP Extraction with Biaffine Linker.
 Implements:
 - LayoutLMv3 encoder + entity classifier + Biaffine linker
 - Key-value linking with configurable loss weight
+- Mixed precision (fp16) training for memory efficiency
 - Training from prepared JSON data (data/prepared/train/*.json)
 - Validation with early stopping (patience=3 on F1)
 - Checkpoint saving to data/outputs/stage4b_{linker_loss_weight}/
@@ -12,7 +13,6 @@ Implements:
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torch.cuda.amp import autocast, GradScaler
 from transformers import LayoutLMv3Processor, get_linear_schedule_with_warmup
 from torch.optim import AdamW
 from tqdm import tqdm
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 class Stage4bTrainer:
     """Trainer for Stage 4b: LayoutLMv3 with Biaffine Linker."""
-    
+
     def __init__(
         self,
         model: LayoutLMv3KVPModel,
@@ -61,7 +61,7 @@ class Stage4bTrainer:
         self.linker_loss_weight = linker_loss_weight
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.device = device
-        
+
         self.optimizer = AdamW(self.model.parameters(), lr=learning_rate)
         self.total_steps = len(train_loader) * num_epochs
         self.scheduler = get_linear_schedule_with_warmup(
@@ -69,7 +69,7 @@ class Stage4bTrainer:
             num_warmup_steps=int(0.1 * self.total_steps),
             num_training_steps=self.total_steps
         )
-        
+
         self.training_history = {
             "epochs": [],
             "train_losses": [],
@@ -79,16 +79,12 @@ class Stage4bTrainer:
         }
         self.best_val_f1 = 0.0
         self.patience_counter = 0
-        
-        # Mixed precision training for memory efficiency
-        self.scaler = GradScaler(enabled=True)
+
+        # fp16 mixed precision: use new torch.amp API (avoids deprecation warnings)
+        self.scaler = torch.amp.GradScaler("cuda")
 
     def restore_history(self, checkpoint_dir: Path):
-        """
-        Restore training history state from a checkpoint directory.
-        Reads training_history.json if present, otherwise looks for the
-        best val_f1 among all checkpoint config files.
-        """
+        """Restore training history and best_val_f1 from a previous run."""
         history_file = self.output_dir / "training_history.json"
         if history_file.exists():
             with open(history_file) as f:
@@ -96,34 +92,51 @@ class Stage4bTrainer:
             self.training_history = saved
             if saved.get('val_f1s'):
                 self.best_val_f1 = max(saved['val_f1s'])
-            self.patience_counter = 0  # Reset patience after explicit resume
-            logger.info(f"✓ Restored training history: best_val_f1={self.best_val_f1:.4f}")
+            self.patience_counter = 0
+            logger.info(f"\u2713 Restored training history: best_val_f1={self.best_val_f1:.4f}")
         else:
             logger.warning(f"No training_history.json found in {self.output_dir}, history not restored")
 
+    def _optimizer_step(self):
+        """
+        Single helper that always goes through the fp16 scaler correctly:
+          1. unscale_ so clip_grad_norm_ operates on real gradients
+          2. clip
+          3. scaler.step  (skips update if inf/nan detected)
+          4. scaler.update
+          5. zero_grad
+          6. scheduler step
+        """
+        self.scaler.unscale_(self.optimizer)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+        self.scaler.step(self.optimizer)
+        self.scaler.update()
+        self.optimizer.zero_grad()
+        self.scheduler.step()
+
     def train_epoch(self):
-        """Train one epoch."""
+        """Train one epoch with fp16 mixed precision."""
         self.model.train()
         total_loss = 0.0
         num_batches = 0
         pbar = tqdm(self.train_loader, desc="Training", leave=False)
-        
+
         for batch_idx, batch in enumerate(pbar):
-            input_ids = batch["input_ids"].to(self.device)
+            input_ids      = batch["input_ids"].to(self.device)
             attention_mask = batch["attention_mask"].to(self.device)
-            bbox = batch["bbox"].to(self.device)
-            pixel_values = batch.get("pixel_values", None)
+            bbox           = batch["bbox"].to(self.device)
+            pixel_values   = batch.get("pixel_values", None)
             if pixel_values is not None:
                 pixel_values = pixel_values.to(self.device)
-            entity_labels = batch.get("entity_labels", None)
+            entity_labels  = batch.get("entity_labels", None)
             if entity_labels is not None:
                 entity_labels = entity_labels.to(self.device)
-            link_labels = batch.get("link_labels", None)
+            link_labels    = batch.get("link_labels", None)
             if link_labels is not None:
                 link_labels = link_labels.to(self.device)
-            
-            # Forward pass with mixed precision (fp16)
-            with autocast(enabled=True):
+
+            # Forward pass under fp16 autocast
+            with torch.amp.autocast("cuda"):
                 outputs = self.model(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
@@ -132,156 +145,131 @@ class Stage4bTrainer:
                     entity_labels=entity_labels,
                     link_labels=link_labels
                 )
-                
-                # Extract separate losses and apply lambda weight
+
                 entity_loss = outputs.get('entity_loss')
-                link_loss = outputs.get('link_loss')
-                
+                link_loss   = outputs.get('link_loss')
+
                 if entity_loss is not None and link_loss is not None:
                     loss = entity_loss + self.linker_loss_weight * link_loss
                 elif entity_loss is not None:
                     loss = entity_loss
                 else:
                     loss = outputs['loss']
-                
+
                 # Scale loss for gradient accumulation
                 loss = loss / self.gradient_accumulation_steps
-            
-            # Backward pass with gradient scaling
+
+            # Backward with scaled gradients
             self.scaler.scale(loss).backward()
-            
-            # Step optimizer every N batches
+
+            # Optimizer step every N batches
             if (batch_idx + 1) % self.gradient_accumulation_steps == 0:
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-                self.scaler.step(self.optimizer)
-                self.scaler.update()
-                self.scheduler.step()
-                self.optimizer.zero_grad()
-            
-            total_loss += loss.item() * self.gradient_accumulation_steps  # Undo scaling for logging
+                self._optimizer_step()
+
+            total_loss += loss.item() * self.gradient_accumulation_steps
             num_batches += 1
             pbar.set_postfix({"loss": loss.item() * self.gradient_accumulation_steps})
-        
-        # Flush any remaining gradients from the last partial accumulation batch
-        remainder = num_batches % self.gradient_accumulation_steps
-        if remainder != 0:
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-            self.optimizer.step()
-            self.scheduler.step()
-            self.optimizer.zero_grad()
-        
-        avg_loss = total_loss / max(num_batches, 1)
-        return avg_loss
+
+        # Flush the last partial accumulation batch (if any)
+        if num_batches % self.gradient_accumulation_steps != 0:
+            self._optimizer_step()
+
+        return total_loss / max(num_batches, 1)
 
     def validate(self):
         """Validate on validation set."""
         self.model.eval()
         total_loss = 0.0
         num_batches = 0
-        
-        # For F1: track TP, FP, FN across all val batches (same as stage4a)
-        val_tp = 0
-        val_fp = 0
-        val_fn = 0
-        
+        val_tp = val_fp = val_fn = 0
+
         with torch.no_grad():
             for batch in tqdm(self.val_loader, desc="Validating", leave=False):
-                input_ids = batch["input_ids"].to(self.device)
+                input_ids      = batch["input_ids"].to(self.device)
                 attention_mask = batch["attention_mask"].to(self.device)
-                bbox = batch["bbox"].to(self.device)
-                pixel_values = batch.get("pixel_values", None)
+                bbox           = batch["bbox"].to(self.device)
+                pixel_values   = batch.get("pixel_values", None)
                 if pixel_values is not None:
                     pixel_values = pixel_values.to(self.device)
-                entity_labels = batch.get("entity_labels", None)
+                entity_labels  = batch.get("entity_labels", None)
                 if entity_labels is not None:
                     entity_labels = entity_labels.to(self.device)
-                link_labels = batch.get("link_labels", None)
+                link_labels    = batch.get("link_labels", None)
                 if link_labels is not None:
                     link_labels = link_labels.to(self.device)
-                
-                # Forward pass
-                outputs = self.model(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask,
-                    bbox=bbox,
-                    pixel_values=pixel_values,
-                    entity_labels=entity_labels,
-                    link_labels=link_labels
-                )
-                
-                # Extract separate losses and apply lambda weight
-                entity_loss = outputs.get('entity_loss')
-                link_loss = outputs.get('link_loss')
-                
-                if entity_loss is not None and link_loss is not None:
-                    loss = entity_loss + self.linker_loss_weight * link_loss
-                elif entity_loss is not None:
-                    loss = entity_loss
-                else:
-                    loss = outputs['loss']
-                
-                total_loss += loss.item()
+
+                # Validation also benefits from autocast (faster + less memory)
+                with torch.amp.autocast("cuda"):
+                    outputs = self.model(
+                        input_ids=input_ids,
+                        attention_mask=attention_mask,
+                        bbox=bbox,
+                        pixel_values=pixel_values,
+                        entity_labels=entity_labels,
+                        link_labels=link_labels
+                    )
+
+                    entity_loss = outputs.get('entity_loss')
+                    link_loss   = outputs.get('link_loss')
+
+                    if entity_loss is not None and link_loss is not None:
+                        loss = entity_loss + self.linker_loss_weight * link_loss
+                    elif entity_loss is not None:
+                        loss = entity_loss
+                    else:
+                        loss = outputs['loss']
+
+                total_loss  += loss.item()
                 num_batches += 1
-                
-                # Entity predictions for F1 (same manual Key/Value F1 as stage4a for comparability)
-                entity_logits = outputs["entity_logits"]
-                pred_labels = torch.argmax(entity_logits, dim=-1)
-                gt_labels = entity_labels
-                mask = attention_mask
-                
-                # Count matches for non-padding, non-Other tokens (1=Key, 2=Value)
-                key_val_mask = ((gt_labels == 1) | (gt_labels == 2)) & (mask == 1)
+
+                entity_logits    = outputs["entity_logits"]
+                pred_labels      = torch.argmax(entity_logits, dim=-1)
+                gt_labels        = entity_labels
+                mask             = attention_mask
+
+                key_val_mask      = ((gt_labels == 1) | (gt_labels == 2)) & (mask == 1)
                 pred_key_val_mask = ((pred_labels == 1) | (pred_labels == 2)) & (mask == 1)
-                
-                tp = ((pred_labels == gt_labels) & key_val_mask).sum().item()
-                fp = (pred_key_val_mask & ~key_val_mask).sum().item()
-                fn = (~pred_key_val_mask & key_val_mask).sum().item()
-                
-                val_tp += tp
-                val_fp += fp
-                val_fn += fn
-        
-        # Compute F1 (Key/Value only, same as stage4a for comparability)
+
+                val_tp += ((pred_labels == gt_labels) & key_val_mask).sum().item()
+                val_fp += (pred_key_val_mask & ~key_val_mask).sum().item()
+                val_fn += (~pred_key_val_mask & key_val_mask).sum().item()
+
         precision = val_tp / (val_tp + val_fp + 1e-8)
-        recall = val_tp / (val_tp + val_fn + 1e-8)
-        val_f1 = 2 * (precision * recall) / (precision + recall + 1e-8)
-        
-        avg_loss = total_loss / max(num_batches, 1)
-        return avg_loss, val_f1
+        recall    = val_tp / (val_tp + val_fn + 1e-8)
+        val_f1    = 2 * precision * recall / (precision + recall + 1e-8)
+
+        return total_loss / max(num_batches, 1), val_f1
 
     def train(self):
-        """Train the model."""
-        logger.info(f"Starting Stage 4b training with linker_loss_weight={self.linker_loss_weight}")
+        """Full training loop with early stopping."""
+        logger.info(f"Starting Stage 4b training | linker_loss_weight={self.linker_loss_weight}")
         logger.info(f"Output directory: {self.output_dir}")
-        
+        logger.info(f"Mixed precision: fp16 (torch.amp)")
+
         for epoch in range(self.num_epochs):
             logger.info(f"\n=== Epoch {epoch+1}/{self.num_epochs} ===")
-            
-            # Train
+
             train_loss = self.train_epoch()
             logger.info(f"Train loss: {train_loss:.4f}")
-            
-            # Validate
+
             val_loss, val_f1 = self.validate()
             logger.info(f"Val loss: {val_loss:.4f}, Val F1: {val_f1:.4f}")
-            
-            # Save to history
+
             self.training_history["epochs"].append(epoch + 1)
             self.training_history["train_losses"].append(train_loss)
             self.training_history["val_losses"].append(val_loss)
             self.training_history["val_f1s"].append(val_f1)
-            
+
             # Checkpoint every epoch
             ckpt_dir = self.output_dir / f"checkpoint-{epoch+1}"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
             torch.save(self.model.state_dict(), ckpt_dir / "pytorch_model.bin")
             logger.info(f"Checkpoint saved to {ckpt_dir}")
-            
+
             # Early stopping
             if val_f1 > self.best_val_f1:
                 self.best_val_f1 = val_f1
                 self.patience_counter = 0
-                # Save best model
                 best_dir = self.output_dir / "best_model"
                 best_dir.mkdir(parents=True, exist_ok=True)
                 torch.save(self.model.state_dict(), best_dir / "pytorch_model.bin")
@@ -292,49 +280,54 @@ class Stage4bTrainer:
                 if self.patience_counter >= self.early_stopping_patience:
                     logger.info(f"Early stopping at epoch {epoch+1}")
                     break
-        
-        # Save training history
+
         history_file = self.output_dir / "training_history.json"
         with open(history_file, "w") as f:
             json.dump(self.training_history, f, indent=2)
         logger.info(f"Training history saved to {history_file}")
-        
+
         return self.training_history
 
 
 def main():
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Stage 4b Training: LayoutLMv3 with Linker")
-    parser.add_argument("--data_dir", type=str, default="../../data/prepared", help="Path to prepared data")
-    parser.add_argument("--output_dir", type=str, default="../../data/outputs/stage4b", help="Output directory")
-    parser.add_argument("--batch_size", type=int, default=4, help="Batch size")
-    parser.add_argument("--gradient_accumulation_steps", type=int, default=8, help="Gradient accumulation steps")
-    parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate")
-    parser.add_argument("--num_epochs", type=int, default=10, help="Number of epochs")
-    parser.add_argument("--early_stopping_patience", type=int, default=3, help="Early stopping patience")
-    parser.add_argument("--val_fraction", type=float, default=0.1, help="Validation fraction")
-    parser.add_argument("--linker_loss_weight", type=float, default=1.0, help="Linker loss weight λ")
-    parser.add_argument("--include_images", action="store_true", help="Include pixel values from images")
-    parser.add_argument("--resume_from_checkpoint", action="store_true", help="Resume training from latest checkpoint (auto-detects)")
-    parser.add_argument("--pretrained_encoder", type=str, default=None, help="Path to Stage 4a checkpoint with pretrained encoder + entity classifier")
-    
+    parser.add_argument("--data_dir",                   type=str,   default="../../data/prepared")
+    parser.add_argument("--output_dir",                 type=str,   default="../../data/outputs/stage4b")
+    parser.add_argument("--batch_size",                 type=int,   default=2)
+    parser.add_argument("--gradient_accumulation_steps",type=int,   default=16)
+    parser.add_argument("--learning_rate",              type=float, default=5e-5)
+    parser.add_argument("--num_epochs",                 type=int,   default=10)
+    parser.add_argument("--early_stopping_patience",   type=int,   default=3)
+    parser.add_argument("--val_fraction",               type=float, default=0.1)
+    parser.add_argument("--linker_loss_weight",         type=float, default=1.0,
+                        help="Linker loss weight \u03bb")
+    parser.add_argument("--include_images",             action="store_true")
+    parser.add_argument("--resume_from_checkpoint",     action="store_true")
+    parser.add_argument("--pretrained_encoder",         type=str,   default=None,
+                        help="Path to Stage 4a checkpoint (pytorch_model.bin)")
+
     args = parser.parse_args()
-    
-    # Check for checkpoint resumption
+
+    # ── Checkpoint resumption ────────────────────────────────────────────────
     latest_ckpt = None
     if args.resume_from_checkpoint:
         output_path = Path(args.output_dir)
         if output_path.exists():
-            checkpoints = sorted([d for d in output_path.iterdir() if d.is_dir() and d.name.startswith("checkpoint-")])
+            checkpoints = sorted(
+                [d for d in output_path.iterdir()
+                 if d.is_dir() and d.name.startswith("checkpoint-")]
+            )
             if checkpoints:
                 latest_ckpt = checkpoints[-1]
                 logger.info(f"Found checkpoint: {latest_ckpt}")
-    
-    # Create dataloaders
+
+    # ── Device ───────────────────────────────────────────────────────────────
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
-    
+
+    # ── Dataloaders ──────────────────────────────────────────────────────────
     dataloaders = create_stage4_dataloaders(
         data_dir=args.data_dir,
         batch_size=args.batch_size,
@@ -342,54 +335,48 @@ def main():
         include_images=args.include_images
     )
     train_loader = dataloaders['train']
-    val_loader = dataloaders['val']
-    test_loader = dataloaders['test']
-    logger.info(f"Train: {len(train_loader)} batches, Val: {len(val_loader)} batches, Test: {len(test_loader)} batches")
-    
-    # Create model with linker (stays on CPU for now)
+    val_loader   = dataloaders['val']
+    test_loader  = dataloaders['test']
+    logger.info(f"Train: {len(train_loader)} batches | Val: {len(val_loader)} batches | Test: {len(test_loader)} batches")
+
+    # ── Model (CPU first to avoid memory spike) ──────────────────────────────
     model = LayoutLMv3KVPModel(use_linker=True)
     logger.info("LayoutLMv3KVPModel (with linker) created on CPU")
-    
-    # Load pretrained encoder and entity classifier from Stage 4a if provided (and not resuming).
-    # IMPORTANT: Both Stage 4a and Stage 4b use LayoutLMv3KVPModel with identical key names:
-    #   encoder.*           (212 keys) - the LayoutLMv3Encoder stored as self.encoder
-    #   entity_classifier.* (2 keys)   - the EntityClassifier stored as self.entity_classifier
-    # No key remapping is needed — just copy matching keys directly with strict=False.
-    # The linker.* keys (only in Stage 4b) are simply skipped, staying randomly initialised.
+
+    # ── Transfer Stage 4a weights ────────────────────────────────────────────
+    # Both Stage 4a and Stage 4b share identical key names:
+    #   encoder.*            (212 keys) - LayoutLMv3Encoder as self.encoder
+    #   entity_classifier.*  (2 keys)   - EntityClassifier
+    # The linker.* keys are unique to 4b and stay randomly initialised.
     if args.pretrained_encoder and not latest_ckpt:
         pretrained_path = Path(args.pretrained_encoder)
         if pretrained_path.exists():
-            state_dict = torch.load(pretrained_path, map_location="cpu")
-            logger.info(f"Loaded Stage 4a checkpoint from {pretrained_path} on CPU")
-            
+            state_dict  = torch.load(pretrained_path, map_location="cpu")
             model_state = model.state_dict()
-            transferred_keys = []
-            skipped_keys = []
+            transferred, skipped = [], []
 
             for key, value in state_dict.items():
                 if key in model_state:
                     model_state[key] = value
-                    transferred_keys.append(key)
+                    transferred.append(key)
                 else:
-                    skipped_keys.append(key)
+                    skipped.append(key)
 
             model.load_state_dict(model_state, strict=False)
 
-            encoder_keys = [k for k in transferred_keys if k.startswith('encoder.')]
-            classifier_keys = [k for k in transferred_keys if k.startswith('entity_classifier.')]
-            logger.info(f"✓ Transferred {len(transferred_keys)} keys on CPU (skipped {len(skipped_keys)})")
-            logger.info(f"  Encoder keys: {len(encoder_keys)}, Classifier keys: {len(classifier_keys)}")
+            enc_keys  = [k for k in transferred if k.startswith('encoder.')]
+            cls_keys  = [k for k in transferred if k.startswith('entity_classifier.')]
+            logger.info(f"\u2713 Transferred {len(transferred)} keys on CPU (skipped {len(skipped)})")
+            logger.info(f"  Encoder keys: {len(enc_keys)}, Classifier keys: {len(cls_keys)}")
 
-            if len(encoder_keys) == 0:
-                logger.error("ERROR: 0 encoder keys transferred! Check checkpoint key names.")
-                # Log first 10 checkpoint keys to diagnose
-                sample_keys = list(state_dict.keys())[:10]
-                logger.error(f"Checkpoint key samples: {sample_keys}")
-                raise RuntimeError("Pretrained encoder transfer failed — 0 encoder keys matched.")
+            if len(enc_keys) == 0:
+                sample = list(state_dict.keys())[:10]
+                logger.error(f"ERROR: 0 encoder keys transferred! Checkpoint samples: {sample}")
+                raise RuntimeError("Pretrained encoder transfer failed \u2014 0 encoder keys matched.")
         else:
             logger.warning(f"Pretrained encoder path not found: {pretrained_path}")
-    
-    # Create trainer (will move model to GPU inside __init__)
+
+    # ── Trainer ──────────────────────────────────────────────────────────────
     trainer = Stage4bTrainer(
         model=model,
         train_loader=train_loader,
@@ -403,22 +390,18 @@ def main():
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         device=device
     )
-    
-    # Load checkpoint if resuming and restore training history state
+
+    # ── Resume from checkpoint ───────────────────────────────────────────────
     if latest_ckpt:
-        logger.info(f"Resuming training from {latest_ckpt}...")
         model_path = latest_ckpt / "pytorch_model.bin"
         if model_path.exists():
-            state_dict = torch.load(model_path, map_location="cpu")
-            model.load_state_dict(state_dict)
-            logger.info(f"✓ Loaded model weights from checkpoint")
-        # Restore history so early stopping patience is correct after resume
+            model.load_state_dict(torch.load(model_path, map_location="cpu"))
+            logger.info(f"\u2713 Loaded weights from {latest_ckpt}")
         trainer.restore_history(latest_ckpt)
-    
-    history = trainer.train()
-    
-    logger.info("Training complete!")
-    logger.info(f"Best validation F1: {trainer.best_val_f1:.4f}")
+
+    # ── Train ────────────────────────────────────────────────────────────────
+    trainer.train()
+    logger.info(f"Training complete! Best validation F1: {trainer.best_val_f1:.4f}")
 
 
 if __name__ == "__main__":
