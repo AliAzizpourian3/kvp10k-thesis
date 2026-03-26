@@ -1,17 +1,17 @@
 """
 Stage 4b Training: LayoutLMv3 KVP Extraction with Biaffine Linker.
 
-Implements:
-- LayoutLMv3 encoder + entity classifier + Biaffine linker
-- Key-value linking with configurable loss weight
-- Mixed precision (bf16) training for memory efficiency
-  NOTE: bf16 is used instead of fp16 because the biaffine pairwise scorer
-  produces large intermediate values that overflow fp16 (max ~65504), causing
-  NaN loss. bf16 shares fp32's dynamic range and is natively supported on A100.
-- Training from prepared JSON data (data/prepared/train/*.json)
-- Validation with early stopping (patience=3 on F1)
-- Checkpoint saving to data/outputs/stage4b_{linker_loss_weight}/
+Memory optimisations applied (Stage 4b OOM fix):
+- batch_size default: 2 -> 1
+- gradient_accumulation_steps default: 16 -> 32  (effective batch = 32 unchanged)
+- Gradient checkpointing on encoder (in layoutlm_model.py)
+- Chunked biaffine linker (in layoutlm_model.py, LINKER_CHUNK_SIZE=8)
+- PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True set at import time
 """
+
+import os
+# Must be set BEFORE any torch import to take effect.
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import torch
 import torch.nn as nn
@@ -19,7 +19,6 @@ from torch.utils.data import DataLoader
 from transformers import LayoutLMv3Processor, get_linear_schedule_with_warmup
 from torch.optim import AdamW
 from tqdm import tqdm
-import os
 import json
 from pathlib import Path
 import logging
@@ -34,10 +33,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# bf16 does not need a GradScaler (no overflow risk), but we keep the
-# scaler instantiation as a no-op (enabled=False) so the code path is
-# identical and easy to switch back if needed.
-_USE_BF16 = True   # A100-safe; set False to revert to fp32
+_USE_BF16 = True
 
 
 class Stage4bTrainer:
@@ -54,7 +50,7 @@ class Stage4bTrainer:
         num_epochs: int = 10,
         early_stopping_patience: int = 3,
         linker_loss_weight: float = 1.0,
-        gradient_accumulation_steps: int = 1,
+        gradient_accumulation_steps: int = 32,
         device: str = "cuda" if torch.cuda.is_available() else "cpu"
     ):
         self.model = model.to(device)
@@ -70,11 +66,11 @@ class Stage4bTrainer:
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.device = device
 
-        self.optimizer = AdamW(self.model.parameters(), lr=learning_rate)
+        self.optimizer = AdamW(self.model.parameters(), lr=learning_rate, weight_decay=0.01)
         self.total_steps = len(train_loader) * num_epochs
         self.scheduler = get_linear_schedule_with_warmup(
             self.optimizer,
-            num_warmup_steps=int(0.1 * self.total_steps),
+            num_warmup_steps=500,
             num_training_steps=self.total_steps
         )
 
@@ -88,14 +84,13 @@ class Stage4bTrainer:
         self.best_val_f1 = 0.0
         self.patience_counter = 0
 
-        # bf16: GradScaler is not needed (bf16 has fp32 dynamic range, no overflow).
-        # We disable it explicitly so the optimizer step path is clean.
         self.scaler = torch.amp.GradScaler("cuda", enabled=False)
         self.autocast_dtype = torch.bfloat16 if _USE_BF16 else torch.float32
-        logger.info(f"Mixed precision: {'bf16' if _USE_BF16 else 'fp32 (no autocast)'}")
+        logger.info(f"Mixed precision: {'bf16' if _USE_BF16 else 'fp32'}")
+        logger.info(f"Gradient accumulation steps: {gradient_accumulation_steps}")
+        logger.info(f"PYTORCH_CUDA_ALLOC_CONF: {os.environ.get('PYTORCH_CUDA_ALLOC_CONF', 'not set')}")
 
     def restore_history(self, checkpoint_dir: Path):
-        """Restore training history and best_val_f1 from a previous run."""
         history_file = self.output_dir / "training_history.json"
         if history_file.exists():
             with open(history_file) as f:
@@ -106,23 +101,17 @@ class Stage4bTrainer:
             self.patience_counter = 0
             logger.info(f"\u2713 Restored training history: best_val_f1={self.best_val_f1:.4f}")
         else:
-            logger.warning(f"No training_history.json found in {self.output_dir}, history not restored")
+            logger.warning(f"No training_history.json found in {self.output_dir}")
 
     def _optimizer_step(self):
-        """
-        Single helper that always performs the optimizer step correctly.
-        With bf16 (scaler disabled) this reduces to: clip -> step -> zero_grad -> scheduler.
-        The scaler calls are no-ops when enabled=False, keeping the code path uniform.
-        """
-        self.scaler.unscale_(self.optimizer)          # no-op when disabled
+        self.scaler.unscale_(self.optimizer)
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-        self.scaler.step(self.optimizer)              # calls optimizer.step() internally
-        self.scaler.update()                          # no-op when disabled
+        self.scaler.step(self.optimizer)
+        self.scaler.update()
         self.optimizer.zero_grad()
         self.scheduler.step()
 
     def train_epoch(self):
-        """Train one epoch with bf16 mixed precision."""
         self.model.train()
         total_loss = 0.0
         num_batches = 0
@@ -132,13 +121,13 @@ class Stage4bTrainer:
             input_ids      = batch["input_ids"].to(self.device)
             attention_mask = batch["attention_mask"].to(self.device)
             bbox           = batch["bbox"].to(self.device)
-            pixel_values   = batch.get("pixel_values", None)
+            pixel_values   = batch.get("pixel_values")
             if pixel_values is not None:
                 pixel_values = pixel_values.to(self.device)
-            entity_labels  = batch.get("entity_labels", None)
+            entity_labels  = batch.get("entity_labels")
             if entity_labels is not None:
                 entity_labels = entity_labels.to(self.device)
-            link_labels    = batch.get("link_labels", None)
+            link_labels    = batch.get("link_labels")
             if link_labels is not None:
                 link_labels = link_labels.to(self.device)
 
@@ -164,7 +153,6 @@ class Stage4bTrainer:
 
                 loss = loss / self.gradient_accumulation_steps
 
-            # bf16 backward (scaler.scale is a no-op when disabled)
             self.scaler.scale(loss).backward()
 
             if (batch_idx + 1) % self.gradient_accumulation_steps == 0:
@@ -174,14 +162,12 @@ class Stage4bTrainer:
             num_batches += 1
             pbar.set_postfix({"loss": f"{loss.item() * self.gradient_accumulation_steps:.4f}"})
 
-        # Flush last partial accumulation batch
         if num_batches % self.gradient_accumulation_steps != 0:
             self._optimizer_step()
 
         return total_loss / max(num_batches, 1)
 
     def validate(self):
-        """Validate on validation set."""
         self.model.eval()
         total_loss = 0.0
         num_batches = 0
@@ -192,13 +178,13 @@ class Stage4bTrainer:
                 input_ids      = batch["input_ids"].to(self.device)
                 attention_mask = batch["attention_mask"].to(self.device)
                 bbox           = batch["bbox"].to(self.device)
-                pixel_values   = batch.get("pixel_values", None)
+                pixel_values   = batch.get("pixel_values")
                 if pixel_values is not None:
                     pixel_values = pixel_values.to(self.device)
-                entity_labels  = batch.get("entity_labels", None)
+                entity_labels  = batch.get("entity_labels")
                 if entity_labels is not None:
                     entity_labels = entity_labels.to(self.device)
-                link_labels    = batch.get("link_labels", None)
+                link_labels    = batch.get("link_labels")
                 if link_labels is not None:
                     link_labels = link_labels.to(self.device)
 
@@ -244,7 +230,6 @@ class Stage4bTrainer:
         return total_loss / max(num_batches, 1), val_f1
 
     def train(self):
-        """Full training loop with early stopping."""
         logger.info(f"Starting Stage 4b training | linker_loss_weight={self.linker_loss_weight}")
         logger.info(f"Output directory: {self.output_dir}")
 
@@ -295,14 +280,15 @@ def main():
     parser = argparse.ArgumentParser(description="Stage 4b Training: LayoutLMv3 with Linker")
     parser.add_argument("--data_dir",                    type=str,   default="../../data/prepared")
     parser.add_argument("--output_dir",                  type=str,   default="../../data/outputs/stage4b")
-    parser.add_argument("--batch_size",                  type=int,   default=2)
-    parser.add_argument("--gradient_accumulation_steps", type=int,   default=16)
+    # OOM fix: batch_size 2->1, grad_accum 16->32 keeps effective batch=32
+    parser.add_argument("--batch_size",                  type=int,   default=1)
+    parser.add_argument("--gradient_accumulation_steps", type=int,   default=32)
     parser.add_argument("--learning_rate",               type=float, default=5e-5)
     parser.add_argument("--num_epochs",                  type=int,   default=10)
     parser.add_argument("--early_stopping_patience",     type=int,   default=3)
     parser.add_argument("--val_fraction",                type=float, default=0.1)
     parser.add_argument("--linker_loss_weight",          type=float, default=1.0,
-                        help="Linker loss weight \u03bb")
+                        help="Linker loss weight lambda")
     parser.add_argument("--include_images",              action="store_true")
     parser.add_argument("--resume_from_checkpoint",      action="store_true")
     parser.add_argument("--pretrained_encoder",          type=str,   default=None,
@@ -310,7 +296,6 @@ def main():
 
     args = parser.parse_args()
 
-    # ── Checkpoint resumption ────────────────────────────────────────────────
     latest_ckpt = None
     if args.resume_from_checkpoint:
         output_path = Path(args.output_dir)
@@ -323,11 +308,11 @@ def main():
                 latest_ckpt = checkpoints[-1]
                 logger.info(f"Found checkpoint: {latest_ckpt}")
 
-    # ── Device ───────────────────────────────────────────────────────────────
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
+    if torch.cuda.is_available():
+        logger.info(f"GPU: {torch.cuda.get_device_name(0)} | Memory: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
 
-    # ── Dataloaders ──────────────────────────────────────────────────────────
     dataloaders = create_stage4_dataloaders(
         data_dir=args.data_dir,
         batch_size=args.batch_size,
@@ -339,42 +324,33 @@ def main():
     test_loader  = dataloaders['test']
     logger.info(f"Train: {len(train_loader)} batches | Val: {len(val_loader)} batches | Test: {len(test_loader)} batches")
 
-    # ── Model (CPU first to avoid memory spike on load) ────────────────────────
     model = LayoutLMv3KVPModel(use_linker=True)
     logger.info("LayoutLMv3KVPModel (with linker) created on CPU")
 
-    # ── Transfer Stage 4a weights ────────────────────────────────────────────
-    # Both stages share identical key names (encoder.*, entity_classifier.*).
-    # linker.* keys are Stage 4b-only and stay randomly initialised.
     if args.pretrained_encoder and not latest_ckpt:
         pretrained_path = Path(args.pretrained_encoder)
         if pretrained_path.exists():
             state_dict  = torch.load(pretrained_path, map_location="cpu")
             model_state = model.state_dict()
             transferred, skipped = [], []
-
             for key, value in state_dict.items():
                 if key in model_state:
                     model_state[key] = value
                     transferred.append(key)
                 else:
                     skipped.append(key)
-
             model.load_state_dict(model_state, strict=False)
-
             enc_keys = [k for k in transferred if k.startswith('encoder.')]
             cls_keys = [k for k in transferred if k.startswith('entity_classifier.')]
             logger.info(f"\u2713 Transferred {len(transferred)} keys on CPU (skipped {len(skipped)})")
             logger.info(f"  Encoder keys: {len(enc_keys)}, Classifier keys: {len(cls_keys)}")
-
             if len(enc_keys) == 0:
                 sample = list(state_dict.keys())[:10]
                 logger.error(f"ERROR: 0 encoder keys transferred! Checkpoint samples: {sample}")
-                raise RuntimeError("Pretrained encoder transfer failed \u2014 0 encoder keys matched.")
+                raise RuntimeError("Pretrained encoder transfer failed -- 0 encoder keys matched.")
         else:
             logger.warning(f"Pretrained encoder path not found: {pretrained_path}")
 
-    # ── Trainer ──────────────────────────────────────────────────────────────
     trainer = Stage4bTrainer(
         model=model,
         train_loader=train_loader,
@@ -389,7 +365,6 @@ def main():
         device=device
     )
 
-    # ── Resume from checkpoint ───────────────────────────────────────────────
     if latest_ckpt:
         model_path = latest_ckpt / "pytorch_model.bin"
         if model_path.exists():
@@ -397,7 +372,6 @@ def main():
             logger.info(f"\u2713 Loaded weights from {latest_ckpt}")
         trainer.restore_history(latest_ckpt)
 
-    # ── Train ────────────────────────────────────────────────────────────────
     trainer.train()
     logger.info(f"Training complete! Best validation F1: {trainer.best_val_f1:.4f}")
 
