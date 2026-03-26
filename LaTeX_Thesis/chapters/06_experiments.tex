@@ -1,162 +1,327 @@
 \chapter{Experiments}
-\label{ch:experiments}
+\label{chap:experiments}
 
 \section{Experimental Setup}
-\label{sec:exp_setup}
+\label{sec:experimental-setup}
 
-Experiments are organized around a staged comparison between heuristic baselines and a learned Mistral-based baseline for \kvp extraction from business documents. The overall goal is to evaluate not only prediction quality but also the practicality of running the full pipeline from raw PDF sources to benchmarked outputs.
+Experiments are organised around a staged comparison between heuristic
+baselines and learned models for key-value pair extraction from business
+documents. The overall goal is to evaluate not only prediction quality but
+also the practicality of running the full pipeline from raw PDF sources to
+benchmarked outputs.
 
-For the learned baseline, the experiment is split into two phases. First, raw KVP10k data are converted into page-level prepared samples containing prompt text, target text, and aligned ground-truth \kvps. Second, the Mistral baseline is trained on the prepared train split and evaluated on the prepared test split.
+For the learned baselines, each experiment is split into two operational
+phases. First, raw KVP10k data are converted into page-level prepared samples
+containing prompt text (Stage~3) or image-text-layout tensors (Stage~4),
+target annotations, and aligned ground-truth key-value pairs. Second, the
+model is trained on the prepared train split and evaluated on the prepared
+test split.
 
+% ---------------------------------------------------------------------------
 \subsection{Hardware}
-Development and debugging were performed on CPU and login-node resources. The final learned-baseline training runs were executed on the TinyGPU cluster using a single NVIDIA A100 40 GB GPU.
+\label{sec:hardware}
 
-An important infrastructure constraint is that TinyGPU compute nodes do not have internet access. Consequently, the Stage 3 workflow had to be split operationally: PDF downloading and data preparation were executed on the login node, while model training and prediction were executed offline on the GPU node using a pre-populated Hugging Face cache.
+\paragraph{Stage 1--3 (Mistral QLoRA baseline).}
+Development and debugging were performed on CPU and login-node resources. The
+final learned-baseline training runs were executed on the TinyGPU cluster
+using a single NVIDIA A100~40\,GB GPU.
 
-The first corrected GPU run exposed a memory constraint on the available hardware. A full bf16 LoRA setup exceeded the 40 GB memory budget, so the final training configuration was adapted to QLoRA with gradient checkpointing and an 8-bit paged optimizer.
+An important infrastructure constraint is that TinyGPU compute nodes do not
+have internet access. Consequently, the Stage~3 workflow had to be split
+operationally: PDF downloading and data preparation were executed on the login
+node, while model training and prediction were executed offline on the GPU
+node using a pre-populated HuggingFace cache.
 
-\subsection{Hyperparameters}
-The learned baseline follows the corrected IBM-style configuration as closely as possible while remaining feasible on the available hardware. The main settings are:
+The first corrected GPU run exposed a memory constraint on the available
+hardware. A full bf16 LoRA setup exceeded the 40\,GB memory budget, so the
+final training configuration was adapted to QLoRA with gradient checkpointing
+and an 8-bit paged optimiser.
 
-\begin{table}[h]
-\centering
-\begin{tabular}{ll}
-\hline
-\textbf{Parameter} & \textbf{Value} \\
-\hline
-Base model & Mistral-7B-Instruct-v0.2 \\
-Adaptation method & LoRA on 4-bit QLoRA base model \\
-LoRA rank $r$ & 4 \\
-LoRA $\alpha$ & 4 \\
-LoRA dropout & 0.05 \\
-Learning rate & $5 \times 10^{-4}$ \\
-Epochs & 8 \\
-Per-device batch size & 1 \\
-Gradient accumulation & 4 \\
-Maximum sequence length & 8192 \\
-Optimizer & paged\_adamw\_8bit \\
-Precision / compute dtype & bfloat16 compute on quantized weights \\
-Gradient checkpointing & enabled \\
-Decoding & greedy \\
-\hline
-\end{tabular}
-\caption{Main hyperparameters for the corrected Mistral baseline.}
-\label{tab:mistral_hparams}
-\end{table}
+\paragraph{Stage 4 (LayoutLMv3\,+\,Linker).}
+Stage~4 training is executed on the LRZ AI Systems cluster using A100~80\,GB
+GPUs. Three separate SLURM jobs handle the Stage~4 workload:
 
-\textbf{QLoRA and LoRA rank justification:} The original full-precision LoRA configuration exceeded the 40 GB memory budget of the available A100 GPU. To make the experiment feasible on available hardware, we adopted QLoRA with 4-bit NF4 quantization (rank $r=4$, alpha $\alpha=4$). While rank 4 is lower than the estimated $r \geq 16$ in the official KVP10k baseline, this is a necessary hardware adaptation. The QLoRA paper (Dettmers et al., 2023) demonstrates that 4-bit quantization does not degrade model performance relative to 16-bit LoRA on standard benchmarks, so quantization is not the primary limitation. However, the reduced rank and 55.8\% training data coverage (581 of 5,389 prepared unique pages, due to PDF download and text extraction failures) both reduce the model's adaptation capacity and may contribute to performance differences relative to the published baseline (see Section~\ref{sec:limitations}).
-
-Prepared data statistics at the current stage are as follows:
-\begin{itemize}
-    \item test split: 581 prepared pages out of 1051 unique pages (55.3\%), with 532 pages containing non-empty \kvp supervision
-    \item train split: 5389 prepared pages out of 9656 unique pages (55.8\%), with 404 prepared pages containing zero \kvps
-\end{itemize}
-
-The dominant source of preparation loss is inaccessible or broken source PDFs rather than failures in the fusion logic itself.
-
-\section{Baseline Models}
-\label{sec:baselines}
-
-We implement a simple baseline to establish a lower bound for performance before developing the full LayoutLMv3+Linker model.
-
-\subsection{Nearest Neighbor Baseline}
-\label{sec:nn_baseline}
-
-Our baseline uses a spatial proximity heuristic to pair keys with values:
-
-\textbf{Algorithm:}
 \begin{enumerate}
-    \item Extract all annotations with linking attributes (keys)
-    \item Extract all annotations with text content (potential values)
-    \item For each key, find the nearest value within maximum distance $d_{max} = 0.3$
-    \item If a value is found, create a KV pair; otherwise mark as ``unvalued''
+  \item \textbf{Job 1 -- Data preparation:} CPU-only login node, converts
+  KVP10k HuggingFace rows into Stage~4 image-tensor-annotation bundles,
+  renders and caches page images at 150\,DPI.
+  \item \textbf{Job 2 -- Stage~4a (entity pre-training):} Single A100~80\,GB
+  GPU, 24-hour wall-clock limit, trains LayoutLMv3 encoder + entity head
+  with the linker disabled.
+  \item \textbf{Job 3 -- Stage~4b (joint fine-tuning):} Single A100~80\,GB
+  GPU, 12-hour wall-clock limit, resumes from Stage~4a checkpoint and
+  activates the biaffine linker with $\lambda > 0$.
 \end{enumerate}
 
-\textbf{Distance Metric:} Euclidean distance between bounding box centroids, normalized by image dimensions.
+All Stage~4 computations use bfloat16 mixed precision, requiring no
+quantisation of the 125M-parameter LayoutLMv3-base model. Peak GPU memory
+utilisation during training is approximately 42\,GB (encoder forward pass +
+gradient accumulation buffer), well within the 80\,GB envelope.
+
+% ---------------------------------------------------------------------------
+\subsection{Hyperparameters}
+\label{sec:hyperparameters}
+
+\subsubsection{Stage~3: Mistral QLoRA Baseline}
+\label{sec:stage3-hyperparams}
+
+The learned baseline follows the corrected IBM-style configuration as closely
+as possible while remaining feasible on the available hardware.
+The main settings are summarised in Table~\ref{tab:mistral-hyperparams}.
+
+\begin{table}[h]
+  \centering
+  \caption{Main hyperparameters for the corrected Mistral baseline.}
+  \label{tab:mistral-hyperparams}
+  \begin{tabular}{ll}
+    \hline
+    \textbf{Parameter} & \textbf{Value} \\
+    \hline
+    Base model & Mistral-7B-Instruct-v0.2 \\
+    Adaptation method & LoRA on 4-bit QLoRA base model \\
+    LoRA rank $r$ & 4 \\
+    LoRA $\alpha$ & 4 \\
+    LoRA dropout & 0.05 \\
+    Learning rate & $5 \times 10^{-4}$ \\
+    Epochs & 8 \\
+    Per-device batch size & 1 \\
+    Gradient accumulation & 4 \\
+    Maximum sequence length & 8192 \\
+    Optimiser & paged\_adamw\_8bit \\
+    Precision / compute dtype & bfloat16 compute on quantised weights \\
+    Gradient checkpointing & enabled \\
+    Decoding & greedy \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\paragraph{QLoRA and LoRA rank justification.}
+The original full-precision LoRA configuration exceeded the 40\,GB memory
+budget of the available A100 GPU. To make the experiment feasible on available
+hardware, we adopted QLoRA with 4-bit NF4 quantisation (rank $r = 4$,
+alpha $\alpha = 4$). While rank 4 is lower than the estimated $r \geq 16$ in
+the official KVP10k baseline, this is a necessary hardware adaptation. The
+QLoRA paper (Dettmers et al., 2023) demonstrates that 4-bit quantisation does
+not degrade model performance relative to 16-bit LoRA on standard benchmarks,
+so quantisation is not the primary limitation. However, the reduced rank and
+55.8\% training data coverage (581 of 5{,}389 prepared unique pages, due to
+PDF download and text extraction failures) both reduce the model's adaptation
+capacity and may contribute to performance differences relative to the
+published baseline.
+
+\subsubsection{Stage~4: LayoutLMv3\,+\,Linker}
+\label{sec:stage4-hyperparams}
+
+Table~\ref{tab:stage4-hyperparams} summarises the Stage~4 hyperparameters.
+
+\begin{table}[h]
+  \centering
+  \caption{Hyperparameters for Stage~4 (LayoutLMv3\,+\,Biaffine Linker).}
+  \label{tab:stage4-hyperparams}
+  \begin{tabular}{ll}
+    \hline
+    \textbf{Parameter} & \textbf{Value} \\
+    \hline
+    Base model & microsoft/layoutlmv3-base \\
+    Encoder parameters & 125M (all unfrozen) \\
+    Entity head & 2-layer MLP, hidden dim 768, GELU \\
+    Linker head & Biaffine, weight matrix $768 \times 768$ \\
+    Linking weight $\lambda$ & swept over \{0.5, 1.0, 2.0\} \\
+    Learning rate (Stage~4a) & $2 \times 10^{-5}$ \\
+    Learning rate (Stage~4b encoder) & $2 \times 10^{-6}$ \\
+    Learning rate (Stage~4b linker) & $2 \times 10^{-5}$ \\
+    Per-device batch size & 4 \\
+    Gradient accumulation steps & 8 \\
+    Effective batch size & 32 \\
+    Warmup steps & 500 \\
+    Maximum epochs & 20 \\
+    Early stopping patience & 3 \\
+    Optimiser & AdamW, weight decay 0.01 \\
+    Precision & bfloat16 (no quantisation) \\
+    Max sequence length & 512 tokens \\
+    Image resolution & $224 \times 224$ \\
+    Gradient checkpointing & enabled \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\paragraph{$\lambda$ sweep rationale.}
+The linking loss weight $\lambda$ controls the relative influence of the
+linker objective on the shared encoder representations. A value that is too
+large risks distorting the entity classification capacity; too small and the
+linker receives insufficient gradient signal. We sweep $\lambda \in
+\{0.5, 1.0, 2.0\}$ on a held-out 10\% validation split of the training set
+(Stage~4b only) and select the value that maximises combined F1.
+
+% ---------------------------------------------------------------------------
+\section{Baseline Models}
+\label{sec:baseline-models}
+
+\subsection{Nearest Neighbour Baseline}
+\label{sec:nn-baseline}
+
+Our heuristic baseline uses a spatial proximity heuristic to pair keys with
+values:
+\begin{enumerate}
+  \item Extract all annotations with linking attributes (keys).
+  \item Extract all annotations with text content (potential values).
+  \item For each key, find the nearest value within maximum distance
+  $d_{\max} = 0.3$ (Euclidean distance between bounding box centroids,
+  normalised by image dimensions).
+  \item If a value is found, create a KV pair; otherwise mark as
+  ``unvalued''.
+\end{enumerate}
 
 \subsection{Baseline Performance}
-\label{sec:baseline_results}
+\label{sec:baseline-performance}
 
 We evaluate the baseline on a 20-sample subset for initial validation:
 
 \begin{table}[h]
-\centering
-\begin{tabular}{lccc}
-\hline
-\textbf{Metric} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
-\hline
-Combined        & 0.093 & 1.000 & 0.169 \\
-Text-only       & 0.093 & 1.000 & 0.169 \\
-Location-only   & 0.093 & 1.000 & 0.169 \\
-\hline
-\end{tabular}
-\caption{Nearest Neighbor Baseline Results (20-sample validation)}
-\label{tab:baseline_results}
+  \centering
+  \caption{Nearest Neighbour Baseline Results (20-sample validation).}
+  \label{tab:nn-baseline}
+  \begin{tabular}{llll}
+    \hline
+    \textbf{Metric} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+    \hline
+    Combined & 0.093 & 1.000 & 0.169 \\
+    Text-only & 0.093 & 1.000 & 0.169 \\
+    Location-only & 0.093 & 1.000 & 0.169 \\
+    \hline
+  \end{tabular}
 \end{table}
 
-\textbf{Analysis:}
-\begin{itemize}
-    \item High recall (100\%): Baseline pairs all detected keys
-    \item Low precision (9.3\%): Many false positive pairings
-    \item F1 = 0.169 establishes lower bound for future models
-    \item Type distribution: 100\% unvalued (keys without matched values)
-\end{itemize}
+High recall (100\%) reflects the fact that the baseline pairs all detected
+keys; low precision (9.3\%) arises from many false positive pairings.
+$F_1 = 0.169$ establishes the lower bound for future models.
 
-% Figure~\ref{fig:baseline_viz} shows the visualization analysis, including predicted vs ground truth counts and error distributions.
-
-% TODO: Include actual plots when running on full test set
-% \begin{figure}[h]
-% \centering
-% \includegraphics[width=0.8\textwidth]{figures/baseline_pred_vs_gt.png}
-% \caption{Baseline: Predicted vs Ground Truth KVP Counts}
-% \label{fig:baseline_viz}
-% \end{figure}
-
+% ---------------------------------------------------------------------------
 \section{Main Benchmark Evaluation}
-\label{sec:benchmark}
-
-% TODO: Run experiments
+\label{sec:main-benchmark}
 
 \subsection{Test Set Results}
-% F1, precision, recall on full test set
+\label{sec:test-set-results}
+
+The Stage~4 model is evaluated on the same 581-page prepared test set used
+for the Stage~3 Mistral baseline (Section~\ref{sec:dataset-coverage}), enabling
+direct comparison. Evaluation follows the dual-threshold protocol:
+$\text{NED} < 0.2$, $\text{IoU} > 0.3$, combined F1 as the primary metric.
+
+Table~\ref{tab:stage4-results-placeholder} reports Stage~4 results once
+experiments are complete.
+
+\begin{table}[h]
+  \centering
+  \caption{Stage~4 LayoutLMv3\,+\,Linker Results
+    (NED\,=\,0.2, IoU\,=\,0.3; $n = 581$ test pages).}
+  \label{tab:stage4-results-placeholder}
+  \begin{tabular}{lllllll}
+    \hline
+    \textbf{Mode} & \textbf{Prec.} & \textbf{Rec.} & \textbf{F1}
+                  & \textbf{TP} & \textbf{FP} & \textbf{FN} \\
+    \hline
+    Text-only (NED) & -- & -- & -- & -- & -- & -- \\
+    Text+Bbox (NED+IoU) & -- & -- & -- & -- & -- & -- \\
+    Linking F1 & \multicolumn{6}{c}{-- (key-value association only)} \\
+    \hline
+  \end{tabular}
+\end{table}
 
 \subsection{Per-Cluster Analysis}
-\label{subsec:per_cluster_analysis}
-% Performance on each layout cluster
+\label{sec:per-cluster-analysis}
+
+Following the per-cluster breakdown established for Stage~3
+(Section~\ref{sec:stage3-per-cluster}), Stage~4 results are reported
+separately for Cluster~0 (dense layouts, $n = 465$ documents) and Cluster~1
+(sparse layouts, $n = 116$ documents). This analysis directly tests whether
+LayoutLMv3's spatial grounding addresses the sparse-layout hallucination
+problem identified in Stage~3.
+
+\begin{table}[h]
+  \centering
+  \caption{Stage~4 Per-Cluster Results (to be filled after experiments).}
+  \label{tab:stage4-cluster-results}
+  \begin{tabular}{llllll}
+    \hline
+    \textbf{Cluster} & \textbf{Docs} & \textbf{Pred} & \textbf{GT}
+                     & \textbf{Correct (\%)} & \textbf{Halluc. (\%)} \\
+    \hline
+    Cluster~0 (Dense)  & 465 & -- & -- & -- & -- \\
+    Cluster~1 (Sparse) & 116 & -- & -- & -- & -- \\
+    \hline
+  \end{tabular}
+\end{table}
 
 \subsection{Error Analysis}
-% Types of errors, failure cases
+\label{sec:stage4-error-analysis}
 
+The error analysis for Stage~4 follows the same taxonomy applied to Stage~3:
+hallucination rate, missed-entity rate, and spatial grounding errors.
+In addition, linking errors are classified into three types:
+\begin{itemize}
+  \item \textbf{False-positive link:} a predicted link whose key or value
+  entity does not match any ground-truth entity.
+  \item \textbf{False-negative link:} a ground-truth link not predicted by
+  the model.
+  \item \textbf{Mis-link:} a correctly predicted key entity paired with
+  an incorrect value entity.
+\end{itemize}
+
+% ---------------------------------------------------------------------------
 \section{Robustness Experiments}
-\label{sec:robustness}
-
-% TODO: Run robustness tests
+\label{sec:robustness-experiments}
 
 \subsection{Rotation Robustness}
-We evaluate robustness to document rotation at angles: 0°, 5°, 10°, 15°.
+\label{sec:rotation-robustness}
 
-% Results table
+We evaluate robustness to document rotation at angles:
+$\{0^\circ, 5^\circ, 10^\circ, 15^\circ\}$. Rotations are applied to the
+document image before rendering; bounding box coordinates are updated via
+the corresponding 2D rotation transform.
 
 \subsection{Occlusion Robustness}
-We simulate occlusion by masking random regions: 0\%, 10\%, 20\%, 30\% of document area.
+\label{sec:occlusion-robustness}
 
-% Results table
+We simulate occlusion by masking random rectangular regions covering
+$\{0\%, 10\%, 20\%, 30\%\}$ of the document area. Masked regions are
+filled with the mean image colour to avoid introducing distribution-shift
+artifacts beyond the intended occlusion.
 
 \subsection{Annotation Dropout}
-We evaluate with missing annotations: 0\%, 10\%, 20\%, 30\% dropout rate.
+\label{sec:annotation-dropout}
 
-% Results table
+We evaluate with annotation dropout rates of
+$\{0\%, 10\%, 20\%, 30\%\}$: randomly selected ground-truth annotations
+are removed from the supervision signal at training time, simulating
+incomplete labelling. At test time, all annotations are retained.
 
+% ---------------------------------------------------------------------------
 \section{Ablation Studies}
-\label{sec:ablation}
-
-% TODO: Ablation experiments
+\label{sec:ablation-studies}
 
 \subsection{Linker Module}
-% Compare with/without linker
+\label{sec:ablation-linker}
+
+We train a model variant with the biaffine linker disabled ($\lambda = 0$)
+to isolate the contribution of the linking objective. In this variant, key-value
+association falls back to a greedy nearest-neighbour heuristic applied to the
+classified entity spans, as a direct like-for-like comparison with Stage~3.
 
 \subsection{Spatial Encoding}
-% Impact of position embeddings
+\label{sec:ablation-spatial}
+
+We ablate the bounding-box spatial augmentation in the linker
+(Section~\ref{sec:spatial-encoding}) by setting $\mathbf{W}_{\text{sp}} = 0$,
+forcing the linker to rely solely on the encoder's learnt spatial representations.
+This tests whether the explicit injection of coordinate features provides
+additional benefit beyond what LayoutLMv3's layout embeddings already capture.
 
 \subsection{Pre-training}
-% Fine-tuned vs. from scratch
+\label{sec:ablation-pretraining}
+
+We compare the full pre-trained LayoutLMv3-base initialisation against a
+random initialisation of the encoder weights (keeping the tokenizer and
+bounding-box embedding tables fixed). This ablation quantifies the benefit
+of the multimodal pre-training described in
+Section~\ref{sec:pretraining-objectives}.

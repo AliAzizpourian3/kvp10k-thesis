@@ -1,75 +1,248 @@
 \chapter{Methodology}
-\label{ch:methodology}
+\label{chap:methodology}
 
 \section{Overview}
-\label{sec:method_overview}
+\label{sec:methodology-overview}
 
-% TODO: Describe overall approach
+Our approach addresses key-value pair extraction as a two-stage discriminative
+problem: (i)~\emph{entity classification}, which assigns each text token a role
+(\textsc{key}, \textsc{value}, or \textsc{other}); and (ii)~\emph{linking},
+which pairs each predicted key span with its corresponding value span.
+Both tasks are solved jointly by a single LayoutLMv3-based model augmented
+with a biaffine linker head, trained end-to-end on the KVP10k dataset.
 
-Our approach combines three key components:
-\begin{enumerate}
-    \item \textbf{LayoutLMv3 Encoder}: Multimodal document understanding
-    \item \textbf{Transformer Decoder}: Generative \kvp{} extraction
-    \item \textbf{Attention Linker}: Explicit key-value association
-\end{enumerate}
+Figure~\ref{fig:architecture-overview} provides a schematic overview.
+The encoder receives token sequences together with 2D bounding-box coordinates
+and document image patches. Its output representations are consumed in parallel
+by the entity-classification head and the biaffine linker head, keeping the
+architecture simple and the number of parameters small.
 
+\begin{figure}[h]
+  \centering
+  % placeholder: replace with actual architecture diagram
+  \fbox{\parbox{0.8\textwidth}{\centering\vspace{2cm}Architecture diagram\\(to be added)\vspace{2cm}}}
+  \caption{Overview of the proposed LayoutLMv3 + Biaffine Linker architecture.
+    Token representations produced by the encoder are fed to two heads:
+    an entity classifier (BIO tagging) and a biaffine linker (pairwise key-value scoring).}
+  \label{fig:architecture-overview}
+\end{figure}
+
+% ---------------------------------------------------------------------------
 \section{LayoutLMv3 Encoder}
-\label{sec:encoder}
-
-% TODO: Describe encoder architecture
+\label{sec:layoutlmv3-encoder}
 
 \subsection{Input Representation}
-% Text tokens, position embeddings, image features
+\label{sec:input-representation}
+
+LayoutLMv3~\cite{huang2022layoutlmv3} accepts three parallel input streams that
+are fused inside the transformer backbone.
+
+\paragraph{Text tokens.}
+The OCR word sequence is tokenised with the LayoutLMv3 tokenizer (a byte-pair
+encoding vocabulary of 50{,}265 entries). A \texttt{[CLS]} token is prepended
+and a \texttt{[SEP]} token appended. For multi-word entities, the bounding box
+of the first sub-word token is used for the whole entity.
+
+\paragraph{Layout embeddings.}
+Each token is associated with its bounding box on a normalised $1000 \times 1000$
+coordinate grid. Following the LayoutLMv3 convention, six scalar values are
+derived per token:
+\[
+  \mathbf{b}_i = (x_{\min},\, y_{\min},\, x_{\max},\, y_{\max},\, w,\, h)
+\]
+where $w = x_{\max} - x_{\min}$ and $h = y_{\max} - y_{\min}$. Each scalar
+is embedded independently with a learnable embedding table and the six
+embeddings are summed with the text token embedding before the first
+transformer layer.
+
+\paragraph{Image patch embeddings.}
+The document image is resized to $224 \times 224$ pixels and split into
+$16 \times 16 = 196$ non-overlapping patches of size $14 \times 14$.
+Each patch is projected to the model hidden dimension $d = 768$ via a
+learnable linear layer. A 2D sine-cosine positional encoding is added to
+preserve patch location. The resulting 196 patch tokens are concatenated with
+the text tokens to form the full input sequence.
 
 \subsection{Self-Attention Mechanism}
-% Multimodal self-attention
+\label{sec:self-attention}
+
+LayoutLMv3 uses a standard multi-head self-attention with $H = 12$ heads and
+hidden dimension $d = 768$. The spatial-aware bias introduced in
+LayoutLMv2~\cite{xu2021layoutlmv2} is \emph{not} re-applied; instead, layout
+information is injected through the embedding summing described above, allowing
+the standard dot-product attention to propagate spatial signals across layers.
+Cross-modal attention between text tokens and image patch tokens is unrestricted,
+enabling the model to ground textual entities in specific image regions.
 
 \subsection{Pre-training Objectives}
-% Masked language modeling, masked image modeling
+\label{sec:pretraining-objectives}
 
-\section{Decoder Architecture}
-\label{sec:decoder}
+The LayoutLMv3 checkpoint used in this work
+(\texttt{microsoft/layoutlmv3-base}) was pre-trained on IIT-CDIP with three
+objectives~\cite{huang2022layoutlmv3}:
 
-% TODO: Describe decoder
+\begin{enumerate}
+  \item \textbf{Masked Language Modelling (MLM):} 15\% of text tokens are masked
+  and the model predicts the missing tokens, encouraging semantic text understanding.
+  \item \textbf{Masked Image Modelling (MIM):} 40\% of image patches are masked
+  and the model reconstructs the discrete token index of each patch (using a
+  pre-trained image tokenizer), encouraging visual-spatial grounding.
+  \item \textbf{Word-Patch Alignment (WPA):} The model predicts whether a text
+  token and an image patch originate from the same document region, creating
+  explicit cross-modal alignment supervision.
+\end{enumerate}
 
-\subsection{T5 Decoder (Development)}
-% CPU-friendly model
+These pre-training objectives give the encoder strong initialisation for both
+textual and layout-spatial understanding, reducing the amount of task-specific
+fine-tuning data required.
 
-\subsection{Mistral Decoder (Production)}
-% GPU model for final experiments
+% ---------------------------------------------------------------------------
+\section{Task Head: Entity Classifier}
+\label{sec:entity-classifier}
 
-\section{Attention-based Linker}
-\label{sec:linker}
+Rather than a sequence-to-sequence decoder, we frame extraction as token
+classification. The entity head maps each text token representation to one of
+three classes: \texttt{O} (other), \texttt{KEY}, \texttt{VALUE}.
 
-% TODO: Describe linker mechanism
+\paragraph{Architecture.}
+Let $\mathbf{H} \in \mathbb{R}^{N \times d}$ denote the encoder output for
+$N$ text tokens. A two-layer MLP with GELU activations projects each token to
+logits:
+\[
+  \hat{y}_i = \operatorname{softmax}\!\bigl(\mathbf{W}_2\,
+    \operatorname{GELU}(\mathbf{W}_1\,\mathbf{h}_i + \mathbf{b}_1) +
+    \mathbf{b}_2\bigr)
+\]
+where $\mathbf{W}_1 \in \mathbb{R}^{d \times d}$,
+$\mathbf{W}_2 \in \mathbb{R}^{d \times 3}$. Dropout with $p = 0.1$ is applied
+after the first projection.
+
+\paragraph{Why token classification instead of generation?}
+Generative baselines (Stage~3 Mistral) demonstrated strong text recall but
+poor spatial grounding and systematic over-prediction on sparse layouts
+(Section~\ref{sec:per-cluster-analysis}). Token classification is grounded by
+construction — predictions are tied to OCR tokens with known bounding boxes —
+eliminating the spatial anchoring problem entirely.
+
+% ---------------------------------------------------------------------------
+\section{Biaffine Linker}
+\label{sec:biaffine-linker}
 
 \subsection{Key-Value Attention}
-% Cross-attention between keys and values
+\label{sec:kv-attention}
+
+After entity spans are predicted, the linker determines which \textsc{key}
+span should be paired with which \textsc{value} span. We adopt the biaffine
+attention formulation~\cite{dozat2017biaffine}, which has been used successfully
+for dependency parsing and entity relation modelling.
+
+Let $\mathbf{k}_i \in \mathbb{R}^{d}$ and $\mathbf{v}_j \in \mathbb{R}^{d}$
+denote the span representations (mean-pooled encoder outputs) of the $i$-th
+key entity and $j$-th value entity, respectively. The linking score is:
+\[
+  s_{ij} = \mathbf{k}_i^\top \mathbf{W}_{\text{link}}\, \mathbf{v}_j
+  + \mathbf{w}_k^\top \mathbf{k}_i
+  + \mathbf{w}_v^\top \mathbf{v}_j
+  + b
+\]
+where $\mathbf{W}_{\text{link}} \in \mathbb{R}^{d \times d}$,
+$\mathbf{w}_k, \mathbf{w}_v \in \mathbb{R}^{d}$, and $b \in \mathbb{R}$
+are learnable parameters. A sigmoid applied to $s_{ij}$ gives the probability
+that key $i$ and value $j$ form a valid pair.
 
 \subsection{Spatial Encoding}
-% Encoding spatial relationships
+\label{sec:spatial-encoding}
 
+Before the biaffine operation, each span representation is augmented with a
+spatial feature vector derived from the bounding box of the span:
+\[
+  \tilde{\mathbf{k}}_i = \mathbf{k}_i + \mathbf{W}_{\text{sp}}\,\mathbf{b}_i
+\]
+where $\mathbf{b}_i = (x_c, y_c, w, h) \in \mathbb{R}^4$ is the
+centroid-and-size representation of the span bounding box and
+$\mathbf{W}_{\text{sp}} \in \mathbb{R}^{d \times 4}$ is a learnable
+projection. The same augmentation is applied to value representations.
+This explicit injection of spatial context helps the linker score proximate
+key-value pairs higher, consistent with the spatial proximity finding in
+Section~\ref{sec:kv-link-analysis}.
+
+% ---------------------------------------------------------------------------
 \section{Training Procedure}
-\label{sec:training}
-
-% TODO: Describe training
+\label{sec:training-procedure}
 
 \subsection{Loss Function}
-% Combined text + location loss
+\label{sec:loss-function}
 
-\subsection{Optimization}
-% AdamW, learning rate schedule
+The model is trained with a joint loss combining entity classification and
+linking:
+\[
+  \mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda\,\mathcal{L}_{\text{link}}
+  \tag{3.1}
+\]
+where:
+\begin{itemize}
+  \item $\mathcal{L}_{\text{entity}}$ is the cross-entropy loss over
+  \{\texttt{O, KEY, VALUE}\} for each text token.
+  \item $\mathcal{L}_{\text{link}}$ is the binary cross-entropy loss over all
+  ground-truth key-value pairs, treating non-linked pairs as negatives.
+  \item $\lambda$ is a weighting hyperparameter swept over
+  $\{0.5, 1.0, 2.0\}$ during development (see Section~\ref{sec:stage4-hyperparams}).
+\end{itemize}
+
+Class imbalance in the entity objective (the \texttt{O} class dominates) is
+addressed by assigning inverse-frequency class weights.
+
+\subsection{Optimisation}
+\label{sec:optimisation}
+
+We use AdamW~\cite{loshchilov2019decoupled} with weight decay $0.01$ and a
+linear warmup of 500 steps followed by linear decay to zero. The effective
+batch size is 32, achieved through gradient accumulation over 8 steps with a
+per-device batch size of 4. Training runs for a maximum of 20 epochs with
+early stopping (patience~$= 3$) on the validation combined F1 score.
+
+Mixed precision training in bfloat16 is enabled throughout Stage~4 (see
+Section~\ref{sec:stage4-training-loop} for cluster-level details). Unlike the
+QLoRA setup required for Stage~3 (which had to quantise the 7B-parameter
+Mistral model to fit within 40\,GB), the LayoutLMv3-base model (125M parameters)
+fits comfortably in full bf16 on a single A100~80\,GB GPU.
 
 \subsection{Data Augmentation}
-% Rotation, noise, etc.
+\label{sec:data-augmentation}
 
+Light data augmentation is applied during Stage~4 training:
+\begin{itemize}
+  \item \textbf{Coordinate jitter:} Bounding box coordinates are perturbed by
+  at most $\pm 2$ normalised units to simulate minor OCR localisation errors.
+  \item \textbf{Token dropout:} With probability 0.05, individual text tokens
+  are replaced by the \texttt{[MASK]} token, encouraging robustness to OCR
+  noise.
+  \item \textbf{Rotation:} Pages are rotated by $\{0^\circ, 5^\circ, 10^\circ,
+  15^\circ\}$ during training (using the same perturbations applied in
+  robustness evaluation) so the model encounters varied orientations.
+\end{itemize}
+Image-level augmentation (brightness, contrast) is applied with low probability
+($p = 0.1$) using standard torchvision transforms.
+
+% ---------------------------------------------------------------------------
 \section{Inference}
 \label{sec:inference}
 
-% TODO: Describe inference procedure
+\subsection{Greedy Decoding and Span Extraction}
+\label{sec:greedy-decoding}
 
-\subsection{Beam Search}
-% Decoding strategy
+At inference time, the entity head produces per-token logits which are
+argmax-decoded to \{\texttt{O, KEY, VALUE}\} labels. Consecutive tokens with
+the same non-\texttt{O} label are merged into spans. The bounding box of a
+span is the tight union box over all constituent token boxes.
 
-\subsection{Post-processing}
-% NMS, filtering, etc.
+\subsection{Linking and Post-processing}
+\label{sec:post-processing}
+
+The biaffine linker scores all key–value span pairs. We apply a sigmoid
+threshold of 0.5 to determine valid links; each key is matched to at most one
+value (the highest-scoring valid pair). Unmatched keys are emitted as
+\emph{unvalued-key} annotations and unmatched values as
+\emph{unkeyed-value} annotations, matching the KVP10k annotation convention.
+No beam search or constrained decoding is applied: the discriminative
+formulation avoids the need for autoregressive search entirely.
