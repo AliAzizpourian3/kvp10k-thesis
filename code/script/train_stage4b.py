@@ -351,11 +351,24 @@ def main():
             state_dict = torch.load(pretrained_path, map_location=device_cpu)
             logger.info(f"Loaded pretrained checkpoint from {pretrained_path} on CPU")
             
-            # Transfer layoutlmv3 encoder + entity_classifier weights from Stage 4a
+            # Transfer encoder + entity_classifier weights from Stage 4a
+            # Stage 4a uses "encoder.*" keys, need to map to Stage 4b's "layoutlmv3.*" keys
             model_state = model.state_dict()
             transferred_keys = []
+            
             for key, value in state_dict.items():
-                if key.startswith("layoutlmv3") or key.startswith("entity_classifier"):
+                # Handle encoder key mapping: encoder.* -> layoutlmv3.*
+                if key.startswith("encoder."):
+                    # Map encoder.* to layoutlmv3.*
+                    new_key = "layoutlmv3." + key[8:]  # Remove "encoder." prefix and add "layoutlmv3."
+                    if new_key in model_state:
+                        model_state[new_key] = value
+                        transferred_keys.append(new_key)
+                    else:
+                        logger.warning(f"Mapped key {new_key} not found in Stage 4b model")
+                
+                # Transfer entity_classifier keys directly
+                elif key.startswith("entity_classifier"):
                     if key in model_state:
                         model_state[key] = value
                         transferred_keys.append(key)
@@ -364,7 +377,9 @@ def main():
             
             model.load_state_dict(model_state, strict=False)
             logger.info(f"✓ Transferred {len(transferred_keys)} weight keys on CPU")
-            logger.info(f"  Encoder keys: {len([k for k in transferred_keys if k.startswith('layoutlmv3')])}, Classifier keys: {len([k for k in transferred_keys if k.startswith('entity_classifier')])}")
+            encoder_keys = [k for k in transferred_keys if k.startswith('layoutlmv3')]
+            classifier_keys = [k for k in transferred_keys if k.startswith('entity_classifier')]
+            logger.info(f"  Encoder keys: {len(encoder_keys)}, Classifier keys: {len(classifier_keys)}")
         else:
             logger.warning(f"Pretrained encoder path not found: {pretrained_path}")
     
