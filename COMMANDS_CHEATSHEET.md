@@ -155,17 +155,37 @@ File:
 - Logs: `/home/woody/iwi5/iwi5413h/kvp10k_thesis/logs`
 - Thesis: `/home/woody/iwi5/iwi5413h/kvp10k_thesis/LaTeX_Thesis`
 
-## 8. Current Job IDs (Stage 4 - LayoutLMv3 Patch Token Truncation Fix)
+## 8. Current Job IDs (Stage 4 - Tensor Reshape Fix)
 
 **Stage 4a (Entity Classification):**
-- Job ID: `1557830` (kvp_stage4a_layout) — PENDING ✅
+- Job ID: `1557881` (kvp_stage4a_layout) — PENDING ✅
 
 **Stage 4b (Entity + Relation, λ Sweep):**
-- Lambda 0.5: `1557831` (kvp_stage4b_l05) — PENDING ✅
-- Lambda 1.0: `1557832` (kvp_stage4b_l10) — PENDING ✅
-- Lambda 2.0: `1557833` (kvp_stage4b_l20) — PENDING ✅
+- Lambda 0.5: `1557882` (kvp_stage4b_l05) — PENDING ✅
+- Lambda 1.0: `1557883` (kvp_stage4b_l10) — PENDING ✅
+- Lambda 2.0: `1557884` (kvp_stage4b_l20) — PENDING ✅
 
 **Status**: 4 PENDING on A100
+
+### NEW FIX: Tensor Contiguity (Commit f417fd5):
+
+**Bug**: RuntimeError: `view size is not compatible with input tensor's size and stride`
+- After truncating entity_logits to text_seq_len, the tensor becomes non-contiguous in memory
+- `.view()` requires contiguous tensors and fails
+- `.reshape()` handles non-contiguous tensors automatically
+
+**Fix Applied**:
+- Replaced all `.view()` calls with `.reshape()` in loss computation
+- Line 361: `entity_logits.reshape(-1, self.num_labels)[active_loss]`
+- Line 362: `entity_labels.reshape(-1)[active_loss]`
+- Also line 360: `active_loss = attention_mask.reshape(-1) == 1`
+
+### All 4 Fixes Now Applied:
+
+1. ✅ **layoutlm_model.py (1ce23fd)** — Variable shadowing fix
+2. ✅ **train_stage4a.py (6bdde45)** — Checkpoint history restoration  
+3. ✅ **train_stage4b.py (de38918)** — Checkpoint history restoration
+4. ✅ **layoutlm_model.py (f417fd5)** — Tensor reshape for contiguity ← **NEW**
 
 ### LayoutLMv3 Patch Token Truncation Fix (ROOT CAUSE):
 
@@ -194,5 +214,5 @@ This is the standard LayoutLMv3 fine-tuning approach from the official code.
 
 **Monitor Stage 4a:**
 ```bash
-tail -f logs/kvp_stage4a_layout-1557830.out
+tail -f logs/kvp_stage4a_layout-1557881.out
 ```

@@ -43,9 +43,8 @@ class LayoutLMv3Encoder(nn.Module):
         self.model = LayoutLMv3Model.from_pretrained(model_name)
         self.hidden_size = self.model.config.hidden_size
 
-        # Enable gradient checkpointing to reduce memory during backward pass.
-        # Trades ~20% speed for ~40% memory saving on the encoder.
-        self.model.gradient_checkpointing_enable()
+        # Note: LayoutLMv3 does not support gradient checkpointing.
+        # Memory optimization is handled via mixed precision (fp16) training.
         
         if freeze_base:
             # Freeze base model, only train task heads

@@ -12,6 +12,7 @@ Implements:
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from torch.cuda.amp import autocast, GradScaler
 from transformers import LayoutLMv3Processor, get_linear_schedule_with_warmup
 from torch.optim import AdamW
 from tqdm import tqdm
@@ -78,6 +79,9 @@ class Stage4bTrainer:
         }
         self.best_val_f1 = 0.0
         self.patience_counter = 0
+        
+        # Mixed precision training for memory efficiency
+        self.scaler = GradScaler(enabled=True)
 
     def restore_history(self, checkpoint_dir: Path):
         """
@@ -118,35 +122,39 @@ class Stage4bTrainer:
             if link_labels is not None:
                 link_labels = link_labels.to(self.device)
             
-            # Forward pass
-            outputs = self.model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                bbox=bbox,
-                pixel_values=pixel_values,
-                entity_labels=entity_labels,
-                link_labels=link_labels
-            )
+            # Forward pass with mixed precision (fp16)
+            with autocast(enabled=True):
+                outputs = self.model(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    bbox=bbox,
+                    pixel_values=pixel_values,
+                    entity_labels=entity_labels,
+                    link_labels=link_labels
+                )
+                
+                # Extract separate losses and apply lambda weight
+                entity_loss = outputs.get('entity_loss')
+                link_loss = outputs.get('link_loss')
+                
+                if entity_loss is not None and link_loss is not None:
+                    loss = entity_loss + self.linker_loss_weight * link_loss
+                elif entity_loss is not None:
+                    loss = entity_loss
+                else:
+                    loss = outputs['loss']
+                
+                # Scale loss for gradient accumulation
+                loss = loss / self.gradient_accumulation_steps
             
-            # Extract separate losses and apply lambda weight
-            entity_loss = outputs.get('entity_loss')
-            link_loss = outputs.get('link_loss')
-            
-            if entity_loss is not None and link_loss is not None:
-                loss = entity_loss + self.linker_loss_weight * link_loss
-            elif entity_loss is not None:
-                loss = entity_loss
-            else:
-                loss = outputs['loss']
-            
-            # Scale loss for gradient accumulation
-            loss = loss / self.gradient_accumulation_steps
-            loss.backward()
+            # Backward pass with gradient scaling
+            self.scaler.scale(loss).backward()
             
             # Step optimizer every N batches
             if (batch_idx + 1) % self.gradient_accumulation_steps == 0:
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-                self.optimizer.step()
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
                 self.scheduler.step()
                 self.optimizer.zero_grad()
             
