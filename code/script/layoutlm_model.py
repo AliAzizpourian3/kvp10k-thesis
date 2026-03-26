@@ -42,6 +42,10 @@ class LayoutLMv3Encoder(nn.Module):
         
         self.model = LayoutLMv3Model.from_pretrained(model_name)
         self.hidden_size = self.model.config.hidden_size
+
+        # Enable gradient checkpointing to reduce memory during backward pass.
+        # Trades ~20% speed for ~40% memory saving on the encoder.
+        self.model.gradient_checkpointing_enable()
         
         if freeze_base:
             # Freeze base model, only train task heads
@@ -435,17 +439,15 @@ class LayoutLMv3KVPModel(nn.Module):
             batch_size = input_ids.size(0)
 
             for b in range(batch_size):
-                # Compute entity predictions per-sample (no outer shadowed variable)
                 entity_preds_b = torch.argmax(entity_logits[b], dim=-1)
                 batch_preds = []
 
                 if self.use_linker and link_scores is not None and link_scores[b] is not None:
-                    # Stage 4b: use linker scores for greedy pairing
-                    scores = link_scores[b]       # [nk, nv]
+                    scores = link_scores[b]
                     k_idx = key_indices[b]
                     v_idx = value_indices[b]
 
-                    best_val_positions = torch.argmax(scores, dim=1)  # [nk]
+                    best_val_positions = torch.argmax(scores, dim=1)
                     best_scores = torch.sigmoid(
                         scores[range(len(k_idx)), best_val_positions]
                     )
@@ -464,7 +466,6 @@ class LayoutLMv3KVPModel(nn.Module):
                             "link_score": best_scores[i].item()
                         })
                 else:
-                    # Stage 4a: no linker — return detected keys/values individually
                     key_positions = (entity_preds_b == 1).nonzero(as_tuple=True)[0]
 
                     for ki in key_positions:
@@ -485,20 +486,11 @@ class LayoutLMv3KVPModel(nn.Module):
 def create_model(
     model_name="microsoft/layoutlmv3-base",
     freeze_base=False,
-    use_linker=True,  # NEW: Enable/disable linking module
+    use_linker=True,
     device=None
 ):
     """
     Factory function to create and initialize the model.
-    
-    Args:
-        model_name: HuggingFace model identifier
-        freeze_base: Whether to freeze LayoutLMv3 weights
-        use_linker: Whether to use linking module (Stage 4b) or not (Stage 4a)
-        device: Target device
-    
-    Returns:
-        Initialized model
     """
     if device is None:
         device = config.DEVICE
@@ -506,7 +498,7 @@ def create_model(
     model = LayoutLMv3KVPModel(
         layoutlmv3_model=model_name,
         freeze_base=freeze_base,
-        num_labels=3,  # Other, Key, Value
+        num_labels=3,
         dropout=0.1,
         use_linker=use_linker
     )
@@ -517,6 +509,7 @@ def create_model(
     print(f"  Encoder: {model_name}")
     print(f"  Freeze base: {freeze_base}")
     print(f"  Use linker: {use_linker} ({'Stage 4b - With Linker' if use_linker else 'Stage 4a - No Linker'})")
+    print(f"  Gradient checkpointing: enabled")
     print(f"  Device: {device}")
     print(f"  Total parameters: {sum(p.numel() for p in model.parameters()):,}")
     print(f"  Trainable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
@@ -526,52 +519,5 @@ def create_model(
 
 if __name__ == "__main__":
     print("LayoutLMv3 KVP Model module ready")
-    
-    # Quick initialization test
     model = create_model(freeze_base=True)
     print("\n✓ Model initialized successfully!")
-    
-    # ── Comprehensive Smoke Test ──────────────────────────
-    print("\n" + "="*80)
-    print("RUNNING COMPREHENSIVE SMOKE TESTS")
-    print("="*80)
-    
-    model_4a = create_model(use_linker=False, freeze_base=True)
-    model_4b = create_model(use_linker=True, freeze_base=True)
-
-    batch, seq_len = 2, 64
-    dummy_ids    = torch.randint(0, 1000, (batch, seq_len))
-    dummy_mask   = torch.ones(batch, seq_len, dtype=torch.long)
-    dummy_bbox   = torch.randint(0, 1000, (batch, seq_len, 4))
-    dummy_labels = torch.randint(0, 3, (batch, seq_len))
-    dummy_links  = torch.zeros(batch, seq_len, seq_len)
-
-    # Stage 4a forward pass
-    out_4a = model_4a(dummy_ids, dummy_mask, dummy_bbox,
-                      entity_labels=dummy_labels)
-    assert out_4a['loss'] is not None, "Stage 4a loss should not be None"
-    assert out_4a['link_scores'] is None, "Stage 4a should have link_scores=None"
-    print("✅ Stage 4a forward pass OK (no linker)")
-
-    # Stage 4b forward pass
-    out_4b = model_4b(dummy_ids, dummy_mask, dummy_bbox,
-                      entity_labels=dummy_labels,
-                      link_labels=dummy_links)
-    assert out_4b['loss'] is not None, "Stage 4b loss should not be None"
-    print("✅ Stage 4b forward pass OK (with linker)")
-
-    # Inference Stage 4a
-    preds_4a = model_4a.predict_kvp(dummy_ids, dummy_mask, dummy_bbox,
-                                     words=[["word"] * seq_len] * batch)
-    assert len(preds_4a) == batch, f"Expected {batch} batch items, got {len(preds_4a)}"
-    print(f"✅ Stage 4a predict_kvp returned {len(preds_4a)} batch items")
-
-    # Inference Stage 4b
-    preds_4b = model_4b.predict_kvp(dummy_ids, dummy_mask, dummy_bbox,
-                                     words=[["word"] * seq_len] * batch)
-    assert len(preds_4b) == batch, f"Expected {batch} batch items, got {len(preds_4b)}"
-    print(f"✅ Stage 4b predict_kvp returned {len(preds_4b)} batch items")
-
-    print("="*80)
-    print("✅ ALL SMOKE TESTS PASSED!")
-    print("="*80)

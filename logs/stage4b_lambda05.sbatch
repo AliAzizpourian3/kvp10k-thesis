@@ -48,8 +48,9 @@ echo "=== Stage 4b Training (λ=0.5) ==="
 echo "Configuration:"
 echo "  Model: LayoutLMv3 with Biaffine Linker"
 echo "  Linker loss weight: 0.5"
-echo "  Batch size: 4"
-echo "  Gradient accumulation: 8 (effective batch: 32)"
+echo "  Batch size: 2 (reduced from 4 to fit linker memory)"
+echo "  Gradient accumulation: 16 (effective batch: 32, same as before)"
+echo "  Gradient checkpointing: enabled"
 echo "  Learning rate: 5e-5"
 echo "  Epochs: 10"
 echo "  Early stopping: patience=3 on validation F1"
@@ -61,15 +62,14 @@ mkdir -p "$output_dir"
 "$python_bin" train_stage4b.py \
     --data_dir "$prepared_dir" \
     --output_dir "$output_dir" \
-    --batch_size 4 \
-    --gradient_accumulation_steps 8 \
+    --batch_size 2 \
+    --gradient_accumulation_steps 16 \
     --learning_rate 5e-5 \
     --num_epochs 10 \
     --early_stopping_patience 3 \
     --val_fraction 0.1 \
     --linker_loss_weight 0.5 \
-    --include_images \
-    --pretrained_encoder "$WORK/kvp10k_thesis/data/outputs/stage4a/checkpoint-9/model.pt" \
+    --pretrained_encoder "$WORK/kvp10k_thesis/data/outputs/stage4a/checkpoint-9/pytorch_model.bin" \
     --resume_from_checkpoint
 
 echo ""
