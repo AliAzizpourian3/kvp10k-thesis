@@ -68,7 +68,7 @@ mkdir -p "$output_dir"
     --early_stopping_patience 3 \
     --val_fraction 0.1 \
     --linker_loss_weight 2.0 \
-    --pretrained_encoder "$WORK/kvp10k_thesis/data/outputs/stage4a/checkpoint-9/pytorch_model.bin" \
+    --pretrained_encoder "$WORK/kvp10k_thesis/data/outputs/stage4a/checkpoint-9/model.pt" \
     --resume_from_checkpoint
 
 echo ""

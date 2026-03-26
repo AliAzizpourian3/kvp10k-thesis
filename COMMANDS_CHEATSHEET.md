@@ -1,218 +1,138 @@
-# Commands Cheat Sheet
+# Commands Cheat Sheet (Only What You Need Now)
 
-This file collects the most useful project commands in one place.
+Use these from the project root:
 
-Use these from the project root unless noted otherwise.
+```bash
+cd "$WORK/kvp10k_thesis"
+```
 
-## 1. Most Important Right Now
+This just moves you into the project folder first.
 
-### Check the Slurm queue
+## 1. Quick Status
+
+### Check queue
 
 ```bash
 squeue -u "$USER"
 ```
 
-### Check A100 partition health
+This shows if your jobs are waiting (`PD`), running (`R`), or finished/failed (gone from queue).
+
+### Check A100 health
 
 ```bash
 sinfo -p a100 && echo && sinfo -R | head -20
 ```
 
-### Follow the current Mistral job log
+This checks if A100 nodes are available and whether any nodes are reported as problematic.
+
+## 2. Stage 4b Monitoring
+
+### List latest Stage 4b logs
 
 ```bash
-grep -E "[0-9]+/9976|epoch|eval_loss" "$WORK/kvp10k_thesis/logs/kvp_stage3_mistral-1550434.out" | tail -30
+ls -1 logs/kvp_stage4b_l*.out | tail -20
 ```
 
-and 
+This lists your newest Stage 4b output log files.
+
+### Check latest errors/warnings in all Stage 4b logs
 
 ```bash
-grep -oE "[0-9]+/9976" "$WORK/kvp10k_thesis/logs/kvp_stage3_mistral-1550434.out" | tail -1
+grep -E "ERROR|Traceback|RuntimeError|OutOfMemory|NaN" logs/kvp_stage4b_l*.out | tail -50
 ```
+
+This quickly shows only bad signs (crashes, OOM, NaN) from all Stage 4b logs.
+
+### Check training progress (epoch/loss/F1)
 
 ```bash
-tail -f "$WORK/kvp10k_thesis/logs/kvp_stage3_mistral-1546224.out"
+grep -E "Epoch|Train loss|Val loss|Val F1|best" logs/kvp_stage4b_l*.out | tail -80
 ```
 
-### Check whether training outputs are appearing
+This shows whether training is actually progressing (epochs, loss, validation F1).
+
+### Follow one log live (replace job id)
 
 ```bash
-find "$WORK/kvp10k_thesis/data/outputs/stage3_mistral" -maxdepth 2 -type d -name 'checkpoint*' | sort
+tail -f logs/kvp_stage4b_l05-<JOB_ID>.out
 ```
 
-### Check whether predictions were written
+Use this when a job starts running and you want live updates.
+
+## 3. Clean + Resubmit Stage 4b (All 3)
+
+### Cancel current Stage 4b jobs (replace IDs)
 
 ```bash
-ls "$WORK/kvp10k_thesis/data/outputs/stage3_mistral/predictions/" | wc -l
+scancel <JOB1> <JOB2> <JOB3>
 ```
 
-### Read the final evaluation file
+Stops old jobs so they do not waste GPU time.
+
+### Pull latest fix
 
 ```bash
-cat "$WORK/kvp10k_thesis/data/outputs/stage3_mistral/evaluation.json"
+git pull origin master
 ```
 
-## 2. Re-run Stage 3 Mistral
+Downloads the newest code fixes from GitHub.
 
-### Submit the Stage 3 Mistral job
+### Clean old Stage 4b outputs
 
 ```bash
-cd "$WORK/kvp10k_thesis"
-sbatch logs/stage3_mistral.sbatch
+rm -rf data/outputs/stage4b_lambda*/
 ```
 
-### Watch the job queue after submission
+Deletes old failed checkpoints so the next run starts clean.
+
+### Submit all three lambdas
+
+```bash
+sbatch logs/stage4b_lambda05.sbatch
+sbatch logs/stage4b_lambda10.sbatch
+sbatch logs/stage4b_lambda20.sbatch
+```
+
+Starts the 3 Stage 4b experiments (lambda 0.5, 1.0, 2.0).
+
+### Confirm queued
 
 ```bash
 squeue -u "$USER"
 ```
 
-## 3. Data Preparation Commands
+Run this right after `sbatch` to confirm all 3 jobs were accepted.
 
-### Count prepared train pages
+## 4. Fast Preflight Checks
+
+### Confirm Stage 4a checkpoint exists (required for transfer)
 
 ```bash
-ls "$WORK/kvp10k_thesis/data/prepared/train/" | wc -l
+ls -l data/outputs/stage4a/checkpoint-9/model.pt
 ```
 
-### Count prepared test pages
+This must exist, otherwise Stage 4b cannot load pretrained Stage 4a weights.
+
+### Confirm train script compiles
 
 ```bash
-ls "$WORK/kvp10k_thesis/data/prepared/test/" | wc -l
+"$WORK/kvp10k_thesis/env/kvp10k_env/bin/python" -m py_compile code/script/train_stage4b.py
 ```
 
-### Check the end of the train-preparation log
+Quick syntax check before submitting jobs.
+
+## 5. Useful Paths
+
+- Project root: /home/woody/iwi5/iwi5413h/kvp10k_thesis
+- Stage 4b outputs: /home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs
+- Logs: /home/woody/iwi5/iwi5413h/kvp10k_thesis/logs
+
+Tip: if you are in a hurry, use only these 4 commands in order:
 
 ```bash
-tail -30 "$WORK/kvp10k_thesis/logs/prepare_train.out"
-```
-
-### Run preparation manually on the login node
-
-```bash
-cd "$WORK/kvp10k_thesis/code/script"
-nohup bash "$WORK/kvp10k_thesis/logs/stage3_prepare_data.sbatch" > "$WORK/kvp10k_thesis/logs/prepare_data.out" 2>&1 &
-```
-
-## 4. Logs And Failure Diagnosis
-
-### Read the previous failed Mistral log
-
-```bash
-tail -50 "$WORK/kvp10k_thesis/logs/kvp_stage3_mistral-1545825.out"
-```
-
-### List relevant logs
-
-```bash
-ls "$WORK/kvp10k_thesis/logs/"*prepare* "$WORK/kvp10k_thesis/logs/"*mistral* "$WORK/kvp10k_thesis/logs/"*submit*
-```
-
-## 5. Environment Checks
-
-### Check that bitsandbytes is installed
-
-```bash
-"$WORK/kvp10k_thesis/env/kvp10k_env/bin/python" -c "import bitsandbytes; print(bitsandbytes.__version__)"
-```
-
-### Validate the Mistral training script syntax
-
-```bash
-"$WORK/kvp10k_thesis/env/kvp10k_env/bin/python" -c "import ast; ast.parse(open('$WORK/kvp10k_thesis/code/script/mistral_baseline.py').read()); print('Syntax OK')"
-```
-
-### Check GPU visibility inside a job environment
-
-```bash
-"$WORK/kvp10k_thesis/env/kvp10k_env/bin/python" -c "import torch; print('cuda:', torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'none')"
-```
-
-## 6. Thesis And Reporting
-
-### Compile the thesis
-
-```bash
-cd "$WORK/kvp10k_thesis/LaTeX_Thesis"
-pdflatex -interaction=nonstopmode -halt-on-error main.tex
-```
-
-### Open the supervisor report file
-
-File:
-[LaTeX_Thesis/SUPERVISOR_PROGRESS_REPORTS.md](/home/woody/iwi5/iwi5413h/kvp10k_thesis/LaTeX_Thesis/SUPERVISOR_PROGRESS_REPORTS.md)
-
-### Open the presentation brief
-
-File:
-[LaTeX_Thesis/PRESENTATION_1_BRIEF.md](/home/woody/iwi5/iwi5413h/kvp10k_thesis/LaTeX_Thesis/PRESENTATION_1_BRIEF.md)
-
-## 7. Useful Paths
-
-- Project root: `/home/woody/iwi5/iwi5413h/kvp10k_thesis`
-- Prepared data: `/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/prepared`
-- Mistral outputs: `/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage3_mistral`
-- Logs: `/home/woody/iwi5/iwi5413h/kvp10k_thesis/logs`
-- Thesis: `/home/woody/iwi5/iwi5413h/kvp10k_thesis/LaTeX_Thesis`
-
-## 8. Current Job IDs (Stage 4 - Tensor Reshape Fix)
-
-**Stage 4a (Entity Classification):**
-- Job ID: `1557881` (kvp_stage4a_layout) — PENDING ✅
-
-**Stage 4b (Entity + Relation, λ Sweep):**
-- Lambda 0.5: `1557882` (kvp_stage4b_l05) — PENDING ✅
-- Lambda 1.0: `1557883` (kvp_stage4b_l10) — PENDING ✅
-- Lambda 2.0: `1557884` (kvp_stage4b_l20) — PENDING ✅
-
-**Status**: 4 PENDING on A100
-
-### NEW FIX: Tensor Contiguity (Commit f417fd5):
-
-**Bug**: RuntimeError: `view size is not compatible with input tensor's size and stride`
-- After truncating entity_logits to text_seq_len, the tensor becomes non-contiguous in memory
-- `.view()` requires contiguous tensors and fails
-- `.reshape()` handles non-contiguous tensors automatically
-
-**Fix Applied**:
-- Replaced all `.view()` calls with `.reshape()` in loss computation
-- Line 361: `entity_logits.reshape(-1, self.num_labels)[active_loss]`
-- Line 362: `entity_labels.reshape(-1)[active_loss]`
-- Also line 360: `active_loss = attention_mask.reshape(-1) == 1`
-
-### All 4 Fixes Now Applied:
-
-1. ✅ **layoutlm_model.py (1ce23fd)** — Variable shadowing fix
-2. ✅ **train_stage4a.py (6bdde45)** — Checkpoint history restoration  
-3. ✅ **train_stage4b.py (de38918)** — Checkpoint history restoration
-4. ✅ **layoutlm_model.py (f417fd5)** — Tensor reshape for contiguity ← **NEW**
-
-### LayoutLMv3 Patch Token Truncation Fix (ROOT CAUSE):
-
-**Root Cause**: LayoutLMv3 encoder appends ~197 visual patch tokens from ViT patch embeddings to the sequence:
-- `input_ids` shape: [batch=4, seq=512]
-- `sequence_output` from encoder: [batch=4, seq=709, hidden] ← 197 visual tokens!
-- `attention_mask`: [batch=4, seq=512] ← only covers text tokens
-- This caused: `entity_logits` [2836, 3] vs `attention_mask` [2048] shape mismatch
-
-**Fix Applied in layoutlm_model.py**:
-1. ✅ After entity_logits = self.entity_classifier(sequence_output):
-   - Truncate entity_logits to text-only: `entity_logits[:, :text_seq_len, :]`
-   - Truncate sequence_output to text-only: `sequence_output[:, :text_seq_len, :]`
-2. ✅ Pass truncated sequence_output to linker (same issue would occur in BiaffineLinker)
-
-**Result**: All tensors now aligned:
-- entity_logits: [batch, 512, 3]
-- attention_mask: [batch, 512]
-- entity_labels: [batch, 512]
-- bbox: [batch, 512, 4]
-- link_labels: [batch, 512, 512]
-
-This is the standard LayoutLMv3 fine-tuning approach from the official code.
-
-**All files compiled successfully** ✅
-
-**Monitor Stage 4a:**
-```bash
-tail -f logs/kvp_stage4a_layout-1557881.out
+git pull origin master
+rm -rf data/outputs/stage4b_lambda*/
+sbatch logs/stage4b_lambda05.sbatch && sbatch logs/stage4b_lambda10.sbatch && sbatch logs/stage4b_lambda20.sbatch
+squeue -u "$USER"
 ```
