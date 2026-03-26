@@ -3,8 +3,8 @@
 #SBATCH --output=logs/kvp_stage4b_l05-%j.out
 #SBATCH --error=logs/kvp_stage4b_l05-%j.err
 #SBATCH --time=24:00:00
+#SBATCH --partition=a100
 #SBATCH --gres=gpu:a100:1
-#SBATCH --mem=40G
 #SBATCH --cpus-per-task=8
 #SBATCH --mail-type=END,FAIL
 
@@ -33,7 +33,7 @@ if [[ -z "$STAGE4A_CKPT" ]]; then
 fi
 echo "Using Stage 4a checkpoint: $STAGE4A_CKPT"
 
-# ── Run training ─────────────────────────────────────────────────────────────
+# ── Run training ──────────────────────────────────────────────────────────────
 python code/script/train_stage4b.py \
   --data_dir            data/prepared \
   --output_dir          data/outputs/stage4b_l05 \

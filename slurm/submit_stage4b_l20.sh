@@ -3,8 +3,8 @@
 #SBATCH --output=logs/kvp_stage4b_l20-%j.out
 #SBATCH --error=logs/kvp_stage4b_l20-%j.err
 #SBATCH --time=24:00:00
+#SBATCH --partition=a100
 #SBATCH --gres=gpu:a100:1
-#SBATCH --mem=40G
 #SBATCH --cpus-per-task=8
 #SBATCH --mail-type=END,FAIL
 
