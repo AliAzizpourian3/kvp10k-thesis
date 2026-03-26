@@ -69,6 +69,7 @@ mkdir -p "$output_dir"
     --val_fraction 0.1 \
     --linker_loss_weight 1.0 \
     --include_images \
+    --pretrained_encoder "$WORK/kvp10k_thesis/data/outputs/stage4a/checkpoint-9/model.pt" \
     --resume_from_checkpoint
 
 echo ""
