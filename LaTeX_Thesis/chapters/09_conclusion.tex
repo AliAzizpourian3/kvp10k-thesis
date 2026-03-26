@@ -1,0 +1,66 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\section{Summary of Contributions}
+\label{sec:summary}
+
+This thesis presented a comprehensive study on \kvp{} extraction from business documents using LayoutLMv3 with an attention-based linker. The main contributions are:
+
+\begin{enumerate}
+    \item \textbf{Dataset Analysis}: Characterized KVP10k dataset through layout clustering, revealing two distinct layout types and strong spatial proximity patterns in \kvps{}
+    
+    \item \textbf{Model Architecture}: Implemented LayoutLMv3 + Linker combining multimodal document understanding with explicit key-value association
+    
+    \item \textbf{Evaluation}: Established dual-threshold evaluation protocol (NED + IoU) and demonstrated \textcolor{red}{[DRAFT: Stage 4 performance results pending]} on benchmark
+    
+    \item \textbf{Robustness}: Evaluated robustness to rotation, occlusion, and annotation dropout, \textcolor{red}{[DRAFT: robustness analysis pending Stage 4]}
+    
+    \item \textbf{Interpretability}: Provided attention visualizations and error analysis revealing model behavior and failure modes
+    
+    \item \textbf{Implementation}: Released modular, reproducible codebase with CONFIG-controlled experiments
+\end{enumerate}
+
+\section{Research Questions Revisited}
+\label{sec:rq_revisited}
+
+\subsection{RQ1: Layout Characteristics}
+% Answer based on Chapter 4 findings
+
+\subsection{RQ2: Model Performance}
+% Answer based on Chapter 7 results
+
+\subsection{RQ3: Robustness}
+% Answer based on Chapter 6 experiments
+
+\subsection{RQ4: Success Factors}
+% Answer based on Chapter 8 discussion
+
+\section{Practical Implications}
+\label{sec:implications}
+
+This work has several practical implications:
+\begin{itemize}
+    \item Automated invoice processing in enterprise systems
+    \item Form understanding in government agencies
+    \item Receipt digitization for expense management
+    \item Generalizable approach applicable to diverse document types
+\end{itemize}
+
+\section{Future Research Directions}
+\label{sec:future}
+
+Promising directions for future research include:
+\begin{itemize}
+    \item Extension to multi-page documents
+    \item Cross-lingual document understanding
+    \item Few-shot adaptation to new document types
+    \item Integration with document retrieval systems
+    \item Real-time processing optimization
+\end{itemize}
+
+\section{Closing Remarks}
+\label{sec:closing}
+
+% TODO: Final thoughts
+
+This thesis demonstrates the effectiveness of combining multimodal pre-training with explicit linking mechanisms for \kvp{} extraction. The systematic evaluation and interpretability analysis provide insights for future research in document understanding.

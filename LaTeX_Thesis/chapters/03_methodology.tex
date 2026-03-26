@@ -1,0 +1,75 @@
+\chapter{Methodology}
+\label{ch:methodology}
+
+\section{Overview}
+\label{sec:method_overview}
+
+% TODO: Describe overall approach
+
+Our approach combines three key components:
+\begin{enumerate}
+    \item \textbf{LayoutLMv3 Encoder}: Multimodal document understanding
+    \item \textbf{Transformer Decoder}: Generative \kvp{} extraction
+    \item \textbf{Attention Linker}: Explicit key-value association
+\end{enumerate}
+
+\section{LayoutLMv3 Encoder}
+\label{sec:encoder}
+
+% TODO: Describe encoder architecture
+
+\subsection{Input Representation}
+% Text tokens, position embeddings, image features
+
+\subsection{Self-Attention Mechanism}
+% Multimodal self-attention
+
+\subsection{Pre-training Objectives}
+% Masked language modeling, masked image modeling
+
+\section{Decoder Architecture}
+\label{sec:decoder}
+
+% TODO: Describe decoder
+
+\subsection{T5 Decoder (Development)}
+% CPU-friendly model
+
+\subsection{Mistral Decoder (Production)}
+% GPU model for final experiments
+
+\section{Attention-based Linker}
+\label{sec:linker}
+
+% TODO: Describe linker mechanism
+
+\subsection{Key-Value Attention}
+% Cross-attention between keys and values
+
+\subsection{Spatial Encoding}
+% Encoding spatial relationships
+
+\section{Training Procedure}
+\label{sec:training}
+
+% TODO: Describe training
+
+\subsection{Loss Function}
+% Combined text + location loss
+
+\subsection{Optimization}
+% AdamW, learning rate schedule
+
+\subsection{Data Augmentation}
+% Rotation, noise, etc.
+
+\section{Inference}
+\label{sec:inference}
+
+% TODO: Describe inference procedure
+
+\subsection{Beam Search}
+% Decoding strategy
+
+\subsection{Post-processing}
+% NMS, filtering, etc.

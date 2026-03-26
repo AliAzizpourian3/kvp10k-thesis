@@ -1,0 +1,197 @@
+\chapter{Implementation}
+\label{ch:implementation}
+
+\section{System Architecture}
+\label{sec:system_arch}
+
+% TODO: Describe overall system
+
+\subsection{Modular Design}
+Our implementation follows a modular design with separate components for data loading, feature extraction, model training, and evaluation.
+
+\subsection{Configuration Management}
+All parameters are centralized in \texttt{config.py} for easy experimentation:
+\begin{itemize}
+    \item Dataset paths and model names
+    \item Hardware settings (CPU/GPU)
+    \item Evaluation thresholds (NED, IoU)
+    \item Training hyperparameters
+    \item Clustering parameters (k, random seed)
+\end{itemize}
+
+\subsection{Modular Pipeline Architecture}
+
+The implementation follows a staged pipeline design:
+
+\begin{enumerate}
+    \item \textbf{Stage 0}: Evaluation protocol definition
+    \item \textbf{Stage 1}: Dataset ingestion and preprocessing
+    \item \textbf{Stage 2}: Layout clustering and analysis
+    \item \textbf{Stage 3}: Baseline implementation and evaluation
+    \item \textbf{Stage 4}: Main model (LayoutLMv3+Linker) - planned
+\end{enumerate}
+
+Each stage is implemented as an independent function in \texttt{main.py}, allowing for:
+\begin{itemize}
+    \item Incremental development and testing
+    \item Easy debugging of individual components
+    \item Flexible execution (run all stages or select specific ones)
+    \item Reproducible experiments with consistent interfaces
+\end{itemize}
+
+\section{Data Preprocessing}
+\label{sec:preprocessing}
+
+The data preprocessing pipeline was extended substantially during the thesis because the raw KVP10k rows were not directly usable for the Mistral baseline. In particular, the learned baseline required page-level document text, bounding boxes, and aligned \kvp supervision in a format consistent with the intended IBM-style prompt and target representation.
+
+\subsection{Image Processing}
+For the Mistral baseline, preprocessing begins from the original PDF source referenced by each dataset item. The relevant page is accessed using the dataset page number and converted from the dataset's one-indexed page numbering to PyMuPDF's zero-indexed page access. Page size is preserved and later mapped to a quantized $100 \times 100$ coordinate system for prompt and target generation.
+
+\subsection{Text Processing}
+Instead of relying on an external OCR engine, the implementation uses PyMuPDF to extract word-level text and bounding boxes directly from the PDF text layer. This choice was made for practical deployment reasons on the cluster environment, where adding a system OCR dependency would have complicated execution. The trade-off is that scanned pages without a text layer cannot contribute usable words and are therefore discarded during preparation.
+
+The extracted words are grouped into line-like units and converted into an LMDX-style textual document representation. This representation is later embedded into the prompt given to the Mistral model. Ground-truth targets are serialized as Python list-of-lists strings, following the benchmark style used by the corrected Stage 3 pipeline.
+
+\subsection{Layout Encoding}
+Annotation geometry is fused with extracted words through an OCR-to-annotation matching step. Bounding boxes are converted into normalized integer coordinates on a $100 \times 100$ grid. The resulting aligned entities are then transformed into three categories: regular \kvps, unkeyed values, and unvalued keys. This preprocessing stage also handles repeated annotator copies in KVP10k by grouping rows by page identifier and selecting the richest annotation set for each unique page.
+
+\section{Model Implementation}
+\label{sec:model_impl}
+
+% TODO: Describe model code
+
+\subsection{LayoutLMv3 Integration}
+% Using HuggingFace transformers
+
+\subsection{Decoder Implementation}
+% T5/Mistral integration
+
+\subsection{Linker Module}
+% Custom attention layer
+
+\section{Baseline Evaluation Pipeline}
+\label{sec:baseline_pipeline}
+
+\subsection{Automated Evaluation Workflow}
+
+Stage 3 implements a fully automated 5-step evaluation pipeline:
+
+\begin{enumerate}
+    \item \textbf{Ground Truth Conversion}: Convert HuggingFace annotations to IBM benchmark format
+    \begin{itemize}
+        \item Extract KV pairs from linking attributes
+        \item Handle ID prefix matching for truncated identifiers
+        \item Generate individual JSON files per document
+    \end{itemize}
+    
+    \item \textbf{Prediction Generation}: Run baseline on test set
+    \begin{itemize}
+        \item Apply spatial pairing algorithm
+        \item Save predictions in IBM-compatible format
+    \end{itemize}
+    
+    \item \textbf{Benchmark Evaluation}: Automatically execute IBM's official benchmark
+    \begin{itemize}
+        \item Compute precision, recall, F1 scores
+        \item Evaluate text-only, location-only, and combined metrics
+    \end{itemize}
+    
+    \item \textbf{Results Analysis}: Generate detailed statistics
+    \begin{itemize}
+        \item Type distribution (kvp, unvalued, unkeyed)
+        \item Per-document statistics
+        \item Sample examples for inspection
+    \end{itemize}
+    
+    \item \textbf{Visualization}: Create publication-ready plots (300 DPI)
+    \begin{itemize}
+        \item Predicted vs GT scatter plot
+        \item Type distribution bar chart
+        \item Error distribution histogram
+        \item Summary statistics table
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Scalability}
+
+The pipeline is designed to scale from small validation sets to full datasets:
+\begin{itemize}
+    \item Quick validation: 20 samples ($\sim$25 seconds)
+    \item Medium validation: 1,000 samples ($\sim$2-3 minutes)
+    \item Full test set: 5,255 samples (scales linearly)
+\end{itemize}
+
+\section{Training Pipeline}
+\label{sec:training_pipeline}
+
+The training pipeline for the Mistral baseline operates on the prepared JSON files generated during preprocessing. Each sample contains the prompt text, the expected target response, and the aligned ground-truth \kvps. During tokenization, prompt tokens are masked in the loss so that optimization is applied only to the response segment.
+
+\subsection{Data Loader}
+The data loader reads page-level JSON files from the prepared train and test directories. Samples without prompt text or without non-empty supervision are skipped to avoid training on degenerate examples. This creates a cleaner supervision set while keeping the storage format simple and easy to inspect.
+
+\subsection{Training Loop}
+We used QLoRA with 4-bit NF4 quantization due to memory constraints on the available 40GB A100 GPU (see Section 6.1.2 for a detailed discussion of the implications).
+
+\subsection{Checkpointing}
+Model checkpoints are stored after training epochs and later reloaded for the prediction phase through PEFT-aware checkpoint loading. This enables a clean separation between training, prediction, and evaluation, which is important for Slurm-based execution and reproducibility.
+
+\section{Evaluation Protocol}
+\label{sec:eval_protocol}
+
+We implement a dual-threshold evaluation protocol:
+
+\subsection{Text Matching: NED}
+Normalized Edit Distance (NED) measures text accuracy:
+
+\begin{equation}
+\text{NED}(p, t) = \frac{\text{Levenshtein}(p, t)}{\max(|p|, |t|)}
+\end{equation}
+
+where $p$ is predicted text, $t$ is target text. Threshold: NED $< 0.2$.
+
+\subsection{Location Matching: IoU}
+Intersection over Union (IoU) measures spatial accuracy:
+
+\begin{equation}
+\text{IoU}(B_p, B_t) = \frac{\text{Area}(B_p \cap B_t)}{\text{Area}(B_p \cup B_t)}
+\end{equation}
+
+where $B_p$ is predicted box, $B_t$ is target box. Threshold: IoU $> 0.3$.
+
+\subsection{Overall Metric: F1 Score}
+A prediction matches ground truth if \textbf{both} NED $< 0.2$ \textbf{and} IoU $> 0.3$.
+
+\begin{align}
+\text{Precision} &= \frac{TP}{TP + FP} \\
+\text{Recall} &= \frac{TP}{TP + FN} \\
+F1 &= \frac{2 \times \text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{align}
+
+\section{Code Organization}
+\label{sec:code_org}
+
+Our codebase is organized as a Python package:
+
+\begin{verbatim}
+Script/
+|-- config.py           # Configuration parameters
+|-- data_loader.py      # Dataset loading
+|-- features.py         # Feature extraction
+|-- visualization.py    # Plotting utilities
+|-- metrics.py          # Evaluation metrics
+|-- main.py            # Pipeline orchestration
+`-- utils.py           # Helper functions
+\end{verbatim}
+
+\section{Reproducibility}
+\label{sec:reproducibility}
+
+To ensure reproducibility:
+\begin{itemize}
+    \item Fixed random seed: \texttt{RANDOM\_SEED = 42}
+    \item Version-controlled dependencies
+    \item Detailed configuration logging
+    \item Checkpoint saving at each epoch
+    \item Offline model caching for compute-node execution
+    \item Separate login-node preparation and GPU-node training workflow on TinyGPU
+\end{itemize}

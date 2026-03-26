@@ -1,0 +1,162 @@
+\chapter{Experiments}
+\label{ch:experiments}
+
+\section{Experimental Setup}
+\label{sec:exp_setup}
+
+Experiments are organized around a staged comparison between heuristic baselines and a learned Mistral-based baseline for \kvp extraction from business documents. The overall goal is to evaluate not only prediction quality but also the practicality of running the full pipeline from raw PDF sources to benchmarked outputs.
+
+For the learned baseline, the experiment is split into two phases. First, raw KVP10k data are converted into page-level prepared samples containing prompt text, target text, and aligned ground-truth \kvps. Second, the Mistral baseline is trained on the prepared train split and evaluated on the prepared test split.
+
+\subsection{Hardware}
+Development and debugging were performed on CPU and login-node resources. The final learned-baseline training runs were executed on the TinyGPU cluster using a single NVIDIA A100 40 GB GPU.
+
+An important infrastructure constraint is that TinyGPU compute nodes do not have internet access. Consequently, the Stage 3 workflow had to be split operationally: PDF downloading and data preparation were executed on the login node, while model training and prediction were executed offline on the GPU node using a pre-populated Hugging Face cache.
+
+The first corrected GPU run exposed a memory constraint on the available hardware. A full bf16 LoRA setup exceeded the 40 GB memory budget, so the final training configuration was adapted to QLoRA with gradient checkpointing and an 8-bit paged optimizer.
+
+\subsection{Hyperparameters}
+The learned baseline follows the corrected IBM-style configuration as closely as possible while remaining feasible on the available hardware. The main settings are:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Base model & Mistral-7B-Instruct-v0.2 \\
+Adaptation method & LoRA on 4-bit QLoRA base model \\
+LoRA rank $r$ & 4 \\
+LoRA $\alpha$ & 4 \\
+LoRA dropout & 0.05 \\
+Learning rate & $5 \times 10^{-4}$ \\
+Epochs & 8 \\
+Per-device batch size & 1 \\
+Gradient accumulation & 4 \\
+Maximum sequence length & 8192 \\
+Optimizer & paged\_adamw\_8bit \\
+Precision / compute dtype & bfloat16 compute on quantized weights \\
+Gradient checkpointing & enabled \\
+Decoding & greedy \\
+\hline
+\end{tabular}
+\caption{Main hyperparameters for the corrected Mistral baseline.}
+\label{tab:mistral_hparams}
+\end{table}
+
+\textbf{QLoRA and LoRA rank justification:} The original full-precision LoRA configuration exceeded the 40 GB memory budget of the available A100 GPU. To make the experiment feasible on available hardware, we adopted QLoRA with 4-bit NF4 quantization (rank $r=4$, alpha $\alpha=4$). While rank 4 is lower than the estimated $r \geq 16$ in the official KVP10k baseline, this is a necessary hardware adaptation. The QLoRA paper (Dettmers et al., 2023) demonstrates that 4-bit quantization does not degrade model performance relative to 16-bit LoRA on standard benchmarks, so quantization is not the primary limitation. However, the reduced rank and 55.8\% training data coverage (581 of 5,389 prepared unique pages, due to PDF download and text extraction failures) both reduce the model's adaptation capacity and may contribute to performance differences relative to the published baseline (see Section~\ref{sec:limitations}).
+
+Prepared data statistics at the current stage are as follows:
+\begin{itemize}
+    \item test split: 581 prepared pages out of 1051 unique pages (55.3\%), with 532 pages containing non-empty \kvp supervision
+    \item train split: 5389 prepared pages out of 9656 unique pages (55.8\%), with 404 prepared pages containing zero \kvps
+\end{itemize}
+
+The dominant source of preparation loss is inaccessible or broken source PDFs rather than failures in the fusion logic itself.
+
+\section{Baseline Models}
+\label{sec:baselines}
+
+We implement a simple baseline to establish a lower bound for performance before developing the full LayoutLMv3+Linker model.
+
+\subsection{Nearest Neighbor Baseline}
+\label{sec:nn_baseline}
+
+Our baseline uses a spatial proximity heuristic to pair keys with values:
+
+\textbf{Algorithm:}
+\begin{enumerate}
+    \item Extract all annotations with linking attributes (keys)
+    \item Extract all annotations with text content (potential values)
+    \item For each key, find the nearest value within maximum distance $d_{max} = 0.3$
+    \item If a value is found, create a KV pair; otherwise mark as ``unvalued''
+\end{enumerate}
+
+\textbf{Distance Metric:} Euclidean distance between bounding box centroids, normalized by image dimensions.
+
+\subsection{Baseline Performance}
+\label{sec:baseline_results}
+
+We evaluate the baseline on a 20-sample subset for initial validation:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\hline
+\textbf{Metric} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
+\hline
+Combined        & 0.093 & 1.000 & 0.169 \\
+Text-only       & 0.093 & 1.000 & 0.169 \\
+Location-only   & 0.093 & 1.000 & 0.169 \\
+\hline
+\end{tabular}
+\caption{Nearest Neighbor Baseline Results (20-sample validation)}
+\label{tab:baseline_results}
+\end{table}
+
+\textbf{Analysis:}
+\begin{itemize}
+    \item High recall (100\%): Baseline pairs all detected keys
+    \item Low precision (9.3\%): Many false positive pairings
+    \item F1 = 0.169 establishes lower bound for future models
+    \item Type distribution: 100\% unvalued (keys without matched values)
+\end{itemize}
+
+% Figure~\ref{fig:baseline_viz} shows the visualization analysis, including predicted vs ground truth counts and error distributions.
+
+% TODO: Include actual plots when running on full test set
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.8\textwidth]{figures/baseline_pred_vs_gt.png}
+% \caption{Baseline: Predicted vs Ground Truth KVP Counts}
+% \label{fig:baseline_viz}
+% \end{figure}
+
+\section{Main Benchmark Evaluation}
+\label{sec:benchmark}
+
+% TODO: Run experiments
+
+\subsection{Test Set Results}
+% F1, precision, recall on full test set
+
+\subsection{Per-Cluster Analysis}
+\label{subsec:per_cluster_analysis}
+% Performance on each layout cluster
+
+\subsection{Error Analysis}
+% Types of errors, failure cases
+
+\section{Robustness Experiments}
+\label{sec:robustness}
+
+% TODO: Run robustness tests
+
+\subsection{Rotation Robustness}
+We evaluate robustness to document rotation at angles: 0°, 5°, 10°, 15°.
+
+% Results table
+
+\subsection{Occlusion Robustness}
+We simulate occlusion by masking random regions: 0\%, 10\%, 20\%, 30\% of document area.
+
+% Results table
+
+\subsection{Annotation Dropout}
+We evaluate with missing annotations: 0\%, 10\%, 20\%, 30\% dropout rate.
+
+% Results table
+
+\section{Ablation Studies}
+\label{sec:ablation}
+
+% TODO: Ablation experiments
+
+\subsection{Linker Module}
+% Compare with/without linker
+
+\subsection{Spatial Encoding}
+% Impact of position embeddings
+
+\subsection{Pre-training}
+% Fine-tuned vs. from scratch

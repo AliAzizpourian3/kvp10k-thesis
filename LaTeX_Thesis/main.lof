@@ -1,0 +1,18 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Stage 2 layout clustering. We select the number of clusters using multiple criteria and report the final cluster size distribution.}}{15}{figure.caption.7}%
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Optimal $k$ selection across metrics.}}}{15}{subfigure.1.1}%
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Cluster size distribution for the chosen $k=2$.}}}{15}{subfigure.1.2}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces PCA visualization of the $k=2$ layout clusters based on standardized layout features.}}{16}{figure.caption.9}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Feature distributions by cluster for selected layout features (Stage 2).}}{16}{figure.caption.10}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Summary statistics of selected layout features per cluster (mean and standard deviation).}}{17}{figure.caption.11}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

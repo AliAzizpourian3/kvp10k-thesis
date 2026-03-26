@@ -1,0 +1,98 @@
+\chapter{Code Listings}
+\label{app:code}
+
+\section{Configuration File}
+\label{app:config}
+
+\begin{lstlisting}[language=Python,caption=Configuration parameters (config.py)]
+"""Configuration file for KVP10k extraction experiments."""
+
+import os
+
+# Paths
+WORKSPACE_ROOT = r"c:\Users\aliaz\Desktop\Thesis"
+SCRIPT_DIR = os.path.join(WORKSPACE_ROOT, "Script")
+OUTPUT_DIR = os.path.join(SCRIPT_DIR, "outputs")
+KVP_CACHE = os.path.join(WORKSPACE_ROOT, "KVP10k", "hf_cache")
+
+# Dataset
+DATASET_NAME = "ibm/KVP10k"
+SUBSET_N = None
+TRAIN_SPLIT = "train"
+TEST_SPLIT = "test"
+
+# Hardware
+DEVICE = "cpu"
+BATCH_SIZE = 2
+
+# Models
+MODEL_NAME_DEV = "google/flan-t5-small"
+MODEL_NAME_GPU = "mistralai/Mistral-7B-Instruct-v0.2"
+MODEL_NAME = MODEL_NAME_DEV if DEVICE == "cpu" else MODEL_NAME_GPU
+
+# Evaluation
+NED_THRESHOLD = 0.2
+IOU_THRESHOLD = 0.3
+
+# Clustering
+NUM_CLUSTERS = 2
+RANDOM_SEED = 42
+\end{lstlisting}
+
+\section{Feature Extraction}
+\label{app:features}
+
+\begin{lstlisting}[language=Python,caption=Layout feature extraction]
+def extract_layout_features(example):
+    """Extract 13 layout features from a document page."""
+    annotations = example.get('annotations', [])
+    
+    if not annotations:
+        return np.zeros(13)
+    
+    # Extract bounding boxes
+    boxes = []
+    for ann in annotations:
+        coords = ann.get('coordinates', [])
+        if coords:
+            xs = [c['x'] for c in coords]
+            ys = [c['y'] for c in coords]
+            
+            if xs and ys:
+                x_min, x_max = min(xs), max(xs)
+                y_min, y_max = min(ys), max(ys)
+                # ... compute box properties
+    
+    # Return feature vector [n_boxes, total_area, ...]
+    return features
+\end{lstlisting}
+
+\section{Evaluation Metrics}
+\label{app:metrics}
+
+\begin{lstlisting}[language=Python,caption=NED and IoU computation]
+def normalized_edit_distance(pred, target):
+    """Compute Normalized Edit Distance."""
+    # Levenshtein distance
+    m, n = len(pred), len(target)
+    dp = np.zeros((m+1, n+1), dtype=int)
+    
+    # ... dynamic programming
+    
+    edit_distance = dp[m][n]
+    ned = edit_distance / max(m, n)
+    return ned
+
+def intersection_over_union(box1, box2):
+    """Compute IoU between two bounding boxes."""
+    x1_min, y1_min, x1_max, y1_max = box1
+    x2_min, y2_min, x2_max, y2_max = box2
+    
+    # Intersection
+    x_left = max(x1_min, x2_min)
+    y_top = max(y1_min, y2_min)
+    # ... compute intersection and union
+    
+    iou = intersection_area / union_area
+    return iou
+\end{lstlisting}

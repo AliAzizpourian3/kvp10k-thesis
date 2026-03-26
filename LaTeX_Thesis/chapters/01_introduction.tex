@@ -1,0 +1,84 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Motivation}
+\label{sec:motivation}
+
+Business document processing is a fundamental task in enterprise automation, affecting industries from finance to healthcare. Organizations process millions of invoices, forms, and receipts annually, requiring extraction of structured information such as \kvps{} (e.g., ``Invoice Number: 12345'', ``Total: \$137''). Manual processing is time-consuming, error-prone, and costly, motivating the need for automated solutions.
+
+Traditional approaches rely on template matching or rule-based systems, which lack generalization to diverse document layouts and formats. Recent advances in deep learning, particularly multimodal pre-trained models like LayoutLMv3 \cite{layoutlmv3}, offer promising solutions by jointly modeling text, layout, and visual features.
+
+\section{Problem Statement}
+\label{sec:problem}
+
+Given a business document image, the task is to extract all \kvps{} with:
+\begin{enumerate}
+    \item \textbf{Text Accuracy}: Correctly recognize the textual content of keys and values
+    \item \textbf{Location Accuracy}: Precisely localize bounding boxes around text regions
+    \item \textbf{Linking Accuracy}: Correctly associate keys with their corresponding values
+\end{enumerate}
+
+Challenges include:
+\begin{itemize}
+    \item \textbf{Layout Diversity}: Documents vary from sparse forms to dense invoices
+    \item \textbf{Spatial Complexity}: Keys and values may be nearby or distant
+    \item \textbf{Visual Noise}: Degraded scans, rotations, occlusions
+    \item \textbf{Implicit Structure}: Relationships not always explicit in layout
+\end{itemize}
+
+\section{Research Questions}
+\label{sec:research_questions}
+
+This thesis addresses the following research questions:
+
+\begin{enumerate}
+    \item \textbf{RQ1}: How do layout characteristics vary across business documents, and how can this inform model design?
+    
+    \item \textbf{RQ2}: Can a generative approach using LayoutLMv3 + Linker achieve state-of-the-art performance on \kvp{} extraction?
+    
+    \item \textbf{RQ3}: How robust is the approach to real-world degradations (rotation, occlusion, missing annotations)?
+    
+    \item \textbf{RQ4}: What are the key factors contributing to model success and failure cases?
+\end{enumerate}
+
+\section{Contributions}
+\label{sec:contributions}
+
+This thesis makes the following contributions:
+
+\begin{enumerate}
+    \item \textbf{Dataset Analysis}: Comprehensive characterization of KVP10k dataset including layout clustering, spatial pattern analysis, and annotation statistics (Chapter \ref{ch:dataset})
+    
+    \item \textbf{Architecture}: Implementation of LayoutLMv3 + Linker for end-to-end generative \kvp{} extraction with explicit key-value association (Chapter \ref{ch:implementation})
+    
+    \item \textbf{Evaluation}: Systematic benchmark on KVP10k test set with dual-threshold evaluation protocol (NED, IoU) and F1 scoring (Chapter \ref{ch:experiments})
+    
+    \item \textbf{Robustness Analysis}: Evaluation under rotation, occlusion, and annotation dropout to assess real-world applicability (Chapter \ref{ch:experiments})
+    
+    \item \textbf{Interpretability}: Attention visualization and error analysis providing insights into model behavior (Chapter \ref{ch:results})
+    
+    \item \textbf{Code Release}: Modular Python implementation with CONFIG-controlled experiments for reproducibility
+\end{enumerate}
+
+\section{Thesis Structure}
+\label{sec:structure}
+
+The remainder of this thesis is organized as follows:
+
+\begin{itemize}
+    \item \textbf{Chapter \ref{ch:literature}}: Reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training
+    
+    \item \textbf{Chapter \ref{ch:methodology}}: Describes the proposed approach including LayoutLMv3 encoder, decoder architecture, and linker module
+    
+    \item \textbf{Chapter \ref{ch:dataset}}: Presents the KVP10k dataset with layout clustering analysis and spatial pattern characterization
+    
+    \item \textbf{Chapter \ref{ch:implementation}}: Details implementation including data preprocessing, model architecture, training procedure, and evaluation protocol
+    
+    \item \textbf{Chapter \ref{ch:experiments}}: Describes experimental setup including baselines, robustness tests, and evaluation metrics
+    
+    \item \textbf{Chapter \ref{ch:results}}: Presents results from all experiments with comparative analysis
+    
+    \item \textbf{Chapter \ref{ch:discussion}}: Discusses findings, interpretability analysis, limitations, and future work
+    
+    \item \textbf{Chapter \ref{ch:conclusion}}: Summarizes contributions and conclusions
+\end{itemize}

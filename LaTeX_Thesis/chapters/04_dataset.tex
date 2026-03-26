@@ -1,0 +1,190 @@
+\chapter{Dataset Analysis}
+\label{ch:dataset}
+
+\section{KVP10k Dataset}
+\label{sec:kvp10k}
+
+The KVP10k dataset \cite{kvp10k} is a large-scale benchmark for \kvp{} extraction from business documents. It consists of 48,280 training samples and 5,255 test samples, spanning diverse document types including invoices, forms, and receipts.
+
+\subsection{Data Collection}
+The dataset was collected by IBM Research from real-world business documents, with manual annotation of bounding boxes and key-value relationships.
+
+\subsection{Annotation Format}
+Each sample contains:
+\begin{itemize}
+    \item \textbf{Image}: Document scan/photo
+    \item \textbf{Annotations}: List of bounding boxes with:
+    \begin{itemize}
+        \item \texttt{coordinates}: List of $\{x, y\}$ points defining polygon
+        \item \texttt{label}: Annotation type (Text, identifier, etc.)
+        \item \texttt{attributes.Linking}: Reference to linked annotation ID
+    \end{itemize}
+\end{itemize}
+
+\section{Layout Clustering Analysis}
+\label{sec:layout_clustering}
+
+We perform unsupervised clustering to identify recurring document layout types in the dataset. This provides a compact way to stratify evaluation in later stages and to check whether model performance varies across layout regimes.
+
+\subsection{Feature Extraction}
+\label{subsec:features}
+
+We extract 13 layout features per document (see Table \ref{tab:features}):
+
+\begin{table}[h]
+\centering
+\caption{Layout features extracted from each document}
+\label{tab:features}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Feature} & \textbf{Description} \\ \midrule
+$n_{\text{boxes}}$ & Number of bounding boxes \\
+$A_{\text{total}}$ & Total area covered by boxes \\
+$\mu_A$ & Mean box area \\
+$\sigma_A$ & Standard deviation of box area \\
+$\mu_w$ & Mean box width \\
+$\mu_h$ & Mean box height \\
+$\mu_r$ & Mean aspect ratio (width/height) \\
+$\mu_x$ & Mean x-position (horizontal center) \\
+$\mu_y$ & Mean y-position (vertical center) \\
+$\rho$ & Layout density (total coverage) \\
+$s_v$ & Vertical spread (max$_y$ - min$_y$) \\
+$s_h$ & Horizontal spread (max$_x$ - min$_x$) \\
+$d_{\text{spacing}}$ & Mean inter-box Euclidean distance \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{K-means Clustering}
+\label{subsec:kmeans}
+
+We apply K-means clustering \cite{kmeans} on standardized layout features. To select the number of clusters, we sweep $k \in \{2,\dots,10\}$ and evaluate multiple complementary criteria: (i) Silhouette score (primary), (ii) Davies--Bouldin index, (iii) Calinski--Harabasz score, and (iv) the inertia curve (elbow). We use a fixed random seed and standardization to make the selection reproducible.
+
+Figure~\ref{fig:stage2_k_selection_and_distribution} summarizes the selection outcome. Across the considered range, the criteria consistently favor a small number of well-separated clusters. In particular, the silhouette score peaks at \textbf{0.763} for $k=2$ (0.7627), and we therefore choose \textbf{$k=2$}.
+
+\textbf{Results:} Two distinct layout types were identified on the annotated KVP10k training pages ($n=25{,}692$):
+
+\begin{figure}[H]
+    \centering
+    \subfloat[Optimal $k$ selection across metrics.\label{fig:stage2_optimal_k}]{
+        \includegraphics[width=0.48\textwidth]{figures/stage2/optimal_k_analysis.png}
+    }
+    \hfill
+    \subfloat[Cluster size distribution for the chosen $k=2$.\label{fig:stage2_cluster_dist}]{
+        \includegraphics[width=0.48\textwidth]{figures/stage2/cluster_distribution.png}
+    }
+    \caption{Stage 2 layout clustering. We select the number of clusters using multiple criteria and report the final cluster size distribution.}
+    \label{fig:stage2_k_selection_and_distribution}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Layout cluster distribution for $k=2$ on annotated training pages}
+\label{tab:clusters}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Cluster} & \textbf{Samples} & \textbf{\%} & \textbf{Characteristics} \\ \midrule
+0 & 8{,}935 & 34.8\% & Content-rich layouts (mean $n_{\text{boxes}}\approx 25.36$) \\
+1 & 16{,}757 & 65.2\% & Sparse layouts (mean $n_{\text{boxes}}\approx 0.062$) \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{PCA Visualization}
+\label{subsec:pca}
+
+Principal Component Analysis (PCA) \cite{pca} with two components explains 82.7\% of the variance (PC1: 71.8\%, PC2: 10.8\%). Figure~\ref{fig:stage2_pca} visualizes the separation between the two layout clusters.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{figures/stage2/pca_clusters.png}
+    \caption{PCA visualization of the $k=2$ layout clusters based on standardized layout features.}
+    \label{fig:stage2_pca}
+\end{figure}
+
+To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Figure~\ref{fig:stage2_cluster_stats} summarize how key layout statistics differ across clusters.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{figures/stage2/feature_distributions.png}
+    \caption{Feature distributions by cluster for selected layout features (Stage 2).}
+    \label{fig:stage2_feature_distributions}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70\textwidth]{figures/stage2/cluster_statistics_table.png}
+    \caption{Summary statistics of selected layout features per cluster (mean and standard deviation).}
+    \label{fig:stage2_cluster_stats}
+\end{figure}
+\begin{itemize}
+    \item \textbf{PC1} (71.8\% variance): Captures overall content density (e.g., number of boxes and coverage)
+    \item \textbf{PC2} (10.8\% variance): Captures secondary geometric variation beyond density
+\end{itemize}
+
+\subsection{Use in Later Stages}
+\label{subsec:cluster_use}
+
+We store the assigned layout cluster ID for each page and use it as a stratification variable in later evaluation. In Stages~3--4 we report overall benchmark performance as well as \emph{per-cluster} performance to identify whether specific layout types remain challenging (see Section~\ref{subsec:per_cluster_analysis}).
+
+\section{Key-Value Link Analysis}
+\label{sec:kv_analysis}
+
+We analyze spatial relationships between linked \kvps{} to inform model design.
+
+\subsection{Spatial Proximity}
+
+For each key-value pair with linking annotation, we compute the Euclidean distance between bounding box centers:
+
+\begin{equation}
+d_{kv} = \sqrt{(x_v - x_k)^2 + (y_v - y_k)^2}
+\end{equation}
+
+where $(x_k, y_k)$ and $(x_v, y_v)$ are the normalized center coordinates of the key and value boxes.
+
+\textbf{Results} (200-sample subset, 755 links):
+\begin{itemize}
+    \item Mean distance: $\mu_d = 0.10$
+    \item Median distance: $\tilde{d} = 0.08$
+    \item 90th percentile: $d_{90} = 0.15$
+\end{itemize}
+
+\textbf{Interpretation:} Most \kvps{} are spatially proximate (within 0.15 normalized units), suggesting that spatial features are crucial for accurate linking.
+
+% TODO: Add Figure - Distance distribution histogram
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/kv_distances.pdf}
+%     \caption{Distribution of key-value link distances}
+%     \label{fig:distances}
+% \end{figure}
+
+\section{Annotation Statistics}
+\label{sec:annotation_stats}
+
+\begin{table}[h]
+\centering
+\caption{Annotation statistics for 200-sample subset}
+\label{tab:ann_stats}
+\begin{tabular}{@{}lr@{}}
+\toprule
+\textbf{Metric} & \textbf{Value} \\ \midrule
+Total samples & 200 \\
+Samples with annotations & 200 (100\%) \\
+Total annotations & 7,000+ \\
+Mean annotations per sample & $\sim$35 \\
+Annotations with linking & 755 \\
+Percentage with linking & $\sim$60\% \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Summary}
+\label{sec:dataset_summary}
+
+Key findings from dataset analysis:
+\begin{enumerate}
+    \item Two distinct layout types with varying density
+    \item Strong spatial proximity between linked \kvps{}
+    \item High annotation quality with consistent linking information
+    \item Layout features capture 82.7\% variance in 2 dimensions
+\end{enumerate}
+
+These insights inform our model design, particularly the importance of spatial encoding in the linker module.

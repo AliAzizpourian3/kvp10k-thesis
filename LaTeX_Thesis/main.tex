@@ -1,0 +1,177 @@
+% Master's Thesis - Key-Value Pair Extraction from Business Documents
+% Author: Ali Azizpourian
+% Date: January 2026
+
+\documentclass[12pt,a4paper,twoside]{report}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+
+% Language and encoding
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+
+% Math
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+
+% Graphics and figures
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage[table]{xcolor}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{longtable}
+
+% Code listings
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% References and citations
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+% Hyperlinks
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+
+% Page layout
+\usepackage{geometry}
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
+
+% Headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+
+% Spacing
+\usepackage{setspace}
+\onehalfspacing
+
+% TOC depth
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+% Custom commands
+\newcommand{\kvp}{key-value pair}
+\newcommand{\kvps}{key-value pairs}
+\newcommand{\KVP}{Key-Value Pair}
+\newcommand{\KVPs}{Key-Value Pairs}
+
+% report.cls does not provide frontmatter/mainmatter/backmatter (book.cls does).
+% Define lightweight equivalents to keep the document structure intact.
+\providecommand{\frontmatter}{\pagenumbering{roman}}
+\providecommand{\mainmatter}{\cleardoublepage\pagenumbering{arabic}}
+\providecommand{\backmatter}{\cleardoublepage}
+
+% ============================================================================
+% DOCUMENT INFORMATION
+% ============================================================================
+
+\title{
+    \LARGE \textbf{Key-Value Pair Extraction from Business Documents} \\
+    \vspace{1cm}
+    \large Using Deep Learning and Multimodal Document Understanding \\
+    \vspace{2cm}
+    \normalsize Master's Thesis
+}
+
+\author{Ali Azizpourian}
+\date{January 2026}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+
+\begin{document}
+
+% Front matter
+\frontmatter
+
+% Title page
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\LARGE \textbf{Key-Value Pair Extraction from Business Documents}} \\
+    \vspace{1cm}
+    {\large Using Deep Learning and Multimodal Document Understanding} \\
+    
+    \vspace{3cm}
+    
+    {\Large Master's Thesis} \\
+    
+    \vspace{2cm}
+    
+    {\large by} \\
+    \vspace{0.5cm}
+    {\Large \textbf{Ali Azizpourian}} \\
+    
+    \vfill
+    
+    {\large Submitted in partial fulfillment of the requirements for the degree of} \\
+    \vspace{0.3cm}
+    {\large \textbf{Master of Science}} \\
+    
+    \vspace{1cm}
+    
+    {\large [University Name]} \\
+    {\large [Department/Faculty]} \\
+    
+    \vspace{1cm}
+    
+    {\large January 2026}
+    
+\end{titlepage}
+
+% Abstract
+\input{chapters/00_abstract}
+
+% Acknowledgments
+\input{chapters/00_acknowledgments}
+
+% Table of contents
+\tableofcontents
+\listoffigures
+\listoftables
+
+% Main matter
+\mainmatter
+
+% Chapters
+\input{chapters/01_introduction}
+\input{chapters/02_literature_review}
+\input{chapters/03_methodology}
+\input{chapters/04_dataset}
+\input{chapters/05_implementation}
+\input{chapters/06_experiments}
+\input{chapters/07_results}
+\input{chapters/08_discussion}
+\input{chapters/09_conclusion}
+
+% Back matter
+\backmatter
+
+% Bibliography
+\printbibliography[heading=bibintoc,title={References}]
+
+% Appendices
+\appendix
+\input{chapters/appendix_a_code}
+\input{chapters/appendix_b_data}
+
+\end{document}

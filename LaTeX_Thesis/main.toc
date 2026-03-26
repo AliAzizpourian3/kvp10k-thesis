@@ -1,0 +1,167 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Abstract}{ii}{chapter*.1}%
+\contentsline {chapter}{Acknowledgments}{iv}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Problem Statement}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Research Questions}{2}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Contributions}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Thesis Structure}{2}{section.1.5}%
+\contentsline {chapter}{\numberline {2}Literature Review}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Document Understanding}{4}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Traditional Approaches}{4}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Deep Learning Approaches}{4}{subsection.2.1.2}%
+\contentsline {section}{\numberline {2.2}Multimodal Pre-training for Documents}{5}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}LayoutLM}{5}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}LayoutLMv2}{5}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}LayoutLMv3}{5}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Key-Value Pair Extraction}{6}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Sequence Labeling Approaches}{6}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Generative Approaches}{6}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Graph-based Approaches}{6}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Information Extraction from Forms}{7}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}FUNSD and CORD Datasets}{7}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Receipt Understanding}{7}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Evaluation Metrics}{7}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Text Matching Metrics}{7}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Spatial Matching Metrics}{8}{subsection.2.5.2}%
+\contentsline {section}{\numberline {2.6}Related Datasets}{8}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}KVP10k}{8}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Other Document Datasets}{8}{subsection.2.6.2}%
+\contentsline {section}{\numberline {2.7}Time-Bounded State of the Art}{9}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Summary and Research Gaps}{9}{section.2.8}%
+\contentsline {chapter}{\numberline {3}Methodology}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Overview}{11}{section.3.1}%
+\contentsline {section}{\numberline {3.2}LayoutLMv3 Encoder}{12}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Input Representation}{12}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Self-Attention Mechanism}{12}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Pre-training Objectives}{12}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Decoder Architecture}{12}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}T5 Decoder (Development)}{12}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Mistral Decoder (Production)}{12}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Attention-based Linker}{12}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Key-Value Attention}{12}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Spatial Encoding}{12}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Training Procedure}{12}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Loss Function}{12}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Optimization}{12}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Data Augmentation}{12}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}Inference}{12}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Beam Search}{12}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Post-processing}{12}{subsection.3.6.2}%
+\contentsline {chapter}{\numberline {4}Dataset Analysis}{13}{chapter.4}%
+\contentsline {section}{\numberline {4.1}KVP10k Dataset}{13}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Data Collection}{13}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Annotation Format}{13}{subsection.4.1.2}%
+\contentsline {section}{\numberline {4.2}Layout Clustering Analysis}{13}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Feature Extraction}{14}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}K-means Clustering}{14}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}PCA Visualization}{15}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Use in Later Stages}{17}{subsection.4.2.4}%
+\contentsline {section}{\numberline {4.3}Key-Value Link Analysis}{17}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Spatial Proximity}{17}{subsection.4.3.1}%
+\contentsline {section}{\numberline {4.4}Annotation Statistics}{18}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Summary}{18}{section.4.5}%
+\contentsline {chapter}{\numberline {5}Implementation}{19}{chapter.5}%
+\contentsline {section}{\numberline {5.1}System Architecture}{19}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Modular Design}{19}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Configuration Management}{19}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Modular Pipeline Architecture}{19}{subsection.5.1.3}%
+\contentsline {section}{\numberline {5.2}Data Preprocessing}{20}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Image Processing}{20}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Text Processing}{20}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Layout Encoding}{21}{subsection.5.2.3}%
+\contentsline {section}{\numberline {5.3}Model Implementation}{21}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}LayoutLMv3 Integration}{21}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Decoder Implementation}{21}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}Linker Module}{21}{subsection.5.3.3}%
+\contentsline {section}{\numberline {5.4}Baseline Evaluation Pipeline}{21}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Automated Evaluation Workflow}{21}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Scalability}{22}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Training Pipeline}{22}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}Data Loader}{22}{subsection.5.5.1}%
+\contentsline {subsection}{\numberline {5.5.2}Training Loop}{22}{subsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.5.3}Checkpointing}{23}{subsection.5.5.3}%
+\contentsline {section}{\numberline {5.6}Evaluation Protocol}{23}{section.5.6}%
+\contentsline {subsection}{\numberline {5.6.1}Text Matching: NED}{23}{subsection.5.6.1}%
+\contentsline {subsection}{\numberline {5.6.2}Location Matching: IoU}{23}{subsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.6.3}Overall Metric: F1 Score}{23}{subsection.5.6.3}%
+\contentsline {section}{\numberline {5.7}Code Organization}{23}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Reproducibility}{24}{section.5.8}%
+\contentsline {chapter}{\numberline {6}Experiments}{25}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Experimental Setup}{25}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Hardware}{25}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Hyperparameters}{26}{subsection.6.1.2}%
+\contentsline {section}{\numberline {6.2}Baseline Models}{27}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Nearest Neighbor Baseline}{27}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}Baseline Performance}{27}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Main Benchmark Evaluation}{28}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Test Set Results}{28}{subsection.6.3.1}%
+\contentsline {subsection}{\numberline {6.3.2}Per-Cluster Analysis}{28}{subsection.6.3.2}%
+\contentsline {subsection}{\numberline {6.3.3}Error Analysis}{28}{subsection.6.3.3}%
+\contentsline {section}{\numberline {6.4}Robustness Experiments}{28}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Rotation Robustness}{28}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}Occlusion Robustness}{28}{subsection.6.4.2}%
+\contentsline {subsection}{\numberline {6.4.3}Annotation Dropout}{28}{subsection.6.4.3}%
+\contentsline {section}{\numberline {6.5}Ablation Studies}{28}{section.6.5}%
+\contentsline {subsection}{\numberline {6.5.1}Linker Module}{28}{subsection.6.5.1}%
+\contentsline {subsection}{\numberline {6.5.2}Spatial Encoding}{28}{subsection.6.5.2}%
+\contentsline {subsection}{\numberline {6.5.3}Pre-training}{28}{subsection.6.5.3}%
+\contentsline {chapter}{\numberline {7}Results}{29}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Main Benchmark Results}{29}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Dataset Coverage}{29}{subsection.7.1.1}%
+\contentsline {subsection}{\numberline {7.1.2}Overall Performance}{30}{subsection.7.1.2}%
+\contentsline {subsubsection}{\numberline {7.1.2.1}Stage 3: Mistral-7B-Instruct-v0.2 LoRA Baseline}{30}{subsubsection.7.1.2.1}%
+\contentsline {subsubsection}{\numberline {7.1.2.2}Paper Comparison}{31}{subsubsection.7.1.2.2}%
+\contentsline {subsubsection}{\numberline {7.1.2.3}Per-Cluster Analysis: Answering "Why does Mistral Fail?"}{31}{subsubsection.7.1.2.3}%
+\contentsline {section}{\numberline {7.2}Robustness Results}{34}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Rotation}{34}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}Occlusion}{34}{subsection.7.2.2}%
+\contentsline {subsection}{\numberline {7.2.3}Dropout}{34}{subsection.7.2.3}%
+\contentsline {section}{\numberline {7.3}Ablation Study Results}{34}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Component Analysis}{34}{subsection.7.3.1}%
+\contentsline {section}{\numberline {7.4}Qualitative Analysis}{34}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Success Cases}{34}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Failure Cases}{34}{subsection.7.4.2}%
+\contentsline {section}{\numberline {7.5}Computational Performance}{34}{section.7.5}%
+\contentsline {subsection}{\numberline {7.5.1}Training Time}{34}{subsection.7.5.1}%
+\contentsline {subsection}{\numberline {7.5.2}Inference Speed}{34}{subsection.7.5.2}%
+\contentsline {subsection}{\numberline {7.5.3}Memory Usage}{34}{subsection.7.5.3}%
+\contentsline {chapter}{\numberline {8}Discussion}{35}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Interpretation of Results}{35}{section.8.1}%
+\contentsline {subsection}{\numberline {8.1.1}Performance Analysis}{35}{subsection.8.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Comparison to Baselines}{35}{subsection.8.1.2}%
+\contentsline {section}{\numberline {8.2}Attention Visualization}{35}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Key-Value Attention}{35}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Spatial Patterns}{35}{subsection.8.2.2}%
+\contentsline {section}{\numberline {8.3}Error Analysis}{35}{section.8.3}%
+\contentsline {subsection}{\numberline {8.3.1}Error Categories}{35}{subsection.8.3.1}%
+\contentsline {subsection}{\numberline {8.3.2}Common Failure Modes}{35}{subsection.8.3.2}%
+\contentsline {section}{\numberline {8.4}Robustness Discussion}{35}{section.8.4}%
+\contentsline {subsection}{\numberline {8.4.1}Real-world Applicability}{35}{subsection.8.4.1}%
+\contentsline {subsection}{\numberline {8.4.2}Limitations}{35}{subsection.8.4.2}%
+\contentsline {section}{\numberline {8.5}Update to the State of the Art at Submission}{35}{section.8.5}%
+\contentsline {section}{\numberline {8.6}Limitations and Future Work}{36}{section.8.6}%
+\contentsline {subsection}{\numberline {8.6.1}Current Limitations}{36}{subsection.8.6.1}%
+\contentsline {subsubsection}{\numberline {8.6.1.1}Hardware and Data Constraints}{36}{subsubsection.8.6.1.1}%
+\contentsline {subsubsection}{\numberline {8.6.1.2}Architectural Constraints}{36}{subsubsection.8.6.1.2}%
+\contentsline {subsection}{\numberline {8.6.2}Future Directions}{37}{subsection.8.6.2}%
+\contentsline {chapter}{\numberline {9}Conclusion}{38}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Summary of Contributions}{38}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Research Questions Revisited}{39}{section.9.2}%
+\contentsline {subsection}{\numberline {9.2.1}RQ1: Layout Characteristics}{39}{subsection.9.2.1}%
+\contentsline {subsection}{\numberline {9.2.2}RQ2: Model Performance}{39}{subsection.9.2.2}%
+\contentsline {subsection}{\numberline {9.2.3}RQ3: Robustness}{39}{subsection.9.2.3}%
+\contentsline {subsection}{\numberline {9.2.4}RQ4: Success Factors}{39}{subsection.9.2.4}%
+\contentsline {section}{\numberline {9.3}Practical Implications}{39}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Future Research Directions}{39}{section.9.4}%
+\contentsline {section}{\numberline {9.5}Closing Remarks}{39}{section.9.5}%
+\contentsline {chapter}{\numberline {A}Code Listings}{41}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Configuration File}{41}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Feature Extraction}{42}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Evaluation Metrics}{42}{section.A.3}%
+\contentsline {chapter}{\numberline {B}Additional Dataset Statistics}{44}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Full Cluster Statistics}{44}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Layout Feature Distributions}{44}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Sample Documents}{44}{section.B.3}%
+\contentsline {section}{\numberline {B.4}Error Case Examples}{44}{section.B.4}%

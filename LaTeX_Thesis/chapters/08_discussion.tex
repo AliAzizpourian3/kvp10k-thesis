@@ -1,0 +1,102 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+\section{Interpretation of Results}
+\label{sec:interpretation}
+
+% TODO: Interpret findings
+
+\subsection{Performance Analysis}
+% Why does the approach work?
+
+\subsection{Comparison to Baselines}
+% What improvements did we achieve?
+
+\section{Attention Visualization}
+\label{sec:attention_viz}
+
+% TODO: Visualize attention patterns
+
+\subsection{Key-Value Attention}
+% Heatmaps showing attention between keys and values
+
+\subsection{Spatial Patterns}
+% What spatial relationships does the model learn?
+
+\section{Error Analysis}
+\label{sec:error_analysis}
+
+% TODO: Analyze errors
+
+\subsection{Error Categories}
+% Text errors, location errors, linking errors
+
+\subsection{Common Failure Modes}
+% What types of documents are challenging?
+
+\section{Robustness Discussion}
+\label{sec:robustness_disc}
+
+% TODO: Discuss robustness findings
+
+\subsection{Real-world Applicability}
+% How well does it handle degraded documents?
+
+\subsection{Limitations}
+% Where does the approach fail?
+
+\section{Update to the State of the Art at Submission}
+\label{sec:sota_update}
+
+The literature review in Chapter~\ref{ch:literature} adopts a
+time-bounded view of the state of the art, fixed at the start of the
+project (February~2026). During the execution of this thesis, additional
+methods for document understanding and key--value extraction have been
+proposed. In this section we briefly summarize the most relevant
+developments and discuss how they relate to our contributions.
+
+% TODO: After experiments are finished and the thesis is close to
+% submission, add 2--3 paragraphs here that:
+%  1) List the main new models or training strategies that appeared
+%     after February 2026 (with citations).
+%  2) Explain whether they target KVP10k directly or related tasks.
+%  3) Position our approach relative to these methods (e.g., complementary,
+%     stronger on KVP10k, or limited by different assumptions).
+
+From an evaluation perspective, our experimental comparisons remain anchored
+to the baselines that were available at project start. The newer approaches
+are therefore discussed qualitatively rather than used as additional
+reference systems in the quantitative tables. This separation keeps the
+experimental protocol stable and reproducible, while still acknowledging
+that the broader state of the art has evolved by the time of submission.
+
+\section{Limitations and Future Work}
+\label{sec:limitations}
+
+\subsection{Current Limitations}
+
+\subsubsection{Hardware and Data Constraints}
+Our Stage 3 Mistral baseline and Stage 4 LayoutLMv3 implementation operate under two significant constraints that impact result interpretation:
+
+\begin{itemize}
+    \item \textbf{LoRA rank reduction}: Hardware constraints (40 GB A100 memory) forced us to use LoRA rank $r=4$ compared to estimated $r \geq 16$ in the official KVP10k baseline. While QLoRA with 4-bit quantization is validated to preserve model quality (Dettmers et al., 2023), the reduced rank limits adaptation capacity. This likely contributes to the performance gap versus the published baseline.
+    
+    \item \textbf{Training data coverage}: Due to inaccessible source PDFs and scanned documents lacking usable text layers (PyMuPDF limitation), our training set comprises only 5,389 of 9,656 unique pages (55.8\%) and test set 581 of 1,051 pages (55.3\%). This reduced coverage provides less training signal than the full KVP10k dataset, further constraining model learning.
+\end{itemize}
+
+When comparing our Mistral results (Stage 3, Table~\ref{tab:stage3_stage0_thresholds}) and LayoutLMv3 results (Stage 4) to published baselines, readers should account for these two confounds: LoRA rank and data coverage. The error analysis (Chapter 7, Section~\ref{subsec:per_cluster_analysis}) provides per-cluster breakdown showing that Mistral's failures are driven primarily by hallucination on sparse layouts and weak spatial grounding, not by the rank or data coverage limitations.
+
+\subsubsection{Architectural Constraints}
+\begin{itemize}
+    \item Limited to single-page documents
+    \item Requires pre-OCR for text
+    \item Computational cost for large documents
+\end{itemize}
+
+\subsection{Future Directions}
+\begin{itemize}
+    \item Multi-page document handling
+    \item End-to-end OCR integration
+    \item Cross-lingual evaluation
+    \item Real-time processing optimization
+\end{itemize}

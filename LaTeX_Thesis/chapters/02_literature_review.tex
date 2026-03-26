@@ -1,0 +1,128 @@
+\chapter{Literature Review}
+\label{ch:literature}
+
+\section{Document Understanding}
+\label{sec:doc_understanding}
+
+Document understanding — the task of extracting structured information from unstructured document images — is a foundational problem in information extraction and enterprise automation. Early systems relied on hand-crafted rules; modern approaches leverage deep learning and pre-training to achieve better generalization.
+
+\subsection{Traditional Approaches}
+Early document understanding systems relied on hand-crafted rules and template matching, where documents were processed using predefined spatial zones or keyword dictionaries. OCR engines such as Tesseract provided raw text extraction, but structural understanding — identifying which text belongs to which field — required manual layout rules per document type. These systems generalize poorly: a rule designed for one invoice format breaks on a different vendor's layout. Heuristic approaches such as regular expressions or nearest-neighbor text pairing (as used in our own Stage 3 heuristic baseline) remain useful lower bounds but cannot handle layout diversity at scale.
+
+\subsection{Deep Learning Approaches}
+Convolutional neural networks were first applied to document images for classification tasks, treating the document as a visual object. Recurrent models such as LSTMs were later used to model sequential token dependencies in OCR output. A major shift came with the introduction of transformer architectures, which allowed joint modeling of text and layout by treating token positions as additional input features~\cite{transformers}. This opened the path to the multimodal pre-trained models that dominate the field today.
+
+\section{Multimodal Pre-training for Documents}
+\label{sec:multimodal}
+
+Multimodal pre-training in the document domain seeks to learn joint representations of text, layout, and visual information, enabling transfer learning to downstream tasks. The LayoutLM family of models has emerged as the dominant architecture in this space.
+
+\subsection{LayoutLM}
+\label{subsec:layoutlm}
+LayoutLM~\cite{layoutlm} was the first model to jointly pre-train text and 2D layout information for document understanding. It extends BERT by adding 2D positional embeddings derived from bounding box coordinates, allowing the model to learn spatial relationships between tokens. Pre-trained on IIT-CDIP with masked language modeling, it achieved strong results on form understanding benchmarks including FUNSD and SROIE. LayoutLM demonstrated that layout is a first-class feature for document tasks, not merely an accessory to text.
+
+\subsection{LayoutLMv2}
+\label{subsec:layoutlmv2}
+LayoutLMv2~\cite{layoutlmv2} extended the original by incorporating visual features from the document image using a CNN backbone, enabling true multimodal fusion of text, layout, and vision within a single pre-training objective. It introduced a spatial-aware self-attention mechanism that conditions attention on relative 2D positions between tokens, rather than only adding absolute position embeddings. This architectural change improved performance across all downstream document understanding tasks and established the design pattern followed by later models.
+
+\subsection{LayoutLMv3}
+\label{subsec:layoutlmv3}
+LayoutLMv3~\cite{layoutlmv3} unifies text and image representation through a single transformer backbone, replacing the CNN visual encoder with patch-based image embeddings similar to Vision Transformers~\cite{vit}. Pre-training objectives include Masked Language Modeling, Masked Image Modeling, and Word-Patch Alignment, enabling the model to learn fine-grained correspondence between text tokens and image regions. LayoutLMv3 achieved state-of-the-art results on FUNSD, CORD, and DocVQA at the time of its release, and serves as the encoder backbone in the proposed architecture of this thesis.
+
+\section{Key-Value Pair Extraction}
+\label{sec:kvp_extraction}
+
+Key-value pair extraction is the core task addressed in this thesis: given a document image, extract structured pairs of semantically-linked keys and values with spatial localization. Multiple algorithmic approaches have emerged, each with distinct trade-offs.
+
+\subsection{Sequence Labeling Approaches}
+\label{subsec:seq_labeling}
+The dominant early paradigm for key-value extraction treats the problem as token classification using BIO tagging schemes (Begin, Inside, Outside), where each token is labeled as the beginning or continuation of a key or value span. Models such as LayoutLM and LayoutLMv2 are typically fine-tuned in this manner on datasets like FUNSD. While effective for predefined entity types, sequence labeling requires a fixed ontology of field names and cannot generalize to unseen key types --- a significant limitation for open-vocabulary business documents.
+
+\subsection{Generative Approaches}
+\label{subsec:generative}
+Generative approaches formulate extraction as a text generation task: given a document's text and layout representation as input, the model generates all key-value pairs as a structured output string. This framing allows open-vocabulary extraction without a predefined field schema. The KVP10k baseline~\cite{kvp10k} adopts this paradigm using Mistral-7B~\cite{mistral} fine-tuned to output Python list-of-lists representations of key-value pairs. Generative models offer flexibility but introduce hallucination risk --- predicting plausible-sounding pairs that have no grounding in the document.
+
+\subsection{Graph-based Approaches}
+\label{subsec:graph_based}
+Graph neural networks have been applied to document understanding by treating detected text regions as nodes and spatial or semantic proximity as edges. Models such as PICK~\cite{pick} construct document graphs and propagate information between nodes to infer key-value relationships. These approaches can naturally model non-local dependencies but require graph construction as a preprocessing step and typically rely on OCR-produced bounding boxes. They are generally competitive with sequence-labeling approaches on structured datasets but have seen less adoption since the rise of large multimodal pre-trained models~\cite{gcn}.
+
+\section{Information Extraction from Forms}
+\label{sec:form_extraction}
+
+Form and receipt understanding represent important specialized domains within document information extraction, where the goal is to extract and link key-value pairs from scanned or digital forms, invoices, and receipts. These domains have motivated substantial recent research.
+
+\subsection{FUNSD and CORD Datasets}
+\label{subsec:funsd_cord}
+FUNSD (Form Understanding in Noisy Scanned Documents, Jaume et al., 2019)~\cite{funsd} is a benchmark of 199 noisy scanned forms with entity labeling and linking annotations, widely used to evaluate form understanding models. CORD (Consolidated Receipt OCR Dataset, Park et al., 2021)~\cite{cord} contains 11,000 Indonesian receipts with structured key-value annotations for receipt parsing. Both datasets were instrumental in driving the development of layout-aware models including the LayoutLM family, and remain standard benchmarks despite their limited scale. Their document types --- forms and receipts --- overlap substantially with the KVP10k categories evaluated in this thesis.
+
+\subsection{Receipt Understanding}
+\label{subsec:receipt_understanding}
+Receipt understanding is a practically important subtask of document information extraction, where the goal is to extract structured fields such as merchant name, date, total amount, and line items from point-of-sale receipts. Receipts present a relatively constrained layout compared to general business documents, making them an accessible entry point for document understanding research. However, real-world receipts vary considerably in quality, language, and format, motivating the inclusion of receipt samples in large-scale diverse benchmarks such as KVP10k.
+
+\section{Evaluation Metrics}
+\label{sec:metrics_review}
+
+Rigorous evaluation of information extraction systems requires metrics that capture both textual correctness and spatial accuracy of extracted spans. The KVP10k benchmark defines a dual-threshold evaluation protocol combining text and spatial metrics.
+
+\subsection{Text Matching Metrics}
+\label{subsec:text_metrics}
+Exact match (EM) is the strictest text evaluation criterion, counting a prediction as correct only if it matches the ground truth string character-for-character. In practice, minor OCR errors or formatting differences cause exact match to undercount true positives. Normalized Edit Distance (NED), defined as the Levenshtein edit distance~\cite{levenshtein} divided by the length of the longer string, provides a softer criterion that tolerates small character-level discrepancies. The KVP10k benchmark uses NED $< 0.2$ as the primary text correctness threshold, and we adopt this definition in all evaluations reported in this thesis.
+
+\subsection{Spatial Matching Metrics}
+\label{subsec:spatial_metrics}
+Intersection over Union (IoU)~\cite{iou} is the standard spatial overlap metric, defined as the ratio of the intersection area to the union area of two bounding boxes. For a predicted bounding box to be considered spatially correct, its IoU with the ground truth box must exceed a defined threshold. The KVP10k benchmark uses IoU $> 0.3$ as the spatial correctness threshold. Combined evaluation requires both NED $< 0.2$ and IoU $> 0.3$ to be satisfied simultaneously, yielding a stricter joint text-and-location F1 score that penalizes models which predict correct text at the wrong location.
+
+\section{Related Datasets}
+\label{sec:related_datasets}
+
+Multiple benchmarks have been introduced for document understanding and information extraction, each emphasizing different aspects of the problem space.
+
+\subsection{KVP10k}
+\label{subsec:kvp10k}
+KVP10k~\cite{kvp10k} is a large-scale benchmark for open-vocabulary key-value pair extraction from business documents, introduced at ICDAR 2024. It contains 48,280 training and 5,255 test samples spanning invoices, forms, and receipts collected from real-world sources by IBM Research. Each sample includes polygon bounding box annotations and explicit linking attributes connecting keys to their corresponding values. Unlike FUNSD and CORD, KVP10k provides both a large-scale training set and an official evaluation benchmark with a Mistral-7B generative baseline, making it the most suitable existing benchmark for the task addressed in this thesis.
+
+\subsection{Other Document Datasets}
+\label{subsec:other_datasets}
+DocVQA~\cite{docvqa} (Document Visual Question Answering, Mathew et al., 2021) frames document understanding as visual question answering over document images, testing a model's ability to locate and extract specific information given a natural language question. RVL-CDIP is a large-scale document classification benchmark of 400,000 scanned document images across 16 categories. XFUND extends FUNSD to multilingual form understanding across eight languages. While these datasets are not directly used in this thesis, they represent the broader evaluation landscape within which the KVP10k benchmark is positioned.
+
+\section{Time-Bounded State of the Art}
+\label{sec:time_bounded_sota}
+
+At the start of this project (February~2026), the state of the art for key--value
+pair extraction from business documents was largely shaped by multimodal
+pre-training approaches (such as the LayoutLM family) and the recently
+introduced KVP10k benchmark~\cite{kvp10k}. The KVP10k paper provides both a
+large-scale dataset and an official generative baseline based on a
+Mistral-7B language model fine-tuned to output structured key--value pairs.
+
+In this thesis we adopt a \emph{time-bounded} view of the literature: the
+experimental design, choice of baselines, and model architecture are fixed
+with respect to the methods that were publicly available and well-documented
+up to this starting date. In particular, our baseline suite is anchored on
+the official KVP10k benchmark and its Mistral-based text-only model, which we
+regard as the representative strong baseline at project start.
+
+To maintain clarity and reproducibility, we separate this ``project-start''
+snapshot from later developments. New models or training strategies that
+appeared after February~2026 are not used to re-design the core method or
+re-run the full experimental pipeline. Instead, they are briefly discussed
+in a dedicated state-of-the-art update in the Discussion chapter
+(Section~\ref{sec:sota_update}), where we position our results relative to
+these newer trends.
+
+\section{Summary and Research Gaps}
+\label{sec:lit_summary}
+
+The literature review reveals several research gaps that motivate the approach in this thesis:
+
+\begin{enumerate}
+    \item \textbf{Layout-aware architectures for KVP extraction}: While LayoutLMv3 achieves strong performance on sequence labeling tasks, its application to open-vocabulary generative KVP extraction remains understudied. The combination of LayoutLMv3 with explicit learned linking mechanisms is novel.
+    
+    \item \textbf{Spatial localization vs.\ text accuracy trade-offs}: Generative baselines (such as Mistral-7B in KVP10k) excel at text extraction but struggle with precise spatial grounding. Understanding and addressing this trade-off is central to this thesis.
+    
+    \item \textbf{Systematic error analysis by document type}: Prior work on form understanding has not deeply analyzed how model performance varies with layout density. This thesis provides detailed per-cluster error analysis revealing distribution-specific failure modes.
+    
+    \item \textbf{Learned linking for key-value association}: Existing literature lacks explicit treatment of the linking problem --- identifying which extracted values belong to which keys. We propose a learned linker module as a novel solution.
+\end{enumerate}
+
+In this thesis, we adopt LayoutLMv3 as the encoder backbone combined with a learned attention-based linker module, positioned as a natural architectural evolution from the sequence-labeling and generative paradigms reviewed above.

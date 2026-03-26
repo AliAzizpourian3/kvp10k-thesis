@@ -1,0 +1,23 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Layout features extracted from each document}}{14}{table.caption.6}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Layout cluster distribution for $k=2$ on annotated training pages}}{15}{table.caption.8}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Annotation statistics for 200-sample subset}}{18}{table.caption.12}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Main hyperparameters for the corrected Mistral baseline.}}{26}{table.caption.13}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Nearest Neighbor Baseline Results (20-sample validation)}}{27}{table.caption.14}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {7.1}{\ignorespaces Stage 3 Mistral-7B Baseline Results (NED=0.5, IoU=0.5; $n=581$ test pages)}}{30}{table.caption.15}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces Stage 3 Mistral-7B Baseline Results (NED=0.2, IoU=0.3; $n=581$ test pages)}}{30}{table.caption.16}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces Impact of Threshold Strictness on Mistral-7B F1 Performance}}{30}{table.caption.17}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces KVP10k Paper Baseline (All category; reported in Table 1 of \blx@tocontentsinit {0}\cite {kvp10k})}}{31}{table.caption.18}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Paper Baseline vs. Our Stage 3 Mistral Baseline (All category comparison)}}{31}{table.caption.19}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces Stage 3 Mistral Error Analysis by Layout Cluster (581 test pages)}}{32}{table.caption.20}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

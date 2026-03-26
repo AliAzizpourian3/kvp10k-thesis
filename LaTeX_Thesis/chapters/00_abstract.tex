@@ -1,0 +1,29 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\begin{spacing}{1.5}
+
+This thesis presents a comprehensive study on automatic \kvp{} extraction from business documents using deep learning and multimodal document understanding. We develop and evaluate a LayoutLMv3-based approach augmented with an attention-based linking mechanism for accurate key-value association.
+
+\textbf{Background:} Business document processing remains a significant challenge in document understanding, requiring accurate extraction of structured information from semi-structured layouts. Traditional approaches rely on template matching or rule-based systems, limiting generalization to diverse document types.
+
+\textbf{Method:} We propose a generative approach combining LayoutLMv3 as a multimodal encoder with a transformer-based decoder (T5/Mistral) for end-to-end \kvp{} extraction. An attention-based linker module explicitly models spatial and semantic relationships between keys and values. Our approach is evaluated on the KVP10k dataset comprising 48,280 training and 5,255 test samples spanning invoices, forms, and receipts.
+
+\textbf{Evaluation:} We employ a dual-threshold evaluation protocol: Normalized Edit Distance (NED) $<$ 0.2 for text accuracy and Intersection over Union (IoU) $>$ 0.3 for location accuracy. Performance is measured using F1 score, combining precision and recall.
+
+\textbf{Results:} [TO BE COMPLETED AFTER EXPERIMENTS]
+% Preliminary layout analysis reveals two distinct layout clusters ($k=2$) with 82.7\% variance explained by two principal components (PC1: 71.8\%, PC2: 10.8\%). Key-value pairs exhibit strong spatial proximity (mean distance = 0.10 normalized units).
+
+\textbf{Contributions:}
+\begin{itemize}
+    \item Comprehensive analysis of KVP10k dataset layout characteristics and spatial patterns
+    \item Implementation of LayoutLMv3 + Linker architecture for generative \kvp{} extraction
+    \item Systematic evaluation of robustness to rotation, occlusion, and annotation dropout
+    \item Interpretability analysis through attention visualization and error case studies
+\end{itemize}
+
+\textbf{Keywords:} Document Understanding, Key-Value Pair Extraction, LayoutLMv3, Multimodal Learning, Information Extraction, Business Documents
+
+\end{spacing}
+
+\clearpage
