@@ -338,16 +338,18 @@ def main():
     test_loader = dataloaders['test']
     logger.info(f"Train: {len(train_loader)} batches, Val: {len(val_loader)} batches, Test: {len(test_loader)} batches")
     
-    # Create model with linker
+    # Create model with linker (stays on CPU for now)
     model = LayoutLMv3KVPModel(use_linker=True)
-    logger.info("LayoutLMv3KVPModel (with linker) created")
+    logger.info("LayoutLMv3KVPModel (with linker) created on CPU")
     
     # Load pretrained encoder and entity classifier from Stage 4a if provided (and not resuming)
+    # Do this BEFORE moving model to GPU to avoid memory spike
     if args.pretrained_encoder and not latest_ckpt:
         pretrained_path = Path(args.pretrained_encoder)
         if pretrained_path.exists():
             device_cpu = torch.device("cpu")
             state_dict = torch.load(pretrained_path, map_location=device_cpu)
+            logger.info(f"Loaded pretrained checkpoint from {pretrained_path} on CPU")
             
             # Transfer layoutlmv3 encoder + entity_classifier weights from Stage 4a
             model_state = model.state_dict()
@@ -361,12 +363,12 @@ def main():
                         logger.warning(f"Key {key} not found in Stage 4b model")
             
             model.load_state_dict(model_state, strict=False)
-            logger.info(f"✓ Loaded pretrained weights from {pretrained_path}: {len(transferred_keys)} keys transferred")
-            logger.info(f"  Transferred: {len([k for k in transferred_keys if k.startswith('layoutlmv3')])} encoder keys, {len([k for k in transferred_keys if k.startswith('entity_classifier')])} classifier keys")
+            logger.info(f"✓ Transferred {len(transferred_keys)} weight keys on CPU")
+            logger.info(f"  Encoder keys: {len([k for k in transferred_keys if k.startswith('layoutlmv3')])}, Classifier keys: {len([k for k in transferred_keys if k.startswith('entity_classifier')])}")
         else:
             logger.warning(f"Pretrained encoder path not found: {pretrained_path}")
     
-    # Create trainer
+    # Create trainer (will move model to GPU inside __init__)
     trainer = Stage4bTrainer(
         model=model,
         train_loader=train_loader,
