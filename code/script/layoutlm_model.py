@@ -12,7 +12,12 @@ Architecture:
 Memory optimisations (Stage 4b OOM fix):
 - Biaffine linker uses chunked scoring (LINKER_CHUNK_SIZE=8) instead of
   materialising the full [nk * nv, hidden] expanded tensor.
-- LayoutLMv3 encoder uses gradient checkpointing to trade compute for memory.
+- Hard cap of MAX_LINK_CANDIDATES=128 keys and 128 values per page,
+  selected by highest entity confidence. Guarantees worst-case linker
+  matrix is 128x128 pairs regardless of epoch noisiness.
+- gradient_checkpointing_enable() is NOT called: LayoutLMv3 does not
+  support the global HuggingFace gradient-checkpointing API reliably.
+  The chunked linker + candidate cap are sufficient to stay within 40GB.
 """
 
 import os
@@ -27,9 +32,14 @@ from dataclasses import dataclass
 import config
 
 # Chunk size for biaffine linker pairwise scoring.
-# Each chunk processes this many key-value pairs at once instead of all at once.
-# Lower = less peak memory, more compute iterations. 8 is safe for A100 40GB.
+# Each chunk processes this many key rows at a time.
+# Lower = less peak memory. 8 is safe for A100 40GB.
 LINKER_CHUNK_SIZE = int(os.environ.get("LINKER_CHUNK_SIZE", "8"))
+
+# Hard cap on key and value candidate tokens fed to the linker per page.
+# Tokens are ranked by entity-class softmax confidence and the top-N kept.
+# Worst-case linker matrix: MAX x MAX pairs. 128 x 128 = 16,384.
+MAX_LINK_CANDIDATES = int(os.environ.get("LINKER_MAX_CANDIDATES", "128"))
 
 
 @dataclass
@@ -46,6 +56,11 @@ class LayoutLMv3Encoder(nn.Module):
     """
     LayoutLMv3 encoder for document understanding.
     Encodes text + layout + visual features.
+
+    Note: gradient_checkpointing_enable() is NOT called here.
+    LayoutLMv3 does not reliably support the global HuggingFace
+    gradient-checkpointing API. Memory is managed via the chunked
+    linker and the MAX_LINK_CANDIDATES cap instead.
     """
 
     def __init__(self, model_name="microsoft/layoutlmv3-base", freeze_base=False):
@@ -53,14 +68,6 @@ class LayoutLMv3Encoder(nn.Module):
 
         self.model = LayoutLMv3Model.from_pretrained(model_name)
         self.hidden_size = self.model.config.hidden_size
-
-        # Enable gradient checkpointing to reduce activation memory.
-        # LayoutLMv3 supports this natively through HuggingFace's interface.
-        try:
-            self.model.gradient_checkpointing_enable()
-            print("[LayoutLMv3Encoder] Gradient checkpointing: ENABLED")
-        except Exception as e:
-            print(f"[LayoutLMv3Encoder] Gradient checkpointing not available: {e}")
 
         if freeze_base:
             for param in self.model.parameters():
@@ -76,7 +83,7 @@ class LayoutLMv3Encoder(nn.Module):
 
         Returns:
             sequence_output: [batch, seq_len, hidden_size]
-            pooled_output: [batch, hidden_size]
+            pooled_output:   [batch, hidden_size]  (same tensor, for API compat)
         """
         outputs = self.model(
             input_ids=input_ids,
@@ -111,9 +118,11 @@ class BiaffineLinker(nn.Module):
     """
     Biaffine attention mechanism for learning key-value links.
 
-    Memory-efficient implementation: pairwise scores are computed in
-    chunks of LINKER_CHUNK_SIZE key rows at a time, avoiding the
-    [nk * nv, hidden] expansion that caused OOM in the original version.
+    Memory-efficient implementation:
+    1. Hard cap: only top-MAX_LINK_CANDIDATES key/value tokens by entity
+       confidence are passed to the linker (eliminates noisy-epoch OOM).
+    2. Chunked scoring: biaffine scores are computed LINKER_CHUNK_SIZE
+       key rows at a time (eliminates [nk*nv, hidden] expansion OOM).
     """
 
     def __init__(self, hidden_size, dropout=0.1):
@@ -147,8 +156,8 @@ class BiaffineLinker(nn.Module):
         Compute spatial features for one key against all values.
 
         Args:
-            key_box:   [4]       - single key bbox
-            val_boxes: [nv, 4]  - all value bboxes
+            key_box:   [4]      - single key bbox
+            val_boxes: [nv, 4] - all value bboxes
         Returns:
             [nv, 8]
         """
@@ -209,15 +218,14 @@ class BiaffineLinker(nn.Module):
         chunk_size = key_chunk.size(0)
         nv = val_reps.size(0)
 
-        # Expand for biaffine: [chunk * nv, hidden]
+        # [chunk * nv, hidden] -- bounded by LINKER_CHUNK_SIZE * MAX_LINK_CANDIDATES
         k_exp = key_chunk.unsqueeze(1).expand(chunk_size, nv, -1).reshape(-1, self.hidden_size)
         v_exp = val_reps.unsqueeze(0).expand(chunk_size, nv, -1).reshape(-1, self.hidden_size)
         biaffine_scores = self.biaffine(k_exp, v_exp).reshape(chunk_size, nv, 1)
 
-        # Spatial features: one key at a time to stay frugal
         spatial_list = []
         for i in range(chunk_size):
-            sf = self._compute_spatial_features_pair(key_boxes_chunk[i], val_boxes)  # [nv, 8]
+            sf = self._compute_spatial_features_pair(key_boxes_chunk[i], val_boxes)
             spatial_list.append(sf)
         spatial_feats = torch.stack(spatial_list, dim=0)  # [chunk, nv, 8]
         spatial_scores = self.spatial_encoder(spatial_feats)  # [chunk, nv, 32]
@@ -227,7 +235,7 @@ class BiaffineLinker(nn.Module):
 
     def forward(self, sequence_output, entity_logits, bboxes, attention_mask):
         """
-        Compute linking scores between all key-value pairs using chunked scoring.
+        Compute linking scores with hard candidate cap + chunked scoring.
 
         Args:
             sequence_output: [batch, seq_len, hidden_size]
@@ -237,11 +245,13 @@ class BiaffineLinker(nn.Module):
 
         Returns:
             link_scores:   list[Tensor|None]  shape per item: [nk, nv]
-            key_indices:   list[Tensor]
+            key_indices:   list[Tensor]  (indices into original seq, capped)
             value_indices: list[Tensor]
         """
         batch_size = sequence_output.shape[0]
-        entity_preds = torch.argmax(entity_logits, dim=-1)
+        # Softmax probabilities for confidence-based ranking
+        entity_probs = torch.softmax(entity_logits, dim=-1)  # [batch, seq_len, 3]
+        entity_preds = torch.argmax(entity_logits, dim=-1)   # [batch, seq_len]
 
         all_link_scores = []
         all_key_indices = []
@@ -254,6 +264,17 @@ class BiaffineLinker(nn.Module):
             key_idx = key_mask.nonzero(as_tuple=True)[0]
             val_idx = val_mask.nonzero(as_tuple=True)[0]
 
+            # ── Hard cap: keep top-MAX_LINK_CANDIDATES by entity confidence ──
+            if len(key_idx) > MAX_LINK_CANDIDATES:
+                key_conf = entity_probs[b][key_idx, 1]  # KEY class prob
+                top_k = torch.topk(key_conf, MAX_LINK_CANDIDATES).indices
+                key_idx = key_idx[top_k]
+
+            if len(val_idx) > MAX_LINK_CANDIDATES:
+                val_conf = entity_probs[b][val_idx, 2]  # VALUE class prob
+                top_k = torch.topk(val_conf, MAX_LINK_CANDIDATES).indices
+                val_idx = val_idx[top_k]
+
             if len(key_idx) == 0 or len(val_idx) == 0:
                 all_link_scores.append(None)
                 all_key_indices.append(key_idx)
@@ -262,16 +283,16 @@ class BiaffineLinker(nn.Module):
 
             key_reps = self.key_projection(
                 self.dropout(sequence_output[b][key_idx])
-            )  # [nk, hidden]
+            )  # [nk, hidden]  nk <= MAX_LINK_CANDIDATES
             val_reps = self.value_projection(
                 self.dropout(sequence_output[b][val_idx])
-            )  # [nv, hidden]
+            )  # [nv, hidden]  nv <= MAX_LINK_CANDIDATES
 
             nk = len(key_idx)
-            key_boxes = bboxes[b][key_idx]   # [nk, 4]
-            val_boxes = bboxes[b][val_idx]   # [nv, 4]
+            key_boxes = bboxes[b][key_idx]  # [nk, 4]
+            val_boxes = bboxes[b][val_idx]  # [nv, 4]
 
-            # Chunked scoring: process LINKER_CHUNK_SIZE keys at a time
+            # Chunked scoring: LINKER_CHUNK_SIZE keys at a time
             score_rows = []
             for start in range(0, nk, LINKER_CHUNK_SIZE):
                 end = min(start + LINKER_CHUNK_SIZE, nk)
@@ -295,9 +316,9 @@ class BiaffineLinker(nn.Module):
 class LayoutLMv3KVPModel(nn.Module):
     """
     Complete model for KVP extraction:
-    1. LayoutLMv3 encoder (with gradient checkpointing)
+    1. LayoutLMv3 encoder
     2. Entity classifier (Key/Value/Other)
-    3. Biaffine linker (chunked pairwise scoring) - optional for ablation
+    3. Biaffine linker (chunked + capped) - optional for ablation
     """
 
     def __init__(
@@ -478,8 +499,9 @@ def create_model(
     print(f"  Encoder: {model_name}")
     print(f"  Freeze base: {freeze_base}")
     print(f"  Use linker: {use_linker} ({'Stage 4b - With Linker' if use_linker else 'Stage 4a - No Linker'})")
-    print(f"  Gradient checkpointing: enabled")
+    print(f"  Gradient checkpointing: NOT used (LayoutLMv3 unsupported)")
     print(f"  Linker chunk size: {LINKER_CHUNK_SIZE}")
+    print(f"  Max link candidates: {MAX_LINK_CANDIDATES}")
     print(f"  Device: {device}")
     print(f"  Total parameters: {sum(p.numel() for p in model.parameters()):,}")
     print(f"  Trainable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
