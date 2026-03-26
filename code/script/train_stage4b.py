@@ -4,7 +4,10 @@ Stage 4b Training: LayoutLMv3 KVP Extraction with Biaffine Linker.
 Implements:
 - LayoutLMv3 encoder + entity classifier + Biaffine linker
 - Key-value linking with configurable loss weight
-- Mixed precision (fp16) training for memory efficiency
+- Mixed precision (bf16) training for memory efficiency
+  NOTE: bf16 is used instead of fp16 because the biaffine pairwise scorer
+  produces large intermediate values that overflow fp16 (max ~65504), causing
+  NaN loss. bf16 shares fp32's dynamic range and is natively supported on A100.
 - Training from prepared JSON data (data/prepared/train/*.json)
 - Validation with early stopping (patience=3 on F1)
 - Checkpoint saving to data/outputs/stage4b_{linker_loss_weight}/
@@ -30,6 +33,11 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# bf16 does not need a GradScaler (no overflow risk), but we keep the
+# scaler instantiation as a no-op (enabled=False) so the code path is
+# identical and easy to switch back if needed.
+_USE_BF16 = True   # A100-safe; set False to revert to fp32
 
 
 class Stage4bTrainer:
@@ -80,8 +88,11 @@ class Stage4bTrainer:
         self.best_val_f1 = 0.0
         self.patience_counter = 0
 
-        # fp16 mixed precision: use new torch.amp API (avoids deprecation warnings)
-        self.scaler = torch.amp.GradScaler("cuda")
+        # bf16: GradScaler is not needed (bf16 has fp32 dynamic range, no overflow).
+        # We disable it explicitly so the optimizer step path is clean.
+        self.scaler = torch.amp.GradScaler("cuda", enabled=False)
+        self.autocast_dtype = torch.bfloat16 if _USE_BF16 else torch.float32
+        logger.info(f"Mixed precision: {'bf16' if _USE_BF16 else 'fp32 (no autocast)'}")
 
     def restore_history(self, checkpoint_dir: Path):
         """Restore training history and best_val_f1 from a previous run."""
@@ -99,23 +110,19 @@ class Stage4bTrainer:
 
     def _optimizer_step(self):
         """
-        Single helper that always goes through the fp16 scaler correctly:
-          1. unscale_ so clip_grad_norm_ operates on real gradients
-          2. clip
-          3. scaler.step  (skips update if inf/nan detected)
-          4. scaler.update
-          5. zero_grad
-          6. scheduler step
+        Single helper that always performs the optimizer step correctly.
+        With bf16 (scaler disabled) this reduces to: clip -> step -> zero_grad -> scheduler.
+        The scaler calls are no-ops when enabled=False, keeping the code path uniform.
         """
-        self.scaler.unscale_(self.optimizer)
+        self.scaler.unscale_(self.optimizer)          # no-op when disabled
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-        self.scaler.step(self.optimizer)
-        self.scaler.update()
+        self.scaler.step(self.optimizer)              # calls optimizer.step() internally
+        self.scaler.update()                          # no-op when disabled
         self.optimizer.zero_grad()
         self.scheduler.step()
 
     def train_epoch(self):
-        """Train one epoch with fp16 mixed precision."""
+        """Train one epoch with bf16 mixed precision."""
         self.model.train()
         total_loss = 0.0
         num_batches = 0
@@ -135,8 +142,7 @@ class Stage4bTrainer:
             if link_labels is not None:
                 link_labels = link_labels.to(self.device)
 
-            # Forward pass under fp16 autocast
-            with torch.amp.autocast("cuda"):
+            with torch.amp.autocast("cuda", dtype=self.autocast_dtype):
                 outputs = self.model(
                     input_ids=input_ids,
                     attention_mask=attention_mask,
@@ -156,21 +162,19 @@ class Stage4bTrainer:
                 else:
                     loss = outputs['loss']
 
-                # Scale loss for gradient accumulation
                 loss = loss / self.gradient_accumulation_steps
 
-            # Backward with scaled gradients
+            # bf16 backward (scaler.scale is a no-op when disabled)
             self.scaler.scale(loss).backward()
 
-            # Optimizer step every N batches
             if (batch_idx + 1) % self.gradient_accumulation_steps == 0:
                 self._optimizer_step()
 
-            total_loss += loss.item() * self.gradient_accumulation_steps
+            total_loss  += loss.item() * self.gradient_accumulation_steps
             num_batches += 1
-            pbar.set_postfix({"loss": loss.item() * self.gradient_accumulation_steps})
+            pbar.set_postfix({"loss": f"{loss.item() * self.gradient_accumulation_steps:.4f}"})
 
-        # Flush the last partial accumulation batch (if any)
+        # Flush last partial accumulation batch
         if num_batches % self.gradient_accumulation_steps != 0:
             self._optimizer_step()
 
@@ -198,8 +202,7 @@ class Stage4bTrainer:
                 if link_labels is not None:
                     link_labels = link_labels.to(self.device)
 
-                # Validation also benefits from autocast (faster + less memory)
-                with torch.amp.autocast("cuda"):
+                with torch.amp.autocast("cuda", dtype=self.autocast_dtype):
                     outputs = self.model(
                         input_ids=input_ids,
                         attention_mask=attention_mask,
@@ -222,10 +225,10 @@ class Stage4bTrainer:
                 total_loss  += loss.item()
                 num_batches += 1
 
-                entity_logits    = outputs["entity_logits"]
-                pred_labels      = torch.argmax(entity_logits, dim=-1)
-                gt_labels        = entity_labels
-                mask             = attention_mask
+                entity_logits     = outputs["entity_logits"]
+                pred_labels       = torch.argmax(entity_logits, dim=-1)
+                gt_labels         = entity_labels
+                mask              = attention_mask
 
                 key_val_mask      = ((gt_labels == 1) | (gt_labels == 2)) & (mask == 1)
                 pred_key_val_mask = ((pred_labels == 1) | (pred_labels == 2)) & (mask == 1)
@@ -244,7 +247,6 @@ class Stage4bTrainer:
         """Full training loop with early stopping."""
         logger.info(f"Starting Stage 4b training | linker_loss_weight={self.linker_loss_weight}")
         logger.info(f"Output directory: {self.output_dir}")
-        logger.info(f"Mixed precision: fp16 (torch.amp)")
 
         for epoch in range(self.num_epochs):
             logger.info(f"\n=== Epoch {epoch+1}/{self.num_epochs} ===")
@@ -260,13 +262,11 @@ class Stage4bTrainer:
             self.training_history["val_losses"].append(val_loss)
             self.training_history["val_f1s"].append(val_f1)
 
-            # Checkpoint every epoch
             ckpt_dir = self.output_dir / f"checkpoint-{epoch+1}"
             ckpt_dir.mkdir(parents=True, exist_ok=True)
             torch.save(self.model.state_dict(), ckpt_dir / "pytorch_model.bin")
             logger.info(f"Checkpoint saved to {ckpt_dir}")
 
-            # Early stopping
             if val_f1 > self.best_val_f1:
                 self.best_val_f1 = val_f1
                 self.patience_counter = 0
@@ -293,19 +293,19 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Stage 4b Training: LayoutLMv3 with Linker")
-    parser.add_argument("--data_dir",                   type=str,   default="../../data/prepared")
-    parser.add_argument("--output_dir",                 type=str,   default="../../data/outputs/stage4b")
-    parser.add_argument("--batch_size",                 type=int,   default=2)
-    parser.add_argument("--gradient_accumulation_steps",type=int,   default=16)
-    parser.add_argument("--learning_rate",              type=float, default=5e-5)
-    parser.add_argument("--num_epochs",                 type=int,   default=10)
-    parser.add_argument("--early_stopping_patience",   type=int,   default=3)
-    parser.add_argument("--val_fraction",               type=float, default=0.1)
-    parser.add_argument("--linker_loss_weight",         type=float, default=1.0,
+    parser.add_argument("--data_dir",                    type=str,   default="../../data/prepared")
+    parser.add_argument("--output_dir",                  type=str,   default="../../data/outputs/stage4b")
+    parser.add_argument("--batch_size",                  type=int,   default=2)
+    parser.add_argument("--gradient_accumulation_steps", type=int,   default=16)
+    parser.add_argument("--learning_rate",               type=float, default=5e-5)
+    parser.add_argument("--num_epochs",                  type=int,   default=10)
+    parser.add_argument("--early_stopping_patience",     type=int,   default=3)
+    parser.add_argument("--val_fraction",                type=float, default=0.1)
+    parser.add_argument("--linker_loss_weight",          type=float, default=1.0,
                         help="Linker loss weight \u03bb")
-    parser.add_argument("--include_images",             action="store_true")
-    parser.add_argument("--resume_from_checkpoint",     action="store_true")
-    parser.add_argument("--pretrained_encoder",         type=str,   default=None,
+    parser.add_argument("--include_images",              action="store_true")
+    parser.add_argument("--resume_from_checkpoint",      action="store_true")
+    parser.add_argument("--pretrained_encoder",          type=str,   default=None,
                         help="Path to Stage 4a checkpoint (pytorch_model.bin)")
 
     args = parser.parse_args()
@@ -339,15 +339,13 @@ def main():
     test_loader  = dataloaders['test']
     logger.info(f"Train: {len(train_loader)} batches | Val: {len(val_loader)} batches | Test: {len(test_loader)} batches")
 
-    # ── Model (CPU first to avoid memory spike) ──────────────────────────────
+    # ── Model (CPU first to avoid memory spike on load) ────────────────────────
     model = LayoutLMv3KVPModel(use_linker=True)
     logger.info("LayoutLMv3KVPModel (with linker) created on CPU")
 
     # ── Transfer Stage 4a weights ────────────────────────────────────────────
-    # Both Stage 4a and Stage 4b share identical key names:
-    #   encoder.*            (212 keys) - LayoutLMv3Encoder as self.encoder
-    #   entity_classifier.*  (2 keys)   - EntityClassifier
-    # The linker.* keys are unique to 4b and stay randomly initialised.
+    # Both stages share identical key names (encoder.*, entity_classifier.*).
+    # linker.* keys are Stage 4b-only and stay randomly initialised.
     if args.pretrained_encoder and not latest_ckpt:
         pretrained_path = Path(args.pretrained_encoder)
         if pretrained_path.exists():
@@ -364,8 +362,8 @@ def main():
 
             model.load_state_dict(model_state, strict=False)
 
-            enc_keys  = [k for k in transferred if k.startswith('encoder.')]
-            cls_keys  = [k for k in transferred if k.startswith('entity_classifier.')]
+            enc_keys = [k for k in transferred if k.startswith('encoder.')]
+            cls_keys = [k for k in transferred if k.startswith('entity_classifier.')]
             logger.info(f"\u2713 Transferred {len(transferred)} keys on CPU (skipped {len(skipped)})")
             logger.info(f"  Encoder keys: {len(enc_keys)}, Classifier keys: {len(cls_keys)}")
 
