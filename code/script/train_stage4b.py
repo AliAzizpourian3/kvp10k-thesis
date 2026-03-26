@@ -309,7 +309,7 @@ def main():
     parser.add_argument("--linker_loss_weight", type=float, default=1.0, help="Linker loss weight λ")
     parser.add_argument("--include_images", action="store_true", help="Include pixel values from images")
     parser.add_argument("--resume_from_checkpoint", action="store_true", help="Resume training from latest checkpoint (auto-detects)")
-    parser.add_argument("--pretrained_encoder", type=str, default=None, help="Path to Stage 4a checkpoint with pretrained entity classifier")
+    parser.add_argument("--pretrained_encoder", type=str, default=None, help="Path to Stage 4a checkpoint with pretrained encoder + entity classifier")
     
     args = parser.parse_args()
     
@@ -342,44 +342,42 @@ def main():
     model = LayoutLMv3KVPModel(use_linker=True)
     logger.info("LayoutLMv3KVPModel (with linker) created on CPU")
     
-    # Load pretrained encoder and entity classifier from Stage 4a if provided (and not resuming)
-    # Do this BEFORE moving model to GPU to avoid memory spike
+    # Load pretrained encoder and entity classifier from Stage 4a if provided (and not resuming).
+    # IMPORTANT: Both Stage 4a and Stage 4b use LayoutLMv3KVPModel with identical key names:
+    #   encoder.*           (212 keys) - the LayoutLMv3Encoder stored as self.encoder
+    #   entity_classifier.* (2 keys)   - the EntityClassifier stored as self.entity_classifier
+    # No key remapping is needed — just copy matching keys directly with strict=False.
+    # The linker.* keys (only in Stage 4b) are simply skipped, staying randomly initialised.
     if args.pretrained_encoder and not latest_ckpt:
         pretrained_path = Path(args.pretrained_encoder)
         if pretrained_path.exists():
-            device_cpu = torch.device("cpu")
-            state_dict = torch.load(pretrained_path, map_location=device_cpu)
-            logger.info(f"Loaded pretrained checkpoint from {pretrained_path} on CPU")
+            state_dict = torch.load(pretrained_path, map_location="cpu")
+            logger.info(f"Loaded Stage 4a checkpoint from {pretrained_path} on CPU")
             
-            # Transfer encoder + entity_classifier weights from Stage 4a
-            # Stage 4a uses "encoder.*" keys, need to map to Stage 4b's "layoutlmv3.*" keys
             model_state = model.state_dict()
             transferred_keys = []
-            
+            skipped_keys = []
+
             for key, value in state_dict.items():
-                # Handle encoder key mapping: encoder.* -> layoutlmv3.*
-                if key.startswith("encoder."):
-                    # Map encoder.* to layoutlmv3.*
-                    new_key = "layoutlmv3." + key[8:]  # Remove "encoder." prefix and add "layoutlmv3."
-                    if new_key in model_state:
-                        model_state[new_key] = value
-                        transferred_keys.append(new_key)
-                    else:
-                        logger.warning(f"Mapped key {new_key} not found in Stage 4b model")
-                
-                # Transfer entity_classifier keys directly
-                elif key.startswith("entity_classifier"):
-                    if key in model_state:
-                        model_state[key] = value
-                        transferred_keys.append(key)
-                    else:
-                        logger.warning(f"Key {key} not found in Stage 4b model")
-            
+                if key in model_state:
+                    model_state[key] = value
+                    transferred_keys.append(key)
+                else:
+                    skipped_keys.append(key)
+
             model.load_state_dict(model_state, strict=False)
-            logger.info(f"✓ Transferred {len(transferred_keys)} weight keys on CPU")
-            encoder_keys = [k for k in transferred_keys if k.startswith('layoutlmv3')]
-            classifier_keys = [k for k in transferred_keys if k.startswith('entity_classifier')]
+
+            encoder_keys = [k for k in transferred_keys if k.startswith('encoder.')]
+            classifier_keys = [k for k in transferred_keys if k.startswith('entity_classifier.')]
+            logger.info(f"✓ Transferred {len(transferred_keys)} keys on CPU (skipped {len(skipped_keys)})")
             logger.info(f"  Encoder keys: {len(encoder_keys)}, Classifier keys: {len(classifier_keys)}")
+
+            if len(encoder_keys) == 0:
+                logger.error("ERROR: 0 encoder keys transferred! Check checkpoint key names.")
+                # Log first 10 checkpoint keys to diagnose
+                sample_keys = list(state_dict.keys())[:10]
+                logger.error(f"Checkpoint key samples: {sample_keys}")
+                raise RuntimeError("Pretrained encoder transfer failed — 0 encoder keys matched.")
         else:
             logger.warning(f"Pretrained encoder path not found: {pretrained_path}")
     
