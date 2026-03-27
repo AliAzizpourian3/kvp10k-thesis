@@ -8,7 +8,17 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mail-type=END,FAIL
 
-# ── OOM fix: expandable segments prevents fragmentation spikes ──────────────
+# Fail immediately on any error, unset variable, or pipe failure.
+# Prevents SLURM reporting COMPLETED 0:0 when Python fails.
+set -euo pipefail
+
+# ── Offline HuggingFace ────────────────────────────────────────────────────
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export HF_HOME="/home/woody/iwi5/iwi5413h/.cache/huggingface"
+export HUGGINGFACE_HUB_CACHE="${HF_HOME}/hub"
+
+# ── PyTorch memory ───────────────────────────────────────────────────────
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # ── Environment ──────────────────────────────────────────────────────────────
@@ -16,11 +26,21 @@ cd /home/woody/iwi5/iwi5413h/kvp10k_thesis
 source venv/bin/activate 2>/dev/null || true
 
 echo "=== Stage 4b lambda=0.5 ==="
-echo "Job ID: $SLURM_JOB_ID"
-echo "Node:   $SLURMD_NODENAME"
-echo "GPU:    $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
-echo "Date:   $(date)"
+echo "Job ID:  $SLURM_JOB_ID"
+echo "Node:    $SLURMD_NODENAME"
+echo "GPU:     $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
+echo "Date:    $(date)"
+echo "HF cache: $HF_HOME"
 echo "PYTORCH_CUDA_ALLOC_CONF: $PYTORCH_CUDA_ALLOC_CONF"
+
+# ── Pre-flight: verify HF cache exists ────────────────────────────────────
+if [[ ! -d "${HUGGINGFACE_HUB_CACHE}/models--microsoft--layoutlmv3-base" ]]; then
+  echo "ERROR: LayoutLMv3 not found in HF cache at ${HUGGINGFACE_HUB_CACHE}"
+  echo "Run this on a login node first:"
+  echo "  python -c \"from transformers import LayoutLMv3Processor; LayoutLMv3Processor.from_pretrained('microsoft/layoutlmv3-base', apply_ocr=False)\""
+  exit 1
+fi
+echo "HF cache check: OK"
 
 # ── Find best Stage 4a checkpoint ────────────────────────────────────────────
 STAGE4A_DIR="data/outputs/stage4a"
@@ -31,7 +51,7 @@ if [[ -z "$STAGE4A_CKPT" ]]; then
   echo "ERROR: No Stage 4a checkpoint found in ${STAGE4A_DIR}"
   exit 1
 fi
-echo "Using Stage 4a checkpoint: $STAGE4A_CKPT"
+echo "Stage 4a checkpoint: $STAGE4A_CKPT"
 
 # ── Run training ──────────────────────────────────────────────────────────────
 python code/script/train_stage4b.py \
