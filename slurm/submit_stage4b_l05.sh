@@ -8,44 +8,51 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mail-type=END,FAIL
 
-# Fail immediately on any error, unset variable, or pipe failure.
-# Prevents SLURM reporting COMPLETED 0:0 when Python fails.
+# Fail immediately on any error — prevents SLURM reporting COMPLETED 0:0 on Python failure.
 set -euo pipefail
 
-# ── Offline HuggingFace ────────────────────────────────────────────────────
+# ── Offline HuggingFace (compute nodes have no internet) ─────────────────
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export HF_HOME="/home/woody/iwi5/iwi5413h/.cache/huggingface"
 export HUGGINGFACE_HUB_CACHE="${HF_HOME}/hub"
 
-# ── PyTorch memory ───────────────────────────────────────────────────────
+# ── PyTorch memory ───────────────────────────────────────────────
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-# ── Environment ──────────────────────────────────────────────────────────────
+# ── Environment ──────────────────────────────────────────────────
 cd /home/woody/iwi5/iwi5413h/kvp10k_thesis
-source venv/bin/activate 2>/dev/null || true
+PYTHON_BIN="/home/woody/iwi5/iwi5413h/kvp10k_thesis/env/kvp10k_env/bin/python"
+
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  echo "ERROR: Python interpreter not found at $PYTHON_BIN"
+  exit 1
+fi
 
 echo "=== Stage 4b lambda=0.5 ==="
-echo "Job ID:  $SLURM_JOB_ID"
-echo "Node:    $SLURMD_NODENAME"
-echo "GPU:     $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
-echo "Date:    $(date)"
+echo "Job ID:   $SLURM_JOB_ID"
+echo "Node:     $SLURMD_NODENAME"
+echo "GPU:      $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
+echo "Date:     $(date)"
+echo "Python:   $PYTHON_BIN"
 echo "HF cache: $HF_HOME"
 echo "PYTORCH_CUDA_ALLOC_CONF: $PYTORCH_CUDA_ALLOC_CONF"
 
-# ── Pre-flight: verify HF cache exists ────────────────────────────────────
+# ── Pre-flight: verify HF cache exists ─────────────────────────────────
 if [[ ! -d "${HUGGINGFACE_HUB_CACHE}/models--microsoft--layoutlmv3-base" ]]; then
   echo "ERROR: LayoutLMv3 not found in HF cache at ${HUGGINGFACE_HUB_CACHE}"
   echo "Run this on a login node first:"
-  echo "  python -c \"from transformers import LayoutLMv3Processor; LayoutLMv3Processor.from_pretrained('microsoft/layoutlmv3-base', apply_ocr=False)\""
+  echo "  $PYTHON_BIN -c \"from transformers import LayoutLMv3Processor; LayoutLMv3Processor.from_pretrained('microsoft/layoutlmv3-base', apply_ocr=False)\""
   exit 1
 fi
 echo "HF cache check: OK"
 
-# ── Find best Stage 4a checkpoint ────────────────────────────────────────────
+# ── Find best Stage 4a checkpoint ──────────────────────────────────────
 STAGE4A_DIR="data/outputs/stage4a"
 STAGE4A_CKPT=$(ls -t ${STAGE4A_DIR}/best_model/pytorch_model.bin \
-               ${STAGE4A_DIR}/checkpoint-*/pytorch_model.bin 2>/dev/null | head -1)
+               ${STAGE4A_DIR}/best_model/model.pt \
+               ${STAGE4A_DIR}/checkpoint-*/pytorch_model.bin \
+               ${STAGE4A_DIR}/checkpoint-*/model.pt 2>/dev/null | head -1)
 
 if [[ -z "$STAGE4A_CKPT" ]]; then
   echo "ERROR: No Stage 4a checkpoint found in ${STAGE4A_DIR}"
@@ -53,8 +60,8 @@ if [[ -z "$STAGE4A_CKPT" ]]; then
 fi
 echo "Stage 4a checkpoint: $STAGE4A_CKPT"
 
-# ── Run training ──────────────────────────────────────────────────────────────
-python code/script/train_stage4b.py \
+# ── Run training ───────────────────────────────────────────────────
+"$PYTHON_BIN" code/script/train_stage4b.py \
   --data_dir            data/prepared \
   --output_dir          data/outputs/stage4b_l05 \
   --batch_size          1 \
