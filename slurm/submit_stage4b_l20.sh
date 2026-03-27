@@ -41,11 +41,9 @@ if [[ ! -d "${HUGGINGFACE_HUB_CACHE}/models--microsoft--layoutlmv3-base" ]]; the
 fi
 echo "HF cache check: OK"
 
+# ── Find best Stage 4a checkpoint ──────────────────────────────────────
 STAGE4A_DIR="data/outputs/stage4a"
-STAGE4A_CKPT=$(ls -t ${STAGE4A_DIR}/best_model/pytorch_model.bin \
-               ${STAGE4A_DIR}/best_model/model.pt \
-               ${STAGE4A_DIR}/checkpoint-*/pytorch_model.bin \
-               ${STAGE4A_DIR}/checkpoint-*/model.pt 2>/dev/null | head -1)
+STAGE4A_CKPT=$(find "${STAGE4A_DIR}" -name 'pytorch_model.bin' -o -name 'model.pt' 2>/dev/null | sort -rV | head -1)
 
 if [[ -z "$STAGE4A_CKPT" ]]; then
   echo "ERROR: No Stage 4a checkpoint found in ${STAGE4A_DIR}"
