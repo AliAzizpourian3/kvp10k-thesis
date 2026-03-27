@@ -12,7 +12,7 @@ set -euo pipefail
 
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
-export HF_HOME="/home/woody/iwi5/iwi5413h/.cache/huggingface"
+export HF_HOME="$HOME/.cache/huggingface"
 export HUGGINGFACE_HUB_CACHE="${HF_HOME}/hub"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
