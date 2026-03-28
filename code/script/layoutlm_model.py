@@ -18,6 +18,10 @@ Memory optimisations (Stage 4b OOM fix):
 - gradient_checkpointing_enable() is NOT called: LayoutLMv3 does not
   support the global HuggingFace gradient-checkpointing API reliably.
   The chunked linker + candidate cap are sufficient to stay within 40GB.
+
+NaN fix:
+- BiaffineLinker weights initialised with xavier_uniform_ / zeros instead
+  of PyTorch default (Kaiming), which overflows in the bilinear layer.
 """
 
 import os
@@ -32,13 +36,9 @@ from dataclasses import dataclass
 import config
 
 # Chunk size for biaffine linker pairwise scoring.
-# Each chunk processes this many key rows at a time.
-# Lower = less peak memory. 8 is safe for A100 40GB.
 LINKER_CHUNK_SIZE = int(os.environ.get("LINKER_CHUNK_SIZE", "8"))
 
 # Hard cap on key and value candidate tokens fed to the linker per page.
-# Tokens are ranked by entity-class softmax confidence and the top-N kept.
-# Worst-case linker matrix: MAX x MAX pairs. 128 x 128 = 16,384.
 MAX_LINK_CANDIDATES = int(os.environ.get("LINKER_MAX_CANDIDATES", "128"))
 
 
@@ -47,25 +47,19 @@ class KVPExample:
     """Single training example for KVP extraction."""
     image_path: str
     words: List[str]
-    bboxes: List[List[int]]  # [x1, y1, x2, y2] in pixel coordinates
-    labels: List[int]  # 0=Other, 1=Key, 2=Value
-    links: List[Tuple[int, int]]  # List of (key_idx, value_idx) pairs
+    bboxes: List[List[int]]
+    labels: List[int]
+    links: List[Tuple[int, int]]
 
 
 class LayoutLMv3Encoder(nn.Module):
     """
     LayoutLMv3 encoder for document understanding.
     Encodes text + layout + visual features.
-
-    Note: gradient_checkpointing_enable() is NOT called here.
-    LayoutLMv3 does not reliably support the global HuggingFace
-    gradient-checkpointing API. Memory is managed via the chunked
-    linker and the MAX_LINK_CANDIDATES cap instead.
     """
 
     def __init__(self, model_name="microsoft/layoutlmv3-base", freeze_base=False):
         super().__init__()
-
         self.model = LayoutLMv3Model.from_pretrained(model_name)
         self.hidden_size = self.model.config.hidden_size
 
@@ -74,17 +68,6 @@ class LayoutLMv3Encoder(nn.Module):
                 param.requires_grad = False
 
     def forward(self, input_ids, attention_mask, bbox, pixel_values=None):
-        """
-        Args:
-            input_ids: [batch, seq_len]
-            attention_mask: [batch, seq_len]
-            bbox: [batch, seq_len, 4] - normalized [x1, y1, x2, y2] in [0, 1000]
-            pixel_values: [batch, 3, 224, 224] - optional image features
-
-        Returns:
-            sequence_output: [batch, seq_len, hidden_size]
-            pooled_output:   [batch, hidden_size]  (same tensor, for API compat)
-        """
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -103,12 +86,6 @@ class EntityClassifier(nn.Module):
         self.classifier = nn.Linear(hidden_size, num_labels)
 
     def forward(self, sequence_output):
-        """
-        Args:
-            sequence_output: [batch, seq_len, hidden_size]
-        Returns:
-            logits: [batch, seq_len, num_labels]
-        """
         sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
         return logits
@@ -120,9 +97,11 @@ class BiaffineLinker(nn.Module):
 
     Memory-efficient implementation:
     1. Hard cap: only top-MAX_LINK_CANDIDATES key/value tokens by entity
-       confidence are passed to the linker (eliminates noisy-epoch OOM).
-    2. Chunked scoring: biaffine scores are computed LINKER_CHUNK_SIZE
-       key rows at a time (eliminates [nk*nv, hidden] expansion OOM).
+       confidence are passed to the linker.
+    2. Chunked scoring: LINKER_CHUNK_SIZE key rows at a time.
+
+    Weight init: xavier_uniform_ on all Linear/Bilinear weights to avoid
+    NaN from default Kaiming init in the bilinear layer.
     """
 
     def __init__(self, hidden_size, dropout=0.1):
@@ -130,10 +109,9 @@ class BiaffineLinker(nn.Module):
 
         self.hidden_size = hidden_size
 
-        self.key_projection = nn.Linear(hidden_size, hidden_size)
+        self.key_projection   = nn.Linear(hidden_size, hidden_size)
         self.value_projection = nn.Linear(hidden_size, hidden_size)
-
-        self.biaffine = nn.Bilinear(hidden_size, hidden_size, 1)
+        self.biaffine         = nn.Bilinear(hidden_size, hidden_size, 1)
 
         self.spatial_encoder = nn.Sequential(
             nn.Linear(8, 64),
@@ -151,18 +129,24 @@ class BiaffineLinker(nn.Module):
 
         self.dropout = nn.Dropout(dropout)
 
-    def _compute_spatial_features_pair(self, key_box, val_boxes):
-        """
-        Compute spatial features for one key against all values.
+        # Xavier init -- prevents NaN from Kaiming default in bilinear weight
+        self._init_weights()
 
-        Args:
-            key_box:   [4]      - single key bbox
-            val_boxes: [nv, 4] - all value bboxes
-        Returns:
-            [nv, 8]
-        """
+    def _init_weights(self):
+        nn.init.xavier_uniform_(self.key_projection.weight)
+        nn.init.zeros_(self.key_projection.bias)
+        nn.init.xavier_uniform_(self.value_projection.weight)
+        nn.init.zeros_(self.value_projection.bias)
+        nn.init.xavier_uniform_(self.biaffine.weight)
+        nn.init.zeros_(self.biaffine.bias)
+        for module in list(self.spatial_encoder) + list(self.final_scorer):
+            if isinstance(module, nn.Linear):
+                nn.init.xavier_uniform_(module.weight)
+                nn.init.zeros_(module.bias)
+
+    def _compute_spatial_features_pair(self, key_box, val_boxes):
         nv = val_boxes.size(0)
-        key_box = key_box.float()
+        key_box   = key_box.float()
         val_boxes = val_boxes.float()
 
         key_cx = (key_box[0] + key_box[2]) / 2
@@ -170,13 +154,13 @@ class BiaffineLinker(nn.Module):
         val_cx = (val_boxes[:, 0] + val_boxes[:, 2]) / 2
         val_cy = (val_boxes[:, 1] + val_boxes[:, 3]) / 2
 
-        dx = val_cx - key_cx
-        dy = val_cy - key_cy
-        dist = torch.sqrt(dx ** 2 + dy ** 2 + 1e-8)
+        dx    = val_cx - key_cx
+        dy    = val_cy - key_cy
+        dist  = torch.sqrt(dx ** 2 + dy ** 2 + 1e-8)
         angle = torch.atan2(dy, dx)
 
-        key_h = key_box[3] - key_box[1]
-        val_h = val_boxes[:, 3] - val_boxes[:, 1]
+        key_h    = key_box[3] - key_box[1]
+        val_h    = val_boxes[:, 3] - val_boxes[:, 1]
         h_overlap = torch.clamp(
             torch.min(key_box[3].expand(nv), val_boxes[:, 3])
             - torch.max(key_box[1].expand(nv), val_boxes[:, 1]),
@@ -184,17 +168,16 @@ class BiaffineLinker(nn.Module):
         )
         h_align = h_overlap / (torch.min(key_h.expand(nv), val_h) + 1e-8)
 
-        key_w = key_box[2] - key_box[0]
-        val_w = val_boxes[:, 2] - val_boxes[:, 0]
+        key_w    = key_box[2] - key_box[0]
+        val_w    = val_boxes[:, 2] - val_boxes[:, 0]
         v_overlap = torch.clamp(
             torch.min(key_box[2].expand(nv), val_boxes[:, 2])
             - torch.max(key_box[0].expand(nv), val_boxes[:, 0]),
             min=0
         )
-        v_align = v_overlap / (torch.min(key_w.expand(nv), val_w) + 1e-8)
-
-        key_area = key_h * key_w
-        val_area = val_h * val_w
+        v_align    = v_overlap / (torch.min(key_w.expand(nv), val_w) + 1e-8)
+        key_area   = key_h * key_w
+        val_area   = val_h * val_w
         area_ratio = val_area / (key_area + 1e-8)
         aspect_ratio = (val_w / (val_h + 1e-8)) / (key_w / (key_h + 1e-8))
 
@@ -204,21 +187,9 @@ class BiaffineLinker(nn.Module):
         )  # [nv, 8]
 
     def _score_chunk(self, key_chunk, val_reps, key_boxes_chunk, val_boxes):
-        """
-        Score one chunk of keys against all values.
-
-        Args:
-            key_chunk:        [chunk, hidden]
-            val_reps:         [nv, hidden]
-            key_boxes_chunk:  [chunk, 4]
-            val_boxes:        [nv, 4]
-        Returns:
-            [chunk, nv]
-        """
         chunk_size = key_chunk.size(0)
-        nv = val_reps.size(0)
+        nv         = val_reps.size(0)
 
-        # [chunk * nv, hidden] -- bounded by LINKER_CHUNK_SIZE * MAX_LINK_CANDIDATES
         k_exp = key_chunk.unsqueeze(1).expand(chunk_size, nv, -1).reshape(-1, self.hidden_size)
         v_exp = val_reps.unsqueeze(0).expand(chunk_size, nv, -1).reshape(-1, self.hidden_size)
         biaffine_scores = self.biaffine(k_exp, v_exp).reshape(chunk_size, nv, 1)
@@ -227,34 +198,19 @@ class BiaffineLinker(nn.Module):
         for i in range(chunk_size):
             sf = self._compute_spatial_features_pair(key_boxes_chunk[i], val_boxes)
             spatial_list.append(sf)
-        spatial_feats = torch.stack(spatial_list, dim=0)  # [chunk, nv, 8]
-        spatial_scores = self.spatial_encoder(spatial_feats)  # [chunk, nv, 32]
+        spatial_feats  = torch.stack(spatial_list, dim=0)          # [chunk, nv, 8]
+        spatial_scores = self.spatial_encoder(spatial_feats)       # [chunk, nv, 32]
 
         combined = torch.cat([biaffine_scores, spatial_scores], dim=-1)  # [chunk, nv, 33]
-        return self.final_scorer(combined).squeeze(-1)  # [chunk, nv]
+        return self.final_scorer(combined).squeeze(-1)                   # [chunk, nv]
 
     def forward(self, sequence_output, entity_logits, bboxes, attention_mask):
-        """
-        Compute linking scores with hard candidate cap + chunked scoring.
+        batch_size   = sequence_output.shape[0]
+        entity_probs = torch.softmax(entity_logits, dim=-1)
+        entity_preds = torch.argmax(entity_logits, dim=-1)
 
-        Args:
-            sequence_output: [batch, seq_len, hidden_size]
-            entity_logits:   [batch, seq_len, 3]
-            bboxes:          [batch, seq_len, 4]
-            attention_mask:  [batch, seq_len]
-
-        Returns:
-            link_scores:   list[Tensor|None]  shape per item: [nk, nv]
-            key_indices:   list[Tensor]  (indices into original seq, capped)
-            value_indices: list[Tensor]
-        """
-        batch_size = sequence_output.shape[0]
-        # Softmax probabilities for confidence-based ranking
-        entity_probs = torch.softmax(entity_logits, dim=-1)  # [batch, seq_len, 3]
-        entity_preds = torch.argmax(entity_logits, dim=-1)   # [batch, seq_len]
-
-        all_link_scores = []
-        all_key_indices = []
+        all_link_scores   = []
+        all_key_indices   = []
         all_value_indices = []
 
         for b in range(batch_size):
@@ -264,16 +220,15 @@ class BiaffineLinker(nn.Module):
             key_idx = key_mask.nonzero(as_tuple=True)[0]
             val_idx = val_mask.nonzero(as_tuple=True)[0]
 
-            # ── Hard cap: keep top-MAX_LINK_CANDIDATES by entity confidence ──
             if len(key_idx) > MAX_LINK_CANDIDATES:
-                key_conf = entity_probs[b][key_idx, 1]  # KEY class prob
-                top_k = torch.topk(key_conf, MAX_LINK_CANDIDATES).indices
-                key_idx = key_idx[top_k]
+                key_conf = entity_probs[b][key_idx, 1]
+                top_k    = torch.topk(key_conf, MAX_LINK_CANDIDATES).indices
+                key_idx  = key_idx[top_k]
 
             if len(val_idx) > MAX_LINK_CANDIDATES:
-                val_conf = entity_probs[b][val_idx, 2]  # VALUE class prob
-                top_k = torch.topk(val_conf, MAX_LINK_CANDIDATES).indices
-                val_idx = val_idx[top_k]
+                val_conf = entity_probs[b][val_idx, 2]
+                top_k    = torch.topk(val_conf, MAX_LINK_CANDIDATES).indices
+                val_idx  = val_idx[top_k]
 
             if len(key_idx) == 0 or len(val_idx) == 0:
                 all_link_scores.append(None)
@@ -281,30 +236,23 @@ class BiaffineLinker(nn.Module):
                 all_value_indices.append(val_idx)
                 continue
 
-            key_reps = self.key_projection(
-                self.dropout(sequence_output[b][key_idx])
-            )  # [nk, hidden]  nk <= MAX_LINK_CANDIDATES
-            val_reps = self.value_projection(
-                self.dropout(sequence_output[b][val_idx])
-            )  # [nv, hidden]  nv <= MAX_LINK_CANDIDATES
+            key_reps = self.key_projection(self.dropout(sequence_output[b][key_idx]))
+            val_reps = self.value_projection(self.dropout(sequence_output[b][val_idx]))
 
-            nk = len(key_idx)
-            key_boxes = bboxes[b][key_idx]  # [nk, 4]
-            val_boxes = bboxes[b][val_idx]  # [nv, 4]
+            nk        = len(key_idx)
+            key_boxes = bboxes[b][key_idx]
+            val_boxes = bboxes[b][val_idx]
 
-            # Chunked scoring: LINKER_CHUNK_SIZE keys at a time
             score_rows = []
             for start in range(0, nk, LINKER_CHUNK_SIZE):
                 end = min(start + LINKER_CHUNK_SIZE, nk)
                 chunk_scores = self._score_chunk(
-                    key_reps[start:end],
-                    val_reps,
-                    key_boxes[start:end],
-                    val_boxes
-                )  # [chunk, nv]
+                    key_reps[start:end], val_reps,
+                    key_boxes[start:end], val_boxes
+                )
                 score_rows.append(chunk_scores)
 
-            link_scores = torch.cat(score_rows, dim=0)  # [nk, nv]
+            link_scores = torch.cat(score_rows, dim=0)
 
             all_link_scores.append(link_scores)
             all_key_indices.append(key_idx)
@@ -359,7 +307,7 @@ class LayoutLMv3KVPModel(nn.Module):
 
         entity_logits = self.entity_classifier(sequence_output)
 
-        text_seq_len = input_ids.shape[1]
+        text_seq_len  = input_ids.shape[1]
         entity_logits = entity_logits[:, :text_seq_len, :]
         sequence_output_text = sequence_output[:, :text_seq_len, :]
 
@@ -373,12 +321,12 @@ class LayoutLMv3KVPModel(nn.Module):
         loss = entity_loss = link_loss = None
 
         if entity_labels is not None:
-            loss_fct = nn.CrossEntropyLoss()
+            loss_fct    = nn.CrossEntropyLoss()
             active_loss = attention_mask.reshape(-1) == 1
             active_logits = entity_logits.reshape(-1, self.num_labels)[active_loss]
             active_labels = entity_labels.reshape(-1)[active_loss]
-            entity_loss = loss_fct(active_logits, active_labels)
-            loss = entity_loss
+            entity_loss   = loss_fct(active_logits, active_labels)
+            loss          = entity_loss
 
             if self.use_linker and link_labels is not None and link_scores is not None:
                 link_loss_total = 0.0
@@ -400,13 +348,13 @@ class LayoutLMv3KVPModel(nn.Module):
                     loss = entity_loss + link_loss
 
         return {
-            'entity_logits': entity_logits,
-            'link_scores': link_scores,
-            'key_indices': key_indices,
-            'value_indices': value_indices,
-            'loss': loss,
-            'entity_loss': entity_loss,
-            'link_loss': link_loss,
+            'entity_logits':   entity_logits,
+            'link_scores':     link_scores,
+            'key_indices':     key_indices,
+            'value_indices':   value_indices,
+            'loss':            loss,
+            'entity_loss':     entity_loss,
+            'link_loss':       link_loss,
             'sequence_output': sequence_output
         }
 
@@ -423,22 +371,22 @@ class LayoutLMv3KVPModel(nn.Module):
         with torch.no_grad():
             outputs = self.forward(input_ids, attention_mask, bbox, pixel_values)
 
-            entity_logits = outputs['entity_logits']
-            link_scores = outputs['link_scores']
-            key_indices = outputs.get('key_indices')
-            value_indices = outputs.get('value_indices')
+            entity_logits  = outputs['entity_logits']
+            link_scores    = outputs['link_scores']
+            key_indices    = outputs.get('key_indices')
+            value_indices  = outputs.get('value_indices')
 
             predictions = []
-            batch_size = input_ids.size(0)
+            batch_size  = input_ids.size(0)
 
             for b in range(batch_size):
                 entity_preds_b = torch.argmax(entity_logits[b], dim=-1)
-                batch_preds = []
+                batch_preds    = []
 
                 if self.use_linker and link_scores is not None and link_scores[b] is not None:
                     scores = link_scores[b]
-                    k_idx = key_indices[b]
-                    v_idx = value_indices[b]
+                    k_idx  = key_indices[b]
+                    v_idx  = value_indices[b]
 
                     best_val_positions = torch.argmax(scores, dim=1)
                     best_scores = torch.sigmoid(
@@ -448,24 +396,24 @@ class LayoutLMv3KVPModel(nn.Module):
                     for i, ki in enumerate(k_idx):
                         if best_scores[i].item() < score_threshold:
                             continue
-                        vi = v_idx[best_val_positions[i]]
+                        vi       = v_idx[best_val_positions[i]]
                         key_word = words[b][ki] if words else str(ki.item())
                         val_word = words[b][vi] if words else str(vi.item())
                         batch_preds.append({
-                            "key": key_word,
-                            "value": val_word,
-                            "key_bbox": bbox[b][ki].tolist(),
-                            "value_bbox": bbox[b][vi].tolist(),
-                            "link_score": best_scores[i].item()
+                            "key":         key_word,
+                            "value":       val_word,
+                            "key_bbox":    bbox[b][ki].tolist(),
+                            "value_bbox":  bbox[b][vi].tolist(),
+                            "link_score":  best_scores[i].item()
                         })
                 else:
                     key_positions = (entity_preds_b == 1).nonzero(as_tuple=True)[0]
                     for ki in key_positions:
                         key_word = words[b][ki] if words else str(ki.item())
                         batch_preds.append({
-                            "key": key_word,
-                            "value": None,
-                            "key_bbox": bbox[b][ki].tolist(),
+                            "key":        key_word,
+                            "value":      None,
+                            "key_bbox":   bbox[b][ki].tolist(),
                             "value_bbox": None,
                             "link_score": None
                         })

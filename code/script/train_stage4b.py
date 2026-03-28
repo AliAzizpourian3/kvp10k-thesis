@@ -4,9 +4,13 @@ Stage 4b Training: LayoutLMv3 KVP Extraction with Biaffine Linker.
 Memory optimisations applied (Stage 4b OOM fix):
 - batch_size default: 2 -> 1
 - gradient_accumulation_steps default: 16 -> 32  (effective batch = 32 unchanged)
-- Gradient checkpointing on encoder (in layoutlm_model.py)
 - Chunked biaffine linker (in layoutlm_model.py, LINKER_CHUNK_SIZE=8)
 - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True set at import time
+
+NaN fix (Stage 4b NaN loss):
+- _USE_BF16 = False  (bf16 caused NaN in randomly-initialised biaffine linker)
+- Separate AdamW param groups: encoder/classifier lr=5e-5, linker lr=1e-4
+- NaN guard in train_epoch raises RuntimeError immediately on NaN loss
 """
 
 import os
@@ -33,7 +37,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-_USE_BF16 = True
+_USE_BF16 = False   # bf16 causes NaN in randomly-initialised biaffine linker
 
 
 class Stage4bTrainer:
@@ -66,7 +70,18 @@ class Stage4bTrainer:
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.device = device
 
-        self.optimizer = AdamW(self.model.parameters(), lr=learning_rate, weight_decay=0.01)
+        # Separate learning rates: pretrained encoder/classifier get lower LR,
+        # freshly-initialised linker head gets 2x LR for faster convergence.
+        linker_params = [p for n, p in model.named_parameters() if "linker" in n]
+        base_params   = [p for n, p in model.named_parameters() if "linker" not in n]
+        self.optimizer = AdamW(
+            [
+                {"params": base_params,   "lr": learning_rate},
+                {"params": linker_params, "lr": learning_rate * 2},
+            ],
+            weight_decay=0.01
+        )
+
         self.total_steps = len(train_loader) * num_epochs
         self.scheduler = get_linear_schedule_with_warmup(
             self.optimizer,
@@ -89,6 +104,7 @@ class Stage4bTrainer:
         logger.info(f"Mixed precision: {'bf16' if _USE_BF16 else 'fp32'}")
         logger.info(f"Gradient accumulation steps: {gradient_accumulation_steps}")
         logger.info(f"PYTORCH_CUDA_ALLOC_CONF: {os.environ.get('PYTORCH_CUDA_ALLOC_CONF', 'not set')}")
+        logger.info(f"Linker LR: {learning_rate * 2:.2e} | Base LR: {learning_rate:.2e}")
 
     def restore_history(self, checkpoint_dir: Path):
         history_file = self.output_dir / "training_history.json"
@@ -150,6 +166,14 @@ class Stage4bTrainer:
                     loss = entity_loss
                 else:
                     loss = outputs['loss']
+
+                # NaN guard -- fail fast instead of silently training on NaN
+                if torch.isnan(loss):
+                    logger.error(
+                        f"NaN loss at step {batch_idx}! "
+                        f"entity_loss={entity_loss}, link_loss={link_loss}"
+                    )
+                    raise RuntimeError("NaN loss detected -- aborting training.")
 
                 loss = loss / self.gradient_accumulation_steps
 
@@ -280,7 +304,6 @@ def main():
     parser = argparse.ArgumentParser(description="Stage 4b Training: LayoutLMv3 with Linker")
     parser.add_argument("--data_dir",                    type=str,   default="../../data/prepared")
     parser.add_argument("--output_dir",                  type=str,   default="../../data/outputs/stage4b")
-    # OOM fix: batch_size 2->1, grad_accum 16->32 keeps effective batch=32
     parser.add_argument("--batch_size",                  type=int,   default=1)
     parser.add_argument("--gradient_accumulation_steps", type=int,   default=32)
     parser.add_argument("--learning_rate",               type=float, default=5e-5)
