@@ -19,9 +19,14 @@ Memory optimisations (Stage 4b OOM fix):
   support the global HuggingFace gradient-checkpointing API reliably.
   The chunked linker + candidate cap are sufficient to stay within 40GB.
 
-NaN fix:
-- BiaffineLinker weights initialised with xavier_uniform_ / zeros instead
-  of PyTorch default (Kaiming), which overflows in the bilinear layer.
+NaN fix (final):
+- Removed nn.Bilinear(768, 768, 1) which caused link_loss=NaN at ~step 1400.
+  Root cause: the 768x768 weight matrix produces exploding gradients during
+  training even under xavier init, because gradients flow back through both
+  key and value streams simultaneously.
+- Replaced with scaled dot-product: (k · v) / sqrt(d), identical to
+  transformer attention scoring. No learned weights => cannot diverge.
+- xavier_uniform_ init retained on all remaining Linear layers.
 """
 
 import os
@@ -93,25 +98,32 @@ class EntityClassifier(nn.Module):
 
 class BiaffineLinker(nn.Module):
     """
-    Biaffine attention mechanism for learning key-value links.
+    Linker module for learning key-value links.
 
-    Memory-efficient implementation:
+    Semantic score: scaled dot-product (k · v) / sqrt(d), identical to
+    transformer attention. Replaces the previous nn.Bilinear(768,768,1)
+    which caused link_loss=NaN at ~step 1400 due to exploding gradients
+    through the 768x768 weight matrix.
+
+    Spatial score: learned MLP over 8 geometric features.
+
+    Final score: MLP combining semantic + spatial signals.
+
+    Memory-efficient:
     1. Hard cap: only top-MAX_LINK_CANDIDATES key/value tokens by entity
        confidence are passed to the linker.
     2. Chunked scoring: LINKER_CHUNK_SIZE key rows at a time.
-
-    Weight init: xavier_uniform_ on all Linear/Bilinear weights to avoid
-    NaN from default Kaiming init in the bilinear layer.
     """
 
     def __init__(self, hidden_size, dropout=0.1):
         super().__init__()
 
         self.hidden_size = hidden_size
+        self.scale = hidden_size ** 0.5  # scaling factor for dot-product
 
         self.key_projection   = nn.Linear(hidden_size, hidden_size)
         self.value_projection = nn.Linear(hidden_size, hidden_size)
-        self.biaffine         = nn.Bilinear(hidden_size, hidden_size, 1)
+        # nn.Bilinear removed -- replaced by scaled dot-product in _score_chunk
 
         self.spatial_encoder = nn.Sequential(
             nn.Linear(8, 64),
@@ -128,8 +140,6 @@ class BiaffineLinker(nn.Module):
         )
 
         self.dropout = nn.Dropout(dropout)
-
-        # Xavier init -- prevents NaN from Kaiming default in bilinear weight
         self._init_weights()
 
     def _init_weights(self):
@@ -137,8 +147,6 @@ class BiaffineLinker(nn.Module):
         nn.init.zeros_(self.key_projection.bias)
         nn.init.xavier_uniform_(self.value_projection.weight)
         nn.init.zeros_(self.value_projection.bias)
-        nn.init.xavier_uniform_(self.biaffine.weight)
-        nn.init.zeros_(self.biaffine.bias)
         for module in list(self.spatial_encoder) + list(self.final_scorer):
             if isinstance(module, nn.Linear):
                 nn.init.xavier_uniform_(module.weight)
@@ -190,9 +198,10 @@ class BiaffineLinker(nn.Module):
         chunk_size = key_chunk.size(0)
         nv         = val_reps.size(0)
 
-        k_exp = key_chunk.unsqueeze(1).expand(chunk_size, nv, -1).reshape(-1, self.hidden_size)
-        v_exp = val_reps.unsqueeze(0).expand(chunk_size, nv, -1).reshape(-1, self.hidden_size)
-        biaffine_scores = self.biaffine(k_exp, v_exp).reshape(chunk_size, nv, 1)
+        # Scaled dot-product: (k · v) / sqrt(d)  -- replaces nn.Bilinear
+        k_exp = key_chunk.unsqueeze(1).expand(chunk_size, nv, -1)  # [chunk, nv, d]
+        v_exp = val_reps.unsqueeze(0).expand(chunk_size, nv, -1)   # [chunk, nv, d]
+        dot_scores = (k_exp * v_exp).sum(dim=-1, keepdim=True) / self.scale  # [chunk, nv, 1]
 
         spatial_list = []
         for i in range(chunk_size):
@@ -201,8 +210,8 @@ class BiaffineLinker(nn.Module):
         spatial_feats  = torch.stack(spatial_list, dim=0)          # [chunk, nv, 8]
         spatial_scores = self.spatial_encoder(spatial_feats)       # [chunk, nv, 32]
 
-        combined = torch.cat([biaffine_scores, spatial_scores], dim=-1)  # [chunk, nv, 33]
-        return self.final_scorer(combined).squeeze(-1)                   # [chunk, nv]
+        combined = torch.cat([dot_scores, spatial_scores], dim=-1)  # [chunk, nv, 33]
+        return self.final_scorer(combined).squeeze(-1)              # [chunk, nv]
 
     def forward(self, sequence_output, entity_logits, bboxes, attention_mask):
         batch_size   = sequence_output.shape[0]
@@ -266,7 +275,7 @@ class LayoutLMv3KVPModel(nn.Module):
     Complete model for KVP extraction:
     1. LayoutLMv3 encoder
     2. Entity classifier (Key/Value/Other)
-    3. Biaffine linker (chunked + capped) - optional for ablation
+    3. Linker (scaled dot-product + spatial MLP) - optional for ablation
     """
 
     def __init__(
@@ -447,6 +456,7 @@ def create_model(
     print(f"  Encoder: {model_name}")
     print(f"  Freeze base: {freeze_base}")
     print(f"  Use linker: {use_linker} ({'Stage 4b - With Linker' if use_linker else 'Stage 4a - No Linker'})")
+    print(f"  Linker scorer: scaled dot-product (no Bilinear)")
     print(f"  Gradient checkpointing: NOT used (LayoutLMv3 unsupported)")
     print(f"  Linker chunk size: {LINKER_CHUNK_SIZE}")
     print(f"  Max link candidates: {MAX_LINK_CANDIDATES}")
