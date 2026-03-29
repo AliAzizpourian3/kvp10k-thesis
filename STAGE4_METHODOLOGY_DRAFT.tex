@@ -150,7 +150,7 @@ KVP10k provides lmdx\_text format: a sequence of extracted text lines, each anno
 \begin{enumerate}
     \item \textbf{Word tokens}: Split each lmdx line on whitespace to obtain individual word-level text and bounding boxes.
     \item \textbf{Coordinate normalization}: Scale pixel coordinates from image-native range to $[0, 1000]$ (LayoutLMv3 standard).
-    \item \textbf{Image handling}: When real document images are unavailable, create dummy 224×224 white images to satisfy LayoutLMv3Processor requirements.
+    \item \textbf{Image handling}: When real document images are unavailable, create dummy 224\texttimes{}224 white images to satisfy LayoutLMv3Processor requirements.
 \end{enumerate}
 
 \subsubsection{LayoutLMv3Processor Configuration}
@@ -173,26 +173,57 @@ y_{\text{token}} = y_{\text{word}} \quad \text{if } \texttt{word\_ids}[\text{tok
 
 For special tokens (CLS, SEP, padding) where \texttt{word\_ids} is None, labels are set to 0 (Other) to exclude from loss computation.
 
+\subsubsection{Dataset Format Conversion}
+\label{sec:dataset_format_fix}
+
+During Stage 4b development, a mismatch was identified between the raw KVP10k ground-truth annotation format and the binary link-label matrix required by the linker. Specifically, ground-truth key-value relationships are stored as nested reference attributes in the KVP10k JSON; converting these to a dense $[\text{seq\_len} \times \text{seq\_len}]$ binary adjacency matrix required explicit resolution of token-level indices after subword tokenization. Pages with unresolvable references (e.g.\ missing bounding box overlaps) are excluded from link-loss computation but retained for entity-loss computation. Full details are documented in \texttt{STAGE4\_DATASET\_FIX.md}.
+
 \subsection{Training Configuration}
 \label{sec:stage4_training_config}
 
 \subsubsection{Optimizer and Learning Rate}
+\label{sec:stage4_lr}
 
-Both Stage 4a and 4b use AdamW optimization with:
+Stage 4a uses a single AdamW optimizer with a uniform learning rate across all parameters. Stage 4b uses a \textbf{parameter-group learning rate schedule} to account for the different convergence dynamics of the pre-trained encoder and the randomly-initialised linker:
 
 \begin{itemize}
-    \item Initial learning rate: $\text{lr} = 2 \times 10^{-5}$
-    \item Warmup steps: 1000 (5\% of training)
-    \item Weight decay: $\lambda_{\text{decay}} = 0.01$
-    \item Gradient clipping: $\|\nabla\| \leq 1.0$
+    \item \textbf{LayoutLMv3 encoder}: $\text{lr}_{\text{enc}} = 2 \times 10^{-5}$ (standard fine-tuning rate for pre-trained transformers)
+    \item \textbf{BiaffineLinker (key/value projections, spatial MLP, final scorer)}: $\text{lr}_{\text{link}} = 1 \times 10^{-4}$ (2$\times$ higher, as these layers are trained from random initialisation)
 \end{itemize}
 
-The learning rate schedule uses linear decay after warmup, following standard transformer fine-tuning practice.
+Using a single uniform rate for both components caused the linker to under-fit (too slow to learn from random init) while simultaneously destabilising the pre-trained encoder (too fast for fine-tuning). Decoupled learning rates resolved this imbalance.
+
+Both parameter groups share:
+\begin{itemize}
+    \item Warmup steps: 1000 (5\% of total training steps)
+    \item Weight decay: $\lambda_{\text{decay}} = 0.01$
+    \item Gradient clipping: $\|\nabla\| \leq 1.0$
+    \item Schedule: linear decay after warmup
+\end{itemize}
+
+\subsubsection{Numerical Precision}
+\label{sec:stage4_precision}
+
+All Stage 4 training is conducted in full \textbf{fp32 precision}. An earlier configuration enabled \texttt{bf16} (bfloat16) mixed-precision training to reduce memory usage. However, \texttt{bf16} caused \texttt{loss~=~NaN} at step~0 of early Stage~4b runs due to underflow in the spatial feature encoder (the geometric feature values, e.g.\ normalised distances and area ratios, fall near the \texttt{bf16} representable range boundary). Reverting to \texttt{fp32} eliminated this issue with negligible impact on memory budget given the chunked linker design.
+
+\subsubsection{Training Stability: NaN Guard}
+\label{sec:stage4_nan_guard}
+
+To prevent silent NaN propagation during training (where a NaN loss updates no parameters but corrupts optimiser state), the training loop includes an explicit guard:
+
+\begin{verbatim}
+if torch.isnan(loss):
+    logger.warning(f"NaN loss at step {step}, skipping batch")
+    optimizer.zero_grad()
+    continue
+\end{verbatim}
+
+This ensures that any residual numerical instability (e.g.\ from degenerate batches with zero key or value candidates) causes an immediate logged skip rather than a silent corruption of the model weights. Together with the Bilinear~$\to$~dot-product fix (Section~\ref{sec:linker_module}) and the fp32 precision decision (Section~\ref{sec:stage4_precision}), this guard makes Stage~4b training robust across all three $\lambda$ configurations.
 
 \subsubsection{Batch Size and Epoch Count}
 
 \begin{itemize}
-    \item Batch size: 16 samples per GPU (effective batch size 16 × 4 GPUs = 64 on A100 hardware)
+    \item Batch size: 16 samples per GPU (effective batch size 16 \texttimes{} 4 GPUs = 64 on A100 hardware)
     \item Training epochs: 5 (chosen based on typical BERT fine-tuning convergence on similar-sized tasks)
     \item Validation frequency: Every 100 mini-batches
     \item Early stopping: Patience = 3 epochs (stop if validation F1 does not improve)
@@ -259,31 +290,37 @@ These ablations directly test the hypothesis that layout awareness and spatial g
 
 % ------------------------------------------------------------------------------
 % ARCHITECTURAL CONSTRAINT NOTE (Section 8.6.1.2)
-% Paste this into LaTeX_Thesis/chapters/08_discussion.tex under \subsubsection{Architectural Constraints}
+% Paste into LaTeX_Thesis/chapters/08_discussion.tex under:
+%   \subsubsection{Architectural Constraints}
 % ------------------------------------------------------------------------------
 %
 % \subsubsection{Architectural Constraints}
 % \label{sec:arch_constraints}
 %
-% The \texttt{BiaffineLinker} underwent one architectural revision during Stage~4b
-% training. The original design used \texttt{nn.Bilinear}$(768, 768, 1)$ as the
-% semantic scorer, which produced \texttt{link\_loss = NaN} at approximately
-% step~1400 across all three link-loss weight configurations
-% ($\lambda \in \{0.5, 1.0, 2.0\}$). The root cause is that a $768 \times 768$
-% weight matrix receiving simultaneous gradients from both key and value input
-% streams is highly susceptible to gradient explosion, even under Xavier
-% initialisation.
-%
-% The fix (commit \texttt{01c3f72}) replaces the Bilinear layer with a
+% The \texttt{BiaffineLinker} underwent one architectural revision during
+% Stage~4b training. The original design used \texttt{nn.Bilinear}$(768, 768, 1)$
+% as the semantic scorer, which produced \texttt{link\_loss = NaN} at
+% approximately step~1400 across all three $\lambda$ configurations. The root
+% cause is that a $768 \times 768$ weight matrix receiving simultaneous gradients
+% from both key and value streams is prone to gradient explosion even under Xavier
+% initialisation. The fix (commit \texttt{01c3f72}) replaces this with a
 % parameter-free scaled dot-product scorer $(\mathbf{k}^\top \mathbf{v}) /
-% \sqrt{d}$. This scorer cannot diverge because there are no learned weights
-% in the pairwise scoring numerator; gradient flow through the key and value
-% projection layers remains independent and bounded. All other architectural
-% components and hyperparameters are unchanged.
-% Stage~4b results with this fix are reported in
-% Section~\ref{sec:stage4b_results}.
+% \sqrt{d}$. All other components and hyperparameters are unchanged.
+% Stage~4b results are reported in Section~\ref{sec:stage4b_results}.
 %
-% Additionally, gradient checkpointing was not enabled for LayoutLMv3, as this
-% model does not reliably support the HuggingFace gradient-checkpointing API.
-% Memory budget was managed via chunked linker scoring and the
-% \texttt{MAX\_LINK\_CANDIDATES} cap (see Section~\ref{sec:linker_module}).
+% Three additional training-stability measures were required:
+% (1)~\textbf{fp32 precision}: \texttt{bf16} mixed-precision caused NaN at
+%     step~0 due to underflow in spatial feature values; reverted to fp32
+%     (see Section~\ref{sec:stage4_precision}).
+% (2)~\textbf{Decoupled learning rates}: the linker requires
+%     $\text{lr}_{\text{link}} = 10^{-4}$ vs.\ $\text{lr}_{\text{enc}} = 2\times 10^{-5}$
+%     for the encoder; a single uniform rate caused linker under-fitting
+%     (see Section~\ref{sec:stage4_lr}).
+% (3)~\textbf{NaN guard}: explicit \texttt{torch.isnan(loss)} check skips
+%     degenerate batches and prevents silent optimiser-state corruption
+%     (see Section~\ref{sec:stage4_nan_guard}).
+%
+% Gradient checkpointing was not enabled: LayoutLMv3 does not reliably support
+% the HuggingFace gradient-checkpointing API. Memory was managed via chunked
+% linker scoring and the \texttt{MAX\_LINK\_CANDIDATES} cap
+% (see Section~\ref{sec:linker_module}).
