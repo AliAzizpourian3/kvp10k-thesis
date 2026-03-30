@@ -19,14 +19,15 @@ Memory optimisations (Stage 4b OOM fix):
   support the global HuggingFace gradient-checkpointing API reliably.
   The chunked linker + candidate cap are sufficient to stay within 40GB.
 
-NaN fix (final):
-- Removed nn.Bilinear(768, 768, 1) which caused link_loss=NaN at ~step 1400.
-  Root cause: the 768x768 weight matrix produces exploding gradients during
-  training even under xavier init, because gradients flow back through both
-  key and value streams simultaneously.
-- Replaced with scaled dot-product: (k · v) / sqrt(d), identical to
-  transformer attention scoring. No learned weights => cannot diverge.
-- xavier_uniform_ init retained on all remaining Linear layers.
+NaN fix history:
+- v1: Removed nn.Bilinear(768, 768, 1) which caused link_loss=NaN at ~step
+  1400. Root cause: the 768x768 weight matrix produces exploding gradients
+  because gradients flow back through both key and value streams simultaneously.
+  Replaced with scaled dot-product: (k · v) / sqrt(d).
+- v2: Logit clamp +/-10 applied to link scores before BCE loss (see
+  forward() in LayoutLMv3KVPModel). sigmoid(10) ~ 0.9999, so any value
+  beyond +/-10 is numerically meaningless and only causes gradient explosion.
+  This is a permanent safety net regardless of LR or accumulation settings.
 """
 
 import os
@@ -45,6 +46,11 @@ LINKER_CHUNK_SIZE = int(os.environ.get("LINKER_CHUNK_SIZE", "8"))
 
 # Hard cap on key and value candidate tokens fed to the linker per page.
 MAX_LINK_CANDIDATES = int(os.environ.get("LINKER_MAX_CANDIDATES", "128"))
+
+# Clamp link logits to this range before BCE loss.
+# sigmoid(+/-10) ~= 1.0/0.0 -- values beyond this are numerically meaningless
+# and only cause gradient explosion. Safe for any LR or accumulation setting.
+LINK_LOGIT_CLAMP = 10.0
 
 
 @dataclass
@@ -348,8 +354,15 @@ class LayoutLMv3KVPModel(nn.Module):
                     if len(k_idx) == 0 or len(v_idx) == 0:
                         continue
                     gt_links = link_labels[b][k_idx][:, v_idx].float()
+                    # Clamp logits to +/-LINK_LOGIT_CLAMP before BCE.
+                    # sigmoid(+/-10) ~= 1/0 -- values beyond this are
+                    # numerically meaningless and cause gradient explosion.
+                    # Permanent safety net regardless of LR or accum settings.
+                    scores_clamped = torch.clamp(
+                        scores, min=-LINK_LOGIT_CLAMP, max=LINK_LOGIT_CLAMP
+                    )
                     link_loss_total += F.binary_cross_entropy_with_logits(
-                        scores, gt_links
+                        scores_clamped, gt_links
                     )
                     link_count += 1
                 if link_count > 0:
@@ -457,6 +470,7 @@ def create_model(
     print(f"  Freeze base: {freeze_base}")
     print(f"  Use linker: {use_linker} ({'Stage 4b - With Linker' if use_linker else 'Stage 4a - No Linker'})")
     print(f"  Linker scorer: scaled dot-product (no Bilinear)")
+    print(f"  Link logit clamp: +/-{LINK_LOGIT_CLAMP}")
     print(f"  Gradient checkpointing: NOT used (LayoutLMv3 unsupported)")
     print(f"  Linker chunk size: {LINKER_CHUNK_SIZE}")
     print(f"  Max link candidates: {MAX_LINK_CANDIDATES}")
