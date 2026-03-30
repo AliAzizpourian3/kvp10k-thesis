@@ -7,10 +7,16 @@ Memory optimisations applied (Stage 4b OOM fix):
 - Chunked biaffine linker (in layoutlm_model.py, LINKER_CHUNK_SIZE=8)
 - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True set at import time
 
-NaN fix (Stage 4b NaN loss):
-- _USE_BF16 = False  (bf16 caused NaN in randomly-initialised biaffine linker)
-- Separate AdamW param groups: encoder/classifier lr=5e-5, linker lr=1e-4
-- NaN guard in train_epoch raises RuntimeError immediately on NaN loss
+NaN fix history:
+- v1: _USE_BF16 = False  (bf16 caused NaN at step 0 in spatial feature encoder)
+- v2: nn.Bilinear replaced with scaled dot-product (NaN at step ~1400, exploding
+      gradients through 768x768 weight matrix)
+- v3: Unified learning rate for encoder and linker (NaN at step 909 with 2x LR
+      + accumulation=32; large accumulated gradients pushed dot-product scores
+      outside safe range for binary_cross_entropy_with_logits).
+      linker lr = learning_rate (same as encoder, NOT 2x).
+- v4: Logit clamp +/-10 applied to link scores before BCE loss (in
+      layoutlm_model.py) as a permanent safety net against future score blow-up.
 """
 
 import os
@@ -37,7 +43,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-_USE_BF16 = False   # bf16 causes NaN in randomly-initialised biaffine linker
+_USE_BF16 = False   # bf16 causes NaN in randomly-initialised biaffine linker (step 0)
 
 
 class Stage4bTrainer:
@@ -70,15 +76,14 @@ class Stage4bTrainer:
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.device = device
 
-        # Separate learning rates: pretrained encoder/classifier get lower LR,
-        # freshly-initialised linker head gets 2x LR for faster convergence.
-        linker_params = [p for n, p in model.named_parameters() if "linker" in n]
-        base_params   = [p for n, p in model.named_parameters() if "linker" not in n]
+        # Unified learning rate for all parameters.
+        # A 2x higher LR for the linker was tried but caused link_loss=NaN at
+        # step ~909: with gradient_accumulation_steps=32 the accumulated
+        # gradients pushed dot-product scores outside the safe range for
+        # binary_cross_entropy_with_logits. Unified LR avoids this.
         self.optimizer = AdamW(
-            [
-                {"params": base_params,   "lr": learning_rate},
-                {"params": linker_params, "lr": learning_rate * 2},
-            ],
+            model.parameters(),
+            lr=learning_rate,
             weight_decay=0.01
         )
 
@@ -103,8 +108,8 @@ class Stage4bTrainer:
         self.autocast_dtype = torch.bfloat16 if _USE_BF16 else torch.float32
         logger.info(f"Mixed precision: {'bf16' if _USE_BF16 else 'fp32'}")
         logger.info(f"Gradient accumulation steps: {gradient_accumulation_steps}")
+        logger.info(f"Learning rate (unified): {learning_rate:.2e}")
         logger.info(f"PYTORCH_CUDA_ALLOC_CONF: {os.environ.get('PYTORCH_CUDA_ALLOC_CONF', 'not set')}")
-        logger.info(f"Linker LR: {learning_rate * 2:.2e} | Base LR: {learning_rate:.2e}")
 
     def restore_history(self, checkpoint_dir: Path):
         history_file = self.output_dir / "training_history.json"
