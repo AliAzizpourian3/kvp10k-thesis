@@ -3,7 +3,7 @@ Stage 4b Training: LayoutLMv3 KVP Extraction with Biaffine Linker.
 
 Memory optimisations applied (Stage 4b OOM fix):
 - batch_size default: 2 -> 1
-- gradient_accumulation_steps default: 16 -> 32  (effective batch = 32 unchanged)
+- gradient_accumulation_steps default: 32 -> 8  (stability-first; see below)
 - Chunked biaffine linker (in layoutlm_model.py, LINKER_CHUNK_SIZE=8)
 - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True set at import time
 
@@ -17,6 +17,16 @@ NaN fix history:
       linker lr = learning_rate (same as encoder, NOT 2x).
 - v4: Logit clamp +/-10 applied to link scores before BCE loss (in
       layoutlm_model.py) as a permanent safety net against future score blow-up.
+
+Stability-first hyperparameter strategy (v5):
+- learning_rate default: 5e-5 -> 2e-5
+  Standard LayoutLMv3 fine-tuning rate; lower = smaller weight update per step.
+- gradient_accumulation_steps default: 32 -> 8
+  With accum=32 + lr=5e-5, each weight update was ~10x more aggressive than
+  needed, causing repeated NaN crashes. accum=8 + lr=2e-5 is ~10x more
+  conservative and sufficient for the A100 memory budget (batch_size=1).
+  The λ sweep (linker_loss_weight in {0.5, 1.0, 2.0}) remains the primary
+  accuracy-oriented ablation and is unchanged.
 """
 
 import os
@@ -56,11 +66,11 @@ class Stage4bTrainer:
         val_loader: DataLoader,
         test_loader: DataLoader,
         output_dir: str,
-        learning_rate: float = 5e-5,
+        learning_rate: float = 2e-5,
         num_epochs: int = 10,
         early_stopping_patience: int = 3,
         linker_loss_weight: float = 1.0,
-        gradient_accumulation_steps: int = 32,
+        gradient_accumulation_steps: int = 8,
         device: str = "cuda" if torch.cuda.is_available() else "cpu"
     ):
         self.model = model.to(device)
@@ -310,13 +320,13 @@ def main():
     parser.add_argument("--data_dir",                    type=str,   default="../../data/prepared")
     parser.add_argument("--output_dir",                  type=str,   default="../../data/outputs/stage4b")
     parser.add_argument("--batch_size",                  type=int,   default=1)
-    parser.add_argument("--gradient_accumulation_steps", type=int,   default=32)
-    parser.add_argument("--learning_rate",               type=float, default=5e-5)
+    parser.add_argument("--gradient_accumulation_steps", type=int,   default=8)
+    parser.add_argument("--learning_rate",               type=float, default=2e-5)
     parser.add_argument("--num_epochs",                  type=int,   default=10)
     parser.add_argument("--early_stopping_patience",     type=int,   default=3)
     parser.add_argument("--val_fraction",                type=float, default=0.1)
     parser.add_argument("--linker_loss_weight",          type=float, default=1.0,
-                        help="Linker loss weight lambda")
+                        help="Linker loss weight lambda (primary accuracy ablation)")
     parser.add_argument("--include_images",              action="store_true")
     parser.add_argument("--resume_from_checkpoint",      action="store_true")
     parser.add_argument("--pretrained_encoder",          type=str,   default=None,
