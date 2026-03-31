@@ -28,6 +28,15 @@ NaN fix history:
   forward() in LayoutLMv3KVPModel). sigmoid(10) ~ 0.9999, so any value
   beyond +/-10 is numerically meaningless and only causes gradient explosion.
   This is a permanent safety net regardless of LR or accumulation settings.
+- v3: Mask invalid link label positions before BCE. link_labels can contain
+  values outside [0, 1] (e.g. padding rows filled with 0.0 are fine, but
+  token positions corresponding to special tokens like CLS/SEP may carry
+  uninitialised float values). More critically, the linker only scores
+  predicted key/value candidates -- if the ground-truth link matrix contains
+  any non-binary value at the selected (k_idx, v_idx) positions (e.g. due
+  to floating-point edge cases), BCE produces NaN silently. The valid_mask
+  guard below ensures only values strictly in {0, 1} are passed to BCE.
+  Root cause of canary_B crash at step 2488: link_loss=NaN, entity_loss=0.648.
 """
 
 import os
@@ -353,18 +362,32 @@ class LayoutLMv3KVPModel(nn.Module):
                     v_idx = value_indices[b]
                     if len(k_idx) == 0 or len(v_idx) == 0:
                         continue
+
                     gt_links = link_labels[b][k_idx][:, v_idx].float()
-                    # Clamp logits to +/-LINK_LOGIT_CLAMP before BCE.
-                    # sigmoid(+/-10) ~= 1/0 -- values beyond this are
-                    # numerically meaningless and cause gradient explosion.
-                    # Permanent safety net regardless of LR or accum settings.
+
+                    # v3 NaN fix: mask out any label position that is not
+                    # strictly binary (0 or 1) before passing to BCE.
+                    # BCE requires targets in [0, 1]; any other value
+                    # (e.g. uninitialised floats, -1 padding) produces NaN
+                    # silently -- even with clamped logits.
+                    # This was the root cause of canary_B crash at step 2488:
+                    # link_loss=nan while entity_loss=0.648 (normal).
+                    valid_mask = (gt_links >= 0.0) & (gt_links <= 1.0)
+
+                    if not valid_mask.any():
+                        continue
+
+                    scores_valid   = scores[valid_mask]
+                    gt_links_valid = gt_links[valid_mask]
+
                     scores_clamped = torch.clamp(
-                        scores, min=-LINK_LOGIT_CLAMP, max=LINK_LOGIT_CLAMP
+                        scores_valid, min=-LINK_LOGIT_CLAMP, max=LINK_LOGIT_CLAMP
                     )
                     link_loss_total += F.binary_cross_entropy_with_logits(
-                        scores_clamped, gt_links
+                        scores_clamped, gt_links_valid
                     )
                     link_count += 1
+
                 if link_count > 0:
                     link_loss = link_loss_total / link_count
                     loss = entity_loss + link_loss
