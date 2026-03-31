@@ -23,7 +23,7 @@ export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-PYTHON_BIN="/home/woody/iwi5/iwi5413h/kvp10k_thesis/kvp10k_env/bin/python"
+PYTHON_BIN="/home/woody/iwi5/iwi5413h/kvp10k_thesis/env/kvp10k_env/bin/python"
 prepared_dir="/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/prepared"
 output_dir="/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_lambda05"
 
