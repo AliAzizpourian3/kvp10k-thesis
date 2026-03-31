@@ -7,8 +7,7 @@
 #SBATCH --output=/home/woody/iwi5/iwi5413h/kvp10k_thesis/logs/%x-%j.out
 #
 # Stage 4b – Phase B2: LayoutLMv3 with Biaffine Linker (λ=1.0)
-# Key-value linking with linker loss weight = 1.0 (balanced baseline)
-# GPU job on A100.
+# Stability-first defaults: lr=2e-5, accum=8, batch=1
 #
 # Usage:  sbatch logs/stage4b_lambda10.sbatch
 #
@@ -23,12 +22,14 @@ export KVP10K_OUTPUT_DIR="$WORK/kvp10k_thesis/data/outputs"
 export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
-python_bin="$WORK/kvp10k_thesis/env/kvp10k_env/bin/python"
+python_bin="$WORK/kvp10k_thesis/kvp10k_env/bin/python"
 prepared_dir="$WORK/kvp10k_thesis/data/prepared"
 output_dir="$WORK/kvp10k_thesis/data/outputs/stage4b_lambda10"
 
 echo "HOST: $(hostname)"
 echo "DATE: $(date)"
+echo "Python: $python_bin"
+[ -f "$python_bin" ] || { echo "ERROR: Python not found at $python_bin"; exit 1; }
 
 echo "=== GPU check ==="
 nvidia-smi -L
@@ -46,11 +47,11 @@ fi
 echo "=== Stage 4b Training (λ=1.0) ==="
 echo "Configuration:"
 echo "  Model: LayoutLMv3 with Biaffine Linker"
-echo "  Linker loss weight: 1.0"
-echo "  Batch size: 2 (reduced from 4 to fit linker memory)"
-echo "  Gradient accumulation: 16 (effective batch: 32, same as before)"
-echo "  Mixed precision: enabled (fp16 for memory efficiency)"
-echo "  Learning rate: 5e-5"
+echo "  Linker loss weight: 1.0 (balanced baseline)"
+echo "  Batch size: 1"
+echo "  Gradient accumulation: 8 (stability-first)"
+echo "  Learning rate: 2e-5 (stability-first)"
+echo "  Mixed precision: fp32 (bf16 disabled)"
 echo "  Epochs: 10"
 echo "  Early stopping: patience=3 on validation F1"
 echo "  Output: $output_dir"
@@ -61,15 +62,13 @@ mkdir -p "$output_dir"
 "$python_bin" train_stage4b.py \
     --data_dir "$prepared_dir" \
     --output_dir "$output_dir" \
-    --batch_size 2 \
-    --gradient_accumulation_steps 16 \
-    --learning_rate 5e-5 \
+    --batch_size 1 \
+    --gradient_accumulation_steps 8 \
+    --learning_rate 2e-5 \
     --num_epochs 10 \
     --early_stopping_patience 3 \
     --val_fraction 0.1 \
-    --linker_loss_weight 1.0 \
-    --pretrained_encoder "$WORK/kvp10k_thesis/data/outputs/stage4a/checkpoint-9/model.pt" \
-    --resume_from_checkpoint
+    --linker_loss_weight 1.0
 
 echo ""
 echo "=== Stage 4b (λ=1.0) Training Complete ==="
