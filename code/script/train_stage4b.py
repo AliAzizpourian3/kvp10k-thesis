@@ -3,30 +3,14 @@ Stage 4b Training: LayoutLMv3 KVP Extraction with Biaffine Linker.
 
 Memory optimisations applied (Stage 4b OOM fix):
 - batch_size default: 2 -> 1
-- gradient_accumulation_steps default: 32 -> 8  (stability-first; see below)
+- gradient_accumulation_steps default: 16 -> 32  (effective batch = 32 unchanged)
 - Chunked biaffine linker (in layoutlm_model.py, LINKER_CHUNK_SIZE=8)
 - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True set at import time
 
-NaN fix history:
-- v1: _USE_BF16 = False  (bf16 caused NaN at step 0 in spatial feature encoder)
-- v2: nn.Bilinear replaced with scaled dot-product (NaN at step ~1400, exploding
-      gradients through 768x768 weight matrix)
-- v3: Unified learning rate for encoder and linker (NaN at step 909 with 2x LR
-      + accumulation=32; large accumulated gradients pushed dot-product scores
-      outside safe range for binary_cross_entropy_with_logits).
-      linker lr = learning_rate (same as encoder, NOT 2x).
-- v4: Logit clamp +/-10 applied to link scores before BCE loss (in
-      layoutlm_model.py) as a permanent safety net against future score blow-up.
-
-Stability-first hyperparameter strategy (v5):
-- learning_rate default: 5e-5 -> 2e-5
-  Standard LayoutLMv3 fine-tuning rate; lower = smaller weight update per step.
-- gradient_accumulation_steps default: 32 -> 8
-  With accum=32 + lr=5e-5, each weight update was ~10x more aggressive than
-  needed, causing repeated NaN crashes. accum=8 + lr=2e-5 is ~10x more
-  conservative and sufficient for the A100 memory budget (batch_size=1).
-  The λ sweep (linker_loss_weight in {0.5, 1.0, 2.0}) remains the primary
-  accuracy-oriented ablation and is unchanged.
+NaN fix (Stage 4b NaN loss):
+- _USE_BF16 = False  (bf16 caused NaN in randomly-initialised biaffine linker)
+- Separate AdamW param groups: encoder/classifier lr=5e-5, linker lr=1e-4
+- NaN guard in train_epoch raises RuntimeError immediately on NaN loss
 """
 
 import os
@@ -53,7 +37,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-_USE_BF16 = False   # bf16 causes NaN in randomly-initialised biaffine linker (step 0)
+_USE_BF16 = False   # bf16 causes NaN in randomly-initialised biaffine linker
 
 
 class Stage4bTrainer:
@@ -66,11 +50,11 @@ class Stage4bTrainer:
         val_loader: DataLoader,
         test_loader: DataLoader,
         output_dir: str,
-        learning_rate: float = 2e-5,
+        learning_rate: float = 5e-5,
         num_epochs: int = 10,
         early_stopping_patience: int = 3,
         linker_loss_weight: float = 1.0,
-        gradient_accumulation_steps: int = 8,
+        gradient_accumulation_steps: int = 32,
         device: str = "cuda" if torch.cuda.is_available() else "cpu"
     ):
         self.model = model.to(device)
@@ -86,14 +70,15 @@ class Stage4bTrainer:
         self.gradient_accumulation_steps = gradient_accumulation_steps
         self.device = device
 
-        # Unified learning rate for all parameters.
-        # A 2x higher LR for the linker was tried but caused link_loss=NaN at
-        # step ~909: with gradient_accumulation_steps=32 the accumulated
-        # gradients pushed dot-product scores outside the safe range for
-        # binary_cross_entropy_with_logits. Unified LR avoids this.
+        # Separate learning rates: pretrained encoder/classifier get lower LR,
+        # freshly-initialised linker head gets 2x LR for faster convergence.
+        linker_params = [p for n, p in model.named_parameters() if "linker" in n]
+        base_params   = [p for n, p in model.named_parameters() if "linker" not in n]
         self.optimizer = AdamW(
-            model.parameters(),
-            lr=learning_rate,
+            [
+                {"params": base_params,   "lr": learning_rate},
+                {"params": linker_params, "lr": learning_rate * 2},
+            ],
             weight_decay=0.01
         )
 
@@ -118,8 +103,8 @@ class Stage4bTrainer:
         self.autocast_dtype = torch.bfloat16 if _USE_BF16 else torch.float32
         logger.info(f"Mixed precision: {'bf16' if _USE_BF16 else 'fp32'}")
         logger.info(f"Gradient accumulation steps: {gradient_accumulation_steps}")
-        logger.info(f"Learning rate (unified): {learning_rate:.2e}")
         logger.info(f"PYTORCH_CUDA_ALLOC_CONF: {os.environ.get('PYTORCH_CUDA_ALLOC_CONF', 'not set')}")
+        logger.info(f"Linker LR: {learning_rate * 2:.2e} | Base LR: {learning_rate:.2e}")
 
     def restore_history(self, checkpoint_dir: Path):
         history_file = self.output_dir / "training_history.json"
@@ -320,13 +305,13 @@ def main():
     parser.add_argument("--data_dir",                    type=str,   default="../../data/prepared")
     parser.add_argument("--output_dir",                  type=str,   default="../../data/outputs/stage4b")
     parser.add_argument("--batch_size",                  type=int,   default=1)
-    parser.add_argument("--gradient_accumulation_steps", type=int,   default=8)
-    parser.add_argument("--learning_rate",               type=float, default=2e-5)
+    parser.add_argument("--gradient_accumulation_steps", type=int,   default=32)
+    parser.add_argument("--learning_rate",               type=float, default=5e-5)
     parser.add_argument("--num_epochs",                  type=int,   default=10)
     parser.add_argument("--early_stopping_patience",     type=int,   default=3)
     parser.add_argument("--val_fraction",                type=float, default=0.1)
     parser.add_argument("--linker_loss_weight",          type=float, default=1.0,
-                        help="Linker loss weight lambda (primary accuracy ablation)")
+                        help="Linker loss weight lambda")
     parser.add_argument("--include_images",              action="store_true")
     parser.add_argument("--resume_from_checkpoint",      action="store_true")
     parser.add_argument("--pretrained_encoder",          type=str,   default=None,

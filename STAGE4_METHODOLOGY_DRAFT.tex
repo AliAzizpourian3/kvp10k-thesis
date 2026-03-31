@@ -184,16 +184,9 @@ During Stage 4b development, a mismatch was identified between the raw KVP10k gr
 \subsubsection{Optimizer and Learning Rate}
 \label{sec:stage4_lr}
 
-Stage 4a uses a single AdamW optimizer with a uniform learning rate across all parameters. Stage 4b uses a \textbf{parameter-group learning rate schedule} to account for the different convergence dynamics of the pre-trained encoder and the randomly-initialised linker:
+Stage 4a uses a single AdamW optimizer with a uniform learning rate across all parameters. Stage 4b uses a unified AdamW optimizer with learning rate $2 \times 10^{-5}$ across all parameters (encoder and linker). An earlier configuration attempted decoupled learning rates (encoder: $2 \times 10^{-5}$, linker: $1 \times 10^{-4}$), which are documented in the architectural constraint note below.
 
-\begin{itemize}
-    \item \textbf{LayoutLMv3 encoder}: $\text{lr}_{\text{enc}} = 2 \times 10^{-5}$ (standard fine-tuning rate for pre-trained transformers)
-    \item \textbf{BiaffineLinker (key/value projections, spatial MLP, final scorer)}: $\text{lr}_{\text{link}} = 1 \times 10^{-4}$ (2$\times$ higher, as these layers are trained from random initialisation)
-\end{itemize}
-
-Using a single uniform rate for both components caused the linker to under-fit (too slow to learn from random init) while simultaneously destabilising the pre-trained encoder (too fast for fine-tuning). Decoupled learning rates resolved this imbalance.
-
-Both parameter groups share:
+Both stages share:
 \begin{itemize}
     \item Warmup steps: 1000 (5\% of total training steps)
     \item Weight decay: $\lambda_{\text{decay}} = 0.01$
@@ -206,19 +199,35 @@ Both parameter groups share:
 
 All Stage 4 training is conducted in full \textbf{fp32 precision}. An earlier configuration enabled \texttt{bf16} (bfloat16) mixed-precision training to reduce memory usage. However, \texttt{bf16} caused \texttt{loss~=~NaN} at step~0 of early Stage~4b runs due to underflow in the spatial feature encoder (the geometric feature values, e.g.\ normalised distances and area ratios, fall near the \texttt{bf16} representable range boundary). Reverting to \texttt{fp32} eliminated this issue with negligible impact on memory budget given the chunked linker design.
 
-\subsubsection{Training Stability: NaN Guard}
+\subsubsection{Training Stability: NaN Guard and Label Masking}
 \label{sec:stage4_nan_guard}
 
-To prevent silent NaN propagation during training (where a NaN loss updates no parameters but corrupts optimiser state), the training loop includes an explicit guard:
+% [DRAFT] This section describes the full NaN investigation trail.
+% Update outcome once canary results confirmed.
 
+Achieving stable Stage~4b training required an iterative diagnostic process in which the root cause of \texttt{link\_loss = NaN} was initially misattributed before being correctly identified. This trail is documented here both for methodological transparency and as a cautionary note for practitioners implementing custom loss heads over pre-trained transformer encoders.
+
+\paragraph{Misattributed cause (hyperparameter hypothesis).}
+Early crashes at step~$\sim$900--1400 were attributed to the learning rate being too aggressive, causing exploding gradients. Two canary experiments were submitted: Canary~A with $(\text{lr} = 5 \times 10^{-5},\ \text{accum} = 32)$ and Canary~B with $(\text{lr} = 2 \times 10^{-5},\ \text{accum} = 8)$. Canary~B trained stably for 2{,}488 steps -- well past any previous crash -- before collapsing with \texttt{link\_loss = nan} while \texttt{entity\_loss = 0.648} (normal). This result falsified the hyperparameter hypothesis: the instability was not in the optimiser, but in the loss computation itself.
+
+\paragraph{True root cause (invalid link label targets).}
+Post-mortem analysis identified the actual cause: certain positions in the ground-truth link label tensor \texttt{gt\_links} passed to \texttt{binary\_cross\_entropy\_with\_logits} contained values outside the valid range $[0, 1]$. \texttt{BCE} requires all targets to be binary; any out-of-range value produces \texttt{NaN} silently, even when logits are clamped to $\pm 10$. The failure was sporadic -- it only triggered when a particular batch happened to surface a (key, value) candidate pair whose corresponding link label position was uninitialised or carried a floating-point edge case. The entity loss was unaffected because its labels are integer class indices processed by \texttt{CrossEntropyLoss}, which ignores \texttt{-100} padding by design.
+
+\paragraph{Fix (v3 label masking).}
+The fix is a valid-label mask applied before the BCE call:
 \begin{verbatim}
-if torch.isnan(loss):
-    logger.warning(f"NaN loss at step {step}, skipping batch")
-    optimizer.zero_grad()
-    continue
+valid_mask = (gt_links >= 0.0) & (gt_links <= 1.0)
+if not valid_mask.any():
+    continue  # skip degenerate batch
+scores_clamped = torch.clamp(scores[valid_mask],
+                             min=-10.0, max=10.0)
+link_loss = F.binary_cross_entropy_with_logits(
+    scores_clamped, gt_links[valid_mask])
 \end{verbatim}
+This is the same mechanism that \texttt{CrossEntropyLoss} uses for entity labels (\texttt{ignore\_index=-100}), applied equivalently to the binary linker head. After this fix, training proceeded without \texttt{NaN} across all subsequent runs.
 
-This ensures that any residual numerical instability (e.g.\ from degenerate batches with zero key or value candidates) causes an immediate logged skip rather than a silent corruption of the model weights. Together with the Bilinear~$\to$~dot-product fix (Section~\ref{sec:linker_module}) and the fp32 precision decision (Section~\ref{sec:stage4_precision}), this guard makes Stage~4b training robust across all three $\lambda$ configurations.
+\paragraph{Methodological lesson.}
+Hyperparameters were tuned in a stability-first order: numerical precision first (fp32 vs.\ bf16), then architectural stability (Bilinear $\to$ dot-product), then optimiser dynamics (LR, accumulation), and finally loss correctness (label masking). This ordering revealed that the root instability resided in the loss computation -- not in the optimiser -- and would not have been found by hyperparameter search alone.
 
 \subsubsection{Batch Size and Epoch Count}
 
@@ -308,17 +317,20 @@ These ablations directly test the hypothesis that layout awareness and spatial g
 % \sqrt{d}$. All other components and hyperparameters are unchanged.
 % Stage~4b results are reported in Section~\ref{sec:stage4b_results}.
 %
-% Three additional training-stability measures were required:
+% Four training-stability measures were required in total:
 % (1)~\textbf{fp32 precision}: \texttt{bf16} mixed-precision caused NaN at
 %     step~0 due to underflow in spatial feature values; reverted to fp32
 %     (see Section~\ref{sec:stage4_precision}).
-% (2)~\textbf{Decoupled learning rates}: the linker requires
-%     $\text{lr}_{\text{link}} = 10^{-4}$ vs.\ $\text{lr}_{\text{enc}} = 2\times 10^{-5}$
-%     for the encoder; a single uniform rate caused linker under-fitting
+% (2)~\textbf{Unified learning rate}: a single AdamW lr=2e-5 is used for
+%     all parameters; earlier decoupled-LR experiments did not resolve NaN.
 %     (see Section~\ref{sec:stage4_lr}).
 % (3)~\textbf{NaN guard}: explicit \texttt{torch.isnan(loss)} check skips
 %     degenerate batches and prevents silent optimiser-state corruption
 %     (see Section~\ref{sec:stage4_nan_guard}).
+% (4)~\textbf{Link label masking (v3, root cause fix)}: BCE requires targets
+%     in [0,1]; uninitialised/edge-case float values in gt_links silently
+%     produced NaN at step 2488 in canary_B. A valid_mask guard now filters
+%     these positions before BCE (see Section~\ref{sec:stage4_nan_guard}).
 %
 % Gradient checkpointing was not enabled: LayoutLMv3 does not reliably support
 % the HuggingFace gradient-checkpointing API. Memory was managed via chunked
