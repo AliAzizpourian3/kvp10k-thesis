@@ -30,7 +30,7 @@ This decomposition offers two distinct advantages over the generative baseline:
     \item \textbf{Unsupervised domain adaptation}: Transition learning can be invoked from Stage 3 (text encoding) into Stage 4 (spatial linking), leveraging the lmdx\_text representations already available.
 \end{enumerate}
 
-The encoder backbone is LayoutLMv3 (microsoft/layoutlmv3-base), chosen for its state-of-the-art multimodal fusion and proven effectiveness on form-understanding benchmarks (FUNSD, CORD, DocVQA). Stage 4a adds a simple softmax classifier over the encoder output to produce entity labels; Stage 4b adds an additional biaffine scoring module to predict relation scores.
+The encoder backbone is LayoutLMv3 (microsoft/layoutlmv3-base), chosen for its state-of-the-art multimodal fusion and proven effectiveness on form-understanding benchmarks (FUNSD, CORD, DocVQA). Stage 4a adds a simple softmax classifier over the encoder output to produce entity labels; Stage 4b adds an additional scoring module to predict relation scores.
 
 \subsection{Why LayoutLMv3 as Encoder}
 \label{sec:layoutlmv3_justification}
@@ -90,30 +90,25 @@ This bbox-based alignment avoids text-matching ambiguity and leverages the spati
 \label{sec:stage4b_entity_relation}
 
 \subsubsection{Architecture}
+\label{sec:linker_module}
 
-Stage 4b extends Stage 4a by adding a biaffine attention module to score potential key-value relationships. After token-level entity labels are produced, the model computes pairwise relation scores:
+Stage 4b extends Stage 4a by adding the \texttt{BiaffineLinker} module to score potential key-value relationships. For each (key, value) candidate token pair, the linker computes a scalar score combining a semantic signal and a spatial signal.
 
+\paragraph{Semantic scorer (Stage~4b final).}
+The semantic score is a scaled dot-product between projected key and value representations:
 \[
-s_{i,j} = h_i^T W_{\text{biaffine}} h_j + w_{\text{bias}}
+    s_{\text{sem}}(i,j) = \frac{\mathbf{k}_i^\top \mathbf{v}_j}{\sqrt{d}}
 \]
+where $\mathbf{k}_i = W_k h_i$ and $\mathbf{v}_j = W_v h_j$ are linear projections of the LayoutLMv3 hidden states, and $d = 768$ is the hidden dimension. This scoring rule is identical to the attention mechanism in~\cite{vaswani2017attention} and is numerically stable because no learned weight matrix couples the key and value streams in the scoring step.
 
-where $h_i$ and $h_j$ are LayoutLMv3 hidden states for tokens $i$ and $j$, $W_{\text{biaffine}} \in \mathbb{R}^{768 \times 768}$ is a learned bilinear matrix, and $w_{\text{bias}}$ is a scalar bias term.
+\textbf{Design note.}
+An earlier implementation used \texttt{nn.Bilinear}$(d, d, 1)$, i.e.\ $s = \mathbf{k}^\top W_{\text{bil}} \mathbf{v}$ with a $768 \times 768$ weight matrix. This caused \texttt{link\_loss~=~NaN} at approximately step~1400 of every training run due to exploding gradients: gradients flow back through both $\mathbf{k}$ and $\mathbf{v}$ simultaneously via $W_{\text{bil}}$, destabilising training even under Xavier initialisation. The scaled dot-product formulation eliminates this failure mode at no cost in modelling capacity (commit \texttt{01c3f72}).
 
-The relation matrix is then thresholded and masked to only allow edges from Key tokens to Value tokens based on the Stage 4b entity predictions, yielding a sparse directed graph of key-value associations.
+\paragraph{Spatial scorer.}
+Eight geometric features are computed per (key, value) pair: horizontal and vertical centre displacement $(\Delta x, \Delta y)$, Euclidean distance, angle $\theta = \text{atan2}(\Delta y, \Delta x)$, horizontal and vertical bounding-box alignment overlap ratios, relative area ratio, and relative aspect-ratio ratio. These are encoded by a two-layer MLP with ReLU activations into a 32-dimensional vector.
 
-\subsubsection{Biaffine Attention Justification}
-
-Biaffine attention was chosen for relation scoring for the following reasons:
-
-\begin{enumerate}
-    \item \textbf{Demonstrated effectiveness}: Biaffine layers achieve state-of-the-art results in dependency parsing (Dozat \& Manning, 2017) and semantic role labeling, both requiring scoring pairwise token relations.
-    
-    \item \textbf{Computational efficiency}: Unlike dense cross-attention (which scales as $O(n^2)$), biaffine scoring is a simple matrix multiplication and scales effectively to documents with hundreds of tokens.
-    
-    \item \textbf{Interpretability}: The biaffine matrix captures symmetric and asymmetric token interaction patterns, and attention weights can be visualized to diagnose failure modes.
-    
-    \item \textbf{Flexibility}: The biaffine parametrization naturally supports application-specific masking (e.g., constraining links to only originate from Key tokens).
-\end{enumerate}
+\paragraph{Final scoring and memory efficiency.}
+The semantic scalar and 32-dimensional spatial vector are concatenated and passed through a second MLP to produce the final link score $s_{i,j}$. To avoid materialising the full $n_k \times n_v$ expanded tensor in GPU memory, scoring is performed in chunks of \texttt{LINKER\_CHUNK\_SIZE}~$= 8$ key rows at a time. A hard cap of \texttt{MAX\_LINK\_CANDIDATES}~$= 128$ key and value tokens per page (selected by highest entity-classifier confidence) ensures the worst-case linker matrix is $128 \times 128$, regardless of entity-classifier noise at early training steps.
 
 \subsubsection{Training Objective}
 
@@ -126,22 +121,22 @@ Stage 4b optimizes a weighted combination of entity and relation losses:
 where $\mathcal{L}_{\text{entity}}$ is the cross-entropy loss from Stage 4a, and $\mathcal{L}_{\text{relation}}$ is binary cross-entropy over predicted relation scores:
 
 \[
-\mathcal{L}_{\text{relation}} = -\sum_{i,j} \left[ r^*_{i,j} \log \sigma(s_{i,j}) + (1 - r^*_{i,j}) \log(1 - \sigma(s_{i,j})) \right]
+\mathcal{L}_{\text{relation}} = -\frac{1}{|\mathcal{B}|} \sum_{b \in \mathcal{B}} \sum_{i,j} \left[ r^*_{i,j} \log \sigma(s_{i,j}) + (1 - r^*_{i,j}) \log(1 - \sigma(s_{i,j})) \right]
 \]
 
-Here $r^*_{i,j}$ is the ground-truth relation label (1 if token $i$ is a Key and token $j$ is its Value, 0 otherwise), and $\sigma$ is the sigmoid function.
+Here $r^*_{i,j}$ is the ground-truth relation label (1 if token $i$ is a Key and token $j$ is its corresponding Value, 0 otherwise), $\sigma$ is the sigmoid function, and $|\mathcal{B}|$ is the number of training pages with at least one key-value pair.
 
 \subsubsection{Hyperparameter Sweep}
 
-To explore the interplay between entity and relation learning, we conduct an ablation study varying $\lambda \in \{0.5, 1.0, 2.0\}$:
+To explore the interplay between entity and relation learning, we conduct an ablation varying $\lambda \in \{0.5, 1.0, 2.0\}$:
 
 \begin{itemize}
-    \item $\lambda = 0.5$: Emphasize entity learning, relation learning is secondary
-    \item $\lambda = 1.0$: Balanced weighting of entity and relation objectives
-    \item $\lambda = 2.0$: Emphasize relation learning; aggressive link prediction
+    \item $\lambda = 0.5$: Emphasise entity learning; relation signal is secondary.
+    \item $\lambda = 1.0$: Balanced weighting of entity and relation objectives.
+    \item $\lambda = 2.0$: Emphasise relation learning; more aggressive link prediction.
 \end{itemize}
 
-This sweep allows us to determine whether the task is entity-limited (relations are easy given perfect entities) or relation-limited (entities are easy but linking is hard).
+This sweep determines whether the task is entity-limited (relations are easy given correct entities) or relation-limited (entities are easy but linking is hard).
 
 \subsection{Data Preprocessing and Alignment}
 \label{sec:stage4_data_prep}
@@ -155,7 +150,7 @@ KVP10k provides lmdx\_text format: a sequence of extracted text lines, each anno
 \begin{enumerate}
     \item \textbf{Word tokens}: Split each lmdx line on whitespace to obtain individual word-level text and bounding boxes.
     \item \textbf{Coordinate normalization}: Scale pixel coordinates from image-native range to $[0, 1000]$ (LayoutLMv3 standard).
-    \item \textbf{Image handling}: When real document images are unavailable, create dummy 224×224 white images to satisfy LayoutLMv3Processor requirements.
+    \item \textbf{Image handling}: When real document images are unavailable, create dummy 224\texttimes{}224 white images to satisfy LayoutLMv3Processor requirements.
 \end{enumerate}
 
 \subsubsection{LayoutLMv3Processor Configuration}
@@ -178,26 +173,66 @@ y_{\text{token}} = y_{\text{word}} \quad \text{if } \texttt{word\_ids}[\text{tok
 
 For special tokens (CLS, SEP, padding) where \texttt{word\_ids} is None, labels are set to 0 (Other) to exclude from loss computation.
 
+\subsubsection{Dataset Format Conversion}
+\label{sec:dataset_format_fix}
+
+During Stage 4b development, a mismatch was identified between the raw KVP10k ground-truth annotation format and the binary link-label matrix required by the linker. Specifically, ground-truth key-value relationships are stored as nested reference attributes in the KVP10k JSON; converting these to a dense $[\text{seq\_len} \times \text{seq\_len}]$ binary adjacency matrix required explicit resolution of token-level indices after subword tokenization. Pages with unresolvable references (e.g.\ missing bounding box overlaps) are excluded from link-loss computation but retained for entity-loss computation. Full details are documented in \texttt{STAGE4\_DATASET\_FIX.md}.
+
 \subsection{Training Configuration}
 \label{sec:stage4_training_config}
 
 \subsubsection{Optimizer and Learning Rate}
+\label{sec:stage4_lr}
 
-Both Stage 4a and 4b use AdamW optimization with:
+Stage 4a uses a single AdamW optimizer with a uniform learning rate across all parameters. Stage 4b uses a unified AdamW optimizer with learning rate $2 \times 10^{-5}$ across all parameters (encoder and linker). An earlier configuration attempted decoupled learning rates (encoder: $2 \times 10^{-5}$, linker: $1 \times 10^{-4}$), which are documented in the architectural constraint note below.
 
+Both stages share:
 \begin{itemize}
-    \item Initial learning rate: $\text{lr} = 2 \times 10^{-5}$
-    \item Warmup steps: 1000 (5\% of training)
+    \item Warmup steps: 1000 (5\% of total training steps)
     \item Weight decay: $\lambda_{\text{decay}} = 0.01$
     \item Gradient clipping: $\|\nabla\| \leq 1.0$
+    \item Schedule: linear decay after warmup
 \end{itemize}
 
-The learning rate schedule uses linear decay after warmup, following standard transformer fine-tuning practice.
+\subsubsection{Numerical Precision}
+\label{sec:stage4_precision}
+
+All Stage 4 training is conducted in full \textbf{fp32 precision}. An earlier configuration enabled \texttt{bf16} (bfloat16) mixed-precision training to reduce memory usage. However, \texttt{bf16} caused \texttt{loss~=~NaN} at step~0 of early Stage~4b runs due to underflow in the spatial feature encoder (the geometric feature values, e.g.\ normalised distances and area ratios, fall near the \texttt{bf16} representable range boundary). Reverting to \texttt{fp32} eliminated this issue with negligible impact on memory budget given the chunked linker design.
+
+\subsubsection{Training Stability: NaN Guard and Label Masking}
+\label{sec:stage4_nan_guard}
+
+% [DRAFT] This section describes the full NaN investigation trail.
+% Update outcome once canary results confirmed.
+
+Achieving stable Stage~4b training required an iterative diagnostic process in which the root cause of \texttt{link\_loss = NaN} was initially misattributed before being correctly identified. This trail is documented here both for methodological transparency and as a cautionary note for practitioners implementing custom loss heads over pre-trained transformer encoders.
+
+\paragraph{Misattributed cause (hyperparameter hypothesis).}
+Early crashes at step~$\sim$900--1400 were attributed to the learning rate being too aggressive, causing exploding gradients. Two canary experiments were submitted: Canary~A with $(\text{lr} = 5 \times 10^{-5},\ \text{accum} = 32)$ and Canary~B with $(\text{lr} = 2 \times 10^{-5},\ \text{accum} = 8)$. Canary~B trained stably for 2{,}488 steps -- well past any previous crash -- before collapsing with \texttt{link\_loss = nan} while \texttt{entity\_loss = 0.648} (normal). This result falsified the hyperparameter hypothesis: the instability was not in the optimiser, but in the loss computation itself.
+
+\paragraph{True root cause (invalid link label targets).}
+Post-mortem analysis identified the actual cause: certain positions in the ground-truth link label tensor \texttt{gt\_links} passed to \texttt{binary\_cross\_entropy\_with\_logits} contained values outside the valid range $[0, 1]$. \texttt{BCE} requires all targets to be binary; any out-of-range value produces \texttt{NaN} silently, even when logits are clamped to $\pm 10$. The failure was sporadic -- it only triggered when a particular batch happened to surface a (key, value) candidate pair whose corresponding link label position was uninitialised or carried a floating-point edge case. The entity loss was unaffected because its labels are integer class indices processed by \texttt{CrossEntropyLoss}, which ignores \texttt{-100} padding by design.
+
+\paragraph{Fix (v3 label masking).}
+The fix is a valid-label mask applied before the BCE call:
+\begin{verbatim}
+valid_mask = (gt_links >= 0.0) & (gt_links <= 1.0)
+if not valid_mask.any():
+    continue  # skip degenerate batch
+scores_clamped = torch.clamp(scores[valid_mask],
+                             min=-10.0, max=10.0)
+link_loss = F.binary_cross_entropy_with_logits(
+    scores_clamped, gt_links[valid_mask])
+\end{verbatim}
+This is the same mechanism that \texttt{CrossEntropyLoss} uses for entity labels (\texttt{ignore\_index=-100}), applied equivalently to the binary linker head. After this fix, training proceeded without \texttt{NaN} across all subsequent runs.
+
+\paragraph{Methodological lesson.}
+Hyperparameters were tuned in a stability-first order: numerical precision first (fp32 vs.\ bf16), then architectural stability (Bilinear $\to$ dot-product), then optimiser dynamics (LR, accumulation), and finally loss correctness (label masking). This ordering revealed that the root instability resided in the loss computation -- not in the optimiser -- and would not have been found by hyperparameter search alone.
 
 \subsubsection{Batch Size and Epoch Count}
 
 \begin{itemize}
-    \item Batch size: 16 samples per GPU (effective batch size 16 × 4 GPUs = 64 on A100 hardware)
+    \item Batch size: 16 samples per GPU (effective batch size 16 \texttimes{} 4 GPUs = 64 on A100 hardware)
     \item Training epochs: 5 (chosen based on typical BERT fine-tuning convergence on similar-sized tasks)
     \item Validation frequency: Every 100 mini-batches
     \item Early stopping: Patience = 3 epochs (stop if validation F1 does not improve)
@@ -232,7 +267,7 @@ Stage 4b additionally computes relation scores and constructs key-value associat
 
 \begin{enumerate}
     \item Predict entity labels as in Stage 4a.
-    \item Compute relation scores $s_{i,j}$ for all token pairs.
+    \item Compute relation scores $s_{i,j}$ for all (key, value) token pairs.
     \item Extract maximum-weight bipartite matching between Key and Value spans using the relation scores as edge weights.
     \item Return (key phrase, value phrase) pairs along with confidence scores from the linker.
 \end{enumerate}
@@ -255,9 +290,49 @@ Stage 4 is structured around a series of controlled ablations to isolate the con
 \begin{enumerate}
     \item \textbf{Stage 4a (entity-only) vs Stage 4b (entity + relation)}: Measures the performance gain from explicit relation learning. If Stage 4b substantially improves F1, relations are learnable; if Stage 4a is already strong, the task is entity-dominated.
     
-    \item \textbf{Relation weight $\lambda$ sweep}: Stage 4b is trained with $\lambda \in \{0.5, 1.0, 2.0\}$ to determine whether the model benefits from emphasizing relation predictions ($\lambda > 1$) or entity predictions ($\lambda < 1$).
+    \item \textbf{Relation weight $\lambda$ sweep}: Stage 4b is trained with $\lambda \in \{0.5, 1.0, 2.0\}$ to determine whether the model benefits from emphasising relation predictions ($\lambda > 1$) or entity predictions ($\lambda < 1$).
     
     \item \textbf{Stage 3 vs Stage 4 comparison}: Comparing generative Stage 3 (Mistral-7B, text-only) against discriminative Stage 4 (LayoutLMv3, layout-aware) isolates the contribution of spatial grounding to end-to-end KVP extraction accuracy.
 \end{enumerate}
 
 These ablations directly test the hypothesis that layout awareness and spatial grounding improve over text-only generative approaches on the KVP extraction task.
+
+% ------------------------------------------------------------------------------
+% ARCHITECTURAL CONSTRAINT NOTE (Section 8.6.1.2)
+% Paste into LaTeX_Thesis/chapters/08_discussion.tex under:
+%   \subsubsection{Architectural Constraints}
+% ------------------------------------------------------------------------------
+%
+% \subsubsection{Architectural Constraints}
+% \label{sec:arch_constraints}
+%
+% The \texttt{BiaffineLinker} underwent one architectural revision during
+% Stage~4b training. The original design used \texttt{nn.Bilinear}$(768, 768, 1)$
+% as the semantic scorer, which produced \texttt{link\_loss = NaN} at
+% approximately step~1400 across all three $\lambda$ configurations. The root
+% cause is that a $768 \times 768$ weight matrix receiving simultaneous gradients
+% from both key and value streams is prone to gradient explosion even under Xavier
+% initialisation. The fix (commit \texttt{01c3f72}) replaces this with a
+% parameter-free scaled dot-product scorer $(\mathbf{k}^\top \mathbf{v}) /
+% \sqrt{d}$. All other components and hyperparameters are unchanged.
+% Stage~4b results are reported in Section~\ref{sec:stage4b_results}.
+%
+% Four training-stability measures were required in total:
+% (1)~\textbf{fp32 precision}: \texttt{bf16} mixed-precision caused NaN at
+%     step~0 due to underflow in spatial feature values; reverted to fp32
+%     (see Section~\ref{sec:stage4_precision}).
+% (2)~\textbf{Unified learning rate}: a single AdamW lr=2e-5 is used for
+%     all parameters; earlier decoupled-LR experiments did not resolve NaN.
+%     (see Section~\ref{sec:stage4_lr}).
+% (3)~\textbf{NaN guard}: explicit \texttt{torch.isnan(loss)} check skips
+%     degenerate batches and prevents silent optimiser-state corruption
+%     (see Section~\ref{sec:stage4_nan_guard}).
+% (4)~\textbf{Link label masking (v3, root cause fix)}: BCE requires targets
+%     in [0,1]; uninitialised/edge-case float values in gt_links silently
+%     produced NaN at step 2488 in canary_B. A valid_mask guard now filters
+%     these positions before BCE (see Section~\ref{sec:stage4_nan_guard}).
+%
+% Gradient checkpointing was not enabled: LayoutLMv3 does not reliably support
+% the HuggingFace gradient-checkpointing API. Memory was managed via chunked
+% linker scoring and the \texttt{MAX\_LINK\_CANDIDATES} cap
+% (see Section~\ref{sec:linker_module}).
