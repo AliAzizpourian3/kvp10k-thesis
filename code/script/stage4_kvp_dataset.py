@@ -328,21 +328,38 @@ class LayoutLMv3PreparedDataset(Dataset):
             return entity_labels, link_labels
 
         for kvp in kvps:
+            kvp_type = kvp.get("type", "kvp")
             key_bbox = kvp.get("key", {}).get("bbox", None)
             val_bbox = kvp.get("value", {}).get("bbox", None)
 
+            # --- Entity labels: assign for ALL types that have bboxes ---
+            if key_bbox:
+                for idx in self._find_words_by_bbox_overlap(bboxes, key_bbox):
+                    if idx < len(entity_labels):
+                        entity_labels[idx] = 1
+            if val_bbox:
+                for idx in self._find_words_by_bbox_overlap(bboxes, val_bbox):
+                    if idx < len(entity_labels):
+                        entity_labels[idx] = 2
+
+            # --- Link labels: only for "kvp" type with valid key+value ---
+            if kvp_type != "kvp":
+                continue
             if not key_bbox or not val_bbox:
+                continue
+
+            key_text = kvp.get("key", {}).get("text", "").strip()
+            val_text = kvp.get("value", {}).get("text", "").strip()
+            if not key_text or not val_text:
+                continue
+
+            k_x1, k_y1, k_x2, k_y2 = key_bbox
+            v_x1, v_y1, v_x2, v_y2 = val_bbox
+            if k_x1 >= k_x2 or k_y1 >= k_y2 or v_x1 >= v_x2 or v_y1 >= v_y2:
                 continue
 
             key_indices = self._find_words_by_bbox_overlap(bboxes, key_bbox)
             val_indices = self._find_words_by_bbox_overlap(bboxes, val_bbox)
-
-            for idx in key_indices:
-                if idx < len(entity_labels):
-                    entity_labels[idx] = 1
-            for idx in val_indices:
-                if idx < len(entity_labels):
-                    entity_labels[idx] = 2
 
             for key_idx in key_indices:
                 for val_idx in val_indices:
