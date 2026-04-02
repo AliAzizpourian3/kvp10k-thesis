@@ -1,0 +1,299 @@
+\documentclass[11pt,a4paper]{article}
+
+% ── Packages ────────────────────────────────────────────────────────────────
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{microtype}
+
+% ── Page style ──────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Master Thesis Progress Report}
+\lhead{Ali Azizpourian}
+\cfoot{\thepage}
+
+% ── Title ───────────────────────────────────────────────────────────────────
+\title{\textbf{Progress Report}\\[0.4em]
+       \large Key-Value Pair Extraction from Document Images\\[0.2em]
+       \normalsize Master Thesis --- Supervisor Update}
+\author{Ali Azizpourian}
+\date{April 2026}
+
+% ── Document ────────────────────────────────────────────────────────────────
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+% ── Overview ────────────────────────────────────────────────────────────────
+\section*{Overview}
+
+This report summarises work completed on the master thesis project\,:
+\textit{Key-Value Pair Extraction from Document Images using LayoutLMv3 with a
+Biaffine Linker}.
+Stages 1 through 3 are complete and have produced the full prepared dataset
+ready for model training.
+Stage 4 (model fine-tuning) is the next planned phase and is described in
+Section~\ref{sec:stage4}.
+
+The pipeline processes raw document images from the IBM KVP10k benchmark
+dataset and produces, step by step, structured key-value predictions at the
+word level.
+
+% ── Stage 1 ─────────────────────────────────────────────────────────────────
+\section{Stage 1 --- Dataset Acquisition}
+
+\subsection*{Objective}
+Obtain the IBM KVP10k benchmark and establish a reproducible data loading
+pipeline.
+
+\subsection*{Dataset}
+KVP10k~\cite{kvp10k} is a large-scale document understanding benchmark
+published by IBM Research. It contains scanned and born-digital business
+documents (invoices, receipts, purchase orders, forms) with ground-truth
+key-value pair annotations at the bounding-box level.
+
+\begin{table}[h!]
+  \centering
+  \caption{IBM KVP10k dataset statistics}
+  \label{tab:dataset}
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Split} & \textbf{Documents} & \textbf{Annotated KVP entries} \\
+    \midrule
+    Train          & 48{,}280           & $\sim$640{,}000 \\
+    Test           & 5{,}255            & $\sim$70{,}000 \\
+    \midrule
+    Total          & 53{,}535           & $\sim$710{,}000 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection*{KVP Entry Types}
+Each annotated entry carries one of three semantic types:
+\begin{itemize}[noitemsep]
+  \item \texttt{kvp} --- a complete key-value pair (both key and value present)
+  \item \texttt{unvalued} --- a key with no associated value
+  \item \texttt{unkeyed} --- a value with no associated key
+\end{itemize}
+
+\subsection*{Output}
+Raw JSON annotation files and document images downloaded and cached locally
+on the HPC cluster.
+
+% ── Stage 2 ─────────────────────────────────────────────────────────────────
+\section{Stage 2 --- Document Preprocessing}
+
+\subsection*{Objective}
+Convert raw document PDFs to standardised page images and extract layout
+metadata required for spatial modelling.
+
+\subsection*{Steps}
+\begin{enumerate}[noitemsep]
+  \item PDF pages rendered to PNG images at a fixed resolution.
+  \item Page dimensions (\texttt{image\_width}, \texttt{image\_height} in
+        pixels) recorded per document.
+  \item Bounding-box coordinates kept in original pixel space for
+        traceability; normalisation to $[0, 1000]$ performed later
+        (Stage 3) as required by LayoutLMv3.
+\end{enumerate}
+
+\subsection*{Output}
+PNG images and per-page metadata files stored under
+\texttt{data/raw/}.
+
+% ── Stage 3 ─────────────────────────────────────────────────────────────────
+\section{Stage 3 --- Data Preparation (LMDX Encoding)}
+
+\subsection*{Objective}
+Transform raw annotations into a format directly consumable by the
+LayoutLMv3 processor, producing one self-contained JSON file per document.
+
+\subsection*{LMDX Text Format}
+Each word is encoded on a single line as:
+\begin{center}
+  \texttt{word\_text\;x1|y1|x2|y2}
+\end{center}
+where coordinates are in pixel space.  The full page is serialised as a
+newline-delimited sequence of such lines and stored in the field
+\texttt{lmdx\_text}.
+
+\subsection*{Prepared JSON Schema}
+Each output file contains the following top-level fields:
+
+\begin{table}[h!]
+  \centering
+  \caption{Prepared JSON file schema}
+  \label{tab:json}
+  \begin{tabularx}{\textwidth}{llX}
+    \toprule
+    \textbf{Field} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \texttt{hash\_name}      & string  & Unique SHA-256 document identifier \\
+    \texttt{lmdx\_text}      & string  & Words with pixel-space bounding boxes
+                                         (one word per line, format
+                                         \texttt{word x1|y1|x2|y2}) \\
+    \texttt{image\_width}    & int     & Page width in pixels \\
+    \texttt{image\_height}   & int     & Page height in pixels \\
+    \texttt{gt\_kvps}        & object  & Ground-truth KVPs;
+                                         contains \texttt{kvps\_list} --- a
+                                         list of entries each with
+                                         \texttt{type}, \texttt{key.text},
+                                         \texttt{key.bbox},
+                                         \texttt{value.text},
+                                         \texttt{value.bbox} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection*{Prepared Dataset Statistics}
+
+\begin{table}[h!]
+  \centering
+  \caption{Prepared dataset split statistics}
+  \label{tab:prepared}
+  \begin{tabular}{lrrrr}
+    \toprule
+    \textbf{Split} & \textbf{JSON files} & \textbf{Total KVP entries}
+    & \textbf{Valid \texttt{kvp} pairs} & \textbf{Unvalued / Unkeyed} \\
+    \midrule
+    Train & 5{,}389 & 81{,}817 & 35{,}363\;(43.2\,\%) & 42{,}157\;(51.5\,\%) \\
+    Test  & $\sim$600 & --- & --- & --- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\noindent
+An important data characteristic surfaced during preprocessing analysis:
+only $43.2\,\%$ of annotated entries are complete \texttt{kvp} pairs
+(both key and value present with non-empty text and non-degenerate
+bounding boxes).
+The remaining $56.8\,\%$ are either \texttt{unvalued} keys or
+\texttt{unkeyed} values --- partial annotations that are valid for
+entity labelling but must not generate key-value link targets.
+This distinction is handled explicitly in the data preparation step for
+Stage 4 (see Section~\ref{sec:stage4}).
+
+\subsection*{Output}
+\begin{itemize}[noitemsep]
+  \item \texttt{data/prepared/train/*.json} --- 5{,}389 files
+  \item \texttt{data/prepared/test/*.json} --- held-out test set
+\end{itemize}
+
+% ── Stage 4 ─────────────────────────────────────────────────────────────────
+\section{Stage 4 --- Model Fine-Tuning (Planned)}
+\label{sec:stage4}
+
+\subsection*{Objective}
+Fine-tune \textbf{LayoutLMv3-base}~\cite{layoutlmv3} (Microsoft, 125M
+parameters) on the prepared KVP10k data to perform end-to-end key-value
+pair extraction using a two-component architecture.
+
+\subsection*{Model Architecture}
+\begin{enumerate}[noitemsep]
+  \item \textbf{LayoutLMv3 Encoder} --- joint text, layout (bounding box),
+        and visual (patch pixel) encoding; output: $[B,\,512,\,768]$
+        hidden states.
+  \item \textbf{Entity Classifier} --- token-level linear head classifying
+        each token as \textit{Other} (0), \textit{Key} (1), or
+        \textit{Value} (2) via cross-entropy loss.
+  \item \textbf{Biaffine Linker} --- pairs key tokens to value tokens using
+        a scaled dot-product semantic score combined with an 8-feature
+        spatial MLP; trained with binary cross-entropy on the
+        key$\times$value adjacency matrix.
+\end{enumerate}
+
+\subsection*{Training Configuration}
+
+\begin{table}[h!]
+  \centering
+  \caption{Planned Stage 4 training hyperparameters}
+  \label{tab:hparams}
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Hyperparameter}           & \textbf{Value} \\
+    \midrule
+    Base model                        & \texttt{microsoft/layoutlmv3-base} \\
+    Max sequence length               & 512 tokens \\
+    Learning rate                     & $2 \times 10^{-5}$ \\
+    Batch size                        & 1 (gradient accumulation: 8) \\
+    Effective batch size              & 8 \\
+    Optimiser                         & AdamW ($\lambda=0.01$) \\
+    LR schedule                       & Linear warmup (500 steps) + decay \\
+    Max epochs                        & 10 \\
+    Early stopping patience           & 3 epochs \\
+    Linker loss weight $\lambda$      & ablation: $\{0.5,\;1.0,\;2.0\}$ \\
+    Hardware                          & NVIDIA A100 40\,GB (SLURM) \\
+    Mixed precision                   & fp32 (bf16 disabled for stability) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection*{Two-Stage Training Strategy}
+\begin{itemize}[noitemsep]
+  \item \textbf{Stage 4a} --- Train encoder + entity classifier only
+        (linker disabled). Produces a pretrained encoder checkpoint.
+  \item \textbf{Stage 4b} --- Load Stage 4a checkpoint; train full model
+        including the biaffine linker. The linker loss weight $\lambda$
+        is swept across $\{0.5, 1.0, 2.0\}$ to study its effect on
+        linking accuracy.
+\end{itemize}
+
+\subsection*{Evaluation Metrics}
+\begin{itemize}[noitemsep]
+  \item \textbf{Entity F1} --- precision/recall on Key/Value token
+        classification.
+  \item \textbf{KVP F1} --- end-to-end extraction metric: a predicted pair
+        is correct if the key text matches (NED $< 0.2$) and the bounding
+        boxes overlap (IoU $> 0.3$).
+  \item \textbf{Linker precision/recall} --- standalone linker evaluation
+        on correctly classified key-value candidates.
+\end{itemize}
+
+\subsection*{Anticipated Challenges}
+\begin{itemize}[noitemsep]
+  \item \textbf{Data preprocessing complexity} --- the distinction between
+        \texttt{kvp}, \texttt{unvalued}, and \texttt{unkeyed} entries
+        requires careful label generation: entity labels are assigned for
+        all types, but link labels only for complete \texttt{kvp} entries
+        with non-empty text and non-degenerate bounding boxes.
+  \item \textbf{GPU memory constraints} --- the 512-token limit and
+        $512 \times 512$ link label matrix impose strict batch-size
+        restrictions on the 40\,GB A100; chunked linker scoring and
+        candidate capping (max 128 keys / 128 values per page) are
+        applied to stay within budget.
+  \item \textbf{Training stability} --- the biaffine linker introduces
+        additional gradient pathways that require careful learning-rate
+        tuning and logit clamping to prevent numerical instability.
+\end{itemize}
+
+% ── Bibliography ────────────────────────────────────────────────────────────
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+
+\bibitem{kvp10k}
+IBM Research,
+\textit{KVP10k: A Comprehensive Dataset for Key-Value Pair Extraction
+from Business Documents},
+2023.
+\url{https://huggingface.co/datasets/ibm/KVP10k}
+
+\bibitem{layoutlmv3}
+Y.~Huang et al.,
+\textit{LayoutLMv3: Pre-Training for Document AI with Unified Text and
+Image Masking},
+ACM Multimedia, 2022.
+
+\end{thebibliography}
+
+\end{document}
