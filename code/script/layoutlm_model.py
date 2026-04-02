@@ -201,8 +201,11 @@ class BiaffineLinker(nn.Module):
         v_align    = v_overlap / (torch.min(key_w.expand(nv), val_w) + 1e-8)
         key_area   = key_h * key_w
         val_area   = val_h * val_w
-        area_ratio = val_area / (key_area + 1e-8)
-        aspect_ratio = (val_w / (val_h + 1e-8)) / (key_w / (key_h + 1e-8))
+        area_ratio   = val_area / (key_area + 1e-8)
+        area_ratio   = torch.clamp(area_ratio, max=50.0)  # guard: degenerate key bbox
+        key_aspect   = key_w / (key_h + 1e-8)
+        val_aspect   = val_w / (val_h + 1e-8)
+        aspect_ratio = val_aspect / (key_aspect + 1e-8)  # guard: zero-area key bbox
 
         return torch.stack(
             [dx, dy, dist, angle, h_align, v_align, area_ratio, aspect_ratio],
@@ -217,6 +220,7 @@ class BiaffineLinker(nn.Module):
         k_exp = key_chunk.unsqueeze(1).expand(chunk_size, nv, -1)  # [chunk, nv, d]
         v_exp = val_reps.unsqueeze(0).expand(chunk_size, nv, -1)   # [chunk, nv, d]
         dot_scores = (k_exp * v_exp).sum(dim=-1, keepdim=True) / self.scale  # [chunk, nv, 1]
+        dot_scores = torch.clamp(dot_scores, min=-20.0, max=20.0)  # guard: large encoder norm early in training
 
         spatial_list = []
         for i in range(chunk_size):
@@ -238,8 +242,11 @@ class BiaffineLinker(nn.Module):
         all_value_indices = []
 
         for b in range(batch_size):
-            key_mask = (entity_preds[b] == 1) & (attention_mask[b] == 1)
-            val_mask = (entity_preds[b] == 2) & (attention_mask[b] == 1)
+            # Exclude tokens with degenerate bboxes (CLS/SEP/PAD have [0,0,0,0])
+            bbox_valid = (bboxes[b, :, 0] < bboxes[b, :, 2]) & \
+                         (bboxes[b, :, 1] < bboxes[b, :, 3])
+            key_mask = (entity_preds[b] == 1) & (attention_mask[b] == 1) & bbox_valid
+            val_mask = (entity_preds[b] == 2) & (attention_mask[b] == 1) & bbox_valid
 
             key_idx = key_mask.nonzero(as_tuple=True)[0]
             val_idx = val_mask.nonzero(as_tuple=True)[0]
