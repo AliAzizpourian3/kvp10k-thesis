@@ -390,8 +390,17 @@ class LayoutLMv3KVPModel(nn.Module):
                     scores_clamped = torch.clamp(
                         scores_valid, min=-LINK_LOGIT_CLAMP, max=LINK_LOGIT_CLAMP
                     )
+
+                    # Class-imbalance fix: weight positive examples by
+                    # num_negatives / num_positives, capped at 50.
+                    # Without this, the ~450:1 neg:pos ratio in sparse link
+                    # matrices drives BCE to predict all-zero (no link).
+                    n_pos = gt_links_valid.sum().clamp(min=1.0)
+                    n_neg = (1.0 - gt_links_valid).sum().clamp(min=1.0)
+                    pw = torch.clamp(n_neg / n_pos, max=50.0)
                     link_loss_total += F.binary_cross_entropy_with_logits(
-                        scores_clamped, gt_links_valid
+                        scores_clamped, gt_links_valid,
+                        pos_weight=pw.to(scores_clamped.device)
                     )
                     link_count += 1
 
