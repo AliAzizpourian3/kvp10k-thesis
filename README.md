@@ -1,224 +1,278 @@
-# KVP10k LayoutLMv3 Stage 4: Entity + Linking
+# KVP10k: Key-Value Pair Extraction Pipeline
 
-![Stage 4 Architecture](https://img.shields.io/badge/Stage-4-blue) ![Status](https://img.shields.io/badge/Status-Training-yellow) ![Fix](https://img.shields.io/badge/Latest-LayoutLMv3_Patch_Truncation-brightgreen)
+![Stages](https://img.shields.io/badge/Stages-0--4-blue) ![Dataset](https://img.shields.io/badge/Dataset-KVP10k%20ICDAR%202024-orange) ![Status](https://img.shields.io/badge/Stage%204b-In%20Progress-yellow)
 
-This repository contains the **Stage 4** implementation of the KVP10k key-value pair extraction pipeline using LayoutLMv3 with an optional biaffine relation linker.
+Thesis project implementing a full key-value pair (KVP) extraction pipeline on the [KVP10k dataset](https://huggingface.co/datasets/ibm/KVP10k) (ICDAR 2024). The pipeline progresses through five stages: evaluation protocol → dataset ingestion → layout analysis → baselines → LayoutLMv3 fine-tuning with biaffine linking.
 
-## 🎯 Overview
 
-**Two-stage architecture:**
-- **Stage 4a** (`train_stage4a.py`): Entity classification baseline
-  - LayoutLMv3 encoder + Entity classifier
-  - Detects Keys and Values token-level
-  
-- **Stage 4b** (`train_stage4b.py`): Entity + Relation linking with λ sweep
-  - LayoutLMv3 encoder + Entity classifier + Biaffine linker
-  - Learns to pair keys with values
-  - Lambda sweep: λ ∈ {0.5, 1.0, 2.0} for linker loss weight
+## Pipeline Overview
 
-## 📋 Key Features
+| Stage | Script | Description |
+|-------|--------|-------------|
+| 0 | `config.py` + `main.py` | Evaluation protocol (NED, IoU thresholds) |
+| 1 | `data_loader.py` | Dataset ingestion from HuggingFace |
+| 2 | `features.py` + `visualization.py` | Layout clustering & data audit |
+| 3 | `prepare_data.py` + `baselines.py` + `mistral_baseline.py` | Data preparation + baselines |
+| 4a | `train_stage4a.py` | LayoutLMv3 entity classifier (ablation) |
+| 4b | `train_stage4b.py` | LayoutLMv3 + biaffine linker, λ sweep |
 
-✅ **Gradient Accumulation**: Batch size 4 × accumulation 8 = effective batch 32  
-✅ **LayoutLMv3 Patch Token Handling**: Correct truncation of vision patch tokens  
-✅ **Lambda Weight Application**: Configurable link loss weighting  
-✅ **Word-to-Token Alignment**: Proper label mapping for subword tokenization  
-✅ **Unified F1 Metrics**: Key/Value-only F1 computation (no weighting)  
+---
 
-## 🔧 Model Architecture
+## Stage 0: Evaluation Protocol
 
-```
-Input: [batch, seq_len, 4]  (text_ids, attention_mask, bbox, pixel_values)
-  ↓
-LayoutLMv3Encoder
-  ├─ Text embedding + layout + visual features
-  └─ Output: [batch, 512+197_patches, hidden] → truncate to [batch, 512, hidden]
-  ↓
-EntityClassifier
-  └─ Output: [batch, 512, 3]  (Other/Key/Value)
-  ↓
-BiaffineLinker (optional for Stage 4b)
-  ├─ Extract key/value positions
-  ├─ Compute spatial + semantic scores
-  └─ Output: [batch, num_keys, num_values]
-  ↓
-Loss = entity_loss + λ * link_loss
-```
+Defined in `config.py`, validated via `main.py`.
 
-## 🐛 Important Fix: LayoutLMv3 Visual Patch Tokens
+- **Text matching**: NED (Normalised Edit Distance) < 0.2
+- **Location matching**: IoU > 0.3
+- **Overall metric**: F1 score (balanced precision + recall)
+- **Protocol**: IBM-compatible pair-level matching — a predicted KVP is a true positive if both its key text/bbox and value text/bbox match a ground-truth pair
 
-**Problem**: LayoutLMv3 encoder appends ~197 visual patch tokens from its ViT backbone:
-- `sequence_output` shape: `[batch, 709, hidden]` ← 512 text + 197 visual
-- `attention_mask` shape: `[batch, 512]` ← text tokens only
-- Causes shape mismatch in loss computation
+---
 
-**Solution**: Truncate sequence_output to text-only before loss/linker:
-```python
-text_seq_len = input_ids.shape[1]  # 512
-entity_logits = entity_logits[:, :text_seq_len, :]
-sequence_output = sequence_output[:, :text_seq_len, :]
-```
+## Stage 1: Dataset Ingestion
 
-This is the standard approach in official LayoutLMv3 fine-tuning code.
+`data_loader.py` loads KVP10k from HuggingFace (`ibm/KVP10k`, cached locally at `hf_cache/`):
 
-## 📊 Data Format
+- 10,000 document pages — 9,405 train / 595 test (after filtering annotated pages)
+- Each page: PDF URL + word annotations + KVP ground truth
+- Annotation format: bounding polygon coordinates per word, structured KVP pairs
 
-**Input**: Prepared JSON files from Stage 3
+---
+
+## Stage 2: Layout Clustering & Data Audit
+
+`features.py` extracts 13 layout features per document page:
+
+| Feature | Description |
+|---------|-------------|
+| `n_boxes` | Number of annotated bounding boxes |
+| `total_area` | Total area covered by boxes |
+| `mean_area`, `std_area` | Box area statistics |
+| `mean_width`, `mean_height` | Average box dimensions |
+| `mean_aspect_ratio` | Mean width/height ratio |
+| `mean_cx`, `mean_cy` | Centroid of layout |
+| `density` | Area coverage fraction |
+| `v_spread`, `h_spread` | Vertical/horizontal extent |
+| `mean_spacing` | Average inter-box spacing |
+
+K-means clustering with optimal k selected by silhouette score. Results saved to `data/outputs/stage2/`.
+
+---
+
+## Stage 3: Data Preparation & Baselines
+
+### Data Preparation (`prepare_data.py`)
+
+Converts raw KVP10k pages into prepared JSON files for Stage 4 training:
+
+1. Download PDF from HuggingFace image URL
+2. Render page at 300 DPI with PyMuPDF (native text extraction, no Tesseract dependency)
+3. Fuse extracted words with annotation bounding boxes (word-match threshold = 0.6)
+4. Produce LMDX-format text and ground-truth KVP labels
+
+Output format (`data/prepared/{train,test}/{hash_name}.json`):
 ```json
 {
-  "hash_name": "doc_12345",
-  "lmdx_text": "Company Name Co Ltd 100|200|150|220\nInvoice 200|250|250|270\n...",
+  "hash_name": "abc123...",
+  "lmdx_text": "Company Name 100|200|150|220\nACME Corp 100|300|180|320\n...",
   "image_width": 2000,
   "image_height": 2800,
   "gt_kvps": {
     "kvps_list": [
-      {
-        "key": "Company Name",
-        "key_bbox": [100, 200, 150, 220],
-        "value": "ACME Corp",
-        "value_bbox": [100, 300, 180, 320]
-      }
+      {"key": "Company Name", "key_bbox": [100, 200, 150, 220],
+       "value": "ACME Corp",  "value_bbox": [100, 300, 180, 320]}
     ]
   }
 }
 ```
 
-**Label alignment**:
-1. Words → token-level via `word_ids()` mapping
-2. Entity labels: 0=Other, 1=Key, 2=Value
-3. Link labels: [seq_len, seq_len] binary adjacency matrix
+Dataset sizes after preparation: **5,389 train** / **581 test**.
 
-## 🚀 Training
+### Nearest-Neighbour Baseline (`baselines.py`)
 
-### Stage 4a (Entity Only)
-```bash
-python train_stage4a.py \
-    --data_dir data/prepared \
-    --output_dir data/outputs/stage4a \
-    --batch_size 4 \
-    --gradient_accumulation_steps 8 \
-    --learning_rate 5e-5 \
-    --num_epochs 10 \
-    --early_stopping_patience 3 \
-    --val_fraction 0.1 \
-    --include_images
-```
+Rule-based: pair each key with the spatially closest value (Euclidean centroid distance, max 0.3 normalised units). No learning required.
 
-### Stage 4b (Entity + Linker)
-```bash
-# Lambda 0.5
-python train_stage4b.py \
-    --data_dir data/prepared \
-    --linker_loss_weight 0.5 \
-    --... (other args)
+### Mistral-7B LoRA Baseline (`mistral_baseline.py`)
 
-# Lambda 1.0
-python train_stage4b.py \
-    --data_dir data/prepared \
-    --linker_loss_weight 1.0 \
-    --... (other args)
+Faithful reproduction of the IBM ICDAR 2024 baseline:
 
-# Lambda 2.0
-python train_stage4b.py \
-    --data_dir data/prepared \
-    --linker_loss_weight 2.0 \
-    --... (other args)
-```
+| Parameter | Value |
+|-----------|-------|
+| Model | `mistralai/Mistral-7B-Instruct-v0.2` |
+| Quantisation | 4-bit QLoRA (NF4) |
+| LoRA rank | r=4, α=4, dropout=0.05 |
+| Learning rate | 5×10⁻⁴ (AdamW) |
+| Epochs | 8 |
+| Batch / accum | 1 / 4 (effective 4) |
+| Max length | 8192 tokens |
+| Prompt format | LMDX (`<Document>…</Document><Task>…`) |
 
-## 📈 Training Status (Latest)
+**Results on 581 test documents:**
 
-| Job | Stage | Lambda | Status | Started |
-|-----|-------|--------|--------|---------|
-| 1557830 | 4a | — | PENDING | Mar 25, 2026 |
-| 1557831 | 4b | 0.5 | PENDING | Mar 25, 2026 |
-| 1557832 | 4b | 1.0 | PENDING | Mar 25, 2026 |
-| 1557833 | 4b | 2.0 | PENDING | Mar 25, 2026 |
-
-**Hardware**: A100 GPU (40GB VRAM)  
-**Batch Config**: Batch=4, Accumulation=8 → Effective batch=32  
-**Expected Duration**: ~12 hours (10 epochs × ~1.2hr epoch-1)
-
-## 🔗 Previous Fixes (Stages 4a/4b)
-
-### Bug #1: Loss Key Mismatch
-- **Issue**: `train_stage4b.py` accessed non-existent `outputs['entity_loss']`
-- **Fix**: Model now returns separate `entity_loss` and `link_loss`
-
-### Bug #2: Gradient Accumulation Ignored
-- **Issue**: Argument parsed but never applied in training loop
-- **Fix**: Implemented loss scaling (÷ accumulation_steps) + conditional optimizer.step()
-
-### Bug #3: Link Label Alignment
-- **Issue**: Word-level supervision vs token-level indices mismatch
-- **Fix**: Added `_align_link_labels_to_tokens()` using `word_ids()` mapping
-
-### Bug #4: F1 Metric Inconsistency
-- **Issue**: Stage 4a manual F1 vs Stage 4b sklearn weighted F1
-- **Fix**: Unified both to manual Key/Value-only F1
-
-### Bug #5: Lambda Weight Ignored
-- **Issue**: Model hardcoded `loss = entity_loss + link_loss` (λ=1.0)
-- **Fix**: Trainer applies λ explicitly: `loss = entity_loss + λ * link_loss`
-
-### Bug #6 (Latest): Visual Patch Token Offset
-- **Issue**: LayoutLMv3 visual tokens cause sequence length mismatch
-- **Fix**: Truncate to text_seq_len after entity_classifier
-
-## 📂 Project Structure
-
-```
-code/script/
-├── layoutlm_model.py           # Core model (encoder + classifier + linker)
-├── stage4_kvp_dataset.py       # Data loading + label alignment
-├── train_stage4a.py            # Stage 4a trainer (entity only)
-├── train_stage4b.py            # Stage 4b trainer (entity + linker)
-├── config.py                   # Configuration
-├── metrics.py                  # F1 computation
-└── utils.py                    # Utilities
-
-logs/
-├── stage4a.sbatch              # SLURM script for Stage 4a
-├── stage4b_lambda05.sbatch     # SLURM script for Stage 4b λ=0.5
-├── stage4b_lambda10.sbatch     # SLURM script for Stage 4b λ=1.0
-└── stage4b_lambda20.sbatch     # SLURM script for Stage 4b λ=2.0
-
-COMMANDS_CHEATSHEET.md          # Quick reference for monitoring/debugging
-```
-
-## 💾 Model Checkpoints
-
-Saved to `data/outputs/{stage4a,stage4b_lambda05,stage4b_lambda10,stage4b_lambda20}/`:
-```
-├── checkpoint-1/
-│   ├── pytorch_model.bin
-│   ├── config.json
-│   └── training_args.bin
-├── best_model/
-│   └── pytorch_model.bin
-├── training_history.json       # Loss curves + F1 scores
-└── evaluation.json             # Test set metrics
-```
-
-## 🎓 Notes on Gradient Accumulation
-
-When `len(train_loader) % gradient_accumulation_steps ≠ 0`, final batches are dropped:
-- Train loader: ~1348 batches
-- Accumulation: 8
-- Dropped per epoch: 4 batches (~0.3% of data)
-- **Expected behavior**, not a bug — standard in most frameworks
-
-Loss curves may show minor irregularities at epoch boundaries due to this.
-
-## 📝 References
-
-- **LayoutLMv3**: [microsoft/layoutlmv3-base](https://huggingface.co/microsoft/layoutlmv3-base)
-- **Biaffine Attention**: Zhang et al., 2016 ([arxiv:1611.02902](https://arxiv.org/abs/1611.02902))
-- **KVP10k Dataset**: ICDAR 2024
-
-## 📧 Contact
-
-Questions about this code? Ask Claude Sonnet 4.6 with a link to this repo!
+| Metric | Text-only | Text + BBox |
+|--------|-----------|-------------|
+| Precision | 0.627 | 0.497 |
+| Recall | 0.785 | 0.622 |
+| **F1** | **0.697** | **0.552** |
 
 ---
 
-**Latest Commit**: LayoutLMv3 patch token truncation fix (Jobs 1557830-1557833)  
-**Date**: March 25, 2026
+## Stage 4: LayoutLMv3 Fine-tuning
+
+### Architecture
+
+```
+Input: (input_ids, attention_mask, bbox, pixel_values)
+  ↓
+LayoutLMv3Encoder (microsoft/layoutlmv3-base, 125M params)
+  ├─ Text + layout + visual features  
+  └─ Output: [batch, 709, hidden] → truncate to [batch, 512, hidden]
+  ↓
+EntityClassifier
+  └─ Output: [batch, 512, 3]  (0=Other, 1=Key, 2=Value)
+  ↓
+BiaffineLinker  ← Stage 4b only
+  ├─ Filter tokens: key_mask & value_mask (bbox_valid applied)
+  ├─ Spatial encoder: 9-dim spatial features → 64-dim MLP
+  ├─ Dot-product scorer: key_proj · val_proj + spatial_bias
+  └─ Output: [num_keys, num_values] logits
+  ↓
+Loss = CrossEntropy(entity) + λ × BCE(link, pos_weight=n_neg/n_pos)
+```
+
+The `pos_weight` in the link BCE loss corrects a ~450:1 negative-to-positive class imbalance in link labels (capped at 50 to prevent collapse).
+
+### Stage 4a: Entity-Only Baseline
+
+LayoutLMv3 encoder + entity classifier, no linker. Serves as an ablation.
+
+```bash
+sbatch logs/stage4a.sbatch
+```
+
+**Best validation entity F1: 0.8436**
+
+### Stage 4b: Entity + Linker (λ Sweep)
+
+Adds the BiaffineLinker with a configurable loss weight λ ∈ {0.5, 1.0, 2.0}.
+
+```bash
+sbatch logs/stage4b_lambda05.sbatch   # λ=0.5
+sbatch logs/stage4b_lambda10.sbatch   # λ=1.0
+sbatch logs/stage4b_lambda20.sbatch   # λ=2.0
+```
+
+**Hyperparameters (all Stage 4b runs):**
+
+| Parameter | Value |
+|-----------|-------|
+| Encoder | `microsoft/layoutlmv3-base` |
+| Precision | fp32 (bf16 disabled) |
+| Learning rate | 2×10⁻⁵ |
+| Batch size | 1 |
+| Gradient accumulation | 8 (effective batch 8) |
+| Epochs (max) | 20 |
+| Early stopping patience | 3 epochs |
+| GPU | A100 40GB |
+
+**Stage 4b entity F1 results (λ sweep, best epoch):**
+
+| Run | λ | Best Entity F1 | Best Epoch | Stopped |
+|-----|---|----------------|------------|---------|
+| Canary B | 1.0 | 0.8463 | 6 | 9 |
+| λ=0.5 | 0.5 | **0.8488** | 6 | 9 |
+| λ=1.0 | 1.0 | 0.8447 | 6 | 9 |
+| λ=2.0 | 2.0 | 0.8480 | 9 | 9 |
+
+**Link F1 evaluation (Canary B best_model, pos_weight pending):**
+
+| Metric | Value |
+|--------|-------|
+| Entity F1 | 0.835 |
+| Entity Precision | 0.816 |
+| Entity Recall | 0.856 |
+| Link F1 | 0.0 (linker predicted 0/3776 GT pairs — pos_weight fix in testing) |
+
+### Evaluation
+
+```bash
+# Evaluate a trained checkpoint (entity F1 + link F1)
+sbatch slurm/submit_eval.sh data/outputs/stage4b_canary_B
+
+# Results saved to:
+cat data/outputs/stage4b_canary_B/eval_results.json
+```
+
+`evaluate_stage4b.py` computes token-level entity F1 and word-level pair-matching link F1 (requires word-level F1 ≥ 0.5 for a match to handle subword tokenisation boundaries).
+
+---
+
+## Project Structure
+
+```
+kvp10k_thesis/
+├── code/script/
+│   ├── config.py                   # Stage 0: evaluation protocol constants
+│   ├── main.py                     # Pipeline orchestration (stages 0–2)
+│   ├── data_loader.py              # Stage 1: HuggingFace dataset loading
+│   ├── features.py                 # Stage 2: layout feature extraction
+│   ├── visualization.py            # Stage 2: cluster plots
+│   ├── prepare_data.py             # Stage 3: PDF → prepared JSON
+│   ├── baselines.py                # Stage 3: nearest-neighbour baseline
+│   ├── mistral_baseline.py         # Stage 3: Mistral-7B LoRA baseline
+│   ├── evaluate_mistral.py         # Stage 3: inference + evaluation
+│   ├── analyze_results.py          # Stage 3: results analysis vs ground truth
+│   ├── analyze_stage3_errors.py    # Stage 3: per-cluster error breakdown
+│   ├── visualize_baseline.py       # Stage 3: baseline result visualisation
+│   ├── kvp_dataset.py              # Stage 4 (prototype): original dataset class
+│   ├── train_kvp.py                # Stage 4 (prototype): original training script
+│   ├── layoutlm_model.py           # Stage 4: LayoutLMv3 + BiaffineLinker
+│   ├── stage4_kvp_dataset.py       # Stage 4: data loading + label alignment
+│   ├── train_stage4a.py            # Stage 4a: entity-only trainer
+│   ├── train_stage4b.py            # Stage 4b: entity + linker trainer
+│   ├── evaluate_stage4b.py         # Stage 4b: entity + link F1 evaluation
+│   ├── metrics.py                  # F1 computation utilities
+│   ├── utils.py                    # Shared utilities
+│   └── KVP10k_poc.ipynb            # Exploratory notebook (proof of concept)
+├── logs/
+│   ├── gpu_check.sbatch            # SLURM: GPU availability check
+│   ├── stage3_prepare_data.sbatch  # SLURM: Stage 3 data preparation
+│   ├── stage3_mistral.sbatch       # SLURM: Stage 3 Mistral-7B fine-tuning
+│   ├── stage4a.sbatch              # SLURM: Stage 4a train
+│   ├── stage4b_lambda05.sbatch     # SLURM: Stage 4b λ=0.5
+│   ├── stage4b_lambda10.sbatch     # SLURM: Stage 4b λ=1.0
+│   └── stage4b_lambda20.sbatch     # SLURM: Stage 4b λ=2.0
+├── slurm/
+│   ├── submit_stage4b_canary_A.sh  # SLURM: canary A run (lr=5e-5)
+│   ├── submit_stage4b_canary_B.sh  # SLURM: canary B run (lr=2e-5)
+│   └── submit_eval.sh              # SLURM: evaluation job
+├── data/
+│   ├── prepared/{train,test}/      # 5389 train + 581 test prepared JSONs
+│   └── outputs/                    # Training checkpoints + eval results
+├── hf_cache/                       # Offline HuggingFace model/dataset cache
+├── COMMANDS_CHEATSHEET.md          # Quick reference for common commands
+└── env/kvp10k_env/                 # Python virtualenv
+```
+
+---
+
+## Key Implementation Notes
+
+**LayoutLMv3 visual patch truncation**: The encoder appends 197 ViT patch tokens; sequence output is truncated to `input_ids.shape[1]` (512) before the entity classifier and linker.
+
+**BiaffineLinker NaN fixes**: Three patches were required to eliminate `link_loss=NaN`:
+1. `bbox_valid` filter — excludes CLS/SEP/PAD tokens (zero bboxes) from key/value candidate sets
+2. Aspect-ratio denominator guard — `+1e-8` to prevent divide-by-zero for zero-height boxes
+3. Dot-score clamp ±20 — prevents MLP explosion in early training
+
+**Link label quality**: 56.8% of raw link labels were junk (non-KVP annotation types). Fixed in `stage4_kvp_dataset.py` — link labels only generated for `type=="kvp"` entries with non-empty key/value text and valid bboxes.
+
+**Class imbalance**: Link label matrices are ~450:1 negative-to-positive. `pos_weight = n_neg/n_pos` (capped at 50) passed to `F.binary_cross_entropy_with_logits` to prevent trivial all-zero predictions.
+
+---
+
+## References
+
+- **KVP10k / IBM baseline**: [ICDAR 2024](https://huggingface.co/datasets/ibm/KVP10k)
+- **LayoutLMv3**: Huang et al., 2022 — [microsoft/layoutlmv3-base](https://huggingface.co/microsoft/layoutlmv3-base)
+- **Biaffine relation extraction**: Dozat & Manning, 2017
