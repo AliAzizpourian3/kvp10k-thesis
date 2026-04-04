@@ -31,62 +31,38 @@ This checks if A100 nodes are available and whether any nodes are reported as pr
 ### List latest Stage 4b logs
 
 ```bash
-ls -1 logs/kvp_stage4b_l*.out | tail -20
+ls -lt logs/kvp_stage4b_canary*.err | head -10
 ```
 
-This lists your newest Stage 4b output log files.
+Shows your newest canary/experiment log files.
 
-### Check latest errors/warnings in all Stage 4b logs
+### Check for errors in a log
 
 ```bash
-grep -E "ERROR|Traceback|RuntimeError|OutOfMemory|NaN" logs/kvp_stage4b_l*.out | tail -50
+grep -E "ERROR|NaN|RuntimeError|OutOfMemory" logs/kvp_stage4b_canary_B-<JOB_ID>.err | tail -20
 ```
-
-This quickly shows only bad signs (crashes, OOM, NaN) from all Stage 4b logs.
 
 ### Check training progress (epoch/loss/F1)
 
 ```bash
-grep -E "Epoch|Train loss|Val loss|Val F1|best" logs/kvp_stage4b_l*.out | tail -80
+grep -E "Epoch|Train loss|Val loss|Val F1|best|Early" logs/kvp_stage4b_canary_B-<JOB_ID>.err
 ```
 
-This shows whether training is actually progressing (epochs, loss, validation F1).
-
-### Follow one log live (replace job id)
+### Follow a log live (replace job id)
 
 ```bash
-tail -f logs/kvp_stage4b_l05-<JOB_ID>.out
+tail -f logs/kvp_stage4b_canary_B-<JOB_ID>.err
 ```
 
-Use this when a job starts running and you want live updates.
+## 3. Submit / Re-run Jobs
 
-## 3. Clean + Resubmit Stage 4b (All 3)
-
-### Cancel current Stage 4b jobs (replace IDs)
+### Run a new canary (main experiment, pos_weight fix)
 
 ```bash
-scancel <JOB1> <JOB2> <JOB3>
+sbatch slurm/submit_stage4b_canary_B.sh
 ```
 
-Stops old jobs so they do not waste GPU time.
-
-### Pull latest fix
-
-```bash
-git pull origin master
-```
-
-Downloads the newest code fixes from GitHub.
-
-### Clean old Stage 4b outputs
-
-```bash
-rm -rf data/outputs/stage4b_lambda*/
-```
-
-Deletes old failed checkpoints so the next run starts clean.
-
-### Submit all three lambdas
+### Run the lambda sweep (after canary confirms linker works)
 
 ```bash
 sbatch logs/stage4b_lambda05.sbatch
@@ -94,7 +70,15 @@ sbatch logs/stage4b_lambda10.sbatch
 sbatch logs/stage4b_lambda20.sbatch
 ```
 
-Starts the 3 Stage 4b experiments (lambda 0.5, 1.0, 2.0).
+### Evaluate a trained checkpoint
+
+```bash
+sbatch slurm/submit_eval.sh data/outputs/stage4b_canary_B
+# or for lambda runs:
+sbatch slurm/submit_eval.sh data/outputs/stage4b_lambda10
+```
+
+Results saved to `eval_results.json` inside the checkpoint dir.
 
 ### Confirm queued
 
@@ -102,37 +86,30 @@ Starts the 3 Stage 4b experiments (lambda 0.5, 1.0, 2.0).
 squeue -u "$USER"
 ```
 
-Run this right after `sbatch` to confirm all 3 jobs were accepted.
-
 ## 4. Fast Preflight Checks
 
 ### Confirm Stage 4a checkpoint exists (required for transfer)
 
 ```bash
-ls -l data/outputs/stage4a/checkpoint-9/model.pt
+ls -l data/outputs/stage4a/best_model/
 ```
-
-This must exist, otherwise Stage 4b cannot load pretrained Stage 4a weights.
 
 ### Confirm train script compiles
 
 ```bash
-"$WORK/kvp10k_thesis/env/kvp10k_env/bin/python" -m py_compile code/script/train_stage4b.py
+env/kvp10k_env/bin/python -m py_compile code/script/train_stage4b.py && echo OK
 ```
-
-Quick syntax check before submitting jobs.
 
 ## 5. Useful Paths
 
 - Project root: /home/woody/iwi5/iwi5413h/kvp10k_thesis
-- Stage 4b outputs: /home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs
-- Logs: /home/woody/iwi5/iwi5413h/kvp10k_thesis/logs
+- Outputs: data/outputs/  (stage4b_canary_B, stage4b_lambda05/10/20)
+- Slurm scripts: slurm/
+- Lambda sbatch files: logs/stage4b_lambda*.sbatch
 
-Tip: if you are in a hurry, use only these 4 commands in order:
+Tip — quick restart after a long break:
 
 ```bash
 git pull origin master
-rm -rf data/outputs/stage4b_lambda*/
-sbatch logs/stage4b_lambda05.sbatch && sbatch logs/stage4b_lambda10.sbatch && sbatch logs/stage4b_lambda20.sbatch
 squeue -u "$USER"
 ```
