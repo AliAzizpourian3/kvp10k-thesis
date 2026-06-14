@@ -1,5 +1,5 @@
 \chapter{Methodology}
-\label{chap:methodology}
+\label{ch:methodology}
 
 \section{Overview}
 \label{sec:methodology-overview}
@@ -11,19 +11,58 @@ which pairs each predicted key span with its corresponding value span.
 Both tasks are solved jointly by a single LayoutLMv3-based model augmented
 with a biaffine linker head, trained end-to-end on the KVP10k dataset.
 
+We investigate two linking granularities: \textbf{V1 (token-level)}, where
+every key token is scored against every value token, and \textbf{V2
+(span-level)}, where contiguous same-label tokens are first grouped into
+spans before pairwise scoring. The span-level approach is motivated by
+SPADE~\cite{spade} and BROS~\cite{bros}, which demonstrate that entity
+linking operates naturally at the segment level (Section~\ref{subsec:entity_linking}).
+
 Figure~\ref{fig:architecture-overview} provides a schematic overview.
 The encoder receives token sequences together with 2D bounding-box coordinates
 and document image patches. Its output representations are consumed in parallel
-by the entity-classification head and the biaffine linker head, keeping the
-architecture simple and the number of parameters small.
+by the entity-classification head and the biaffine linker head.
 
-\begin{figure}[h]
+\begin{figure}[ht]
   \centering
-  % placeholder: replace with actual architecture diagram
-  \fbox{\parbox{0.8\textwidth}{\centering\vspace{2cm}Architecture diagram\\(to be added)\vspace{2cm}}}
+  \begin{tikzpicture}[
+    block/.style={rectangle, draw, rounded corners, minimum height=1cm, minimum width=2.8cm, align=center, font=\small},
+    io/.style={rectangle, draw, minimum height=0.8cm, minimum width=2.2cm, align=center, font=\small, fill=gray!10},
+    arrow/.style={-{Stealth[length=3mm]}, thick},
+    node distance=0.8cm and 1.2cm
+  ]
+    % Input
+    \node[io] (input) {OCR Words +\\Bounding Boxes +\\Document Image};
+
+    % Encoder
+    \node[block, below=of input, fill=blue!10] (encoder) {LayoutLMv3\\Encoder};
+
+    % Two heads
+    \node[block, below left=1.2cm and 1.5cm of encoder, fill=orange!15] (entity) {Entity Classifier\\(Key / Value / Other)};
+    \node[block, below right=1.2cm and 1.5cm of encoder, fill=red!12] (linker) {Biaffine Linker\\(Key--Value Scoring)};
+
+    % Span grouper (V2 only)
+    \node[block, below=0.8cm of entity, fill=green!12] (spans) {Span Grouper\\(V2 only)};
+
+    % Output
+    \node[io, below=2.5cm of encoder] (output) {KVP Pairs\\(key $\rightarrow$ value)};
+
+    % Arrows
+    \draw[arrow] (input) -- (encoder);
+    \draw[arrow] (encoder) -| (entity);
+    \draw[arrow] (encoder) -| (linker);
+    \draw[arrow] (entity) -- (spans);
+    \draw[arrow] (spans) -| (linker);
+    \draw[arrow] (linker) |- (output);
+
+    % Labels
+    \node[font=\scriptsize\itshape, right=0.1cm of spans] {contiguous merge};
+  \end{tikzpicture}
   \caption{Overview of the proposed LayoutLMv3 + Biaffine Linker architecture.
     Token representations produced by the encoder are fed to two heads:
-    an entity classifier (BIO tagging) and a biaffine linker (pairwise key-value scoring).}
+    an entity classifier (token-level labelling) and a biaffine linker
+    (pairwise key--value scoring). In V2, a span grouper merges contiguous
+    same-label tokens into spans before linking.}
   \label{fig:architecture-overview}
 \end{figure}
 
@@ -125,46 +164,179 @@ construction — predictions are tied to OCR tokens with known bounding boxes �
 eliminating the spatial anchoring problem entirely.
 
 % ---------------------------------------------------------------------------
-\section{Biaffine Linker}
+\section{Biaffine Linker (V1: Token-Level)}
 \label{sec:biaffine-linker}
 
-\subsection{Key-Value Attention}
+\subsection{Scoring Function}
 \label{sec:kv-attention}
 
-After entity spans are predicted, the linker determines which \textsc{key}
-span should be paired with which \textsc{value} span. We adopt the biaffine
-attention formulation~\cite{dozat2017biaffine}, which has been used successfully
-for dependency parsing and entity relation modelling.
+After entity labels are predicted, the linker determines which \textsc{key}
+tokens should be paired with which \textsc{value} tokens. The scoring function
+combines a semantic signal with a spatial signal.
 
-Let $\mathbf{k}_i \in \mathbb{R}^{d}$ and $\mathbf{v}_j \in \mathbb{R}^{d}$
-denote the span representations (mean-pooled encoder outputs) of the $i$-th
-key entity and $j$-th value entity, respectively. The linking score is:
+\paragraph{Semantic scorer.}
+The semantic score uses a scaled dot-product between projected key and value
+representations:
 \[
-  s_{ij} = \mathbf{k}_i^\top \mathbf{W}_{\text{link}}\, \mathbf{v}_j
-  + \mathbf{w}_k^\top \mathbf{k}_i
-  + \mathbf{w}_v^\top \mathbf{v}_j
-  + b
+  s_{\text{sem}}(i,j) = \frac{(\mathbf{W}_k\,\mathbf{h}_i)^\top\,
+  (\mathbf{W}_v\,\mathbf{h}_j)}{\sqrt{d}}
 \]
-where $\mathbf{W}_{\text{link}} \in \mathbb{R}^{d \times d}$,
-$\mathbf{w}_k, \mathbf{w}_v \in \mathbb{R}^{d}$, and $b \in \mathbb{R}$
-are learnable parameters. A sigmoid applied to $s_{ij}$ gives the probability
-that key $i$ and value $j$ form a valid pair.
+where $\mathbf{h}_i, \mathbf{h}_j \in \mathbb{R}^{d}$ are encoder hidden
+states ($d = 768$), and $\mathbf{W}_k, \mathbf{W}_v \in \mathbb{R}^{d \times d}$
+are learnable projections. This formulation follows the attention mechanism
+of Vaswani et al.~\cite{vaswani2017attention} and is numerically stable
+because no learned weight matrix couples the key and value streams in the
+scoring step.
+
+\paragraph{Design evolution.}
+An earlier implementation used a full biaffine formulation
+($s = \mathbf{k}^\top \mathbf{W}_{\text{bil}} \mathbf{v}$, following
+Dozat and Manning~\cite{dozat2017biaffine}), but this caused
+\texttt{link\_loss~=~NaN} at approximately step~1400 due to exploding
+gradients through the $768 \times 768$ bilinear weight matrix. The scaled
+dot-product formulation eliminates this failure mode.
 
 \subsection{Spatial Encoding}
 \label{sec:spatial-encoding}
 
-Before the biaffine operation, each span representation is augmented with a
-spatial feature vector derived from the bounding box of the span:
+Eight geometric features are computed per (key, value) token pair: horizontal
+and vertical centre displacement $(\Delta x, \Delta y)$, Euclidean distance,
+angle $\theta = \text{atan2}(\Delta y, \Delta x)$, horizontal and vertical
+bounding-box overlap ratios, relative area ratio, and relative aspect-ratio
+ratio. These are encoded by a two-layer MLP with ReLU activations into a
+32-dimensional vector, which is concatenated with the semantic scalar before
+a final MLP produces the link score $s_{i,j}$.
+
+\subsection{Class Imbalance Problem}
+\label{sec:v1-imbalance}
+
+In V1, every key token is scored against every value token, producing a dense
+$n_k \times n_v$ matrix. On a typical KVP10k page with $\sim$100 key tokens
+and $\sim$100 value tokens, this yields $\sim$10{,}000 candidate pairs of
+which only $\sim$20 are positive (true links), giving a negative-to-positive
+ratio of approximately \textbf{450:1}. Despite applying
+\texttt{pos\_weight}~$= \min(n_{\text{neg}}/n_{\text{pos}},\, 50)$ to the
+BCE loss, the extreme imbalance prevents the linker from learning meaningful
+associations, resulting in link F1~$\approx 0.008$ (see
+Section~\ref{sec:v1-results}).
+
+This observation motivates V2: by grouping tokens into spans before linking,
+the candidate matrix shrinks from $\sim$10{,}000 to $\sim$225 entries with
+a manageable $\sim$5:1 imbalance ratio.
+
+% ---------------------------------------------------------------------------
+\section{Span-Level Linker (V2)}
+\label{sec:v2-span-linking}
+
+V2 addresses the granularity mismatch identified in V1 by performing linking
+at the \emph{span} level rather than the token level. This design is directly
+motivated by SPADE~\cite{spade}, which operates on text segments, and
+BROS~\cite{bros}, which links entity-initial tokens to reduce the prediction
+space.
+
+\subsection{Span Grouping}
+\label{sec:span-grouping}
+
+After entity classification, contiguous tokens sharing the same non-\texttt{O}
+label are merged into spans. For example, if tokens 5--7 are labelled
+\texttt{KEY} and tokens 8--12 are labelled \texttt{VALUE}, they form one key
+span and one value span respectively. This grouping is performed
+deterministically at both training and inference time.
+
+Figure~\ref{fig:span-grouping} illustrates the span grouping process.
+
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}[
+    tok/.style={rectangle, draw, minimum height=0.7cm, minimum width=1.2cm,
+                align=center, font=\scriptsize},
+    span/.style={rectangle, draw, rounded corners, minimum height=0.8cm,
+                 align=center, font=\scriptsize\bfseries},
+    arrow/.style={-{Stealth[length=2mm]}, thick, gray},
+    node distance=0.05cm
+  ]
+    % Token row
+    \node[tok, fill=gray!15] (t1) {Invoice};
+    \node[tok, fill=red!20, right=of t1] (t2) {Date};
+    \node[tok, fill=red!20, right=of t2] (t3) {:};
+    \node[tok, fill=blue!20, right=of t3] (t4) {01};
+    \node[tok, fill=blue!20, right=of t4] (t5) {/15/};
+    \node[tok, fill=blue!20, right=of t5] (t6) {2024};
+    \node[tok, fill=red!20, right=of t6] (t7) {Total};
+    \node[tok, fill=red!20, right=of t7] (t8) {Amt};
+    \node[tok, fill=blue!20, right=of t8] (t9) {\$1500};
+
+    % Labels
+    \node[font=\tiny, above=0.15cm of t1] {O};
+    \node[font=\tiny, above=0.15cm of t2] {KEY};
+    \node[font=\tiny, above=0.15cm of t3] {KEY};
+    \node[font=\tiny, above=0.15cm of t4] {VAL};
+    \node[font=\tiny, above=0.15cm of t5] {VAL};
+    \node[font=\tiny, above=0.15cm of t6] {VAL};
+    \node[font=\tiny, above=0.15cm of t7] {KEY};
+    \node[font=\tiny, above=0.15cm of t8] {KEY};
+    \node[font=\tiny, above=0.15cm of t9] {VAL};
+
+    % Span row
+    \node[span, fill=red!30, below=1.2cm of $(t2)!0.5!(t3)$] (s1) {Key 1:\\``Date :''};
+    \node[span, fill=blue!30, below=1.2cm of t5] (s2) {Val 1:\\``01/15/2024''};
+    \node[span, fill=red!30, below=1.2cm of $(t7)!0.5!(t8)$] (s3) {Key 2:\\``Total Amt''};
+    \node[span, fill=blue!30, below=1.2cm of t9] (s4) {Val 2:\\``\$1500''};
+
+    % Arrows
+    \draw[arrow] (t2.south) -- (s1.north);
+    \draw[arrow] (t3.south) -- (s1.north);
+    \draw[arrow] (t4.south) -- (s2.north);
+    \draw[arrow] (t5.south) -- (s2.north);
+    \draw[arrow] (t6.south) -- (s2.north);
+    \draw[arrow] (t7.south) -- (s3.north);
+    \draw[arrow] (t8.south) -- (s3.north);
+    \draw[arrow] (t9.south) -- (s4.north);
+  \end{tikzpicture}
+  \caption{Span grouping: contiguous tokens with the same entity label are
+    merged into spans. The span representation is the mean pool of constituent
+    token hidden states; the span bounding box is the union of constituent
+    token boxes.}
+  \label{fig:span-grouping}
+\end{figure}
+
+\subsection{Span Representation}
+\label{sec:span-representation}
+
+Each span's representation is formed by mean-pooling the encoder hidden states
+of its constituent tokens:
 \[
-  \tilde{\mathbf{k}}_i = \mathbf{k}_i + \mathbf{W}_{\text{sp}}\,\mathbf{b}_i
+  \mathbf{s}_k = \frac{1}{|T_k|} \sum_{i \in T_k} \mathbf{h}_i
 \]
-where $\mathbf{b}_i = (x_c, y_c, w, h) \in \mathbb{R}^4$ is the
-centroid-and-size representation of the span bounding box and
-$\mathbf{W}_{\text{sp}} \in \mathbb{R}^{d \times 4}$ is a learnable
-projection. The same augmentation is applied to value representations.
-This explicit injection of spatial context helps the linker score proximate
-key-value pairs higher, consistent with the spatial proximity finding in
-Section~\ref{sec:kv-link-analysis}.
+where $T_k$ is the set of token indices in span $k$. The span bounding box
+is the tight union box over all constituent token boxes. The same spatial
+augmentation (8 geometric features, Section~\ref{sec:spatial-encoding}) is
+applied at the span level.
+
+\subsection{Span-Level Scoring}
+\label{sec:span-scoring}
+
+The span-level biaffine scorer operates identically to V1
+(Section~\ref{sec:kv-attention}) but over span representations instead of
+token representations. For $K$ key spans and $V$ value spans, the linker
+produces a $K \times V$ score matrix. On typical KVP10k pages, $K \approx 15$
+and $V \approx 15$, yielding $\sim$225 candidate pairs with
+$\sim$15 positives --- a \textbf{$\sim$5:1} neg:pos ratio compared to V1's
+$\sim$450:1.
+
+\subsection{Training Objective}
+\label{sec:v2-training}
+
+V2 uses the same joint loss as V1:
+\[
+  \mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda\,\mathcal{L}_{\text{link}}
+  \tag{3.1}
+\]
+The entity loss is unchanged. The link loss is binary cross-entropy over the
+$K \times V$ span-level score matrix. Because the class imbalance is
+manageable at this granularity, \texttt{pos\_weight} is computed dynamically
+per batch as $n_{\text{neg}}/n_{\text{pos}}$ without the cap of~50 required
+in V1.
 
 % ---------------------------------------------------------------------------
 \section{Training Procedure}
@@ -174,23 +346,30 @@ Section~\ref{sec:kv-link-analysis}.
 \label{sec:loss-function}
 
 The model is trained with a joint loss combining entity classification and
-linking:
+linking (Equation~3.1, repeated here for convenience):
 \[
   \mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda\,\mathcal{L}_{\text{link}}
-  \tag{3.1}
 \]
 where:
 \begin{itemize}
   \item $\mathcal{L}_{\text{entity}}$ is the cross-entropy loss over
-  \{\texttt{O, KEY, VALUE}\} for each text token.
-  \item $\mathcal{L}_{\text{link}}$ is the binary cross-entropy loss over all
-  ground-truth key-value pairs, treating non-linked pairs as negatives.
+  \{\texttt{O, KEY, VALUE}\} for each text token, with inverse-frequency
+  class weights to address the dominance of the \texttt{O} class.
+  \item $\mathcal{L}_{\text{link}}$ is the binary cross-entropy loss over
+  predicted link scores, with \texttt{pos\_weight} to address class imbalance
+  (capped at 50 for V1; uncapped for V2).
   \item $\lambda$ is a weighting hyperparameter swept over
   $\{0.5, 1.0, 2.0\}$ during development (see Section~\ref{sec:stage4-hyperparams}).
 \end{itemize}
 
-Class imbalance in the entity objective (the \texttt{O} class dominates) is
-addressed by assigning inverse-frequency class weights.
+\paragraph{Training stability.}
+Achieving stable Stage~4b training required addressing two sources of
+numerical instability: (i)~the switch from a bilinear weight matrix to
+scaled dot-product scoring (Section~\ref{sec:kv-attention}), and
+(ii)~a valid-label mask applied before the BCE call to exclude positions
+with uninitialised link labels. After these fixes, training proceeds
+without \texttt{NaN} across all runs. Full details of the diagnostic
+process are documented in Section~\ref{sec:linker-impl}.
 
 \subsection{Optimisation}
 \label{sec:optimisation}
@@ -199,36 +378,33 @@ We use AdamW~\cite{loshchilov2019decoupled} with weight decay $0.01$ and a
 linear warmup of 500 steps followed by linear decay to zero. The effective
 batch size is 32, achieved through gradient accumulation over 8 steps with a
 per-device batch size of 4. Training runs for a maximum of 20 epochs with
-early stopping (patience~$= 3$) on the validation combined F1 score.
+early stopping (patience~$= 3$) on the validation entity F1 score.
 
-Mixed precision training in bfloat16 is enabled throughout Stage~4 (see
-Section~\ref{sec:stage4-training-loop} for cluster-level details). Unlike the
-QLoRA setup required for Stage~3 (which had to quantise the 7B-parameter
-Mistral model to fit within 40\,GB), the LayoutLMv3-base model (125M parameters)
-fits comfortably in full bf16 on a single A100~80\,GB GPU.
+All Stage~4 training uses fp32 precision. An earlier attempt with bfloat16
+caused \texttt{loss~=~NaN} due to underflow in the spatial feature encoder;
+reverting to fp32 resolved the issue with negligible memory impact given
+the compact model size (125M parameters).
 
-\subsection{Data Augmentation}
-\label{sec:data-augmentation}
+\subsection{Two-Phase Training}
+\label{sec:two-phase}
 
-Light data augmentation is applied during Stage~4 training:
-\begin{itemize}
-  \item \textbf{Coordinate jitter:} Bounding box coordinates are perturbed by
-  at most $\pm 2$ normalised units to simulate minor OCR localisation errors.
-  \item \textbf{Token dropout:} With probability 0.05, individual text tokens
-  are replaced by the \texttt{[MASK]} token, encouraging robustness to OCR
-  noise.
-  \item \textbf{Rotation:} Pages are rotated by $\{0^\circ, 5^\circ, 10^\circ,
-  15^\circ\}$ during training (using the same perturbations applied in
-  robustness evaluation) so the model encounters varied orientations.
-\end{itemize}
-Image-level augmentation (brightness, contrast) is applied with low probability
-($p = 0.1$) using standard torchvision transforms.
+Training proceeds in two phases:
+\begin{enumerate}
+  \item \textbf{Stage~4a (entity pre-training):} The encoder and entity
+  classification head are trained with $\lambda = 0$ (linker disabled).
+  This establishes strong entity representations before the linking
+  objective is introduced.
+  \item \textbf{Stage~4b (joint fine-tuning):} The model resumes from the
+  Stage~4a checkpoint with the linker activated ($\lambda > 0$). The encoder
+  learning rate is reduced by a factor of 10 to preserve entity classification
+  capability.
+\end{enumerate}
 
 % ---------------------------------------------------------------------------
 \section{Inference}
 \label{sec:inference}
 
-\subsection{Greedy Decoding and Span Extraction}
+\subsection{Entity Extraction}
 \label{sec:greedy-decoding}
 
 At inference time, the entity head produces per-token logits which are
@@ -236,13 +412,27 @@ argmax-decoded to \{\texttt{O, KEY, VALUE}\} labels. Consecutive tokens with
 the same non-\texttt{O} label are merged into spans. The bounding box of a
 span is the tight union box over all constituent token boxes.
 
-\subsection{Linking and Post-processing}
+\subsection{Linking (V1)}
+\label{sec:v1-linking-inference}
+
+In V1, the linker scores all key--value token pairs. A sigmoid threshold of
+0.5 determines valid links; each key is matched to at most one value (the
+highest-scoring valid pair).
+
+\subsection{Linking (V2)}
+\label{sec:v2-linking-inference}
+
+In V2, spans are first formed by the grouping step
+(Section~\ref{sec:span-grouping}), then span representations are computed via
+mean-pooling. The span-level biaffine scorer produces a $K \times V$ score
+matrix and the highest-scoring match for each key span is selected.
+
+\subsection{Post-processing}
 \label{sec:post-processing}
 
-The biaffine linker scores all key–value span pairs. We apply a sigmoid
-threshold of 0.5 to determine valid links; each key is matched to at most one
-value (the highest-scoring valid pair). Unmatched keys are emitted as
-\emph{unvalued-key} annotations and unmatched values as
-\emph{unkeyed-value} annotations, matching the KVP10k annotation convention.
-No beam search or constrained decoding is applied: the discriminative
-formulation avoids the need for autoregressive search entirely.
+Unmatched keys are emitted as \emph{unvalued-key} annotations and unmatched
+values as \emph{unkeyed-value} annotations, matching the KVP10k annotation
+convention. No beam search or constrained decoding is applied: the
+discriminative formulation avoids the need for autoregressive search entirely.
+Bounding boxes are inherited directly from the OCR input, eliminating the
+hallucinated bounding boxes that arise in generative approaches.

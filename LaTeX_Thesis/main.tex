@@ -23,6 +23,10 @@
 \usepackage{subfig}
 \usepackage[table]{xcolor}
 
+% TikZ for diagrams (supervisor requirement: native LaTeX diagrams)
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
+
 % Tables
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -34,7 +38,7 @@
 \usepackage{algpseudocode}
 
 % References and citations
-\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\usepackage[backend=bibtex,style=ieee,sorting=none]{biblatex}
 \addbibresource{references.bib}
 
 % Hyperlinks
@@ -47,7 +51,8 @@
     left=3cm,
     right=2.5cm,
     top=2.5cm,
-    bottom=2.5cm
+    bottom=2.5cm,
+    headheight=14.5pt
 }
 
 % Headers and footers
@@ -129,8 +134,8 @@
     
     \vspace{1cm}
     
-    {\large [University Name]} \\
-    {\large [Department/Faculty]} \\
+    {\large [Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg]} \\
+    {\large [Department of Computer Science]} \\
     
     \vspace{1cm}
     

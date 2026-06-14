@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=kvp_eval
-#SBATCH --output=logs/kvp_eval-%j.out
-#SBATCH --error=logs/kvp_eval-%j.err
-#SBATCH --time=02:00:00
+#SBATCH --job-name=kvp_eval_v2
+#SBATCH --output=logs/kvp_eval_v2-%j.out
+#SBATCH --error=logs/kvp_eval_v2-%j.err
+#SBATCH --time=01:00:00
 #SBATCH --partition=a100
 #SBATCH --gres=gpu:a100:1
 #SBATCH --cpus-per-task=4
@@ -19,22 +19,34 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 cd /home/woody/iwi5/iwi5413h/kvp10k_thesis
 PYTHON_BIN="/home/woody/iwi5/iwi5413h/kvp10k_thesis/env/kvp10k_env/bin/python"
 
-CHECKPOINT_DIR="${1:-data/outputs/stage4b_canary_B}"
-MODEL_VERSION="${2:-v1}"
+CHECKPOINT_DIR="data/outputs/stage4b_v2/checkpoint-1"
 
-echo "=== Stage 4b Evaluation ==="
+# Wait up to 90 min for epoch-1 checkpoint to appear
+echo "Waiting for $CHECKPOINT_DIR/pytorch_model.bin ..."
+for i in $(seq 1 180); do
+    if [[ -f "$CHECKPOINT_DIR/pytorch_model.bin" ]]; then
+        echo "Checkpoint found after $((i * 30))s"
+        break
+    fi
+    if [[ $i -eq 180 ]]; then
+        echo "ERROR: Checkpoint not found after 90 min, aborting."
+        exit 1
+    fi
+    sleep 30
+done
+
+echo "=== Stage 4b V2 Evaluation (Epoch 1) ==="
 echo "Job ID:   $SLURM_JOB_ID"
 echo "Node:     $SLURMD_NODENAME"
 echo "GPU:      $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
 echo "Checkpoint: $CHECKPOINT_DIR"
-echo "Model version: $MODEL_VERSION"
 echo "Date:     $(date)"
 
 "$PYTHON_BIN" code/script/evaluate_stage4b.py \
-  --checkpoint_dir "$CHECKPOINT_DIR" \
+  --checkpoint_dir "data/outputs/stage4b_v2" \
   --data_dir data/prepared \
   --batch_size 1 \
   --score_threshold 0.5 \
-  --model_version "$MODEL_VERSION"
+  --model_version v2
 
 echo "=== Evaluation DONE ==="

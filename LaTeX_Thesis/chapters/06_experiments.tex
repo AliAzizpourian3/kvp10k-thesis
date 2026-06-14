@@ -1,5 +1,5 @@
 \chapter{Experiments}
-\label{chap:experiments}
+\label{ch:experiments}
 
 \section{Experimental Setup}
 \label{sec:experimental-setup}
@@ -38,25 +38,25 @@ final training configuration was adapted to QLoRA with gradient checkpointing
 and an 8-bit paged optimiser.
 
 \paragraph{Stage 4 (LayoutLMv3\,+\,Linker).}
-Stage~4 training is executed on the LRZ AI Systems cluster using A100~80\,GB
+Stage~4 training is executed on the TinyGPU cluster using A100~40\,GB
 GPUs. Three separate SLURM jobs handle the Stage~4 workload:
 
 \begin{enumerate}
   \item \textbf{Job 1 -- Data preparation:} CPU-only login node, converts
   KVP10k HuggingFace rows into Stage~4 image-tensor-annotation bundles,
   renders and caches page images at 150\,DPI.
-  \item \textbf{Job 2 -- Stage~4a (entity pre-training):} Single A100~80\,GB
+  \item \textbf{Job 2 -- Stage~4a (entity pre-training):} Single A100~40\,GB
   GPU, 24-hour wall-clock limit, trains LayoutLMv3 encoder + entity head
   with the linker disabled.
-  \item \textbf{Job 3 -- Stage~4b (joint fine-tuning):} Single A100~80\,GB
-  GPU, 12-hour wall-clock limit, resumes from Stage~4a checkpoint and
-  activates the biaffine linker with $\lambda > 0$.
+  \item \textbf{Job 3 -- Stage~4b (joint fine-tuning):} Single A100~40\,GB
+  GPU, 24-hour wall-clock limit, resumes from Stage~4a checkpoint and
+  activates the linker with $\lambda > 0$.
 \end{enumerate}
 
-All Stage~4 computations use bfloat16 mixed precision, requiring no
+All Stage~4 computations use fp32 precision, requiring no
 quantisation of the 125M-parameter LayoutLMv3-base model. Peak GPU memory
-utilisation during training is approximately 42\,GB (encoder forward pass +
-gradient accumulation buffer), well within the 80\,GB envelope.
+utilisation during training is approximately 4\,GB (encoder forward pass +
+gradient accumulation buffer), well within the 40\,GB envelope.
 
 % ---------------------------------------------------------------------------
 \subsection{Hyperparameters}
@@ -125,7 +125,7 @@ Table~\ref{tab:stage4-hyperparams} summarises the Stage~4 hyperparameters.
     Base model & microsoft/layoutlmv3-base \\
     Encoder parameters & 125M (all unfrozen) \\
     Entity head & 2-layer MLP, hidden dim 768, GELU \\
-    Linker head & Biaffine, weight matrix $768 \times 768$ \\
+    Linker head & Scaled dot-product scorer \\
     Linking weight $\lambda$ & swept over \{0.5, 1.0, 2.0\} \\
     Learning rate (Stage~4a) & $2 \times 10^{-5}$ \\
     Learning rate (Stage~4b encoder) & $2 \times 10^{-6}$ \\
@@ -137,7 +137,7 @@ Table~\ref{tab:stage4-hyperparams} summarises the Stage~4 hyperparameters.
     Maximum epochs & 20 \\
     Early stopping patience & 3 \\
     Optimiser & AdamW, weight decay 0.01 \\
-    Precision & bfloat16 (no quantisation) \\
+    Precision & fp32 (no quantisation) \\
     Max sequence length & 512 tokens \\
     Image resolution & $224 \times 224$ \\
     Gradient checkpointing & enabled \\
@@ -207,26 +207,9 @@ The Stage~4 model is evaluated on the same 581-page prepared test set used
 for the Stage~3 Mistral baseline (Section~\ref{sec:dataset-coverage}), enabling
 direct comparison. Evaluation follows the dual-threshold protocol:
 $\text{NED} < 0.2$, $\text{IoU} > 0.3$, combined F1 as the primary metric.
+Stage~4 results are presented in Chapter~\ref{ch:results}.
 
-Table~\ref{tab:stage4-results-placeholder} reports Stage~4 results once
-experiments are complete.
-
-\begin{table}[h]
-  \centering
-  \caption{Stage~4 LayoutLMv3\,+\,Linker Results
-    (NED\,=\,0.2, IoU\,=\,0.3; $n = 581$ test pages).}
-  \label{tab:stage4-results-placeholder}
-  \begin{tabular}{lllllll}
-    \hline
-    \textbf{Mode} & \textbf{Prec.} & \textbf{Rec.} & \textbf{F1}
-                  & \textbf{TP} & \textbf{FP} & \textbf{FN} \\
-    \hline
-    Text-only (NED) & -- & -- & -- & -- & -- & -- \\
-    Text+Bbox (NED+IoU) & -- & -- & -- & -- & -- & -- \\
-    Linking F1 & \multicolumn{6}{c}{-- (key-value association only)} \\
-    \hline
-  \end{tabular}
-\end{table}
+% Stage~4 results are presented in Chapter~\ref{ch:results}.
 
 \subsection{Per-Cluster Analysis}
 \label{sec:per-cluster-analysis}
@@ -236,22 +219,8 @@ Following the per-cluster breakdown established for Stage~3
 separately for Cluster~0 (dense layouts, $n = 465$ documents) and Cluster~1
 (sparse layouts, $n = 116$ documents). This analysis directly tests whether
 LayoutLMv3's spatial grounding addresses the sparse-layout hallucination
-problem identified in Stage~3.
-
-\begin{table}[h]
-  \centering
-  \caption{Stage~4 Per-Cluster Results (to be filled after experiments).}
-  \label{tab:stage4-cluster-results}
-  \begin{tabular}{llllll}
-    \hline
-    \textbf{Cluster} & \textbf{Docs} & \textbf{Pred} & \textbf{GT}
-                     & \textbf{Correct (\%)} & \textbf{Halluc. (\%)} \\
-    \hline
-    Cluster~0 (Dense)  & 465 & -- & -- & -- & -- \\
-    Cluster~1 (Sparse) & 116 & -- & -- & -- & -- \\
-    \hline
-  \end{tabular}
-\end{table}
+problem identified in Stage~3. Results are presented in
+Chapter~\ref{ch:results}.
 
 \subsection{Error Analysis}
 \label{sec:stage4-error-analysis}
@@ -266,6 +235,67 @@ In addition, linking errors are classified into three types:
   the model.
   \item \textbf{Mis-link:} a correctly predicted key entity paired with
   an incorrect value entity.
+\end{itemize}
+
+\subsection{V1 vs.\ V2 Linking Experiment}
+\label{sec:v1-v2-experiment}
+
+The central experiment of this thesis compares two linking granularities:
+
+\begin{itemize}
+  \item \textbf{V1 (token-level):} Each key token is scored against each
+  value token, producing a dense $n_k \times n_v$ matrix with $\sim$450:1
+  neg:pos ratio.
+  \item \textbf{V2 (span-level):} Contiguous same-label tokens are grouped
+  into spans, then each key span is scored against each value span, producing
+  a $K \times V$ matrix with $\sim$5:1 neg:pos ratio.
+\end{itemize}
+
+Both variants share the same LayoutLMv3 encoder and entity classifier; only
+the linker granularity differs. V2 warm-starts from the best V1 checkpoint
+to ensure that encoder representations are comparable. Results are reported
+in Section~\ref{sec:v1-results} (V1) and Section~\ref{sec:v2-results} (V2).
+
+\subsection{Diagnostic Experiments}
+\label{sec:diagnostic-experiments}
+
+After V2 training produced near-zero link F1 despite the span-level
+reformulation, a systematic root-cause analysis was conducted through three
+diagnostic experiments:
+
+\paragraph{Experiment~D1: Link score distribution.}
+A diagnostic script extracted raw sigmoid link scores from the best V2
+checkpoint across 200 test documents.  The goal was to determine whether the
+linker produces any high-confidence predictions or is uniformly near-zero.
+
+\paragraph{Experiment~D2: Entity span analysis.}
+A second diagnostic compared ground-truth entity token counts against
+predicted entity token counts, measuring the effect of the bounding-box
+validity filter in the span grouping function.  For each document, the script
+recorded (i)~predicted key/value tokens before and after \texttt{bbox\_valid}
+filtering, (ii)~the number of grouped spans, and (iii)~the word-level and
+token-level link label counts.
+
+\paragraph{Experiment~D3: Link label audit.}
+The third diagnostic traced the link label generation pipeline from
+ground-truth KVPs through word-level labels, token-level alignment, and
+span-level collapse.  This revealed the cross-product explosion and the
+OCR-block granularity mismatch described in
+Section~\ref{sec:text-processing}.
+
+\subsection{V4 Training Configuration}
+\label{sec:v4-training}
+
+Based on the diagnostic findings, a corrected V4 training run (job~1568926)
+was submitted with the four data-pipeline fixes described in
+Section~\ref{sec:stage4-training-loop}.  The hyperparameters are identical
+to V2 except:
+\begin{itemize}
+  \item \textbf{Linker loss weight} $\lambda = 5.0$ (increased from 1.0 to
+  compensate for the sparser but correct link supervision signal).
+  \item \textbf{Early stopping patience} = 10 (increased from 7 to allow the
+  linker more epochs to converge with the corrected labels).
+  \item \textbf{Maximum epochs} = 30.
 \end{itemize}
 
 % ---------------------------------------------------------------------------

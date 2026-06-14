@@ -46,6 +46,17 @@ Generative approaches formulate extraction as a text generation task: given a do
 \label{subsec:graph_based}
 Graph neural networks have been applied to document understanding by treating detected text regions as nodes and spatial or semantic proximity as edges. Models such as PICK~\cite{pick} construct document graphs and propagate information between nodes to infer key-value relationships. These approaches can naturally model non-local dependencies but require graph construction as a preprocessing step and typically rely on OCR-produced bounding boxes. They are generally competitive with sequence-labeling approaches on structured datasets but have seen less adoption since the rise of large multimodal pre-trained models~\cite{gcn}.
 
+\subsection{Entity Linking Approaches}
+\label{subsec:entity_linking}
+
+A distinct line of work formulates key-value extraction as an entity linking problem: first identify entity spans (keys and values), then predict which spans are semantically linked. This two-stage decomposition separates the ``what'' (entity recognition) from the ``who-with-whom'' (relationship prediction), enabling specialised modules for each sub-task.
+
+\paragraph{SPADE.}
+SPADE (Spatial Dependency Parsing for Semi-Structured Document Information Extraction)~\cite{spade} was the first model to frame document entity linking as dependency parsing over text segments. Rather than classifying individual tokens, SPADE groups OCR outputs into \emph{segments} (contiguous text regions) and predicts directed edges between segments to form a dependency graph. The parsing formulation naturally handles one-to-many and many-to-one key-value relationships. Crucially, SPADE operates at the \emph{segment level}, not the token level, reducing the number of candidate pairs from $O(n^2_{\text{tokens}})$ to $O(n^2_{\text{segments}})$ and producing a much more balanced positive-to-negative ratio in the link labels. SPADE achieves state-of-the-art results on CORD and a Japanese receipt dataset, demonstrating that explicit relational modelling at the segment level is both effective and efficient. The segment-level linking insight directly motivates the span-level linking design in our V2 architecture (Section~\ref{sec:v2-span-linking}).
+
+\paragraph{BROS.}
+BROS (BERT Relying On Spatiality)~\cite{bros} extends the entity linking approach with a pre-trained language model that encodes 2D positional information. BROS introduces two innovations relevant to this thesis: (i)~an area-based 2D positional encoding that captures spatial relationships between text segments more expressively than point-based position embeddings, and (ii)~an \emph{initial token linking} objective that predicts, for each entity's initial token, which other entity's initial token it should be linked to. This reduces the linking problem to a sparse prediction over entity-initial positions rather than a dense token-to-token matrix, addressing the class imbalance problem inherent in token-level linking. BROS achieves strong results on FUNSD and CORD entity linking benchmarks and demonstrates that pre-training with spatial awareness significantly benefits the linking task. Both the span-level granularity and the spatial encoding strategy of BROS inform the design of our V2 linker (Section~\ref{sec:v2-span-linking}).
+
 \section{Information Extraction from Forms}
 \label{sec:form_extraction}
 
@@ -62,15 +73,7 @@ Receipt understanding is a practically important subtask of document information
 \section{Evaluation Metrics}
 \label{sec:metrics_review}
 
-Rigorous evaluation of information extraction systems requires metrics that capture both textual correctness and spatial accuracy of extracted spans. The KVP10k benchmark defines a dual-threshold evaluation protocol combining text and spatial metrics.
-
-\subsection{Text Matching Metrics}
-\label{subsec:text_metrics}
-Exact match (EM) is the strictest text evaluation criterion, counting a prediction as correct only if it matches the ground truth string character-for-character. In practice, minor OCR errors or formatting differences cause exact match to undercount true positives. Normalized Edit Distance (NED), defined as the Levenshtein edit distance~\cite{levenshtein} divided by the length of the longer string, provides a softer criterion that tolerates small character-level discrepancies. The KVP10k benchmark uses NED $< 0.2$ as the primary text correctness threshold, and we adopt this definition in all evaluations reported in this thesis.
-
-\subsection{Spatial Matching Metrics}
-\label{subsec:spatial_metrics}
-Intersection over Union (IoU)~\cite{iou} is the standard spatial overlap metric, defined as the ratio of the intersection area to the union area of two bounding boxes. For a predicted bounding box to be considered spatially correct, its IoU with the ground truth box must exceed a defined threshold. The KVP10k benchmark uses IoU $> 0.3$ as the spatial correctness threshold. Combined evaluation requires both NED $< 0.2$ and IoU $> 0.3$ to be satisfied simultaneously, yielding a stricter joint text-and-location F1 score that penalizes models which predict correct text at the wrong location.
+Rigorous evaluation of information extraction systems requires metrics that capture both textual correctness and spatial accuracy of extracted spans. The KVP10k benchmark defines a dual-threshold evaluation protocol combining text and spatial metrics: Normalized Edit Distance (NED) for text matching and Intersection over Union (IoU) for spatial matching. A prediction is considered correct only when both NED~$< 0.2$ and IoU~$> 0.3$ are satisfied simultaneously. The formal definitions and implementation details of these metrics are presented in Section~\ref{sec:evaluation-protocol}.
 
 \section{Related Datasets}
 \label{sec:related_datasets}
@@ -122,7 +125,7 @@ The literature review reveals several research gaps that motivate the approach i
     
     \item \textbf{Systematic error analysis by document type}: Prior work on form understanding has not deeply analyzed how model performance varies with layout density. This thesis provides detailed per-cluster error analysis revealing distribution-specific failure modes.
     
-    \item \textbf{Learned linking for key-value association}: Existing literature lacks explicit treatment of the linking problem --- identifying which extracted values belong to which keys. We propose a learned linker module as a novel solution.
+    \item \textbf{Learned linking for key-value association}: While SPADE~\cite{spade} and BROS~\cite{bros} demonstrate effective entity linking at the segment level on CORD and FUNSD, their approaches have not been evaluated on the larger and more diverse KVP10k benchmark. Furthermore, the effect of linking granularity (token-level vs.\ span-level) on class imbalance and linking accuracy has not been systematically studied.
 \end{enumerate}
 
-In this thesis, we adopt LayoutLMv3 as the encoder backbone combined with a learned attention-based linker module, positioned as a natural architectural evolution from the sequence-labeling and generative paradigms reviewed above.
+In this thesis, we adopt LayoutLMv3 as the encoder backbone combined with a learned biaffine linker module. We investigate both token-level (V1) and span-level (V2) linking granularities, drawing on the segment-level insights from SPADE and BROS while adapting them to the KVP10k task structure.

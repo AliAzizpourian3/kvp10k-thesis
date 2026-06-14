@@ -4,99 +4,160 @@
 \section{Interpretation of Results}
 \label{sec:interpretation}
 
-% TODO: Interpret findings
+\subsection{Entity Classification Success}
 
-\subsection{Performance Analysis}
-% Why does the approach work?
+The LayoutLMv3 V4 entity classifier achieves F1~$= 0.827$, demonstrating that
+the multimodal encoder effectively distinguishes key, value, and other tokens
+using joint text-layout-image representations. This result validates the
+choice of a discriminative formulation over the generative baseline: by
+constraining predictions to existing OCR tokens, the model eliminates
+spatial hallucination entirely.
+
+\subsection{Token-Level Linking Failure}
+
+The near-zero link F1 ($0.008$) of V1 is the central negative result of this
+thesis. The failure is attributable to the granularity mismatch between the
+linking formulation (token-to-token) and the task structure (span-to-span).
+With $\sim$450:1 negative-to-positive ratio at the token level, the BCE loss
+is dominated by negative examples even with \texttt{pos\_weight} correction.
+This finding aligns with SPADE~\cite{spade} and BROS~\cite{bros}, which both
+operate at the segment/span level rather than the token level.
 
 \subsection{Comparison to Baselines}
-% What improvements did we achieve?
 
-\section{Attention Visualization}
-\label{sec:attention_viz}
+Compared to the Stage~3 Mistral baseline (text+location F1~$= 0.600$),
+the discriminative LayoutLMv3 model provides strong entity extraction but
+the initial V2 span-level linker fails to improve linking over V1 (both near
+zero).  The published KVP10k baseline achieves linking F1~$= 0.659$ using
+a text-only generative approach.  The diagnostic analysis
+(Section~\ref{sec:diagnostic-results}) revealed that V2's failure was caused
+not by the span-level architecture itself but by three compounding data
+pipeline bugs.  Once all three pipeline bugs were corrected, the V4 model
+achieves link F1~$= 0.673$ (threshold $= 0.5$) --- matching the KVP10k
+paper's published baseline with a 125M-parameter discriminative model versus
+their proprietary generative system.
 
-% TODO: Visualize attention patterns
+\section{Root-Cause Analysis}
+\label{sec:root-cause-analysis}
 
-\subsection{Key-Value Attention}
-% Heatmaps showing attention between keys and values
+The progression from V1 to V4 illustrates a common but underreported pattern
+in structured prediction pipelines: architectural improvements cannot
+compensate for corrupted supervision.  Each bug individually would have been
+sufficient to prevent learning:
 
-\subsection{Spatial Patterns}
-% What spatial relationships does the model learn?
+\begin{enumerate}
+  \item \textbf{Missing teacher forcing} (Bug~1): The linker was trained on
+  spans derived from noisy \texttt{argmax} predictions rather than
+  ground-truth labels.  Span boundaries were inconsistent with the
+  ground-truth link labels, creating a train--test mismatch that prevented
+  convergence.
+
+  \item \textbf{Bounding box filter} (Bug~2): The strict
+  $(x_1 < x_2) \wedge (y_1 < y_2)$ predicate rejected tokens whose
+  normalised coordinates had $x_1 = x_2$ after LayoutLMv3's integer
+  quantisation to $[0, 1000]$.  This removed 49\% of predicted key tokens
+  and 46\% of value tokens --- halfing the number of entity spans available
+  for linking.
+
+  \item \textbf{Cross-product link labels} (Bug~3): The label generator
+  created all-pairs links between key and value words rather than a single
+  representative link per KVP.  Combined with OCR blocks that concatenated
+  multiple words into single ``word'' entries, this produced $\sim$1{,}000
+  positive link entries per document instead of $\sim$8, making the
+  span-level collapse produce near-uniform positive labels.
+\end{enumerate}
+
+\noindent The critical insight is that Bug~3 was invisible at the token level
+(V1), where the dense $n_k \times n_v$ matrix already had many positives.
+It only became observable when the span-level collapse was introduced in V2,
+because the small $K \times V$ matrix should have been sparse but was not.
+This underscores the value of the span-level reformulation as a diagnostic
+tool, not only an architectural improvement.
 
 \section{Error Analysis}
 \label{sec:error_analysis}
 
-% TODO: Analyze errors
+\subsection{Entity Classification Errors}
 
-\subsection{Error Categories}
-% Text errors, location errors, linking errors
+Entity errors fall into three categories: (i)~boundary errors, where partial
+spans are predicted (e.g., missing the last token of a multi-word key);
+(ii)~type confusion, where a key is predicted as a value or vice versa; and
+(iii)~false positives on non-entity tokens that appear near key-value regions.
 
-\subsection{Common Failure Modes}
-% What types of documents are challenging?
+\subsection{Linking Errors (V1)}
 
-\section{Robustness Discussion}
-\label{sec:robustness_disc}
+V1 linking errors are dominated by false negatives: the model predicts only
+200 links against 3{,}776 ground-truth links. Of the 200 predictions, 15
+are correct (7.5\% precision). The model adopts an overly conservative
+strategy, preferring to predict no link rather than risk a false positive ---
+a rational response to the extreme class imbalance in the training signal.
 
-% TODO: Discuss robustness findings
+\subsection{V2 Linking Errors}
 
-\subsection{Real-world Applicability}
-% How well does it handle degraded documents?
+V2 span-level linking achieves link F1\,=\,0.007, marginally below V1's
+0.008.  The model predicts 498~links across 581 test documents, of which
+37 are correct (7.4\% precision).  Recall is 0.3\%, with only 37 of
+3{,}776 ground-truth links recovered.
 
-\subsection{Limitations}
-% Where does the approach fail?
+The error pattern differs from V1 in a revealing way: the linker produces
+more predictions (498~vs.\ 200) but no improvement in true positives.  The
+additional predictions are false positives caused by the corrupted
+link supervision (Bug~3), which trained the linker to associate nearly any
+span pair.  With the V4 corrections, the linker receives correct sparse
+supervision where each KVP produces exactly one positive span link.
+
+A supplementary experiment---V3 (linker-only), where the encoder and
+entity classifier were frozen and only the linker was trained---achieved
+83\% link accuracy on the validation set, demonstrating that the
+\texttt{SpanBiaffineLinker} architecture itself is capable of learning
+correct associations when given clean input representations.  The test-set
+link F1 of V3 (0.018) remained low because it inherited the same sparse
+entity spans from the bbox-filtered entity classifier (Bug~2).
 
 \section{Update to the State of the Art at Submission}
 \label{sec:sota_update}
 
 The literature review in Chapter~\ref{ch:literature} adopts a
 time-bounded view of the state of the art, fixed at the start of the
-project (February~2026). During the execution of this thesis, additional
-methods for document understanding and key--value extraction have been
-proposed. In this section we briefly summarize the most relevant
-developments and discuss how they relate to our contributions.
-
-% TODO: After experiments are finished and the thesis is close to
-% submission, add 2--3 paragraphs here that:
-%  1) List the main new models or training strategies that appeared
-%     after February 2026 (with citations).
-%  2) Explain whether they target KVP10k directly or related tasks.
-%  3) Position our approach relative to these methods (e.g., complementary,
-%     stronger on KVP10k, or limited by different assumptions).
+project (February~2026). During the execution of this thesis, we identified
+two additional models --- SPADE~\cite{spade} and BROS~\cite{bros} --- that
+are directly relevant to our linking methodology. Both models were published
+before our project start but were not included in the original literature
+survey. They have been integrated into the literature review
+(Section~\ref{subsec:entity_linking}) and directly informed the design of the
+V2 span-level linker.
 
 From an evaluation perspective, our experimental comparisons remain anchored
-to the baselines that were available at project start. The newer approaches
-are therefore discussed qualitatively rather than used as additional
-reference systems in the quantitative tables. This separation keeps the
-experimental protocol stable and reproducible, while still acknowledging
-that the broader state of the art has evolved by the time of submission.
+to the KVP10k baseline. SPADE and BROS are evaluated on CORD and FUNSD
+respectively, not on KVP10k, so direct numerical comparison is not possible.
+However, their architectural insight --- that entity linking should operate at
+the segment/span level --- is validated by our V1 failure analysis.
 
 \section{Limitations and Future Work}
 \label{sec:limitations}
 
 \subsection{Current Limitations}
 
-\subsubsection{Hardware and Data Constraints}
-Our Stage 3 Mistral baseline and Stage 4 LayoutLMv3 implementation operate under two significant constraints that impact result interpretation:
-
 \begin{itemize}
-    \item \textbf{LoRA rank reduction}: Hardware constraints (40 GB A100 memory) forced us to use LoRA rank $r=4$ compared to estimated $r \geq 16$ in the official KVP10k baseline. While QLoRA with 4-bit quantization is validated to preserve model quality (Dettmers et al., 2023), the reduced rank limits adaptation capacity. This likely contributes to the performance gap versus the published baseline.
-    
-    \item \textbf{Training data coverage}: Due to inaccessible source PDFs and scanned documents lacking usable text layers (PyMuPDF limitation), our training set comprises only 5,389 of 9,656 unique pages (55.8\%) and test set 581 of 1,051 pages (55.3\%). This reduced coverage provides less training signal than the full KVP10k dataset, further constraining model learning.
-\end{itemize}
+    \item \textbf{Training data coverage}: Our training set covers only
+    55.8\% of unique KVP10k pages due to PDF download failures and
+    scanned documents lacking text layers. An OCR-based pipeline (e.g.,
+    Tesseract) would increase coverage.
 
-When comparing our Mistral results (Stage 3, Table~\ref{tab:stage3_stage0_thresholds}) and LayoutLMv3 results (Stage 4) to published baselines, readers should account for these two confounds: LoRA rank and data coverage. The error analysis (Chapter 7, Section~\ref{subsec:per_cluster_analysis}) provides per-cluster breakdown showing that Mistral's failures are driven primarily by hallucination on sparse layouts and weak spatial grounding, not by the rank or data coverage limitations.
+    \item \textbf{LoRA rank}: Hardware constraints (40\,GB A100) forced
+    the Mistral baseline to use LoRA rank $r = 4$ instead of the
+    estimated $r \geq 16$ in the official baseline. This limits the
+    fairness of the Stage~3 vs.\ paper comparison.
 
-\subsubsection{Architectural Constraints}
-\begin{itemize}
-    \item Limited to single-page documents
-    \item Requires pre-OCR for text
-    \item Computational cost for large documents
+    \item \textbf{Single-page limitation}: The current pipeline processes
+    one page at a time; multi-page documents with cross-page key-value
+    pairs cannot be handled.
 \end{itemize}
 
 \subsection{Future Directions}
 \begin{itemize}
-    \item Multi-page document handling
-    \item End-to-end OCR integration
-    \item Cross-lingual evaluation
-    \item Real-time processing optimization
+    \item Multi-page document handling with cross-page linking
+    \item End-to-end OCR integration to increase data coverage
+    \item Cross-lingual evaluation on XFUND
+    \item Contrastive pre-training for the linker head
 \end{itemize}

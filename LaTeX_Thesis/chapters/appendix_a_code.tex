@@ -10,10 +10,10 @@
 import os
 
 # Paths
-WORKSPACE_ROOT = r"c:\Users\aliaz\Desktop\Thesis"
-SCRIPT_DIR = os.path.join(WORKSPACE_ROOT, "Script")
+WORKSPACE_ROOT = os.environ.get("WORKSPACE_ROOT", "/path/to/workspace")
+SCRIPT_DIR = os.path.join(WORKSPACE_ROOT, "code", "script")
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "outputs")
-KVP_CACHE = os.path.join(WORKSPACE_ROOT, "KVP10k", "hf_cache")
+KVP_CACHE = os.path.join(WORKSPACE_ROOT, "hf_cache")
 
 # Dataset
 DATASET_NAME = "ibm/KVP10k"

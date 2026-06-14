@@ -3,20 +3,25 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Layout features extracted from each document}}{14}{table.caption.6}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Layout cluster distribution for $k=2$ on annotated training pages}}{15}{table.caption.8}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Annotation statistics for 200-sample subset}}{18}{table.caption.12}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Layout features extracted from each document}}{20}{table.caption.19}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Layout cluster distribution for $k=2$ on annotated training pages}}{21}{table.caption.21}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Annotation statistics for 200-sample subset}}{24}{table.caption.25}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Main hyperparameters for the corrected Mistral baseline.}}{26}{table.caption.13}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Nearest Neighbor Baseline Results (20-sample validation)}}{27}{table.caption.14}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Main hyperparameters for the corrected Mistral baseline.}}{35}{table.caption.39}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Hyperparameters for Stage~4 (LayoutLMv3\,+\,Biaffine Linker).}}{36}{table.caption.41}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Nearest Neighbour Baseline Results (20-sample validation).}}{36}{table.caption.43}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {7.1}{\ignorespaces Stage 3 Mistral-7B Baseline Results (NED=0.5, IoU=0.5; $n=581$ test pages)}}{30}{table.caption.15}%
-\contentsline {table}{\numberline {7.2}{\ignorespaces Stage 3 Mistral-7B Baseline Results (NED=0.2, IoU=0.3; $n=581$ test pages)}}{30}{table.caption.16}%
-\contentsline {table}{\numberline {7.3}{\ignorespaces Impact of Threshold Strictness on Mistral-7B F1 Performance}}{30}{table.caption.17}%
-\contentsline {table}{\numberline {7.4}{\ignorespaces KVP10k Paper Baseline (All category; reported in Table 1 of \blx@tocontentsinit {0}\cite {kvp10k})}}{31}{table.caption.18}%
-\contentsline {table}{\numberline {7.5}{\ignorespaces Paper Baseline vs. Our Stage 3 Mistral Baseline (All category comparison)}}{31}{table.caption.19}%
-\contentsline {table}{\numberline {7.6}{\ignorespaces Stage 3 Mistral Error Analysis by Layout Cluster (581 test pages)}}{32}{table.caption.20}%
+\contentsline {table}{\numberline {7.1}{\ignorespaces Stage~3 (Mistral-7B QLoRA) overall results ($n = 581$ test pages).}}{40}{table.caption.47}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces Published KVP10k baseline vs.\ our Stage~3 Mistral baseline.}}{41}{table.caption.48}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces Stage~3 Mistral error analysis by layout cluster ($n = 581$).}}{41}{table.caption.49}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces Stage~4a entity classification results (best epoch).}}{41}{table.caption.50}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Stage~4b V1 (token-level linking) results.}}{42}{table.caption.51}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces Stage~4b V2 (span-level linking) results.}}{42}{table.caption.54}%
+\contentsline {table}{\numberline {7.7}{\ignorespaces Overall comparison across all stages. Dashes indicate metrics not applicable to that system: the KVP10k baseline and Mistral produce end-to-end KVP predictions without a separate entity-classification head. Mistral's F1 is text\,+\,location (NED\,$<$\,0.2, IoU\,$>$\,0.3).}}{43}{table.caption.56}%
+\contentsline {table}{\numberline {7.8}{\ignorespaces V1 (token-level) vs.\ V2 (span-level) vs.\ V4 (corrected) linking ablation.}}{43}{table.caption.57}%
+\contentsline {table}{\numberline {7.9}{\ignorespaces Link label pipeline verification (20 test documents, 179 GT KVPs).}}{44}{table.caption.58}%
+\contentsline {table}{\numberline {7.10}{\ignorespaces Training time and resource usage.}}{45}{table.caption.59}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

@@ -1,5 +1,5 @@
 \chapter{Implementation}
-\label{chap:implementation}
+\label{ch:implementation}
 
 \section{System Architecture}
 \label{sec:system-architecture}
@@ -78,6 +78,24 @@ embedded into the prompt given to the Mistral model. Ground-truth targets are
 serialised as Python list-of-lists strings, following the benchmark style used
 by the corrected Stage~3 pipeline.
 
+\paragraph{V4: Word-level splitting.}
+Diagnostic analysis (Section~\ref{sec:diagnostic-experiments}) revealed that
+the LMDX text format stores entire OCR text blocks --- often multi-word
+phrases such as \texttt{"1~lb.\ shelled \$15.00"} --- as single ``words''
+with a single bounding box. This is problematic for LayoutLMv3, which expects
+individual words, and for ground-truth label generation, because a key-value
+pair whose key and value text reside within the same OCR block cannot produce
+distinct entity labels or link labels at the block level.
+
+The V4 data pipeline splits each OCR block into whitespace-separated words and
+estimates horizontal sub-bounding boxes proportional to character count. For
+example, the block \texttt{"1~lb.\ shelled \$15.00"} with bounding box
+$[x_1, y_1, x_2, y_2]$ is split into four words (\texttt{"1"},
+\texttt{"lb."}, \texttt{"shelled"}, \texttt{"\$15.00"}), each assigned a
+horizontal slice of the original bbox. This increased the average word count
+per document from $\sim$35 (block-level) to $\sim$200 (word-level) and
+enabled the entity labels and link labels to reach word-level granularity.
+
 \subsection{Layout Encoding}
 \label{sec:layout-encoding}
 
@@ -102,9 +120,8 @@ above deduplication step.
 
 The Stage~4 model class \texttt{LayoutLMv3KVPModel} wraps the
 \texttt{microsoft/layoutlmv3-base} checkpoint from the HuggingFace Hub.
-The base encoder is loaded in full bfloat16 precision using
-\texttt{torch.bfloat16} as the compute dtype. No quantisation is applied:
-the 125M-parameter LayoutLMv3-base model fits within the 80\,GB memory
+The base encoder is loaded in full fp32 precision. No quantisation is applied:
+the 125M-parameter LayoutLMv3-base model fits within the 40\,GB memory
 envelope of the A100 nodes used for Stage~4, unlike the 7B-parameter Mistral
 model that required QLoRA in Stage~3.
 
@@ -137,25 +154,38 @@ set at the start of each Stage~4a training run.
 \subsection{Biaffine Linker Module}
 \label{sec:linker-impl}
 
-The \texttt{BiaffineLinker} PyTorch module receives the set of key span
-representations and value span representations extracted from the entity
-classifier output. Span representations are formed by mean-pooling the encoder
-hidden states of all sub-word tokens within the span, followed by the
-bounding-box spatial augmentation described in
-Section~\ref{sec:spatial-encoding}.
+The linker module receives key and value representations extracted from the
+entity classifier output. In V1, these are individual token hidden states;
+in V2, they are span-level mean-pooled representations
+(Section~\ref{sec:span-representation}).
 
-The biaffine weight matrix $\mathbf{W}_{\text{link}} \in \mathbb{R}^{768 \times 768}$
-is initialised as the identity matrix scaled by $1/\sqrt{768}$, providing a
-neutral initialisation that decomposes to a dot-product similarity at the
-start of training. Bias vectors $\mathbf{w}_k$ and $\mathbf{w}_v$ are
-initialised to zero. The sigmoid threshold used during inference is fixed at
-$0.5$ for all reported experiments.
+Representations are augmented with 8 spatial features
+(Section~\ref{sec:spatial-encoding}) before scoring. The semantic scorer uses
+scaled dot-product attention (Section~\ref{sec:kv-attention}) --- an earlier
+bilinear implementation was abandoned due to gradient explosion.
 
-Because the number of key and value spans varies per page, the linker operates
-on ragged batches. Scores are computed as a dense $K \times V$ matrix (keys
-vs.~values) and then masked to apply binary cross-entropy only to
-ground-truth-annotated pairs, avoiding the combinatorial cost of enumerating
-all possible pair labels.
+\paragraph{Teacher forcing.}
+During training, the linker receives ground-truth entity labels for span
+grouping rather than the entity classifier's \texttt{argmax} predictions.
+This ensures the linker learns from correctly segmented spans. At inference
+time, the linker receives predicted entity labels. This teacher-forcing
+strategy decouples entity classification errors from linker training and is
+standard practice in structured prediction~\cite{spade}.
+
+\paragraph{NaN guard.}
+Achieving stable training required a valid-label mask before the BCE call:
+ground-truth link labels outside $[0, 1]$ (from uninitialised positions in
+the adjacency matrix) are excluded.  This is analogous to the
+\texttt{ignore\_index=-100} mechanism used for entity labels in
+\texttt{CrossEntropyLoss}. The \texttt{pos\_weight} for the BCE loss is set
+to $\min(n_{\text{neg}}/n_{\text{pos}},\, 50)$ in V1 and
+$n_{\text{neg}}/n_{\text{pos}}$ (uncapped) in V2.
+
+\paragraph{Memory efficiency.}
+To avoid materialising large expanded tensors, scoring is performed in chunks
+of 8 key rows. A hard cap of 128 key and 128 value candidates per page
+(selected by highest entity-classifier confidence) bounds the worst-case
+linker matrix to $128 \times 128$ in V1.
 
 % ---------------------------------------------------------------------------
 \section{Baseline Evaluation Pipeline}
@@ -221,31 +251,42 @@ discussion of the implications).
 
 \paragraph{Stage~4a -- Entity Classifier Pre-training.}
 Stage~4a trains the LayoutLMv3 encoder together with the entity classification
-head only, with the linker module disabled ($\lambda = 0$ in
-Equation~3.1). This pre-trains the representation before the more complex
-linking objective is introduced. Mixed-precision training uses
-\texttt{torch.bfloat16} throughout on the A100~80\,GB cluster nodes; no
-quantisation is required. Gradient accumulation over 8 micro-steps gives an
+head only, with the linker module disabled ($\lambda = 0$).
+This pre-trains the representation before the more complex
+linking objective is introduced. Training uses fp32 precision
+on A100~80\,GB cluster nodes; no quantisation is required.
+Gradient accumulation over 8 micro-steps gives an
 effective batch size of 32. A SLURM job template with a wall-clock limit of
 24~hours is used for this phase.
-
-\begin{verbatim}
-# Relevant Stage 4a SLURM directives
-#SBATCH --gres=gpu:a100:1
-#SBATCH --mem=80G
-#SBATCH --time=24:00:00
-export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-python main.py --stage 4a --precision bf16 \
-               --batch_size 4 --grad_accum 8
-\end{verbatim}
 
 \paragraph{Stage~4b -- Joint Fine-tuning.}
 Stage~4b resumes from the Stage~4a checkpoint and activates the biaffine
 linker ($\lambda > 0$). The encoder learning rate is reduced by a factor of
 10 relative to Stage~4a to avoid catastrophic forgetting of the entity
-classification capability. A second SLURM job with a 12-hour wall-clock limit
-is used for this phase. Early stopping (patience~$= 3$) on the combined
-validation F1 typically terminates training within 10--15 epochs.
+classification capability. Two variants are trained: V1 (token-level linking)
+and V2 (span-level linking). A SLURM job with a 12-hour wall-clock limit
+is used for each variant. Early stopping (patience~$= 3$) on validation
+entity F1 typically terminates training within 10--15 epochs.
+
+\paragraph{V4 link label generation.}
+Diagnostic analysis of V2 training revealed that the ground-truth link label
+matrix contained a cross-product explosion: for each key-value pair, \emph{all}
+key-word indices were linked to \emph{all} value-word indices, rather than a
+single representative pair. A document with 8 ground-truth KVPs produced
+$\sim$1{,}049 positive link entries instead of~8, causing the span-level
+collapse (Section~\ref{sec:v2-span-linking}) to mark nearly every span pair as
+positive --- equivalent to no supervision at all.
+
+The V4 fix assigns exactly one link per KVP: the first key word is linked to
+the first value word, producing $N$ positive link entries for $N$ ground-truth
+KVPs.  Together with the word-level splitting
+(Section~\ref{sec:text-processing}), a bidirectional bounding-box overlap
+criterion ($\geq 50\%$ of either the word or the target region), and a relaxed
+span grouping filter that only excludes $[0,0,0,0]$ bounding boxes (previously,
+the filter $x_1 < x_2 \wedge y_1 < y_2$ rejected $\sim$50\% of valid tokens
+whose LayoutLMv3-normalised coordinates had $x_1 = x_2$), the V4 pipeline
+achieves 79\% word-level and 70\% span-level link label recovery on the test
+set (Section~\ref{sec:diagnostic-results}).
 
 \subsection{Checkpointing}
 \label{sec:checkpointing}

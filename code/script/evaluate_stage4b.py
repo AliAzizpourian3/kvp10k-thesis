@@ -12,6 +12,7 @@ with the ground-truth multi-word key/value spans.
 Usage:
     python evaluate_stage4b.py --checkpoint_dir data/outputs/stage4b_lambda10
     python evaluate_stage4b.py --checkpoint_dir data/outputs/stage4b_canary_B
+    python evaluate_stage4b.py --checkpoint_dir data/outputs/stage4b_v2 --model_version v2
 """
 
 import os
@@ -22,6 +23,7 @@ os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
 import argparse
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import torch
@@ -30,7 +32,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 import config
-from layoutlm_model import create_model
+from layoutlm_model import create_model as create_model_v1
+from layoutlm_model_v2 import create_model as create_model_v2
 from stage4_kvp_dataset import LayoutLMv3PreparedDataset, PaddedBatchCollator
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -148,9 +151,22 @@ def _text_overlap(pred_text, gt_text):
     return f1 >= 0.5
 
 
+def _span_to_text(start, end, word_ids, words):
+    """Convert a token span (start, end inclusive) to text via word_ids mapping."""
+    seen = []
+    for t in range(start, end + 1):
+        if t < len(word_ids) and word_ids[t] is not None:
+            wid = word_ids[t]
+            if wid not in seen:
+                seen.append(wid)
+    parts = [words[wid] for wid in seen if wid < len(words)]
+    return " ".join(parts)
+
+
 def _extract_predicted_pairs(model, batch, device, dataset, idx_start, score_threshold=0.5):
     """Run model inference and extract predicted key-value text pairs.
 
+    Works with both V1 (token-level indices) and V2 (span tuples).
     Returns a list of lists (one per batch item) of (key_text, val_text, score).
     """
     input_ids = batch["input_ids"].to(device)
@@ -165,6 +181,13 @@ def _extract_predicted_pairs(model, batch, device, dataset, idx_start, score_thr
     link_scores = outputs["link_scores"]
     key_indices = outputs["key_indices"]
     value_indices = outputs["value_indices"]
+
+    # Detect V2 (span tuples) vs V1 (token index tensors)
+    is_v2 = (key_indices is not None
+             and len(key_indices) > 0
+             and key_indices[0] is not None
+             and len(key_indices[0]) > 0
+             and isinstance(key_indices[0][0], tuple))
 
     batch_size = input_ids.size(0)
     all_pairs = []
@@ -217,7 +240,7 @@ def _extract_predicted_pairs(model, batch, device, dataset, idx_start, score_thr
             all_pairs.append(pairs)
             continue
 
-        # For each predicted key token, find its best value
+        # For each key, find its best value
         best_val_pos = torch.argmax(scores_b, dim=1)
         best_scores = torch.sigmoid(scores_b[range(len(k_idx)), best_val_pos])
 
@@ -225,21 +248,25 @@ def _extract_predicted_pairs(model, batch, device, dataset, idx_start, score_thr
             if best_scores[i].item() < score_threshold:
                 continue
             vi = v_idx[best_val_pos[i]]
-            ki_int = ki.item()
-            vi_int = vi.item()
 
-            # Map token index to word index
-            if ki_int < len(word_ids) and word_ids[ki_int] is not None:
-                key_word_idx = word_ids[ki_int]
-                key_text = words[key_word_idx] if key_word_idx < len(words) else ""
+            if is_v2:
+                # V2: ki and vi are (start, end) tuples
+                key_text = _span_to_text(ki[0], ki[1], word_ids, words)
+                val_text = _span_to_text(vi[0], vi[1], word_ids, words)
             else:
-                key_text = ""
-
-            if vi_int < len(word_ids) and word_ids[vi_int] is not None:
-                val_word_idx = word_ids[vi_int]
-                val_text = words[val_word_idx] if val_word_idx < len(words) else ""
-            else:
-                val_text = ""
+                # V1: ki and vi are single token index tensors
+                ki_int = ki.item()
+                vi_int = vi.item()
+                if ki_int < len(word_ids) and word_ids[ki_int] is not None:
+                    key_word_idx = word_ids[ki_int]
+                    key_text = words[key_word_idx] if key_word_idx < len(words) else ""
+                else:
+                    key_text = ""
+                if vi_int < len(word_ids) and word_ids[vi_int] is not None:
+                    val_word_idx = word_ids[vi_int]
+                    val_text = words[val_word_idx] if val_word_idx < len(words) else ""
+                else:
+                    val_text = ""
 
             if key_text and val_text:
                 pairs.append((key_text.lower(), val_text.lower(), best_scores[i].item()))
@@ -362,13 +389,21 @@ def main():
                         help="Link score threshold for pair extraction")
     parser.add_argument("--batch_size", type=int, default=1,
                         help="Evaluation batch size")
+    parser.add_argument("--model_version", type=str, default="v1",
+                        choices=["v1", "v2"],
+                        help="Model version: v1 (token-level) or v2 (span-level)")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Device: {device}")
 
     # Create model
-    model = create_model(use_linker=True, device=device)
+    if args.model_version == "v2":
+        logger.info("Using V2 model (span-level linker)")
+        model = create_model_v2(use_linker=True, device=device)
+    else:
+        logger.info("Using V1 model (token-level linker)")
+        model = create_model_v1(use_linker=True, device=device)
 
     # Load checkpoint
     model = _load_checkpoint(model, args.checkpoint_dir, device)
@@ -412,7 +447,8 @@ def main():
     # Save results
     results = {**entity_metrics, **link_metrics, "checkpoint_dir": args.checkpoint_dir,
                "score_threshold": args.score_threshold}
-    out_path = Path(args.checkpoint_dir) / "eval_results.json"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out_path = Path(args.checkpoint_dir) / f"eval_results_{timestamp}.json"
     with open(out_path, "w") as f:
         json.dump(results, f, indent=2)
     logger.info(f"Results saved to {out_path}")

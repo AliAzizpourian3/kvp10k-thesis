@@ -34,11 +34,11 @@ This thesis addresses the following research questions:
 \begin{enumerate}
     \item \textbf{RQ1}: How do layout characteristics vary across business documents, and how can this inform model design?
     
-    \item \textbf{RQ2}: Can a generative approach using LayoutLMv3 + Linker achieve state-of-the-art performance on \kvp{} extraction?
+    \item \textbf{RQ2}: Can a discriminative approach using LayoutLMv3 with a learned biaffine linker improve over generative baselines for \kvp{} extraction?
     
-    \item \textbf{RQ3}: How robust is the approach to real-world degradations (rotation, occlusion, missing annotations)?
+    \item \textbf{RQ3}: How does linking granularity (token-level vs.\ span-level) affect key-value association accuracy?
     
-    \item \textbf{RQ4}: What are the key factors contributing to model success and failure cases?
+    \item \textbf{RQ4}: What are the key factors contributing to model success and failure cases, and how do they vary across document layout types?
 \end{enumerate}
 
 \section{Contributions}
@@ -49,13 +49,13 @@ This thesis makes the following contributions:
 \begin{enumerate}
     \item \textbf{Dataset Analysis}: Comprehensive characterization of KVP10k dataset including layout clustering, spatial pattern analysis, and annotation statistics (Chapter \ref{ch:dataset})
     
-    \item \textbf{Architecture}: Implementation of LayoutLMv3 + Linker for end-to-end generative \kvp{} extraction with explicit key-value association (Chapter \ref{ch:implementation})
+    \item \textbf{Architecture}: Implementation of LayoutLMv3 + Biaffine Linker for discriminative \kvp{} extraction with explicit key-value association, in both token-level (V1) and span-level (V2) variants (Chapter \ref{ch:methodology})
     
-    \item \textbf{Evaluation}: Systematic benchmark on KVP10k test set with dual-threshold evaluation protocol (NED, IoU) and F1 scoring (Chapter \ref{ch:experiments})
+    \item \textbf{Evaluation}: Systematic benchmark on KVP10k test set with dual-threshold evaluation protocol (NED, IoU) and separate entity/link F1 scoring (Chapter \ref{ch:experiments})
     
-    \item \textbf{Robustness Analysis}: Evaluation under rotation, occlusion, and annotation dropout to assess real-world applicability (Chapter \ref{ch:experiments})
+    \item \textbf{Linking Granularity Analysis}: Detailed investigation of why token-level linking fails ($\sim$450:1 class imbalance) and how span-level linking addresses this (Chapter \ref{ch:results})
     
-    \item \textbf{Interpretability}: Attention visualization and error analysis providing insights into model behavior (Chapter \ref{ch:results})
+    \item \textbf{Error Analysis}: Per-cluster breakdown showing layout-dependent failure modes for both generative and discriminative approaches (Chapter \ref{ch:results})
     
     \item \textbf{Code Release}: Modular Python implementation with CONFIG-controlled experiments for reproducibility
 \end{enumerate}

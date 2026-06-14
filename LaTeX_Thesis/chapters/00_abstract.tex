@@ -3,26 +3,26 @@
 
 \begin{spacing}{1.5}
 
-This thesis presents a comprehensive study on automatic \kvp{} extraction from business documents using deep learning and multimodal document understanding. We develop and evaluate a LayoutLMv3-based approach augmented with an attention-based linking mechanism for accurate key-value association.
+This thesis presents a comprehensive study on automatic \kvp{} extraction from business documents using deep learning and multimodal document understanding. We develop and evaluate a LayoutLMv3-based discriminative approach augmented with a learned linking mechanism for accurate key-value association.
 
-\textbf{Background:} Business document processing remains a significant challenge in document understanding, requiring accurate extraction of structured information from semi-structured layouts. Traditional approaches rely on template matching or rule-based systems, limiting generalization to diverse document types.
+\textbf{Background:} Business document processing remains a significant challenge in document understanding, requiring accurate extraction of structured information from semi-structured layouts. Traditional approaches rely on template matching or rule-based systems, limiting generalization to diverse document types. Recent generative baselines using large language models achieve reasonable text extraction but lack spatial grounding, leading to hallucination on sparse document layouts.
 
-\textbf{Method:} We propose a generative approach combining LayoutLMv3 as a multimodal encoder with a transformer-based decoder (T5/Mistral) for end-to-end \kvp{} extraction. An attention-based linker module explicitly models spatial and semantic relationships between keys and values. Our approach is evaluated on the KVP10k dataset comprising 48,280 training and 5,255 test samples spanning invoices, forms, and receipts.
+\textbf{Method:} We propose a discriminative approach combining LayoutLMv3 as a multimodal encoder with a two-head architecture: an entity classifier that assigns each token a role (key, value, or other) and a learned linker that pairs predicted key spans with their corresponding value spans. We investigate two linking granularities: token-level linking (V1) and span-level linking (V2), motivated by the observation that entity linking operates naturally at the span level. Our approach is evaluated on the KVP10k dataset comprising 10,707 documents spanning invoices, forms, and receipts.
 
-\textbf{Evaluation:} We employ a dual-threshold evaluation protocol: Normalized Edit Distance (NED) $<$ 0.2 for text accuracy and Intersection over Union (IoU) $>$ 0.3 for location accuracy. Performance is measured using F1 score, combining precision and recall.
+\textbf{Evaluation:} We employ a dual-threshold evaluation protocol: Normalized Edit Distance (NED) $< 0.2$ for text accuracy and Intersection over Union (IoU) $> 0.3$ for location accuracy. Entity extraction and key-value linking are evaluated separately to isolate the contribution of each component.
 
-\textbf{Results:} [TO BE COMPLETED AFTER EXPERIMENTS]
-% Preliminary layout analysis reveals two distinct layout clusters ($k=2$) with 82.7\% variance explained by two principal components (PC1: 71.8\%, PC2: 10.8\%). Key-value pairs exhibit strong spatial proximity (mean distance = 0.10 normalized units).
+\textbf{Results:} The discriminative LayoutLMv3 model achieves entity F1 of 0.827, substantially outperforming the Mistral-7B generative baseline on spatial grounding and eliminating hallucination on sparse layouts. Token-level linking (V1) yields near-zero link F1 (0.008) due to extreme class imbalance ($\sim$450:1 negative-to-positive ratio). Span-level linking (V2) addresses this granularity mismatch by reducing the imbalance to $\sim$5:1, but initially produces link F1 of only 0.007 due to three compounding data-pipeline bugs. A systematic diagnostic analysis identifies and corrects these bugs, yielding the final V4 model with link F1 $= 0.673$ --- on par with the published KVP10k baseline using a 125M-parameter discriminative model.
 
 \textbf{Contributions:}
 \begin{itemize}
     \item Comprehensive analysis of KVP10k dataset layout characteristics and spatial patterns
-    \item Implementation of LayoutLMv3 + Linker architecture for generative \kvp{} extraction
-    \item Systematic evaluation of robustness to rotation, occlusion, and annotation dropout
-    \item Interpretability analysis through attention visualization and error case studies
+    \item Implementation and comparison of token-level (V1) and span-level (V2) linking architectures
+    \item Systematic diagnosis of three compounding data-pipeline bugs and corrected V4 model achieving link F1 $= 0.673$
+    \item Detailed failure analysis showing that linking granularity, not model capacity, is the primary bottleneck
+    \item Per-cluster error analysis demonstrating that layout-aware encoding eliminates generative hallucination
 \end{itemize}
 
-\textbf{Keywords:} Document Understanding, Key-Value Pair Extraction, LayoutLMv3, Multimodal Learning, Information Extraction, Business Documents
+\textbf{Keywords:} Document Understanding, Key-Value Pair Extraction, LayoutLMv3, Span-Level Linking, Multimodal Learning, Information Extraction
 
 \end{spacing}
 

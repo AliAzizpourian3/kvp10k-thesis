@@ -4,63 +4,91 @@
 \section{Summary of Contributions}
 \label{sec:summary}
 
-This thesis presented a comprehensive study on \kvp{} extraction from business documents using LayoutLMv3 with an attention-based linker. The main contributions are:
+This thesis presented a comprehensive study on \kvp{} extraction from business
+documents using LayoutLMv3 with a learned span-level linker. The main
+contributions are:
 
 \begin{enumerate}
-    \item \textbf{Dataset Analysis}: Characterized KVP10k dataset through layout clustering, revealing two distinct layout types and strong spatial proximity patterns in \kvps{}
-    
-    \item \textbf{Model Architecture}: Implemented LayoutLMv3 + Linker combining multimodal document understanding with explicit key-value association
-    
-    \item \textbf{Evaluation}: Established dual-threshold evaluation protocol (NED + IoU) and demonstrated \textcolor{red}{[DRAFT: Stage 4 performance results pending]} on benchmark
-    
-    \item \textbf{Robustness}: Evaluated robustness to rotation, occlusion, and annotation dropout, \textcolor{red}{[DRAFT: robustness analysis pending Stage 4]}
-    
-    \item \textbf{Interpretability}: Provided attention visualizations and error analysis revealing model behavior and failure modes
-    
-    \item \textbf{Implementation}: Released modular, reproducible codebase with CONFIG-controlled experiments
+    \item \textbf{Dataset Analysis}: Characterised the KVP10k dataset through
+    layout clustering, revealing two distinct layout types and strong spatial
+    proximity patterns in \kvps{} (Chapter~\ref{ch:dataset}).
+
+    \item \textbf{Generative Baseline}: Reproduced the KVP10k Mistral-7B
+    baseline and identified its failure modes: hallucination on sparse layouts
+    (52.9\% hallucination rate) and weak spatial grounding
+    (Chapter~\ref{ch:results}).
+
+    \item \textbf{Discriminative Architecture}: Implemented a LayoutLMv3-based
+    entity classifier achieving F1~$= 0.827$, eliminating spatial
+    hallucination through grounded token classification
+    (Chapter~\ref{ch:methodology}).
+
+    \item \textbf{Linking Granularity Analysis}: Demonstrated that token-level
+    linking fails due to extreme class imbalance ($\sim$450:1), yielding link
+    F1~$= 0.008$. Designed and implemented span-level linking (V2) to address
+    this mismatch (Chapter~\ref{ch:methodology}).
+
+    \item \textbf{Pipeline Debugging and V4 Results}: Diagnosed three
+    compounding data-pipeline bugs (missing teacher forcing, over-strict
+    bounding-box filter, cross-product link label explosion) that masked
+    span-level linking performance. The corrected V4 model achieves
+    link F1~$= 0.673$, on par with the published KVP10k baseline using
+    a 125M-parameter discriminative model
+    (Chapters~\ref{ch:results}--\ref{ch:discussion}).
+
+    \item \textbf{Implementation}: Released a modular, reproducible codebase
+    with CONFIG-controlled experiments.
 \end{enumerate}
 
 \section{Research Questions Revisited}
 \label{sec:rq_revisited}
 
 \subsection{RQ1: Layout Characteristics}
-% Answer based on Chapter 4 findings
+Layout clustering reveals two distinct document types (dense and sparse) with
+82.7\% of variance explained by two principal components. \kvps{} exhibit
+strong spatial proximity (mean distance = 0.10 normalised units), confirming
+that spatial features are essential for accurate linking.
 
-\subsection{RQ2: Model Performance}
-% Answer based on Chapter 7 results
+\subsection{RQ2: Discriminative vs.\ Generative}
+The discriminative LayoutLMv3 model achieves entity F1~$= 0.827$ with no
+spatial hallucination, compared to Mistral's text+location F1~$= 0.600$ with
+significant hallucination. Layout-aware discriminative models outperform
+text-only generative approaches on spatially-grounded extraction.
 
-\subsection{RQ3: Robustness}
-% Answer based on Chapter 6 experiments
+\subsection{RQ3: Linking Granularity}
+Token-level linking (V1) fails decisively (F1~$= 0.008$) due to the
+$\sim$450:1 class imbalance inherent in token-to-token scoring. Span-level
+linking (V2) reduces this to $\sim$5:1 by grouping contiguous tokens before
+scoring. However, three data-pipeline bugs initially masked this benefit,
+producing link F1 of only 0.007. After systematic diagnosis and correction,
+the V4 model achieves link F1~$= 0.673$, confirming that span-level linking
+is effective when paired with correct supervision.
 
-\subsection{RQ4: Success Factors}
-% Answer based on Chapter 8 discussion
+\subsection{RQ4: Success and Failure Factors}
+Model performance depends strongly on document layout type. Dense layouts
+benefit from rich contextual signals; sparse layouts challenge both generative
+(hallucination) and discriminative (fewer training examples) approaches.
+Linking granularity, not model capacity, is the primary bottleneck for
+key-value association.
 
 \section{Practical Implications}
 \label{sec:implications}
 
-This work has several practical implications:
-\begin{itemize}
-    \item Automated invoice processing in enterprise systems
-    \item Form understanding in government agencies
-    \item Receipt digitization for expense management
-    \item Generalizable approach applicable to diverse document types
-\end{itemize}
-
-\section{Future Research Directions}
-\label{sec:future}
-
-Promising directions for future research include:
-\begin{itemize}
-    \item Extension to multi-page documents
-    \item Cross-lingual document understanding
-    \item Few-shot adaptation to new document types
-    \item Integration with document retrieval systems
-    \item Real-time processing optimization
-\end{itemize}
+This work demonstrates that discriminative multimodal models are well-suited
+for enterprise document processing: they provide spatially grounded
+predictions, eliminate hallucination, and operate efficiently on modest
+hardware (single GPU, 125M parameters). The modular pipeline design enables
+adaptation to new document types with minimal re-engineering.
 
 \section{Closing Remarks}
 \label{sec:closing}
 
-% TODO: Final thoughts
-
-This thesis demonstrates the effectiveness of combining multimodal pre-training with explicit linking mechanisms for \kvp{} extraction. The systematic evaluation and interpretability analysis provide insights for future research in document understanding.
+This thesis demonstrates that effective \kvp{} extraction requires both
+layout-aware encoding and appropriate linking granularity. While entity
+classification is largely solved by LayoutLMv3 (F1~$= 0.827$), the linking
+problem demands careful attention to data pipeline correctness, class
+imbalance, and task structure. The progression from V1 through V4 illustrates
+that architectural improvements --- such as span-level linking --- can only
+realise their potential when the supervision signal is correct. The final
+V4 model achieves link F1~$= 0.673$, matching the published KVP10k baseline
+with a compact 125M-parameter discriminative model.

@@ -199,8 +199,15 @@ class LayoutLMv3PreparedDataset(Dataset):
         """
         Parse lmdx_text format to extract words and bounding boxes.
 
-        Format: "word1 x1|y1|x2|y2\nword2 x1|y1|x2|y2"
+        Format: "text_block x1|y1|x2|y2\ntext_block x1|y1|x2|y2"
         Coordinates are in pixel space (not quantized).
+
+        V4 fix: each LMDX line may contain a multi-word text block with a
+        single bounding box.  We split every block into individual whitespace-
+        separated words and estimate each word's horizontal sub-bbox based on
+        character offsets.  This gives LayoutLMv3 proper word-level input and
+        enables fine-grained entity labels and link labels (key and value text
+        within the same OCR block can now be distinguished).
         """
         words = []
         bboxes = []
@@ -215,7 +222,7 @@ class LayoutLMv3PreparedDataset(Dataset):
             if len(parts) != 2:
                 continue
 
-            word_text = parts[0].strip()
+            block_text = parts[0].strip()
             coords_str = parts[1].strip()
 
             try:
@@ -228,8 +235,27 @@ class LayoutLMv3PreparedDataset(Dataset):
                 x2 = max(x1, int(coords[2]))
                 y2 = max(y1, int(coords[3]))
 
-                words.append(word_text)
-                bboxes.append([x1, y1, x2, y2])
+                # Split block into individual words
+                sub_words = block_text.split()
+                if not sub_words:
+                    continue
+
+                if len(sub_words) == 1:
+                    words.append(block_text)
+                    bboxes.append([x1, y1, x2, y2])
+                else:
+                    # Estimate horizontal sub-bboxes proportional to char count
+                    total_chars = len(block_text)
+                    block_width = x2 - x1
+                    char_offset = 0
+                    for sw in sub_words:
+                        sw_x1 = x1 + int(char_offset / total_chars * block_width) if total_chars > 0 else x1
+                        char_offset += len(sw)
+                        sw_x2 = x1 + int(char_offset / total_chars * block_width) if total_chars > 0 else x2
+                        char_offset += 1  # space between words
+                        sw_x2 = max(sw_x1 + 1, sw_x2)  # ensure valid width
+                        words.append(sw)
+                        bboxes.append([sw_x1, y1, sw_x2, y2])
 
             except (ValueError, IndexError):
                 logger.debug(f"Could not parse coordinates from line: {line}")
@@ -317,6 +343,17 @@ class LayoutLMv3PreparedDataset(Dataset):
         Generate word-level entity labels and key-value relationship links.
         Entity labels: 0=Other, 1=Key, 2=Value
         Link labels: [seq_len x seq_len] binary adjacency matrix
+
+        Link label strategy (V4 fix):
+          For each KVP, pick ONE representative key word and ONE representative
+          value word (the first word found by bbox overlap) and set only that
+          single cell to 1.0. This produces exactly N positive link entries for
+          N ground-truth KVPs, matching the span-level semantics: each key span
+          should link to exactly one value span.
+
+          Previous bug: all key_word × val_word cross-products were set to 1,
+          causing ~1000 positives per document instead of ~8, making it
+          impossible for the linker to learn which span pair is the real link.
         """
         entity_labels = [0] * len(words)
         link_labels = torch.zeros(
@@ -361,10 +398,12 @@ class LayoutLMv3PreparedDataset(Dataset):
             key_indices = self._find_words_by_bbox_overlap(bboxes, key_bbox)
             val_indices = self._find_words_by_bbox_overlap(bboxes, val_bbox)
 
-            for key_idx in key_indices:
-                for val_idx in val_indices:
-                    if key_idx < self.max_seq_length and val_idx < self.max_seq_length:
-                        link_labels[key_idx, val_idx] = 1.0
+            # V4 fix: one representative link per KVP (first key word → first val word)
+            if key_indices and val_indices:
+                ki = key_indices[0]
+                vi = val_indices[0]
+                if ki < self.max_seq_length and vi < self.max_seq_length:
+                    link_labels[ki, vi] = 1.0
 
         return entity_labels, link_labels
 
@@ -373,8 +412,15 @@ class LayoutLMv3PreparedDataset(Dataset):
         word_bboxes: List[List[int]],
         target_bbox: List[int]
     ) -> List[int]:
-        """Find word indices with >50% bbox overlap with target_bbox."""
+        """Find word indices whose bboxes overlap significantly with target_bbox.
+
+        A word matches if either:
+        - >50% of the target bbox area is covered by the word (original), OR
+        - >50% of the word bbox area is inside the target (new: handles small
+          words within a large target region, needed after V4 word splitting).
+        """
         target_x1, target_y1, target_x2, target_y2 = target_bbox
+        target_area = (target_x2 - target_x1) * (target_y2 - target_y1)
         matching_indices = []
 
         for idx, bbox in enumerate(word_bboxes):
@@ -387,9 +433,14 @@ class LayoutLMv3PreparedDataset(Dataset):
 
             if inter_x1 < inter_x2 and inter_y1 < inter_y2:
                 intersection_area = (inter_x2 - inter_x1) * (inter_y2 - inter_y1)
-                target_area = (target_x2 - target_x1) * (target_y2 - target_y1)
+                word_area = (wx2 - wx1) * (wy2 - wy1)
 
-                if target_area > 0 and intersection_area / target_area > 0.5:
+                target_covered = (target_area > 0 and
+                                  intersection_area / target_area >= 0.5)
+                word_inside = (word_area > 0 and
+                               intersection_area / word_area >= 0.5)
+
+                if target_covered or word_inside:
                     matching_indices.append(idx)
 
         return matching_indices
