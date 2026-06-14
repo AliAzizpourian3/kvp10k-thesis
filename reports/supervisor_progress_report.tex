@@ -24,7 +24,7 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{\small Progress Report --- April 2026}
+\rhead{\small Progress Report --- June 2026}
 \lhead{\small Ali Azizpourian}
 \cfoot{\thepage}
 
@@ -36,7 +36,7 @@
 Extraction through Layout-Aware Modelling and\\Data-Centric Analysis on the KVP10k Dataset}
 \author{Ali Azizpourian\\[2pt]
 \small Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg}
-\date{April 8, 2026}
+\date{June 2026}
 
 \begin{document}
 \maketitle
@@ -46,7 +46,7 @@ Extraction through Layout-Aware Modelling and\\Data-Centric Analysis on the KVP1
 \section{Thesis Recap}
 % ============================================================
 
-This thesis investigates \textbf{key-value pair (KVP) extraction} from semi-structured documents (invoices, receipts, forms) using IBM's \textbf{KVP10k} benchmark dataset (ICDAR 2024).
+This thesis investigates \textbf{key-value pair (KVP) extraction} from semi-structured documents (invoices, receipts, forms) using IBM's \textbf{KVP10k} benchmark dataset (ICDAR 2024, Naparstek et al.).
 The KVP10k paper argued that encoder-based models such as LayoutLMv3 have limitations for direct KVP linking, and therefore evaluated only a generative LMDX-style baseline rather than empirically benchmarking LayoutLMv3 on KVP10k.
 
 This thesis revisits that claim by combining \textbf{layout-aware modelling} with \textbf{data-centric analysis}.
@@ -60,7 +60,7 @@ The research goals from the proposal are:
 \end{enumerate}
 
 The project is organized into five stages (Figure~\ref{fig:pipeline}).
-\textbf{Stages~0--3 are complete}; Stage~4 is the next focus.
+\textbf{Stages~0--3 are complete}; Stage~4 is in active progress.
 
 \begin{figure}[ht]
 \centering
@@ -90,9 +90,9 @@ The project is organized into five stages (Figure~\ref{fig:pipeline}).
   \node[below=0.12cm of s1, font=\scriptsize\color{completed}] {\checkmark\ Complete};
   \node[below=0.12cm of s2, font=\scriptsize\color{completed}] {\checkmark\ Complete};
   \node[below=0.12cm of s3, font=\scriptsize\color{completed}] {\checkmark\ Complete};
-  \node[below=0.12cm of s4, font=\scriptsize\color{inprogress}] {Next Step};
+  \node[below=0.12cm of s4, font=\scriptsize\color{inprogress}] {In Progress};
 \end{tikzpicture}
-\caption{Pipeline overview. Green = completed, orange = next step.}
+\caption{Pipeline overview. Green = completed, orange = in progress.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -101,11 +101,16 @@ The project is organized into five stages (Figure~\ref{fig:pipeline}).
 % ============================================================
 
 \subsection{Stage 0: Evaluation Protocol}
-I adopted the evaluation protocol from the KVP10k paper (Perot et al., 2023):
+I adopted the evaluation protocol from the KVP10k paper (Naparstek et al., ICDAR 2024):
 \begin{itemize}[nosep]
   \item \textbf{Text-only:} Normalized Edit Distance (NED) $< 0.2$ between predicted and ground-truth text.
   \item \textbf{Text + Location:} NED $< 0.2$ \emph{and} bounding-box IoU $> 0.3$.
 \end{itemize}
+
+\noindent
+The NED metric tolerates minor OCR or formatting differences; a score below 0.2 means the predicted text is close enough to the ground truth to count as correct.
+IoU (Intersection over Union) measures how much the predicted bounding box overlaps with the ground-truth box; a threshold of 0.3 ensures the prediction is spatially in the right region.
+F1 score combines precision (how many predictions were correct) and recall (how many ground-truth pairs were found) into a single balanced metric.
 
 \subsection{Stage 1: Data Ingestion \& Preparation}
 
@@ -115,12 +120,12 @@ Substantial preparation was required:
 
 \begin{enumerate}[nosep, leftmargin=1.5em]
   \item \textbf{Deduplication:} The same page appears $\sim$5 times in the raw data (one per annotator).
-        I grouped by \texttt{hash\_name} and selected the richest usable annotation set, reducing 48{,}280 train rows to 9{,}656 unique pages and 5{,}255 test rows to 1{,}051 unique pages.
-  \item \textbf{PDF download \& validation:} For each unique page, I downloaded the source PDF and verified it was a valid PDF (many URLs returned broken files, permission-denied pages, or HTML error pages).
-  \item \textbf{Text extraction:} I used PyMuPDF to extract words and bounding boxes from each page's text layer.
-        Pages without a text layer (scanned images with no OCR) were discarded---this is the main source of data loss.
-  \item \textbf{Annotation fusion:} I matched extracted words against annotation bounding boxes (by spatial overlap) to assign entity labels and reconstruct key--value link supervision.
-  \item \textbf{LMDX formatting:} Each word was encoded as \texttt{word x1|y1|x2|y2} in normalized $[0,100]$ coordinates, following the format from the KVP10k paper.
+        Pages were grouped by \texttt{hash\_name} and the richest usable annotation set was selected, reducing 48{,}280 train rows to 9{,}656 unique pages and 5{,}255 test rows to 1{,}051 unique pages.
+  \item \textbf{PDF download \& validation:} For each unique page, the source PDF was downloaded and verified (many URLs returned broken files, permission-denied pages, or HTML error pages).
+  \item \textbf{Text extraction:} PyMuPDF was used to extract words and bounding boxes from each page's text layer.
+        Pages without a text layer (scanned images with no embedded text) were discarded---this is the main source of data loss.
+  \item \textbf{Annotation fusion:} Extracted words were matched against annotation bounding boxes (by spatial overlap) to assign entity labels (Key / Value / Other) and reconstruct key--value link supervision.
+  \item \textbf{LMDX formatting:} Each word was encoded as \texttt{word x1|y1|x2|y2} in normalized coordinates, following the format from the KVP10k paper (Perot et al., 2023, LMDX).
 \end{enumerate}
 
 \begin{center}
@@ -135,11 +140,11 @@ Test  & 5{,}255  & 1{,}051 & 581    & 55.3\% \\
 \end{center}
 
 \noindent
-While IBM's repository documents a similar preparation workflow, I had to fully reproduce and adapt it: replacing their OCR dependency with PyMuPDF text extraction, handling the Hugging Face raw-row format, making the pipeline work on the HPC cluster, and producing prepared outputs in the format needed by my training code.
+While IBM's repository documents a similar preparation workflow, the pipeline was fully reproduced and adapted: replacing their OCR dependency with PyMuPDF text extraction, handling the Hugging Face raw-row format, adapting the pipeline to the HPC cluster environment, and producing prepared outputs in the format needed by the training code.
 
 \subsection{Stage 2: Layout Clustering \& Analysis}
 
-I applied $k$-means clustering on layout features (token count, bounding-box density, spatial distribution) and identified two dominant document clusters:
+K-means clustering was applied on 13 layout features per page (token count, bounding-box density, spatial spread, mean aspect ratio, etc.) and two dominant document clusters were identified:
 
 \begin{center}
 \begin{tabular}{lccl}
@@ -152,12 +157,15 @@ I applied $k$-means clustering on layout features (token count, bounding-box den
 \end{tabular}
 \end{center}
 
-This clustering is useful for per-layout error analysis (see Section~\ref{sec:stage3results}) and will be extended in Stage~4 to study how LayoutLMv3 behaves across different layout types.
+This clustering enables per-layout error analysis (Section~\ref{sec:stage3results}) and will be used in Stage~4 to study how LayoutLMv3 behaves across different document types.
 
 \subsection{Stage 3: Generative Baseline (Mistral-7B QLoRA)}
 
 \subsubsection{Approach}
-I fine-tuned \textbf{Mistral-7B-Instruct-v0.2} using 4-bit QLoRA quantization (NF4):
+
+Mistral-7B-Instruct-v0.2 was fine-tuned using 4-bit QLoRA quantization (NF4).
+QLoRA is a memory-efficient fine-tuning technique that compresses the model weights to 4 bits and trains only small adapter layers (LoRA), making it feasible to run a 7-billion-parameter model on a single GPU.
+The model takes a document as text input (in LMDX format, where each word is printed with its coordinates) and generates KVP predictions as structured text output.
 
 \begin{center}
 \begin{tabular}{ll}
@@ -196,9 +204,9 @@ KVP10k paper (Gemini Pro) & --- & --- & 0.612 & --- \\
 \end{center}
 
 \noindent
-My text-only F1 of \textbf{0.671} exceeds the KVP10k paper's published baseline (0.643) by 2.8 percentage points, using a \emph{7B-parameter open-source model} versus Google's proprietary Gemini Pro.
-Note that this comparison is approximate: our evaluation covers only 55.3\% of the test set (581 of 1{,}051 unique pages) due to PDF download failures and scanned pages without a text layer.
-Text+Location F1 is 1.2~pp lower, primarily due to bounding-box localization errors in the generative output.
+The text-only F1 of \textbf{0.671} exceeds the KVP10k paper's published baseline (0.643) by 2.8 percentage points, using a 7B open-source model versus Google's proprietary Gemini Pro.
+This comparison is approximate: evaluation covers 55.3\% of the test set (581 of 1{,}051 unique pages) due to PDF download failures and scanned pages without a text layer.
+Text+Location F1 is lower, primarily because a generative model outputs approximate bounding-box coordinates rather than the exact pixel-level boxes that an encoder reads directly.
 
 \subsubsection{Error Analysis by Cluster}
 
@@ -214,7 +222,7 @@ Text+Location F1 is 1.2~pp lower, primarily due to bounding-box localization err
 \end{center}
 
 The model struggles significantly with sparse-layout documents (Cluster~1), where hallucination rates exceed 50\%.
-This motivates the layout-aware discriminative approach in Stage~4.
+This directly motivates the layout-aware discriminative approach in Stage~4: a model that natively reads spatial positions should handle both dense and sparse layouts more robustly.
 
 % ============================================================
 \section{Technical Challenges Encountered}
@@ -231,15 +239,21 @@ This motivates the layout-aware discriminative approach in Stage~4.
 \item \textbf{CUDA / PyTorch / Quantization Compatibility.}
   The cluster runs CUDA~13.0 with A100-40GB GPUs.
   Building a working environment required resolving version conflicts between PyTorch, Transformers, and bitsandbytes (required for 4-bit QLoRA).
-  The quantization library needed specific CUDA toolkit alignment that was not straightforward on the shared HPC system.
 
 \item \textbf{Data Preparation Pipeline.}
   As described in Stage~1, the raw KVP10k data required substantial engineering to convert into training-ready format.
-  Key difficulties included: broken/inaccessible source PDFs ($\sim$45\% of pages), conflicting duplicate annotations from multiple annotators, and reproducing IBM's preparation workflow with different tooling (PyMuPDF instead of their OCR stack).
+  Key difficulties included: broken/inaccessible source PDFs ($\sim$45\% of pages), conflicting duplicate annotations from multiple annotators, and reproducing IBM's preparation workflow with different tooling.
 
 \item \textbf{Generative Model Output Parsing.}
-  Mistral-7B generates free-form text, and parsing structured KVP output from its responses required robust post-processing.
-  The model occasionally produces malformed outputs (incomplete JSON, hallucinated fields, or bounding-box coordinates outside the valid range), all of which had to be handled gracefully during evaluation.
+  Mistral-7B generates free-form text; parsing structured KVP output from its responses required robust post-processing to handle malformed outputs, hallucinated fields, and out-of-range bounding-box coordinates.
+
+\item \textbf{Stage 4 GPU Memory Constraints.}
+  The 512-token sequence limit combined with the $N_{key} \times N_{value}$ link label matrix creates significant memory pressure on the A100-40GB.
+  Candidate capping (max 128 keys and 128 values per page) and chunked linker scoring were implemented to stay within the memory budget.
+
+\item \textbf{Stage 4 Training Stability.}
+  The biaffine linker introduces additional gradient pathways. Early training runs suffered from NaN losses due to unclamped logits.
+  A NaN guard (logit clamping to $[-20, 20]$) and teacher forcing (feeding ground-truth entity labels to the linker during training rather than predicted labels) were added to stabilize training.
 
 \end{enumerate}
 
@@ -247,31 +261,30 @@ This motivates the layout-aware discriminative approach in Stage~4.
 \section{Literature Review Findings}
 % ============================================================
 
-In preparation for Stage~4, I conducted a literature review of existing approaches to key information extraction and entity linking in documents:
+In preparation for Stage~4, a literature review of existing approaches to key information extraction and entity linking in documents was conducted:
 
 \begin{itemize}[leftmargin=1.5em]
-  \item \textbf{SPADE} (Hwang et al., ACL Findings 2021) formulates information extraction as \emph{spatial dependency parsing}, modelling relationships among text tokens as a graph rather than a sequence tagging problem.
-        This is directly relevant to the linking subtask.
+  \item \textbf{SPADE} (Hwang et al., ACL Findings 2021) formulates information extraction as \emph{spatial dependency parsing}, modelling relationships among text tokens as a graph.
+        This is directly relevant to the linking subtask and inspired the spatial MLP component in the Stage~4 linker.
 
-  \item \textbf{BROS} (Hong et al., AAAI 2022) uses a BERT-based encoder with relative 2D position encoding and a \emph{subsequent token prediction} head for linking---avoiding pairwise scoring entirely.
-        It achieves strong results on FUNSD, SROIE, and CORD without visual features.
+  \item \textbf{BROS} (Hong et al., AAAI 2022) uses a BERT-based encoder with relative 2D position encoding and a subsequent token prediction head for linking, achieving strong results on FUNSD, SROIE, and CORD without visual features.
 
-  \item \textbf{LMDX} (Perot et al., 2023) uses generative LLMs (PaLM~2-S, Gemini Pro) and is the approach evaluated in the KVP10k paper.
-        Their link F1 of 0.659 sets the current benchmark, but relies on a proprietary generative model whose parameter count is undisclosed.
+  \item \textbf{LMDX} (Perot et al., 2023) uses generative LLMs (PaLM~2-S, Gemini Pro) with LMDX-formatted document prompts.
+        This is the approach evaluated in the KVP10k paper (Naparstek et al., 2024).
+        Their published F1 of 0.643 (text-only) is the current benchmark this thesis compares against.
 
-  \item \textbf{LayoutLMv3} (Huang et al., ACM MM 2022) pre-trains on unified text and image masking.
-        It achieves entity F1 of 0.91 on FUNSD (form understanding), but the official codebase only provides entity classification---\emph{no relation extraction head is included}.
-        Adding a linking module on top of LayoutLMv3 for KVP extraction is an open contribution.
+  \item \textbf{LayoutLMv3} (Huang et al., ACM MM 2022) pre-trains jointly on text, layout (bounding boxes), and image patches using masked modelling.
+        It achieves entity F1 of 0.91 on FUNSD, but the official codebase provides no relation extraction head.
+        Adding a linking module on top of LayoutLMv3 for KVP extraction is the novel contribution of this thesis.
 \end{itemize}
 
-These works inform my Stage~4 design: I plan to combine LayoutLMv3's strong document encoding with a linking head inspired by the approaches in SPADE and BROS.
-
 % ============================================================
-\section{Stage 4: Planned Work}
+\section{Stage 4: Discriminative Model (In Progress)}
 % ============================================================
 
-\subsection{Approach}
-Stage~4 will use \textbf{LayoutLMv3-base} (125M parameters) as the document encoder, with two task heads:
+\subsection{Architecture}
+
+Stage~4 uses \textbf{LayoutLMv3-base} (125M parameters) as the document encoder with two task heads:
 
 \begin{figure}[ht]
 \centering
@@ -284,7 +297,7 @@ Stage~4 will use \textbf{LayoutLMv3-base} (125M parameters) as the document enco
   \node[block, fill=blue!10, minimum width=10cm] (enc) {LayoutLMv3 Encoder (text + layout + image)};
 
   \node[block, below left=0.7cm and 0.5cm of enc] (ent) {Entity Classifier\\[-2pt]\footnotesize Key / Value / Other};
-  \node[block, below right=0.7cm and 0.5cm of enc] (lnk) {Linking Head\\[-2pt]\footnotesize Key $\to$ Value pairing};
+  \node[block, below right=0.7cm and 0.5cm of enc] (lnk) {Biaffine Linker\\[-2pt]\footnotesize Key $\to$ Value pairing};
 
   \node[block, below=0.5cm of lnk, fill=resultbox, minimum width=3.2cm] (pred) {Predicted KVPs};
 
@@ -293,34 +306,81 @@ Stage~4 will use \textbf{LayoutLMv3-base} (125M parameters) as the document enco
   \draw[arr, dashed] (ent.east) -- node[above, font=\scriptsize] {spans} (lnk.west);
   \draw[arr] (lnk) -- (pred);
 \end{tikzpicture}
-\caption{Planned Stage 4 architecture: LayoutLMv3 encoder with entity classification and linking heads.}
+\caption{Stage 4 architecture: LayoutLMv3 encoder with entity classification and biaffine linking heads.}
 \label{fig:stage4}
 \end{figure}
 
 \begin{enumerate}[nosep]
-  \item \textbf{Entity Classifier:} Token-level classification into Key / Value / Other.
-  \item \textbf{Linking Head:} Learns to pair detected key spans with their corresponding value spans, inspired by biaffine scoring (SPADE) or next-token prediction (BROS).
+  \item \textbf{Entity Classifier:} A linear layer on top of the encoder that classifies each token as Key, Value, or Other using cross-entropy loss.
+  \item \textbf{Biaffine Linker:} Pairs detected key tokens with their corresponding value tokens.
+        The linking score for a (key, value) pair is computed as a combination of:
+        \begin{itemize}[nosep]
+          \item a \emph{semantic score}: scaled dot-product between the key and value hidden vectors;
+          \item a \emph{spatial score}: an 8-feature MLP encoding the relative position and distance between the key and value bounding boxes.
+        \end{itemize}
+        The model is trained to predict a binary adjacency matrix (which key is linked to which value) using binary cross-entropy loss.
 \end{enumerate}
 
-\subsection{Anticipated Challenges}
+\subsection{Training Configuration}
 
-Based on the literature review, I expect several challenges in this stage:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Hyperparameter}          & \textbf{Value} \\
+\midrule
+Base model                       & \texttt{microsoft/layoutlmv3-base} (125M params) \\
+Max sequence length              & 512 tokens \\
+Learning rate                    & $2 \times 10^{-5}$ \\
+Batch size                       & 1 (gradient accumulation: 8 steps) \\
+Effective batch size             & 8 \\
+Optimiser                        & AdamW (weight decay $= 0.01$) \\
+LR schedule                      & Linear warmup (500 steps) + linear decay \\
+Max epochs                       & 10 \\
+Early stopping patience          & 3 epochs \\
+Linker loss weight $\lambda$     & Ablation: $\{0.5,\;1.0,\;2.0\}$ \\
+Hardware                         & NVIDIA A100 40\,GB (FAU HPC, SLURM) \\
+Mixed precision                  & fp32 (bf16 disabled for stability) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Two-Phase Training Strategy}
 
 \begin{itemize}[nosep]
-  \item \textbf{Class imbalance in linking:} The key--value link matrix is extremely sparse (most token/span pairs are not linked). SPADE and BROS both address this with specialized architectures; I may need similar strategies.
-  \item \textbf{Scale gap vs.\ generative models:} LayoutLMv3-base has 125M parameters, compared to the KVP10k paper's proprietary generative model (parameter count undisclosed, but substantially larger). The discriminative model may not match the generative F1, which itself would be an interesting finding.
-  \item \textbf{Train/test distribution mismatch:} If entity predictions are imperfect at test time, the linker must work with noisy inputs---a known difficulty in pipeline architectures.
+  \item \textbf{Phase 4a} --- The encoder and entity classifier are trained first, with the linker disabled.
+        This gives the encoder a strong representation of key and value tokens before the harder linking task is introduced.
+        Output: a pretrained checkpoint used to warm-start Phase~4b.
+  \item \textbf{Phase 4b} --- The full model (encoder + entity classifier + biaffine linker) is trained jointly.
+        The linker loss weight $\lambda$ controls how strongly the linking objective influences the overall training loss:
+        $\mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda \cdot \mathcal{L}_{\text{link}}$.
+        Three values of $\lambda$ are evaluated ($0.5$, $1.0$, $2.0$) to study the trade-off between entity classification and linking accuracy.
 \end{itemize}
 
-\subsection{Additional Analyses (from Proposal)}
+\subsection{Steps Taken So Far}
 
-Beyond the core LayoutLMv3 + Linker experiment, the following analyses are planned as part of Stage~4 and the thesis discussion:
+\begin{enumerate}[nosep, leftmargin=1.5em]
+  \item Designed and implemented the full model architecture (encoder + entity classifier + biaffine linker) in PyTorch.
+  \item Implemented the Stage~4 dataset class: loads prepared JSON files, runs the LayoutLMv3 processor, generates entity labels and binary link label matrices.
+  \item Implemented teacher forcing for the linker: during training, ground-truth entity labels are passed to the linker (rather than predicted labels) to decouple entity and linking errors.
+  \item Added a NaN guard (logit clamping) to prevent numerical instability in the biaffine scoring.
+  \item Wrote and tested SLURM job scripts for the A100 cluster, with separate scripts for each $\lambda$ value.
+  \item Submitted canary (small-scale test) runs on the cluster to verify end-to-end training stability before full training.
+  \item Investigated and fixed three data preparation bugs found during canary runs:
+        (a) missing teacher forcing,
+        (b) over-aggressive bounding-box filtering removing valid annotations,
+        (c) cross-product explosion in link label generation causing memory overflow.
+  \item Full training runs are now underway on the cluster; results are expected next week.
+\end{enumerate}
+
+\subsection{Expected Results}
+
+Based on the architecture design and the literature, the following is anticipated:
 
 \begin{itemize}[nosep]
-  \item \textbf{Robustness testing:} Evaluate model stability under layout distortions (masking, rotation, partial removal).
-  \item \textbf{OCR-based vs.\ OCR-free comparison:} Compare LayoutLMv3 with OCR-free approaches (Donut, PaLI-X, Pix2Struct) in zero-shot and few-shot settings, if time permits.
-  \item \textbf{Embedding visualization:} Use t-SNE or PCA to visualize how key, value, and other text elements are represented in the LayoutLMv3 hidden space, and how spatial relationships emerge during fine-tuning.
-  \item \textbf{Per-cluster performance analysis:} Break down Stage~4 results by the layout clusters identified in Stage~2.
+  \item LayoutLMv3's native spatial encoding gives it a structural advantage over the generative baseline for \textbf{dense-layout documents} (Cluster~0), where many key-value pairs are spatially close and regular.
+  \item For \textbf{sparse-layout documents} (Cluster~1), where the generative model hallucinated at 52.9\%, the discriminative model is expected to perform more reliably because it only classifies tokens that actually exist in the document.
+  \item Overall KVP~F1 is expected to be competitive with, or approach, the Stage~3 Mistral baseline (0.671 text-only).
+  \item The $\lambda$ ablation will reveal how strongly the linking objective needs to be weighted relative to entity classification.
 \end{itemize}
 
 % ============================================================
@@ -328,9 +388,10 @@ Beyond the core LayoutLMv3 + Linker experiment, the following analyses are plann
 % ============================================================
 
 \begin{enumerate}[nosep]
-  \item Given the scale gap (125M vs.\ $>$100B parameters), \textbf{what would be a reasonable expected performance} for the discriminative approach compared to the generative baseline?
-  \item Should I prioritize the linking head experiments, or focus more on the \textbf{robustness/OCR-free comparison} analyses from the proposal?
-  \item Are there any \textbf{additional related works} or approaches you would recommend investigating?
+  \item Given the scale gap (125M vs.\ undisclosed but substantially larger generative model), \textbf{what would be a reasonable expected performance} for the discriminative approach?
+  \item With approaching deadlines, should I prioritize completing the $\lambda$ ablation and per-cluster analysis, or also include the \textbf{robustness and OCR-free comparison} analyses from the proposal?
+  \item Are there any \textbf{additional related works} or approaches you would recommend investigating before submission?
+  \item Is the \textbf{proposed thesis chapter structure} (Section~\ref{sec:structure}) appropriate for the FAU programme requirements?
 \end{enumerate}
 
 % ============================================================
@@ -345,9 +406,10 @@ Beyond the core LayoutLMv3 + Linker experiment, the following analyses are plann
 Stages 0--2 (data + layout analysis)      & \textcolor{completed}{\textbf{Complete}} & --- \\
 Stage 3 (generative baseline)              & \textcolor{completed}{\textbf{Complete}} & --- \\
 Literature review                          & \textcolor{completed}{\textbf{Complete}} & --- \\
-Stage 4: LayoutLMv3 + Linking              & \textcolor{inprogress}{\textbf{Starting}} & 2--3 weeks \\
-Robustness \& OCR-free analysis            & Planned & 1--2 weeks \\
-Embedding visualization                    & Planned & 1 week \\
+Stage 4 implementation \& canary runs     & \textcolor{completed}{\textbf{Complete}} & --- \\
+Stage 4 full training \& $\lambda$ ablation & \textcolor{inprogress}{\textbf{Running}} & This week \\
+Stage 4 evaluation \& error analysis       & \textcolor{inprogress}{\textbf{Next}} & 1 week \\
+Robustness \& OCR-free analysis            & Planned & TBD (scope TBC) \\
 Thesis writing (results + discussion)      & Pending results & 2--3 weeks \\
 Final submission                           & --- & TBD \\
 \bottomrule
@@ -356,16 +418,17 @@ Final submission                           & --- & TBD \\
 
 % ============================================================
 \section{Proposed Thesis Structure}
+\label{sec:structure}
 % ============================================================
 
 \begin{enumerate}[nosep]
   \item \textbf{Introduction} --- Motivation, research questions, contributions
-  \item \textbf{Literature Review} --- Document understanding, layout-aware models (LayoutLM family), generative approaches (LMDX), entity linking (SPADE, BROS)
-  \item \textbf{Methodology} --- Pipeline overview, evaluation protocol, model architectures
+  \item \textbf{Literature Review} --- Document understanding, LayoutLM family, generative approaches (LMDX), entity linking (SPADE, BROS)
+  \item \textbf{Methodology} --- Pipeline overview, evaluation protocol, model architectures (Mistral QLoRA + LayoutLMv3 + Biaffine Linker)
   \item \textbf{Dataset Analysis} --- KVP10k dataset, data preparation pipeline, layout clustering
   \item \textbf{Implementation} --- System architecture, HPC setup, training procedures
-  \item \textbf{Experiments} --- Generative baseline (Mistral-7B), discriminative model (LayoutLMv3 + Linker), ablations
-  \item \textbf{Results} --- Quantitative results, per-cluster breakdown, comparison with KVP10k baselines
+  \item \textbf{Experiments} --- Generative baseline (Mistral-7B), discriminative model (LayoutLMv3 + Linker), $\lambda$ ablation
+  \item \textbf{Results} --- Quantitative results, per-cluster breakdown, comparison with KVP10k published baseline
   \item \textbf{Discussion} --- Interpretation, generative vs.\ discriminative trade-offs, limitations, embedding analysis
   \item \textbf{Conclusion} --- Summary of contributions, future work
 \end{enumerate}
