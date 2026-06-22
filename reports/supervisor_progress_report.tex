@@ -53,7 +53,7 @@ This thesis revisits that claim by combining \textbf{layout-aware modelling} wit
 The research goals from the proposal are:
 
 \begin{enumerate}[nosep]
-  \item \textbf{Re-evaluate Layout-Aware Modelling:} Reassess LayoutLMv3 for KVP extraction and extend it with a lightweight Linker module for explicit key--value relationships.
+  \item \textbf{Evaluate Layout-Aware Modelling:} The KVP10k paper (Naparstek et al., 2024) argued, without direct empirical evidence, that encoder-based models such as LayoutLMv3 are insufficient for KVP linking, and consequently did not benchmark them on the task. This thesis empirically tests that claim by extending LayoutLMv3 with a lightweight Biaffine Linker module for explicit key--value relationship extraction, and evaluating it directly on the KVP10k benchmark.
   \item \textbf{Analyze and Categorize Document Layouts:} Apply unsupervised clustering to group documents by structural similarity and explore model performance across layout types.
   \item \textbf{Assess Robustness and Generalization:} Investigate model behaviour under layout distortions (masking, rotation, partial removal) and compare OCR-based (LayoutLMv3) with OCR-free approaches (Donut, PaLI-X, Pix2Struct) in zero-shot and few-shot settings.
   \item \textbf{Derive Analytical Insights:} Examine learning trends, ablation effects, and error patterns. Use embedding visualization (t-SNE, PCA) to explore how key, value, and other text elements are represented inside the model.
@@ -109,7 +109,8 @@ I adopted the evaluation protocol from the KVP10k paper (Naparstek et al., ICDAR
 
 \noindent
 The NED metric tolerates minor OCR or formatting differences; a score below 0.2 means the predicted text is close enough to the ground truth to count as correct.
-IoU (Intersection over Union) measures how much the predicted bounding box overlaps with the ground-truth box; a threshold of 0.3 ensures the prediction is spatially in the right region.
+IoU (Intersection over Union) measures how much the predicted bounding box overlaps with the ground-truth box.
+The threshold of 0.3 is adopted directly from Naparstek et al.\ (2024), who chose this value to permit minor spatial imprecision in predicted bounding boxes while still ensuring that the prediction is located in the correct spatial region of the page.
 F1 score combines precision (how many predictions were correct) and recall (how many ground-truth pairs were found) into a single balanced metric.
 
 \subsection{Stage 1: Data Ingestion \& Preparation}
@@ -425,11 +426,10 @@ Final submission                           & --- & TBD \\
 \begin{enumerate}[nosep]
   \item \textbf{Introduction} --- Motivation, research questions, contributions
   \item \textbf{Literature Review} --- Document understanding, LayoutLM family, generative approaches (LMDX), entity linking (SPADE, BROS)
+  \item \textbf{Dataset Analysis} --- KVP10k dataset, data preparation pipeline, layout clustering (moved before Methodology so readers understand the data first)
   \item \textbf{Methodology} --- Pipeline overview, evaluation protocol, model architectures (Mistral QLoRA + LayoutLMv3 + Biaffine Linker)
-  \item \textbf{Dataset Analysis} --- KVP10k dataset, data preparation pipeline, layout clustering
   \item \textbf{Implementation} --- System architecture, HPC setup, training procedures
-  \item \textbf{Experiments} --- Generative baseline (Mistral-7B), discriminative model (LayoutLMv3 + Linker), $\lambda$ ablation
-  \item \textbf{Results} --- Quantitative results, per-cluster breakdown, comparison with KVP10k published baseline
+  \item \textbf{Experiments \& Results} --- Structured as paired experiment--result blocks telling a coherent story: generative baseline $\to$ hallucination problem found $\to$ discriminative model motivated $\to$ LayoutLMv3 + Linker $\to$ $\lambda$ ablation $\to$ per-cluster breakdown. Ends with a narrative summary of findings.
   \item \textbf{Discussion} --- Interpretation, generative vs.\ discriminative trade-offs, limitations, embedding analysis
   \item \textbf{Conclusion} --- Summary of contributions, future work
 \end{enumerate}
