@@ -35,6 +35,11 @@
 %%
 %% $Id: lmedoc.cls,v 1.3 2011/03/15 12:26:26 feulner Exp $
 %% Copyright (C) 2000 Dietrich Paulus
+%%
+%% NOTE (KVP thesis): Logo paths patched to resolve relative to LaTeX_Thesis/
+%% Original lmedoc expected logos inside lmedoc/; we reference them from
+%% ../thesis-templates-master/lmedoc/ to avoid duplicating binary files.
+%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{lmedoc/lmedoc}[2014/24/11 v2.0 lme document (LME)]
 \def\BaseClass{report}
@@ -99,7 +104,7 @@
 \vspace*{-4cm}
 \begin{flushleft}
 \begin{tabular}{@{} c @{\hspace{6cm}} c @{}}
-\adjustbox{valign=t}{\includegraphics[width=5.5cm]{lmedoc/FAU_TechFak_EN_H_RGB_darkblue-1.png}} & \adjustbox{valign=t}{  \includegraphics[width=5.5cm]{lmedoc/logo_large.png}}
+\adjustbox{valign=t}{\includegraphics[width=5.5cm]{../thesis-templates-master/lmedoc/FAU_TechFak_EN_H_RGB_darkblue-1.png}} & \adjustbox{valign=t}{\includegraphics[width=5.5cm]{../thesis-templates-master/lmedoc/logo_large.png}}
 \end{tabular}
 \end{flushleft}
 \vspace*{1.6cm}
@@ -131,7 +136,7 @@
 \begin{center}
 \@Vorname\ \@Name \\[2mm]
 \ifnum\language=\l@english born \else Geboren am\fi~
-\@Geburtsdatum\ in \@Geburtsort \\% [45mm]
+\@Geburtsdatum\ in \@Geburtsort \\%
 \vfill
 \end{center}
 \begin{center}
@@ -144,7 +149,7 @@
 Lehrstuhl f"ur Mustererkennung (Informatik 5)\\
 Department Informatik \\
 Friedrich-Alexander-Universit"at Erlangen-N"urnberg.\\[5mm]
-\@ifundefined{ZweitInstitut}{}{% 
+\@ifundefined{ZweitInstitut}{}{
 \ifnum\language=\l@english\relax
   in Cooperation with
 \else
