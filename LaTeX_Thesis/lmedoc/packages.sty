@@ -1,0 +1,90 @@
+\ProvidesPackage{lmedoc/packages}
+
+
+%%%%%%%%%%%%%%%%%%
+% ++ use \toprule,\midrule und \endrule in your tables, no \hline or vertical
+% columns please
+\RequirePackage{booktabs}
+% guessing if space is needed
+\RequirePackage{xspace}
+
+% mathstuff
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{bm}
+
+% Color stuff
+\RequirePackage[usenames,dvipsnames,table]{xcolor}
+% let's define a dark blue color
+\definecolor{faublue}{RGB}{0,51,102}
+
+% defines units
+\RequirePackage[binary-units,abbreviations]{siunitx}
+
+% allows inline enumerate
+\RequirePackage[inline]{enumitem}
+% and sets them to Arabic
+\setlist*[enumerate]{label=(\arabic*)}
+% remove widows at end or beginning of a page
+\RequirePackage[all]{nowidow}
+
+% great packages to make nice figures/plots/ 
+\RequirePackage{tikz}
+
+% url package, it also breaks at hyphens
+\RequirePackage[hyphens]{url}
+
+% typesetting numbers and units
+\RequirePackage{siunitx}
+\sisetup{mode=text}% use text mode for numbers
+
+% ++ \url{} better breaking of urls and connect w. hyperref
+\RequirePackage{url}
+% ++ Biblatex
+\RequirePackage[backend=biber, bibencoding=utf8, giveninits=true,
+maxbibnames=99,
+maxalphanames=1, minalphanames=1, style=alphabetic,%
+style=trad-alpha, backref=true]{biblatex}
+% biblatex backref
+\DefineBibliographyStrings{english}{%
+  backrefpage = {cited on p\onedot},
+	backrefpages = {cited on pp\onedot},
+}
+
+% ++ use for refercence farther away: \vref
+\RequirePackage{varioref}
+\renewcommand\reftextfaraway[1]{(p.\,\pageref{#1})}
+% ++ Makes all the references in the document clickable.
+\RequirePackage{hyperref}
+\hypersetup{
+  colorlinks = true,
+  linkcolor =  faublue,
+  urlcolor =   magenta,
+  citecolor =  faublue,
+  plainpages =        false,
+  hypertexnames =     true,
+  linktocpage =       true,
+  bookmarksopen =     true,
+  bookmarksnumbered = true,
+  bookmarksopenlevel= 0,
+}
+% Enable correct jumping to figures when referencing
+\RequirePackage[all]{hypcap}
+
+% ++ use for refercence in the local arae \cref, e.g. \cref{fig:xyz}
+%  has to come after hyperref package
+\RequirePackage[noabbrev,capitalise,nameinlink]{cleveref}
+
+% ++ use multiple figures/tables in one
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=bottom}
+\captionsetup[subtable]{position=bottom}
+\captionsetup{subrefformat=parens}
+
+
+% ++ Enables glossaries-extra. Should be used for abbreviations in the paper.
+\RequirePackage[abbreviations,shortcuts=true]{glossaries-extra}
+% abbreviationstyle for acronyms
+\setabbreviationstyle{long-short}
