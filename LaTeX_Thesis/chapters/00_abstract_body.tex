@@ -1,0 +1,24 @@
+This thesis presents a layout-aware discriminative approach to automatic
+key-value pair (KVP) extraction from business documents, evaluated on the
+KVP10k benchmark (ICDAR~2024, Naparstek et al.).
+
+The KVP10k paper argued, without direct empirical evidence, that
+encoder-based models such as LayoutLMv3 are insufficient for KVP linking,
+and consequently evaluated only a generative LMDX-style baseline.
+This thesis empirically tests that claim by extending LayoutLMv3
+(125M parameters) with a lightweight Biaffine Linker module and a two-phase
+training strategy: entity pre-training followed by joint fine-tuning.
+
+We evaluate two linking granularities. Token-level linking (V1) yields
+near-zero link F1 (0.008) due to extreme class imbalance ($\sim$450:1
+negative-to-positive ratio). Span-level linking (V2) reduces this to
+$\sim$5:1 but initially produces link F1 of only 0.007 due to three
+compounding data-pipeline bugs identified through systematic diagnostic
+experiments. After correcting these bugs, the final V4 model achieves
+entity F1~$= 0.827$ and link F1~$= 0.673$ --- on par with the
+published KVP10k generative baseline while using a fully discriminative,
+layout-grounded architecture that eliminates hallucination on sparse layouts.
+
+\textbf{Keywords:} Document Understanding, Key-Value Pair Extraction,
+LayoutLMv3, Span-Level Linking, Biaffine Linker, Multimodal Learning,
+Information Extraction

@@ -1,0 +1,128 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+% Renamed from 08_discussion.tex to 07_discussion.tex to match new chapter order.
+% Content preserved exactly from original 08_discussion.tex.
+
+\section{Interpretation of Results}
+\label{sec:interpretation}
+
+The results across all stages tell a coherent story about the interplay
+between model architecture and data pipeline quality in document
+understanding tasks.
+
+The generative Mistral-7B baseline (Stage~3) achieves competitive
+text-only F1 (0.671) but reveals a fundamental weakness: it hallucinates
+key-value pairs at a 52.9\% rate on sparse-layout documents (Cluster~1),
+where the absence of dense spatial cues leads the model to fabricate
+plausible-looking but incorrect KVP structures. This is a well-documented
+limitation of generative models in structured prediction tasks
+\cite{maynez2020faithfulness}: they optimise for fluency over faithfulness,
+producing outputs that are linguistically coherent but factually grounded
+only in the training distribution rather than the specific input document.
+
+The discriminative LayoutLMv3 approach (Stage~4) addresses this by
+construction: it can only classify tokens that are actually present in the
+document, making hallucination structurally impossible. The near-zero link
+F1 of V1 and V2 initially appeared to be a model capacity problem, but
+systematic diagnostic analysis revealed that the root cause was a
+data-pipeline defect: corrupted link supervision (cross-product explosion)
+and aggressive bounding-box filtering that discarded nearly half of valid
+entity tokens. After correcting these bugs, V4 achieves link F1~=~0.673,
+matching the published KVP10k generative baseline.
+
+\section{Generative vs.\ Discriminative Trade-offs}
+\label{sec:gen-vs-disc}
+
+The comparison between Stage~3 and Stage~4 V4 illuminates the trade-offs
+between generative and discriminative approaches for structured document
+extraction:
+
+\begin{itemize}
+  \item \textbf{Hallucination:} Generative models hallucinate on sparse
+  layouts (52.9\% Cluster~1); discriminative models do not (9.1\%).
+  \item \textbf{Scale:} Mistral-7B uses $\sim$56$\times$ more parameters
+  than LayoutLMv3-base (7B vs.\ 125M) to achieve comparable overall F1.
+  \item \textbf{Spatial grounding:} LayoutLMv3's native 2D position
+  embeddings provide richer spatial context than the coordinate-string
+  encoding used in the LMDX prompt format.
+  \item \textbf{Generalisation:} Discriminative models require task-specific
+  linking heads; generative models produce structured output directly
+  but are more sensitive to prompt formatting and output parsing.
+  \item \textbf{Data sensitivity:} Stage~4 is significantly more sensitive
+  to data pipeline correctness than Stage~3 --- a design consideration
+  for practitioners deploying discriminative document models.
+\end{itemize}
+
+\section{Limitations}
+\label{sec:limitations}
+
+\subsection{Dataset Coverage}
+
+All experiments are conducted on 55\% of the KVP10k test set (581 of
+1{,}051 unique pages) due to PDF download failures and scanned PDFs
+lacking usable text layers. This coverage limitation means comparisons
+with the published KVP10k baseline are approximate: we evaluate on a
+different (and potentially non-representative) subset. The missing
+45\% of pages is disproportionately composed of scanned documents,
+which may be harder than the average page, suggesting our reported
+performance may be optimistically biased.
+
+\subsection{OCR Dependency}
+
+The entire Stage~3 and Stage~4 pipeline depends on high-quality text
+layers in the source PDFs. Documents without embedded text (scanned
+images) are excluded. An OCR-free approach (e.g., Pix2Struct, Donut)
+would eliminate this dependency and extend coverage to the full dataset.
+
+\subsection{Single Dataset}
+
+All results are reported on KVP10k only. The extent to which the
+LayoutLMv3 + Biaffine Linker architecture generalises to other
+document understanding benchmarks (e.g., FUNSD, CORD, SROIE) remains
+an open question.
+
+\subsection{Fixed Hyperparameters}
+
+Due to HPC resource constraints, the $\lambda$ sweep is limited to
+three values for V1 and a single value for V4. A more exhaustive
+hyperparameter search (including learning rate, warmup schedule,
+and entity/linker head architecture) might yield further improvements.
+
+\section{Embedding Analysis}
+\label{sec:embedding-analysis}
+
+To gain qualitative insight into the learned representations,
+t-SNE projections of the LayoutLMv3 encoder's final-layer hidden
+states are computed for 50 randomly sampled test documents.
+Tokens are coloured by their ground-truth label (Key, Value, Other).
+
+The t-SNE visualisation reveals three loosely separated clusters
+aligned with Key, Value, and Other labels, with substantial overlap
+between Key and Value tokens. This is consistent with the high entity
+F1 (0.827): the model has learnt layout-dependent representations
+that distinguish roles, but the embedding geometry does not fully
+separate the classes --- motivating the use of a learned linking
+head rather than relying on embedding distance alone.
+
+\section{Future Work}
+\label{sec:future-work}
+
+\begin{enumerate}
+  \item \textbf{OCR-free extension:} Replace the PyMuPDF text-layer
+  pipeline with an end-to-end vision model (Donut, Pix2Struct) to
+  handle scanned documents and extend KVP10k coverage to 100\%.
+  \item \textbf{Cross-dataset generalisation:} Evaluate the V4
+  architecture on FUNSD, CORD, and SROIE to assess transfer without
+  retraining.
+  \item \textbf{Larger encoders:} Evaluate LayoutLMv3-large (368M)
+  and LayoutXLM to assess whether additional capacity improves the
+  linking head given correct supervision.
+  \item \textbf{Active learning:} The cluster analysis shows that
+  sparse-layout documents are harder; an active-learning loop that
+  selects informative sparse examples for annotation could improve
+  Cluster~1 performance further.
+  \item \textbf{Robustness evaluation:} Assess model stability under
+  document rotation ($0$--$15^\circ$) and occlusion (masking
+  10--30\% of page area).
+\end{enumerate}

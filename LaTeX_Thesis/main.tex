@@ -1,182 +1,218 @@
 % Master's Thesis - Key-Value Pair Extraction from Business Documents
 % Author: Ali Azizpourian
-% Date: January 2026
+% Friedrich-Alexander-Universität Erlangen-Nürnberg
+%
+% Compiled with: pdflatex -> biber -> pdflatex -> pdflatex
+% (lmedoc class lives in LaTeX_Thesis/lmedoc/)
 
-\documentclass[12pt,a4paper,twoside]{report}
+\documentclass[english,mt]{lmedoc/lmedoc}
 
 % ============================================================================
-% PACKAGES
+% ENCODING (pdflatex path — lmedoc.cls loads times + setspace automatically)
 % ============================================================================
-
-% Language and encoding
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{csquotes}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 
-% Math
-\usepackage{amsmath,amssymb,amsthm}
+% ============================================================================
+% PACKAGES  (lmedoc already loads: amsmath, graphicx, times, setspace,
+%            microtype, geometry, twoside/12pt/report base)
+% ============================================================================
+\usepackage{lmedoc/packages}   % booktabs, xcolor/faublue, siunitx, tikz,
+                                % biblatex (biber, trad-alpha), hyperref,
+                                % cleveref, caption/subcaption, glossaries-extra
+
+% Additional packages not in lmedoc/packages
+\usepackage{amssymb,amsthm}
 \usepackage{mathtools}
-
-% Graphics and figures
-\usepackage{graphicx}
 \usepackage{float}
-\usepackage{subfig}
-\usepackage[table]{xcolor}
-
-% TikZ for diagrams (supervisor requirement: native LaTeX diagrams)
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
-
-% Tables
-\usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{longtable}
-
-% Code listings
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{csquotes}          % required by biblatex with babel
+\usepackage[english]{babel}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
 
-% References and citations
-\usepackage[backend=bibtex,style=ieee,sorting=none]{biblatex}
+% ============================================================================
+% BIBLIOGRAPHY
+% ============================================================================
 \addbibresource{references.bib}
 
-% Hyperlinks
-\usepackage[hidelinks]{hyperref}
-\usepackage{url}
+% ============================================================================
+% ABBREVIATIONS  (lmedoc/packages loads glossaries-extra)
+% ============================================================================
+\input{lmedoc/abbreviations_kvp}
 
-% Page layout
-\usepackage{geometry}
-\geometry{
-    left=3cm,
-    right=2.5cm,
-    top=2.5cm,
-    bottom=2.5cm,
-    headheight=14.5pt
-}
-
-% Headers and footers
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE,RO]{\thepage}
-\fancyhead[RE]{\leftmark}
-\fancyhead[LO]{\rightmark}
-
-% Spacing
-\usepackage{setspace}
-\onehalfspacing
-
-% TOC depth
-\setcounter{tocdepth}{3}
-\setcounter{secnumdepth}{3}
-
-% Custom commands
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
 \newcommand{\kvp}{key-value pair}
 \newcommand{\kvps}{key-value pairs}
 \newcommand{\KVP}{Key-Value Pair}
 \newcommand{\KVPs}{Key-Value Pairs}
 
-% report.cls does not provide frontmatter/mainmatter/backmatter (book.cls does).
-% Define lightweight equivalents to keep the document structure intact.
-\providecommand{\frontmatter}{\pagenumbering{roman}}
-\providecommand{\mainmatter}{\cleardoublepage\pagenumbering{arabic}}
-\providecommand{\backmatter}{\cleardoublepage}
+% supress underfull hbox warnings (lmedoc recommendation)
+\hbadness=10000
+
+% some useful commands (from lmedoc template)
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\newcommand{\@onedot}{\ifx\@let@token.\else.\null\fi\xspace}
+\makeatother
+
+% TOC depth
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 
 % ============================================================================
-% DOCUMENT INFORMATION
+% CAPTION SETUP  (already partly set in lmedoc/packages)
 % ============================================================================
-
-\title{
-    \LARGE \textbf{Key-Value Pair Extraction from Business Documents} \\
-    \vspace{1cm}
-    \large Using Deep Learning and Multimodal Document Understanding \\
-    \vspace{2cm}
-    \normalsize Master's Thesis
-}
-
-\author{Ali Azizpourian}
-\date{January 2026}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=bottom}
 
 % ============================================================================
 % DOCUMENT
 % ============================================================================
+\pagenumbering{roman}
 
 \begin{document}
 
-% Front matter
-\frontmatter
+% ---------------------------------------------------------------------------
+% TITLE PAGE  (official FAU LME Deckblatt)
+% ---------------------------------------------------------------------------
+\begin{deckblatt}
+  \Titel{Revisiting Document Understanding: Enhancing Key--Value Pair\\
+         Extraction through Layout-Aware Modelling and\\
+         Data-Centric Analysis on the KVP10k Dataset}
+  \Name{Azizpourian}
+  \Vorname{Ali}
+  \Geburtsort{[Place of Birth]}
+  \Geburtsdatum{[Date of Birth]}
+  \Betreuer{[Supervisor Name]}
+  \Start{[Start Date]}
+  \Ende{[End Date]}
+\end{deckblatt}
 
-% Title page
-\begin{titlepage}
-    \centering
-    \vspace*{2cm}
-    
-    {\LARGE \textbf{Key-Value Pair Extraction from Business Documents}} \\
-    \vspace{1cm}
-    {\large Using Deep Learning and Multimodal Document Understanding} \\
-    
-    \vspace{3cm}
-    
-    {\Large Master's Thesis} \\
-    
-    \vspace{2cm}
-    
-    {\large by} \\
-    \vspace{0.5cm}
-    {\Large \textbf{Ali Azizpourian}} \\
-    
-    \vfill
-    
-    {\large Submitted in partial fulfillment of the requirements for the degree of} \\
-    \vspace{0.3cm}
-    {\large \textbf{Master of Science}} \\
-    
-    \vspace{1cm}
-    
-    {\large [Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg]} \\
-    {\large [Department of Computer Science]} \\
-    
-    \vspace{1cm}
-    
-    {\large January 2026}
-    
-\end{titlepage}
+\cleardoublepage
 
-% Abstract
-\input{chapters/00_abstract}
+% ---------------------------------------------------------------------------
+% DECLARATION OF INDEPENDENT WORK (Ehrenwörtliche Erklärung)
+% ---------------------------------------------------------------------------
+Ich versichere, dass ich die Arbeit ohne fremde Hilfe und ohne Benutzung
+anderer als der angegebenen Quellen angefertigt habe und dass die Arbeit
+in gleicher oder ähnlicher Form noch keiner anderen Prüfungsbehörde
+vorgelegen hat und von dieser als Teil einer Prüfungsleistung
+angenommen wurde. Alle Ausführungen, die wörtlich oder sinngemäß
+übernommen wurden, sind als solche gekennzeichnet.
+\\
 
-% Acknowledgments
+\vspace{2cm}
+\noindent Erlangen, \today
+
+\vspace{1.5cm}
+\noindent\rule{6cm}{0.4pt}\\
+Ali Azizpourian
+
+\cleardoublepage
+
+% ---------------------------------------------------------------------------
+% ABSTRACTS  (German Übersicht + English Abstract)
+% ---------------------------------------------------------------------------
+\begin{center}
+  \bfseries
+  {\selectlanguage{german}Übersicht}
+\end{center}
+\normalfont
+
+\vspace{0.5cm}
+\noindent
+Diese Masterarbeit untersucht die automatische Extraktion von Schlüssel-Wert-Paaren
+aus Geschäftsdokumenten (Rechnungen, Formulare, Quittungen) mittels layout-bewusster
+tiefer neuronaler Netze. Auf Basis des KVP10k-Datensatzes (ICDAR 2024) wird ein
+diskriminatives Modell entwickelt, das LayoutLMv3 als multimodalen Encoder mit einem
+zweistufigen Kopf aus Entitäts-Klassifikator und Biaffine-Linker kombiniert.
+Das Modell erreicht eine Entitäts-F1 von 0{,}827 und eine Link-F1 von 0{,}673
+nach systematischer Diagnose und Behebung von drei Pipeline-Fehlern ---
+vergleichbar mit dem veröffentlichten generativen KVP10k-Basiswert bei nur
+125M Parametern.
+
+\vspace{1.5cm}
+
+\begin{center}
+  \bfseries
+  {\selectlanguage{english}Abstract}
+\end{center}
+\normalfont
+
+\vspace{0.5cm}
+\input{chapters/00_abstract_body}
+
+\cleardoublepage
+
+% ---------------------------------------------------------------------------
+% ACKNOWLEDGMENTS
+% ---------------------------------------------------------------------------
 \input{chapters/00_acknowledgments}
 
-% Table of contents
+\cleardoublepage
+
+% ---------------------------------------------------------------------------
+% FRONT MATTER LISTS
+% ---------------------------------------------------------------------------
 \tableofcontents
+\cleardoublepage
+
+\addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
+\cleardoublepage
+
+\addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
+\cleardoublepage
 
-% Main matter
-\mainmatter
+% ---------------------------------------------------------------------------
+% MAIN MATTER
+% ---------------------------------------------------------------------------
+\pagenumbering{arabic}
 
-% Chapters
-\input{chapters/01_introduction}
-\input{chapters/02_literature_review}
-\input{chapters/03_methodology}
-\input{chapters/04_dataset}
-\input{chapters/05_implementation}
-\input{chapters/06_experiments}
-\input{chapters/07_results}
-\input{chapters/08_discussion}
-\input{chapters/09_conclusion}
+\include{chapters/01_introduction}
+\cleardoublepage
+\include{chapters/02_literature_review}
+\cleardoublepage
+\include{chapters/03_dataset}
+\cleardoublepage
+\include{chapters/04_methodology}
+\cleardoublepage
+\include{chapters/05_implementation}
+\cleardoublepage
+\include{chapters/06_experiments_results}
+\cleardoublepage
+\include{chapters/07_discussion}
+\cleardoublepage
+\include{chapters/08_conclusion}
+\cleardoublepage
 
-% Back matter
-\backmatter
+% ---------------------------------------------------------------------------
+% APPENDICES
+% ---------------------------------------------------------------------------
+\appendix
+\cleardoublepage
+\include{chapters/appendix_a_code}
+\cleardoublepage
+\include{chapters/appendix_b_data}
+\cleardoublepage
+
+% ---------------------------------------------------------------------------
+% BACK MATTER
+% ---------------------------------------------------------------------------
+% Abbreviations glossary
+\printunsrtglossary[type=abbreviations]
+\cleardoublepage
 
 % Bibliography
-\printbibliography[heading=bibintoc,title={References}]
-
-% Appendices
-\appendix
-\input{chapters/appendix_a_code}
-\input{chapters/appendix_b_data}
+\selectlanguage{english}{\addcontentsline{toc}{chapter}{\bibname}}
+\printbibliography
 
 \end{document}
