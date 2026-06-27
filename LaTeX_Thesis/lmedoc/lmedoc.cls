@@ -2,44 +2,10 @@
 %% This is file `lmedoc.cls',
 %% generated with the docstrip utility.
 %%
-%% The original source files were:
-%%
-%% lmedoc.dtx  (with options: `package')
-%%
 %% Copyright (C) 2000 by Dietrich Paulus. All rights reserved.
 %% Copyright (C) 2014 by Sergiu Dotenco. All rights reserved.
 %%
-%%
-%% This file is part of the LME TeX package
-%%
-%% IMPORTANT NOTICE:
-%%
-%% You are not allowed to change this file.  You may however copy this file
-%% to a file with a different name and then change the copy.
-%%
-%% You are NOT ALLOWED to distribute this file alone.  You are NOT ALLOWED
-%% to take money for the distribution or use of this file (or a changed
-%% version) except for a nominal charge for copying etc.
-%%
-%% You are allowed to distribute this file under the condition that it is
-%% distributed together with all files mentioned below.
-%%
-%% If you receive only some of these files from someone, complain!
-%%
-%% Error Reports in case of UNCHANGED versions to
-%%
-%%                         Dietrich Paulus
-%%                         Lehrstuhl f. Mustererkennung
-%%                         D 91054 Erlangen
-%%             Internet:  <info@immd4.cs.fau.de>
-%%
 %% $Id: lmedoc.cls,v 1.3 2011/03/15 12:26:26 feulner Exp $
-%% Copyright (C) 2000 Dietrich Paulus
-%%
-%% NOTE (KVP thesis): Logo paths patched to resolve relative to LaTeX_Thesis/
-%% Original lmedoc expected logos inside lmedoc/; we reference them from
-%% ../thesis-templates-master/lmedoc/ to avoid duplicating binary files.
-%%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{lmedoc/lmedoc}[2014/24/11 v2.0 lme document (LME)]
 \def\BaseClass{report}
@@ -67,9 +33,7 @@
 \DeclareOption{fp}{\gdef\Type{8}}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{\BaseClass}}
 \ProcessOptions\relax
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \typeout{Type \Type}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \onehalfspacing
 \let\oldChapter=\chapter
 \def\chapter{\cleardoublepage\oldChapter}
@@ -104,7 +68,7 @@
 \vspace*{-4cm}
 \begin{flushleft}
 \begin{tabular}{@{} c @{\hspace{6cm}} c @{}}
-\adjustbox{valign=t}{\includegraphics[width=5.5cm]{../thesis-templates-master/lmedoc/FAU_TechFak_EN_H_RGB_darkblue-1.png}} & \adjustbox{valign=t}{\includegraphics[width=5.5cm]{../thesis-templates-master/lmedoc/logo_large.png}}
+\adjustbox{valign=t}{\includegraphics[width=5.5cm]{lmedoc/FAU_TechFak_EN_H_RGB_darkblue-1.png}} & \adjustbox{valign=t}{  \includegraphics[width=5.5cm]{lmedoc/logo_large.png}}
 \end{tabular}
 \end{flushleft}
 \vspace*{1.6cm}
@@ -136,7 +100,7 @@
 \begin{center}
 \@Vorname\ \@Name \\[2mm]
 \ifnum\language=\l@english born \else Geboren am\fi~
-\@Geburtsdatum\ in \@Geburtsort \\%
+\@Geburtsdatum\ in \@Geburtsort \\% [45mm]
 \vfill
 \end{center}
 \begin{center}
@@ -146,10 +110,10 @@
   Angefertigt am
 \fi
 \\[5mm]
-Lehrstuhl f"ur Mustererkennung (Informatik 5)\\
+Lehrstuhl f\"ur Mustererkennung (Informatik 5)\\
 Department Informatik \\
-Friedrich-Alexander-Universit"at Erlangen-N"urnberg.\\[5mm]
-\@ifundefined{ZweitInstitut}{}{
+Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg.\\[5mm]
+\@ifundefined{ZweitInstitut}{}{%
 \ifnum\language=\l@english\relax
   in Cooperation with
 \else
@@ -167,63 +131,5 @@ Friedrich-Alexander-Universit"at Erlangen-N"urnberg.\\[5mm]
 \clearpage
 \egroup}
 
-
-%%%%%%%%%%%%%%%%%%%%
-
-\def\dissdeckblatt{\bgroup\def\baselinestretch{1.0}%
-    \def\Titel##1{\gdef\@Titel{##1}\typeout{Defining Titel}}
-    \def\Name##1{\gdef\@Name{##1}}
-    \def\Vorname##1{\gdef\@Vorname{##1}}
-    \def\Jahr##1{\gdef\@Jahr{##1}}
-    \def\AkadGrad##1{\gdef\@AkadGrad{##1}}
-    \def\Ort##1{\gdef\@Ort{##1}}
-}
-\def\enddissdeckblatt{%
-
-\begin{titlepage}
-\centering
-{\huge
-\vspace*{\fill}
-\@Titel
-\vspace{2cm}\\
-\Large
-\ifnum\language=\l@english\relax
-  Submitted to the
-  \vspace{1.0cm}\\
-  Technische Fakult"at der\\
-  Universit"at Erlangen--N"urnberg
-\else
-  Der Technischen Fakult"at der\\
-  Universit"at Erlangen--N"urnberg
-\fi
-\vspace{1.5cm}\\
-\ifnum\language=\l@english\relax
-  in fulfillment of the requirements for\\
-  the degree of
-\else
-  zur Erlangung des Grades
-\fi
-\vspace{1cm}\\
-\huge
-\@AkadGrad
-\vspace{1cm}\\
-\Large
-\ifnum\language=\l@english\relax
-  from
-\else
-  vorgelegt von
-\fi
-\vspace{2cm}\\
-\@Vorname\ \@Name
-\vspace{1.5cm}\\
-\@Ort\ --- \@Jahr
-\vspace*{\fill}
-}
-\end{titlepage}
-
-\egroup}
-
-
 \endinput
-%%
 %% End of file `lmedoc.cls'.

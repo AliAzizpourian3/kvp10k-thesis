@@ -1,38 +1,25 @@
 %%
-%% This is file `twolang.sty' -- patched for TeX Live 2025 / Overleaf
-%%
-%% Original: Copyright (C) 2000 by Dietrich Paulus. All rights reserved.
-%%
-%% PATCH: replaced obsolete `german.sty` with `babel` (ngerman + english).
-%% The old `german.sty` is no longer available in TeX Live 2025 and caused a
-%% recursive \languagename loop leading to "TeX capacity exceeded [input stack
-%% size=10000]" at babel-english/english.ldf line 47.
+%% This is file `twolang.sty' (LME package)
+%% Copyright (C) 2000 by Dietrich Paulus. All rights reserved.
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lmedoc/twolang}
-         [2000/02/19 v1.01-babel SUB Package (LME, patched)]
-
-%% Use babel instead of the obsolete german.sty
-\RequirePackage[ngerman,english]{babel}
-
-\DeclareOption{german}{\selectlanguage{ngerman}}
-\DeclareOption{english}{\selectlanguage{english}}
+         [2000/02/19 v1.01 SUB Package (LME)]
+\RequirePackage{german}
+\DeclareOption{german}{\selectlanguage{\german}}
+\DeclareOption{english}{\selectlanguage{\english}}
 \ProcessOptions
-
 \makeatletter
 \long\def\twolang#1#2{%
-  \ifnum\language=\l@ngerman
-    #1%
-  \else
-    #2%
-  \fi
+\ifnum\language=\l@german
+#1%
+\else
+#2%
+\fi
 }
-\makeatother
-
-\addto\captionsenglish{%
-  \def\abbreviationsname{List of Abbreviations}%
-}
-\addto\captionsngerman{%
+\renewcommand{\captionsenglish}{%
+  \def\abbreviationsname{List of Abbreviations}}
+\renewcommand{\captionsgerman}{%
   \def\prefacename{Vorwort}%
   \def\refname{Literatur}%
   \def\abstractname{Zusammenfassung}%
@@ -51,10 +38,8 @@
   \def\headtoname{An}%
   \def\pagename{Seite}%
   \def\seename{siehe}%
-  \def\alsoname{siehe auch}%
-  \def\abbreviationsname{Abk\"urzungsverzeichnis}%
-}
-
+  \def\alsoname{siehe auch}
+  \def\abbreviationsname{Abk\"urzungsverzeichnis}}
+\ifnum\language=\l@german\selectlanguage{\german}\fi
 \endinput
-%%
 %% End of file `twolang.sty'.

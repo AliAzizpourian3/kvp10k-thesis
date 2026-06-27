@@ -1,14 +1,15 @@
 % Master's Thesis
 % Author: Ali Azizpourian
 % FAU Erlangen-Nuernberg -- LME template (lmedoc)
+%
+% IMPORTANT: The lmedoc/ folder MUST sit next to main.tex (i.e. LaTeX_Thesis/lmedoc/)
+% This is required for Overleaf compatibility.
 
-% Document class: lmedoc (FAU/LME official template)
-% Type: mt = Master's Thesis, language: english
-\documentclass[english,mt]{../thesis-templates-master/lmedoc/lmedoc}
+\documentclass[english,mt]{lmedoc/lmedoc}
 
-% ============================================================================
+% ============================================================
 % ENGINE-SPECIFIC ENCODING
-% ============================================================================
+% ============================================================
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[utf8]{inputenc}
@@ -22,38 +23,34 @@
   \fi
 \fi
 
-% ============================================================================
-% TEMPLATE PACKAGES (lmedoc/packages.sty)
-% Provides: booktabs, xcolor (faublue), siunitx, enumitem, tikz,
-%           biblatex (biber, trad-alpha), hyperref (faublue links),
-%           cleveref, caption/subcaption, glossaries-extra
-% ============================================================================
-\usepackage{../thesis-templates-master/lmedoc/packages}
+% ============================================================
+% LME PACKAGES (booktabs, xcolor/faublue, siunitx, enumitem,
+%   tikz, biblatex/biber/trad-alpha, hyperref, cleveref,
+%   caption/subcaption, glossaries-extra)
+% ============================================================
+\usepackage{lmedoc/packages}
 
-% ============================================================================
+% ============================================================
 % ADDITIONAL PACKAGES NEEDED BY CHAPTERS
-% ============================================================================
+% ============================================================
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{amsmath,amssymb}
-\usepackage{mathtools}
 \usepackage{float}
-\usepackage[all]{nowidow}
 
 % TikZ libraries used in chapters
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
 
-% ============================================================================
+% ============================================================
 % BIBLIOGRAPHY
-% ============================================================================
+% ============================================================
 \addbibresource{references.bib}
 
-% ============================================================================
+% ============================================================
 % CUSTOM COMMANDS
-% ============================================================================
+% ============================================================
 \newcommand{\kvp}{key-value pair}
 \newcommand{\kvps}{key-value pairs}
 \newcommand{\KVP}{Key-Value Pair}
@@ -72,17 +69,17 @@
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
 
-% ============================================================================
+% ============================================================
 % DOCUMENT
-% ============================================================================
-
+% ============================================================
 \pagenumbering{roman}
 
 \begin{document}
 
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 % TITLE PAGE (FAU deckblatt)
-% ---------------------------------------------------------------------------
+% Logos loaded automatically from lmedoc/ by the class file.
+% ------------------------------------------------------------
 \begin{deckblatt}
   \Titel{Key-Value Pair Extraction from Business Documents:\\
          A Discriminative Layout-Aware Approach on KVP10k}
@@ -95,9 +92,9 @@
   \Ende{03.08.2026}
 \end{deckblatt}
 
-% ---------------------------------------------------------------------------
-% STATUTORY DECLARATION (Eigenstaendigkeitserklaerung)
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
+% STATUTORY DECLARATION
+% ------------------------------------------------------------
 \cleardoublepage
 \thispagestyle{empty}
 \vspace*{3cm}
@@ -110,34 +107,33 @@ angenommen wurde. Alle Ausf"uhrungen, die w"ortlich oder sinngem"a"s
 "ubernommen wurden, sind als solche gekennzeichnet.
 \\\\
 \vspace{1cm}
-
 \noindent
 Erlangen, den 03.08.2026 \hfill Ali Azizpourian
 \cleardoublepage
 
-% ---------------------------------------------------------------------------
-% ABSTRACTS: German (Uebersicht) then English
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
+% ABSTRACTS: German then English
+% ------------------------------------------------------------
 \input{chapters/00_zusammenfassung}
 \cleardoublepage
 \input{chapters/00_abstract}
 \cleardoublepage
 
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 % ACKNOWLEDGMENTS
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 \input{chapters/00_acknowledgments}
 \cleardoublepage
 
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 % TABLE OF CONTENTS
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 \tableofcontents
 \cleardoublepage
 
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 % MAIN MATTER
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 \pagenumbering{arabic}
 
 \input{chapters/01_introduction}
@@ -149,33 +145,27 @@ Erlangen, den 03.08.2026 \hfill Ali Azizpourian
 \input{chapters/08_discussion}
 \input{chapters/09_conclusion}
 
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 % APPENDICES
-% ---------------------------------------------------------------------------
+% ------------------------------------------------------------
 \appendix
 \input{chapters/appendix_a_code}
 \input{chapters/appendix_b_data}
 
-% ---------------------------------------------------------------------------
-% BACK MATTER: glossary, figures, tables, bibliography
-% ---------------------------------------------------------------------------
-\backmatter
-
-% Abbreviations glossary
+% ------------------------------------------------------------
+% BACK MATTER: abbreviations, LoF, LoT, bibliography
+% ------------------------------------------------------------
 \printunsrtglossary[type=abbreviations]
 \cleardoublepage
 
-% List of figures
 \addcontentsline{toc}{chapter}{\listfigurename}
 \listoffigures
 \cleardoublepage
 
-% List of tables
 \addcontentsline{toc}{chapter}{\listtablename}
 \listoftables
 \cleardoublepage
 
-% Bibliography
 \selectlanguage{english}{\addcontentsline{toc}{chapter}{\bibname}}
 \printbibliography
 
