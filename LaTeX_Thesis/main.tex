@@ -1,163 +1,145 @@
-% Master's Thesis - Key-Value Pair Extraction from Business Documents
+% Master's Thesis
 % Author: Ali Azizpourian
-% Date: January 2026
+% FAU Erlangen-Nuernberg -- LME template (lmedoc)
 
-\documentclass[12pt,a4paper,twoside]{report}
+% Document class: lmedoc (FAU/LME official template)
+% Type: mt = Master's Thesis, language: english
+\documentclass[english,mt]{../thesis-templates-master/lmedoc/lmedoc}
 
 % ============================================================================
-% PACKAGES
+% ENGINE-SPECIFIC ENCODING
 % ============================================================================
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+\else
+  \ifXeTeX
+    \usepackage{fontspec}
+  \else
+    \usepackage{luatextra}
+  \fi
+\fi
 
-% Language and encoding
-\usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{csquotes}
+% ============================================================================
+% TEMPLATE PACKAGES (lmedoc/packages.sty)
+% Provides: booktabs, xcolor (faublue), siunitx, enumitem, tikz,
+%           biblatex (biber, trad-alpha), hyperref (faublue links),
+%           cleveref, caption/subcaption, glossaries-extra
+% ============================================================================
+\usepackage{../thesis-templates-master/lmedoc/packages}
 
-% Math
-\usepackage{amsmath,amssymb,amsthm}
-\usepackage{mathtools}
-
-% Graphics and figures
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{subfig}
-\usepackage[table]{xcolor}
-
-% TikZ for diagrams (supervisor requirement: native LaTeX diagrams)
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
-
-% Tables
-\usepackage{booktabs}
+% ============================================================================
+% ADDITIONAL PACKAGES NEEDED BY CHAPTERS
+% ============================================================================
 \usepackage{multirow}
 \usepackage{longtable}
-
-% Code listings
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage[all]{nowidow}
 
-% References and citations
-\usepackage[backend=bibtex,style=ieee,sorting=none]{biblatex}
+% TikZ libraries used in chapters
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
+
+% ============================================================================
+% BIBLIOGRAPHY
+% ============================================================================
 \addbibresource{references.bib}
 
-% Hyperlinks
-\usepackage[hidelinks]{hyperref}
-\usepackage{url}
-
-% Page layout
-\usepackage{geometry}
-\geometry{
-    left=3cm,
-    right=2.5cm,
-    top=2.5cm,
-    bottom=2.5cm,
-    headheight=14.5pt
-}
-
-% Headers and footers
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE,RO]{\thepage}
-\fancyhead[RE]{\leftmark}
-\fancyhead[LO]{\rightmark}
-
-% Spacing
-\usepackage{setspace}
-\onehalfspacing
-
-% TOC depth
-\setcounter{tocdepth}{3}
-\setcounter{secnumdepth}{3}
-
-% Custom commands
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
 \newcommand{\kvp}{key-value pair}
 \newcommand{\kvps}{key-value pairs}
 \newcommand{\KVP}{Key-Value Pair}
 \newcommand{\KVPs}{Key-Value Pairs}
 
-% report.cls does not provide frontmatter/mainmatter/backmatter (book.cls does).
-% Define lightweight equivalents to keep the document structure intact.
-\providecommand{\frontmatter}{\pagenumbering{roman}}
-\providecommand{\mainmatter}{\cleardoublepage\pagenumbering{arabic}}
-\providecommand{\backmatter}{\cleardoublepage}
+% Suppress underfull hbox warnings
+\hbadness=10000
 
-% ============================================================================
-% DOCUMENT INFORMATION
-% ============================================================================
+% Single-dot helper (from template)
+\makeatletter
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\newcommand{\@onedot}{\ifx\@let@token.\else.\null\fi\xspace}
+\makeatother
 
-\title{
-    \LARGE \textbf{Key-Value Pair Extraction from Business Documents} \\
-    \vspace{1cm}
-    \large Using Deep Learning and Multimodal Document Understanding \\
-    \vspace{2cm}
-    \normalsize Master's Thesis
-}
-
-\author{Ali Azizpourian}
-\date{January 2026}
+% TOC / section depth
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 
 % ============================================================================
 % DOCUMENT
 % ============================================================================
 
+\pagenumbering{roman}
+
 \begin{document}
 
-% Front matter
-\frontmatter
+% ---------------------------------------------------------------------------
+% TITLE PAGE (FAU deckblatt)
+% ---------------------------------------------------------------------------
+\begin{deckblatt}
+  \Titel{Key-Value Pair Extraction from Business Documents:\\
+         A Discriminative Layout-Aware Approach on KVP10k}
+  \Name{Azizpourian}
+  \Vorname{Ali}
+  \Geburtsort{Khorram Abad}
+  \Geburtsdatum{11.09.1994}
+  \Betreuer{Mathias Seuret}
+  \Start{02.02.2026}
+  \Ende{03.08.2026}
+\end{deckblatt}
 
-% Title page
-\begin{titlepage}
-    \centering
-    \vspace*{2cm}
-    
-    {\LARGE \textbf{Key-Value Pair Extraction from Business Documents}} \\
-    \vspace{1cm}
-    {\large Using Deep Learning and Multimodal Document Understanding} \\
-    
-    \vspace{3cm}
-    
-    {\Large Master's Thesis} \\
-    
-    \vspace{2cm}
-    
-    {\large by} \\
-    \vspace{0.5cm}
-    {\Large \textbf{Ali Azizpourian}} \\
-    
-    \vfill
-    
-    {\large Submitted in partial fulfillment of the requirements for the degree of} \\
-    \vspace{0.3cm}
-    {\large \textbf{Master of Science}} \\
-    
-    \vspace{1cm}
-    
-    {\large [Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg]} \\
-    {\large [Department of Computer Science]} \\
-    
-    \vspace{1cm}
-    
-    {\large January 2026}
-    
-\end{titlepage}
+% ---------------------------------------------------------------------------
+% STATUTORY DECLARATION (Eigenstaendigkeitserklaerung)
+% ---------------------------------------------------------------------------
+\cleardoublepage
+\thispagestyle{empty}
+\vspace*{3cm}
+\noindent
+Ich versichere, dass ich die Arbeit ohne fremde Hilfe und ohne Benutzung
+anderer als der angegebenen Quellen angefertigt habe und dass die Arbeit
+in gleicher oder "ahnlicher Form noch keiner anderen Pr"ufungsbeh"orde
+vorgelegen hat und von dieser als Teil einer Pr"ufungsleistung
+angenommen wurde. Alle Ausf"uhrungen, die w"ortlich oder sinngem"a"s
+"ubernommen wurden, sind als solche gekennzeichnet.
+\\\\
+\vspace{1cm}
 
-% Abstract
+\noindent
+Erlangen, den 03.08.2026 \hfill Ali Azizpourian
+\cleardoublepage
+
+% ---------------------------------------------------------------------------
+% ABSTRACTS: German (Uebersicht) then English
+% ---------------------------------------------------------------------------
+\input{chapters/00_zusammenfassung}
+\cleardoublepage
 \input{chapters/00_abstract}
+\cleardoublepage
 
-% Acknowledgments
+% ---------------------------------------------------------------------------
+% ACKNOWLEDGMENTS
+% ---------------------------------------------------------------------------
 \input{chapters/00_acknowledgments}
+\cleardoublepage
 
-% Table of contents
+% ---------------------------------------------------------------------------
+% TABLE OF CONTENTS
+% ---------------------------------------------------------------------------
 \tableofcontents
-\listoffigures
-\listoftables
+\cleardoublepage
 
-% Main matter
-\mainmatter
+% ---------------------------------------------------------------------------
+% MAIN MATTER
+% ---------------------------------------------------------------------------
+\pagenumbering{arabic}
 
-% Chapters
 \input{chapters/01_introduction}
 \input{chapters/02_literature_review}
 \input{chapters/04_dataset}
@@ -167,15 +149,34 @@
 \input{chapters/08_discussion}
 \input{chapters/09_conclusion}
 
-% Back matter
-\backmatter
-
-% Bibliography
-\printbibliography[heading=bibintoc,title={References}]
-
-% Appendices
+% ---------------------------------------------------------------------------
+% APPENDICES
+% ---------------------------------------------------------------------------
 \appendix
 \input{chapters/appendix_a_code}
 \input{chapters/appendix_b_data}
+
+% ---------------------------------------------------------------------------
+% BACK MATTER: glossary, figures, tables, bibliography
+% ---------------------------------------------------------------------------
+\backmatter
+
+% Abbreviations glossary
+\printunsrtglossary[type=abbreviations]
+\cleardoublepage
+
+% List of figures
+\addcontentsline{toc}{chapter}{\listfigurename}
+\listoffigures
+\cleardoublepage
+
+% List of tables
+\addcontentsline{toc}{chapter}{\listtablename}
+\listoftables
+\cleardoublepage
+
+% Bibliography
+\selectlanguage{english}{\addcontentsline{toc}{chapter}{\bibname}}
+\printbibliography
 
 \end{document}

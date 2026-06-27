@@ -1,0 +1,36 @@
+\cleardoublepage
+\thispagestyle{empty}
+
+\begin{center}
+  \bfseries
+  {\selectlanguage{german}\"Ubersicht}
+\end{center}
+\normalfont
+
+\vspace{0.5cm}
+
+{\selectlanguage{german}
+
+Diese Arbeit pr\"asentiert eine umfassende Untersuchung zur automatischen Extraktion von Schl\"ussel-Wert-Paaren (Key-Value Pairs, KVPs) aus Gesch\"aftsdokumenten mithilfe von Deep-Learning-Methoden und multimodaler Dokumentenverarbeitung. Wir entwickeln und evaluieren einen diskriminativen Ansatz auf Basis von LayoutLMv3, erg\"anzt durch einen gelernten Verkn\"upfungsmechanismus zur pr\"azisen Zuordnung von Schl\"ussel- und Wert-Entit\"aten.
+
+\textbf{Hintergrund:} Die automatische Verarbeitung von Gesch\"aftsdokumenten stellt eine erhebliche Herausforderung im Bereich des Dokumentenverstehens dar. Traditionelle Ans\"atze basieren auf Vorlagen- oder regelbasierten Systemen, die nur begrenzt auf vielf\"altige Dokumenttypen verallgemeinern. Neuere generative Ans\"atze mit gro{\ss}en Sprachmodellen erzielen zufriedenstellende Ergebnisse bei der Texterkennung, weisen jedoch keine r\"aumliche Verankerung auf, was bei sparsam strukturierten Dokumenten zu Halluzinationen f\"uhrt.
+
+\textbf{Methode:} Wir schlagen einen diskriminativen Ansatz vor, der LayoutLMv3 als multimodalen Encoder mit einer Zwei-Kopf-Architektur kombiniert: einem Entit\"atsklassifikator, der jedem Token eine Rolle (Schl\"ussel, Wert oder Sonstiges) zuweist, und einem gelernten Verkn\"upfer, der vorhergesagte Schl\"ussel-Spans den entsprechenden Wert-Spans zuordnet. Wir untersuchen zwei Granularit\"atsstufen der Verkn\"upfung: Token-Ebene (V1) und Span-Ebene (V2). Der Ansatz wird auf dem KVP10k-Datensatz mit 10.707 Dokumenten -- darunter Rechnungen, Formulare und Quittungen -- evaluiert.
+
+\textbf{Evaluation:} Wir verwenden ein duales Evaluationsprotokoll: Normalized Edit Distance (NED) $< 0{,}2$ f\"ur die Textgenauigkeit und Intersection over Union (IoU) $> 0{,}3$ f\"ur die Lagegenauigkeit, entsprechend der Metrik aus dem KVP10k-Paper. Entit\"atsextraktion und Schl\"ussel-Wert-Verkn\"upfung werden getrennt bewertet.
+
+\textbf{Ergebnisse:} Das diskriminative LayoutLMv3-Modell erreicht einen Entit\"ats-F1-Wert von 0,827 und \"ubertrifft das generative Mistral-7B-Modell deutlich in der r\"aumlichen Verankerung, wobei Halluzinationen bei sparsam strukturierten Dokumenten vollst\"andig eliminiert werden. Die Token-Ebenen-Verkn\"upfung (V1) erzielt aufgrund extremer Klassenungleichgewichte ($\sim$450:1) nahezu keinen Link-F1-Wert (0,008). Die Span-Ebenen-Verkn\"upfung (V2) behebt dieses Problem durch Reduzierung des Verh\"altnisses auf $\sim$5:1, liefert jedoch zun\"achst aufgrund von drei zusammenwirkenden Datenverarbeitungsfehlern ebenfalls einen Link-F1-Wert von nur 0,007. Eine systematische Diagnose identifiziert und korrigiert diese Fehler und f\"uhrt zum endg\"ultigen Modell V4 mit einem Link-F1-Wert von $0{,}673$ -- vergleichbar mit dem ver\"offentlichten KVP10k-Basiswert bei Verwendung eines diskriminativen Modells mit 125 Millionen Parametern.
+
+\textbf{Beitr\"age:}
+\begin{itemize}
+    \item Umfassende Analyse der Layout-Charakteristika und r\"aumlichen Muster des KVP10k-Datensatzes
+    \item Implementierung und Vergleich von Token-Ebenen- (V1) und Span-Ebenen-Verkn\"upfungsarchitekturen (V2)
+    \item Systematische Diagnose von drei zusammenwirkenden Datenpipeline-Fehlern sowie korrigiertes V4-Modell mit Link-F1 $= 0{,}673$
+    \item Detaillierte Fehleranalyse, die zeigt, dass die Verkn\"upfungsgranularit\"at -- und nicht die Modellkapazit\"at -- der prim\"are Engpass ist
+    \item Cluster-basierte Fehleranalyse, die belegt, dass layout-bewusstes Encoding generative Halluzinationen eliminiert
+\end{itemize}
+
+\textbf{Stichw\"orter:} Dokumentenverstehen, Schl\"ussel-Wert-Paar-Extraktion, LayoutLMv3, Span-Ebenen-Verkn\"upfung, Multimodales Lernen, Informationsextraktion
+}
+
+\clearpage
