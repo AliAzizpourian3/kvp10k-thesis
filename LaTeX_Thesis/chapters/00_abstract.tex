@@ -1,39 +1,3 @@
-% ============================================================================
-% GERMAN ABSTRACT (Zusammenfassung) -- required by FAU
-% ============================================================================
-\chapter*{Zusammenfassung}
-\addcontentsline{toc}{chapter}{Zusammenfassung}
-
-\begin{spacing}{1.5}
-
-Diese Arbeit pr\"asentiert eine umfassende Untersuchung zur automatischen Extraktion von Schl\"ussel-Wert-Paaren (Key-Value Pairs, KVPs) aus Gesch\"aftsdokumenten mithilfe von Deep Learning und multimodaler Dokumentenanalyse. Wir entwickeln und evaluieren einen auf LayoutLMv3 basierenden diskriminativen Ansatz, der durch einen erlernten Verkn\"upfungsmechanismus f\"ur eine pr\"azise Schl\"ussel-Wert-Zuordnung erweitert wird.
-
-\textbf{Hintergrund:} Die automatische Verarbeitung von Gesch\"aftsdokumenten stellt eine bedeutende Herausforderung im Bereich der Dokumentenanalyse dar, da strukturierte Informationen aus semi-strukturierten Layouts pr\"azise extrahiert werden m\"ussen. Traditionelle Ans\"atze basieren auf Template-Matching oder regelbasierten Systemen und k\"onnen daher nur begrenzt auf diverse Dokumenttypen verallgemeinert werden. Aktuelle generative Ans\"atze mit gro\ss{}en Sprachmodellen erzielen eine grundlegende Texterkennung, es fehlt ihnen jedoch die r\"aumliche Verankerung, was zu Halluzinationen bei d\"unn besetzten Dokumentlayouts f\"uhrt.
-
-\textbf{Methode:} Wir schlagen einen diskriminativen Ansatz vor, der LayoutLMv3 als multimodalen Encoder mit einer Zwei-Kopf-Architektur kombiniert: einem Entit\"atsklassifikator, der jedem Token eine Rolle (Schl\"ussel, Wert oder Sonstiges) zuweist, und einem erlernten Verkn\"upfer, der vorhergesagte Schl\"ussel-Spans ihren entsprechenden Wert-Spans zuordnet. Wir untersuchen zwei Verkn\"upfungsgranularit\"aten: tokenbasierte Verkn\"upfung (V1) und spanbasierte Verkn\"upfung (V2). Der Ansatz wird auf dem KVP10k-Datensatz evaluiert, der 10.707 Dokumente aus den Bereichen Rechnungen, Formulare und Quittungen umfasst.
-
-\textbf{Evaluierung:} Wir verwenden ein Doppel-Schwellenwert-Protokoll: Normalized Edit Distance (NED) $< 0{,}2$ f\"ur die Textgenauigkeit und Intersection over Union (IoU) $> 0{,}3$ f\"ur die Lagegenauigkeit. Entit\"atsextraktion und Schl\"ussel-Wert-Verkn\"upfung werden separat evaluiert, um den Beitrag jeder Komponente zu isolieren.
-
-\textbf{Ergebnisse:} Das diskriminative LayoutLMv3-Modell erreicht einen Entit\"ats-F1-Wert von 0{,}827 und \"ubertrifft damit die generative Mistral-7B-Baseline deutlich in Bezug auf r\"aumliche Verankerung. Die tokenbasierte Verkn\"upfung (V1) erzielt nahezu keinen Link-F1 (0{,}008) aufgrund starker Klassenungleichgewichte ($\sim$450:1). Die spanbasierte Verkn\"upfung (V2) reduziert dieses Ungleichgewicht auf $\sim$5:1, produziert jedoch zun\"achst einen Link-F1 von nur 0{,}007 aufgrund von drei zusammenwirkenden Datenpipeline-Fehlern. Eine systematische Diagnose identifiziert und behebt diese Fehler, woraus das finale V4-Modell mit Link-F1 $= 0{,}673$ resultiert -- vergleichbar mit der ver\"offentlichten KVP10k-Baseline.
-
-\textbf{Beitr\"age:}
-\begin{itemize}
-    \item Umfassende Analyse der Layouteigenschaften und r\"aumlichen Muster des KVP10k-Datensatzes
-    \item Implementierung und Vergleich von tokenbasierter (V1) und spanbasierter (V2) Verkn\"upfungsarchitektur
-    \item Systematische Diagnose von drei Datenpipeline-Fehlern und korrigiertes V4-Modell mit Link-F1 $= 0{,}673$
-    \item Detaillierte Fehleranalyse, die zeigt, dass die Verkn\"upfungsgranularit\"at -- nicht die Modellkapazit\"at -- der prim\"are Engpass ist
-    \item Clusterspezifische Fehleranalyse, die zeigt, dass layoutbewusstes Encoding generative Halluzinationen eliminiert
-\end{itemize}
-
-\textbf{Schl\"usselw\"orter:} Dokumentenanalyse, Schl\"ussel-Wert-Paar-Extraktion, LayoutLMv3, Spanbasierte Verkn\"upfung, Multimodales Lernen, Informationsextraktion
-
-\end{spacing}
-
-\clearpage
-
-% ============================================================================
-% ENGLISH ABSTRACT
-% ============================================================================
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
