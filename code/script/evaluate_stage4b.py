@@ -336,10 +336,13 @@ def compute_entity_metrics(model, dataloader, device):
 def _bbox_ok(pred_bbox, gt_bbox, iou_thresh):
     """IoU gate for a predicted/GT box pair.
 
-    Mirrors ``evaluate_mistral.match_entities``: when either box is missing we
-    fall back to text-only matching (do not reject on geometry we don't have).
+    Mirrors ``evaluate_mistral.match_entities``: when either box is missing or
+    malformed we fall back to text-only matching (do not reject on geometry we
+    don't reliably have).
     """
-    if pred_bbox is None or gt_bbox is None:
+    if not pred_bbox or not gt_bbox:
+        return True
+    if len(pred_bbox) < 4 or len(gt_bbox) < 4:
         return True
     return _iou(pred_bbox, gt_bbox) >= iou_thresh
 
