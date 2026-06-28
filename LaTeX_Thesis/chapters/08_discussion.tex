@@ -33,9 +33,27 @@ a text-only generative approach.  The diagnostic analysis
 (Section~\ref{sec:res567}) revealed that V2's failure was caused
 not by the span-level architecture itself but by three compounding data
 pipeline bugs.  Once all three pipeline bugs were corrected, the V4 model
-achieves link F1~$= 0.673$ (threshold $= 0.5$) --- matching the KVP10k
-paper's published baseline with a 125M-parameter discriminative model versus
-their proprietary generative system.
+achieves link F1~$= 0.448$ under the text-only metric comparable to the
+published baseline (and $0.309$ under the stricter text+location metric).
+This \emph{approaches} but does not reach the KVP10k paper's published
+baseline of $0.659$, using a 125M-parameter discriminative model versus their
+proprietary generative system. Two diagnostic analyses
+(Section~\ref{sec:linker-diagnostics}) show the residual gap is driven by
+relation modeling rather than entity detection or threshold choice.
+
+\subsection{Per-Cluster Performance}
+
+Stratifying Stage~3 results by the Stage~2 layout clusters
+(Table~\ref{tab:exp1-cluster}) shows that performance depends strongly on
+layout type. On text-rich pages (Cluster~0) the generative baseline reaches
+58.6\% correct entities; on text-sparse pages (Cluster~1) it collapses to
+3.0\% correct with a 97\% hallucination rate, over-generating entities
+$20.6\times$ relative to ground truth. The discriminative LayoutLMv3 model
+removes this hallucination by construction, since it can only label tokens
+that exist in the page. Text-sparse pages --- those with very few extractable
+OCR tokens --- thus remain the hardest regime for any text-conditioned
+generative approach, and are the clearest beneficiary of layout-grounded
+discriminative modeling.
 
 \section{Root-Cause Analysis}
 \label{sec:root-cause-analysis}
@@ -156,6 +174,14 @@ the segment/span level --- is validated by our V1 failure analysis.
 
 \subsection{Future Directions}
 \begin{itemize}
+    \item Segment-graph relation decoders (SPADE~\cite{spade}, BROS~\cite{bros})
+    for the linker head. Our oracle analysis
+    (Section~\ref{sec:linker-diagnostics}) localizes the main performance
+    bottleneck to relation modeling rather than entity detection, making
+    span/segment-graph linkers --- which model directed key$\to$value
+    dependencies explicitly --- the most promising next step. This was scoped
+    as future work rather than implemented, as it requires a new decoder head
+    and full retraining.
     \item Multi-page document handling with cross-page linking
     \item End-to-end OCR integration to increase data coverage
     \item Cross-lingual evaluation on XFUND

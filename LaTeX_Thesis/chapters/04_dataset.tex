@@ -61,7 +61,7 @@ We apply K-means clustering \cite{kmeans} on standardized layout features. To se
 
 Figure~\ref{fig:stage2_k_selection_and_distribution} summarizes the selection outcome. Across the considered range, the criteria consistently favor a small number of well-separated clusters. In particular, the silhouette score peaks at \textbf{0.763} for $k=2$ (0.7627), and we therefore choose \textbf{$k=2$}.
 
-\textbf{Results:} Two distinct layout types were identified on the annotated KVP10k training pages ($n=25{,}692$):
+\textbf{Results:} Two distinct layout types were identified on the annotated KVP10k training pages ($n=25{,}692$). This analysis covers the filtered subset of pages with a usable text layer: during preparation, PyMuPDF retained only pages from which text and bounding boxes could be extracted, and pages without a text layer (e.g.\ purely scanned images) were dropped. The clustering therefore separates pages by the density of \emph{extractable} text rather than by document genre:
 
 \begin{figure}[H]
     \centering
@@ -83,8 +83,8 @@ Figure~\ref{fig:stage2_k_selection_and_distribution} summarizes the selection ou
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 \textbf{Cluster} & \textbf{Samples} & \textbf{\%} & \textbf{Characteristics} \\ \midrule
-0 & 8{,}935 & 34.8\% & Content-rich layouts (mean $n_{\text{boxes}}\approx 25.36$) \\
-1 & 16{,}757 & 65.2\% & Sparse layouts (mean $n_{\text{boxes}}\approx 0.062$) \\ \bottomrule
+0 & 8{,}935 & 34.8\% & Text-rich / dense layouts (mean $n_{\text{boxes}}\approx 25.36$) \\
+1 & 16{,}757 & 65.2\% & Text-sparse / low-text layouts (mean $n_{\text{boxes}}\approx 0.062$) \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -116,7 +116,7 @@ To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Fig
     \label{fig:stage2_cluster_stats}
 \end{figure}
 \begin{itemize}
-    \item \textbf{PC1} (71.8\% variance): Captures overall content density (e.g., number of boxes and coverage)
+    \item \textbf{PC1} (71.8\% variance): Captures overall content density (the number of extractable text boxes and their coverage); this dominant axis separates the text-rich cluster from the text-sparse cluster.
     \item \textbf{PC2} (10.8\% variance): Captures secondary geometric variation beyond density
 \end{itemize}
 

@@ -17,14 +17,14 @@ This thesis presents a comprehensive study on automatic \kvp{} extraction from b
 
 \textbf{Evaluation:} We employ a dual-threshold evaluation protocol: Normalized Edit Distance (NED) $< 0.2$ for text accuracy and Intersection over Union (IoU) $> 0.3$ for location accuracy. Entity extraction and key-value linking are evaluated separately to isolate the contribution of each component.
 
-\textbf{Results:} The discriminative LayoutLMv3 model achieves entity F1 of 0.827, substantially outperforming the Mistral-7B generative baseline on spatial grounding and eliminating hallucination on sparse layouts. Token-level linking (V1) yields near-zero link F1 (0.008) due to extreme class imbalance ($\sim$450:1 negative-to-positive ratio). Span-level linking (V2) addresses this granularity mismatch by reducing the imbalance to $\sim$5:1, but initially produces link F1 of only 0.007 due to three compounding data-pipeline bugs. A systematic diagnostic analysis identifies and corrects these bugs, yielding the final V4 model with link F1 $= 0.673$ --- on par with the published KVP10k baseline using a 125M-parameter discriminative model.
+\textbf{Results:} The discriminative LayoutLMv3 model achieves entity F1 of 0.827, substantially outperforming the Mistral-7B generative baseline on spatial grounding and eliminating hallucination on text-sparse layouts. Token-level linking (V1) yields near-zero link F1 (0.008) due to extreme class imbalance ($\sim$450:1 negative-to-positive ratio). Span-level linking (V2) addresses this granularity mismatch by reducing the imbalance to $\sim$5:1, but initially produces link F1 of only 0.007 due to three compounding data-pipeline bugs. A systematic diagnostic analysis identifies and corrects these bugs, yielding the final V4 model with link F1 $= 0.448$ under the text-only metric comparable to the published KVP10k baseline (0.659), and $0.309$ under the stricter text+location metric. The discriminative model thus approaches but does not reach the generative baseline on linking; oracle-entity and threshold analyses localize the remaining gap to relation modeling rather than entity detection.
 
 \textbf{Contributions:}
 \begin{itemize}
     \item Comprehensive analysis of KVP10k dataset layout characteristics and spatial patterns
     \item Implementation and comparison of token-level (V1) and span-level (V2) linking architectures
-    \item Systematic diagnosis of three compounding data-pipeline bugs and corrected V4 model achieving link F1 $= 0.673$
-    \item Detailed failure analysis showing that linking granularity, not model capacity, is the primary bottleneck
+    \item Systematic diagnosis of three compounding data-pipeline bugs and corrected V4 model achieving link F1 $= 0.448$ (text-only) / $0.309$ (text+location)
+    \item Detailed failure analysis showing that relation modeling (linking), not entity detection or model capacity, is the primary bottleneck, confirmed by an oracle-entity analysis
     \item Per-cluster error analysis demonstrating that layout-aware encoding eliminates generative hallucination
 \end{itemize}
 

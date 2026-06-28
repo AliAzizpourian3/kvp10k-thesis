@@ -32,9 +32,10 @@ contributions are:
     compounding data-pipeline bugs (missing teacher forcing, over-strict
     bounding-box filter, cross-product link label explosion) that masked
     span-level linking performance. The corrected V4 model achieves
-    link F1~$= 0.673$, on par with the published KVP10k baseline using
-    a 125M-parameter discriminative model
-    (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
+    link F1~$= 0.448$ (text-only) / $0.309$ (text+location), approaching but
+    not reaching the published KVP10k baseline (0.659); diagnostic analyses
+    localize the remaining gap to relation modeling rather than entity
+    detection (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
 
     \item \textbf{Implementation}: Released a modular, reproducible codebase
     with CONFIG-controlled experiments.
@@ -61,15 +62,20 @@ $\sim$450:1 class imbalance inherent in token-to-token scoring. Span-level
 linking (V2) reduces this to $\sim$5:1 by grouping contiguous tokens before
 scoring. However, three data-pipeline bugs initially masked this benefit,
 producing link F1 of only 0.007. After systematic diagnosis and correction,
-the V4 model achieves link F1~$= 0.673$, confirming that span-level linking
-is effective when paired with correct supervision.
+the V4 model achieves link F1~$= 0.448$ (text-only) / $0.309$ (text+location).
+Span-level linking, paired with correct supervision, is far more effective
+than token-level linking, but still \emph{approaches} rather than reaches the
+published baseline (0.659); an oracle-entity analysis shows the remaining gap
+is dominated by relation modeling rather than entity detection.
 
 \subsection{RQ4: Success and Failure Factors}
-Model performance depends strongly on document layout type. Dense layouts
-benefit from rich contextual signals; sparse layouts challenge both generative
-(hallucination) and discriminative (fewer training examples) approaches.
-Linking granularity, not model capacity, is the primary bottleneck for
-key-value association.
+Model performance depends strongly on document layout type. Text-rich layouts
+benefit from rich contextual signals; text-sparse layouts challenge both
+generative (hallucination) and discriminative (fewer training examples)
+approaches. Relation modeling --- the linker itself --- rather than entity
+detection or model capacity, is the primary bottleneck for key-value
+association: supplying ground-truth entities raises link F1 by only
+$\sim$0.03--0.05.
 
 \section{Practical Implications}
 \label{sec:implications}
@@ -90,5 +96,7 @@ problem demands careful attention to data pipeline correctness, class
 imbalance, and task structure. The progression from V1 through V4 illustrates
 that architectural improvements --- such as span-level linking --- can only
 realise their potential when the supervision signal is correct. The final
-V4 model achieves link F1~$= 0.673$, matching the published KVP10k baseline
-with a compact 125M-parameter discriminative model.
+V4 model achieves link F1~$= 0.448$ (text-only) / $0.309$ (text+location),
+approaching the published KVP10k baseline (0.659) with a compact
+125M-parameter discriminative model; diagnostic analyses identify relation
+modeling as the remaining bottleneck.
