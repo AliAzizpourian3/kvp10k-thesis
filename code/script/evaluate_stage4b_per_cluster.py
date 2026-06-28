@@ -58,6 +58,13 @@ def _load_cluster_map(path):
     return {k: v for k, v in raw.items()}
 
 
+def _normalize_cluster_label(raw_label):
+    """Map raw cluster values to stable display labels."""
+    if isinstance(raw_label, dict):
+        raw_label = raw_label.get("cluster", raw_label.get("label", raw_label))
+    return CLUSTER_LABELS.get(raw_label, str(raw_label))
+
+
 def _build_cluster_indices(dataset, cluster_map):
     """Return {label: [dataset_indices]} mapping."""
     from collections import defaultdict
@@ -70,7 +77,7 @@ def _build_cluster_indices(dataset, cluster_map):
         raw_label = cluster_map.get(h)
         if raw_label is None:
             continue
-        label = CLUSTER_LABELS.get(raw_label, str(raw_label))
+        label = _normalize_cluster_label(raw_label)
         buckets[label].append(i)
     return dict(buckets)
 
