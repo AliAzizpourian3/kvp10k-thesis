@@ -55,6 +55,22 @@ OCR tokens --- thus remain the hardest regime for any text-conditioned
 generative approach, and are the clearest beneficiary of layout-grounded
 discriminative modeling.
 
+\begin{table}[ht]
+  \centering
+  \caption{Stage~4 per-cluster results for the corrected V4 model (same matching as Table~\ref{tab:exp8-results}).}
+  \label{tab:stage4-cluster}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    \textbf{Cluster} & \textbf{Docs} & \textbf{Entity F1} & \textbf{Link F1 (text-only)} & \textbf{Link F1 (text+location)} \\
+    \midrule
+    0 (text-rich)   & 521 & 0.828 & 0.341 & 0.309 \\
+    1 (text-sparse) &  60 & 0.723 & 0.467 & 0.333 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The Stage~4 results mirror the earlier cluster story, but with a crucial difference: the corrected linker no longer collapses on either cluster. Instead, the text-rich cluster dominates the aggregate score because it contains most test pages, while the text-sparse cluster is too small to alter the overall trend materially. The remaining gap is therefore not a cluster-specific failure mode but a general relation-modeling ceiling.
+
 \section{Root-Cause Analysis}
 \label{sec:root-cause-analysis}
 

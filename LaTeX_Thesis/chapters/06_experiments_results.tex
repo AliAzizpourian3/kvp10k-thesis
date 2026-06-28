@@ -351,6 +351,25 @@ generative baseline, it is far more competitive at KVP linking than the KVP10k
 paper assumed encoder-based models could be. Two diagnostic analyses
 (Section~\ref{sec:linker-diagnostics}) characterize the remaining gap.
 
+\paragraph{Per-cluster breakdown: the remaining gap is still layout-sensitive.}
+\label{sec:stage4-per-cluster}
+
+\begin{table}[ht]
+  \centering
+  \caption{Experiment~8: V4 per-cluster results on the test set (same matching as Table~\ref{tab:exp8-results}). Cluster assignments are the Stage~2 layout clusters propagated to Stage~4.}
+  \label{tab:exp8-cluster}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    \textbf{Cluster} & \textbf{Docs} & \textbf{Entity F1} & \textbf{Link F1 (text-only)} & \textbf{Link F1 (text+location)} \\
+    \midrule
+    0 (text-rich)   & 521 & 0.828 & 0.341 & 0.309 \\
+    1 (text-sparse) &  60 & 0.723 & 0.467 & 0.333 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The Stage~4 model remains strongest on the text-rich cluster, which dominates the test set and therefore drives the overall score. The text-sparse cluster is small (60 documents, 16 ground-truth links), so its higher apparent link F1 should be read cautiously; the main conclusion is that the corrected linker now performs consistently across both clusters instead of collapsing entirely on one of them.
+
 % ---------------------------------------------------------------------------
 \section{Linker Diagnostic Analyses}
 \label{sec:linker-diagnostics}
