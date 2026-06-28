@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=kvp_sweep_v4
-#SBATCH --output=logs/kvp_sweep_v4-%j.out
-#SBATCH --error=logs/kvp_sweep_v4-%j.err
+#SBATCH --job-name=analysisA_threshold
+#SBATCH --output=logs/analysisA_threshold-%j.out
+#SBATCH --error=logs/analysisA_threshold-%j.err
 #SBATCH --time=01:00:00
 #SBATCH --partition=rtx3080
 #SBATCH --gres=gpu:rtx3080:1
@@ -19,7 +19,7 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 cd /home/woody/iwi5/iwi5413h/kvp10k_thesis
 PYTHON_BIN="/home/woody/iwi5/iwi5413h/kvp10k_thesis/env/kvp10k_env/bin/python"
 
-echo "=== V4 link-score threshold sweep on held-out VAL slice (rtx3080) ==="
+echo "=== Analysis A: V4 link-score threshold sweep on held-out VAL slice (rtx3080) ==="
 echo "Job: $SLURM_JOB_ID | Node: $SLURMD_NODENAME | $(date)"
 
 # Tune the decision threshold on the seed-42 10% val slice held out from linker

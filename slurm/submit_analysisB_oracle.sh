@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=kvp_oracle_v4
-#SBATCH --output=logs/kvp_oracle_v4-%j.out
-#SBATCH --error=logs/kvp_oracle_v4-%j.err
+#SBATCH --job-name=analysisB_oracle
+#SBATCH --output=logs/analysisB_oracle-%j.out
+#SBATCH --error=logs/analysisB_oracle-%j.err
 #SBATCH --time=01:00:00
 #SBATCH --partition=rtx3080
 #SBATCH --gres=gpu:rtx3080:1
