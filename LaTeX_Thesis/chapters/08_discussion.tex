@@ -30,7 +30,7 @@ the discriminative LayoutLMv3 model provides strong entity extraction but
 the initial V2 span-level linker fails to improve linking over V1 (both near
 zero).  The published KVP10k baseline achieves linking F1~$= 0.659$ using
 a text-only generative approach.  The diagnostic analysis
-(Section~\ref{sec:diagnostic-results}) revealed that V2's failure was caused
+(Section~\ref{sec:res567}) revealed that V2's failure was caused
 not by the span-level architecture itself but by three compounding data
 pipeline bugs.  Once all three pipeline bugs were corrected, the V4 model
 achieves link F1~$= 0.673$ (threshold $= 0.5$) --- matching the KVP10k

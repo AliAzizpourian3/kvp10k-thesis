@@ -20,30 +20,32 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================================
-# Layout density classification
+# Layout cluster lookup (TRUE Stage 2 assignment)
 # ============================================================================
 
-def classify_layout_density(image_width: int, image_height: int, num_annotations: int) -> str:
-    """
-    Classify document layout as sparse or dense based on:
-    - Image dimensions (quantized to Stage 2 clusters)
-    - Annotation count as proxy for annotation density
-    
-    Stage 2 clustering (from Chapter 4 analysis):
-      Cluster 0 (dense):  ~35% of dataset, mean n_boxes ≈ 25.36
-      Cluster 1 (sparse): ~65% of dataset, mean n_boxes ≈ 0.062
-    
-    Simple heuristic: use num_annotations normalized by page area.
-    """
-    page_area = image_width * image_height
-    density = num_annotations / max(1, page_area / 1000000)  # annotations per megapixel
-    
-    # Cluster 1 (sparse) if density < median (threshold ~0.5); Cluster 0 (dense) otherwise
-    if density < 0.5:
-        return "Cluster_1_Sparse"
-    else:
-        return "Cluster_0_Dense"
+# Default location of the cluster map produced by build_test_cluster_map.py.
+DEFAULT_CLUSTER_MAP = "data/outputs/stage2/test_cluster_map.json"
 
+
+def load_cluster_map(path: str = DEFAULT_CLUSTER_MAP) -> Dict[str, str]:
+    """
+    Load the precomputed {hash_name -> cluster} map.
+
+    The map is built by build_test_cluster_map.py, which recomputes the exact
+    Stage 2 layout features for every page and assigns the cluster using the
+    *saved* Stage 2 StandardScaler + KMeans model. This is the real Stage 2
+    cluster membership — not a density approximation.
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            f"Cluster map not found at '{path}'. "
+            f"Generate it first with:\n"
+            f"  HF_DATASETS_OFFLINE=1 python code/script/build_test_cluster_map.py --split test"
+        )
+    with open(path) as f:
+        raw = json.load(f)
+    # Values are {"cluster": ..., "n_boxes": ...}; reduce to cluster string.
+    return {h: entry["cluster"] for h, entry in raw.items()}
 
 # ============================================================================
 # Error categorization
@@ -99,6 +101,7 @@ def analyze_stage3_errors(
     pred_dir: str,
     gt_dir: str,
     output_dir: str,
+    cluster_map_path: str = DEFAULT_CLUSTER_MAP,
 ):
     """
     Load Stage 3 evaluation results + predictions/GT, categorize errors by cluster.
@@ -108,13 +111,19 @@ def analyze_stage3_errors(
     gt_dir = Path(gt_dir)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
+    # Load the TRUE Stage 2 cluster assignment for every test page.
+    cluster_map = load_cluster_map(cluster_map_path)
+    logger.info(f"Loaded cluster map for {len(cluster_map)} pages from {cluster_map_path}")
+
     # Load evaluation summary
     with open(eval_json) as f:
         eval_data = json.load(f)
-    
+
     per_doc = eval_data.get("per_document", [])
     logger.info(f"Loaded {len(per_doc)} document evaluations")
+
+    n_unmapped = 0
     
     # Categorize by cluster
     cluster_stats = defaultdict(lambda: {
@@ -146,10 +155,11 @@ def analyze_stage3_errors(
         pred_kvps = pred_data.get("kvps_list", [])
         gt_kvps = gt_data.get("gt_kvps", {}).get("kvps_list", [])
         
-        # Extract layout info from GT file to classify density
-        image_width = gt_data.get("image_width", 2550)
-        image_height = gt_data.get("image_height", 3300)
-        cluster = classify_layout_density(image_width, image_height, len(gt_kvps))
+        # Look up the TRUE Stage 2 cluster for this document by hash_name.
+        cluster = cluster_map.get(hash_name)
+        if cluster is None:
+            n_unmapped += 1
+            cluster = "Unknown"
         
         # Categorize errors
         errors = categorize_errors(pred_kvps, gt_kvps)
@@ -170,6 +180,9 @@ def analyze_stage3_errors(
             "n_text_only_tp": doc_row.get("text_only_tp", 0),
             "n_text_bbox_tp": doc_row.get("text_bbox_tp", 0),
         })
+    
+    if n_unmapped:
+        logger.warning(f"{n_unmapped} documents had no cluster-map entry (labelled 'Unknown')")
     
     # Save detailed results
     detail_file = output_dir / "error_details.json"
@@ -352,10 +365,17 @@ if __name__ == "__main__":
         default="data/outputs/stage3_mistral/error_analysis",
         help="Output directory for error analysis",
     )
+    p.add_argument(
+        "--cluster_map",
+        default=DEFAULT_CLUSTER_MAP,
+        help="JSON map of hash_name -> Stage 2 cluster (from build_test_cluster_map.py)",
+    )
     args = p.parse_args()
     
     # Run main analysis and capture error details
-    error_details = analyze_stage3_errors(args.eval_json, args.pred_dir, args.gt_dir, args.output_dir)
+    error_details = analyze_stage3_errors(
+        args.eval_json, args.pred_dir, args.gt_dir, args.output_dir, args.cluster_map
+    )
     
     # ── NEW: Additional Stage 3 Insights ──────────────────────────────────
     worst_offenders = analyze_worst_offenders(error_details, top_n=15)

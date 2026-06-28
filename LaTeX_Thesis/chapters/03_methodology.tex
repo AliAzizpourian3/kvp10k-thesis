@@ -159,7 +159,7 @@ after the first projection.
 \paragraph{Why token classification instead of generation?}
 Generative baselines (Stage~3 Mistral) demonstrated strong text recall but
 poor spatial grounding and systematic over-prediction on sparse layouts
-(Section~\ref{sec:per-cluster-analysis}). Token classification is grounded by
+(Section~\ref{sec:stage3-per-cluster}). Token classification is grounded by
 construction — predictions are tied to OCR tokens with known bounding boxes —
 eliminating the spatial anchoring problem entirely.
 
@@ -218,7 +218,7 @@ ratio of approximately \textbf{450:1}. Despite applying
 \texttt{pos\_weight}~$= \min(n_{\text{neg}}/n_{\text{pos}},\, 50)$ to the
 BCE loss, the extreme imbalance prevents the linker from learning meaningful
 associations, resulting in link F1~$\approx 0.008$ (see
-Section~\ref{sec:v1-results}).
+Section~\ref{sec:res3}).
 
 This observation motivates V2: by grouping tokens into spans before linking,
 the candidate matrix shrinks from $\sim$10{,}000 to $\sim$225 entries with
@@ -359,7 +359,7 @@ where:
   predicted link scores, with \texttt{pos\_weight} to address class imbalance
   (capped at 50 for V1; uncapped for V2).
   \item $\lambda$ is a weighting hyperparameter swept over
-  $\{0.5, 1.0, 2.0\}$ during development (see Section~\ref{sec:stage4-hyperparams}).
+  $\{0.5, 1.0, 2.0\}$ during development (see Section~\ref{sec:exp2}).
 \end{itemize}
 
 \paragraph{Training stability.}

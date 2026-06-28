@@ -1,0 +1,4206 @@
+{
+  "002a896d181bd1ceecd77a82e026a1a83dd01497b3d483747e1bd703af842a19": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "003af1c968f071617631afd9c674a94abd9c4028c2c3340ac4f7a00ee3869901": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "0076ee917456f69ad3d054ae138d711c5fa6fdaa6189a86c058933166fe04538": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "0079bc270179d0bac535582dcd2871905f1f688cd32470229181364bd6062d7e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "00dbb5450efe3a6cb80ebb0a4f09dafb14606c7731bffaf3f439cc5067929673": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "00f57e0f4c758e7b964743232134f77fba56cc8a6dc5d1cb81e9a24b8c1a60ef": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "00fe9c849a142013708fc444747c78a4133829d741e343fc4ffbf0cc20976be6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 55
+  },
+  "01356ba12d3a1afbeba6cc2fd31afb661fa1dd5294094fe9c1bd4bd7c25ee155": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "016cebb2a9a28b90713606aa3959e0a9f122a809ffd974aca4a20b06b88f30b4": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "017691fc9c2f3974146ddaae95a8a635c9cd42e4811888bc11fe48f8544ab0fe": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "01e74e5015069f4e8e3dda1d2ae15aaa82d4bfe38dd39f8ced190e5ea55c3c3c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "0226b2b546eece1a8851dcd12cb9d4b5a5f02732c34ee0ffd85d09b3c1a06d9c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "029a0132f33ba2ce64dc1f5c5614c3d1c3ab5b2ac4546878338f3ab53c17e9f8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "029fb211a42b7a00c8cae0709df27d930ba21ba74a4d038c8f5a41ed1fab257d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "030c16a01265b6bbdebe614cf52d059a3cf998313357fab91803317bc2ae777a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "034087b09b065698ac9f9564402febcfa5374436b78f96ae4f332dcf45d61ef1": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "035deab0593f06dda63a4966fa30531f2c96f7505eec76e135a8a0592ed5d760": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "03762725d3b2c2f876805920eeeeff4d42632f1bf4e326d2b10b169afda7c523": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "03acb94183b3f804b2fbfbe93208e593cf1e84d0395bca26dd729519da637aba": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "0425109d29b14a711f83e3401d1f8db95a53e2886b0214a3ce42413f6f2ba5ee": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "047ec53879c9d844bec5c1a6ad211bd25d1bf9884d3c7b4fe6ca1c8ac2458211": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "049cf9859c2d81e68d64e540bdabe4bf9c91f9fe23c9b13ecffee0fe0c46b4a8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "04a5ec663fd5f2ad17a8a38d764fb84c1f1b65f1c3377840c81bd06ee3130dbf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "04d279efe18c2f4c385d8ceaee48a544a9e4f16099ff184b047f09e4578e5643": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "050dcb04a0195d130b5910f294295799f2f0f1e11d86ed9297c78be0bc19e687": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "056f6c2debfc7a27b3cafaa8086ebeff28bda9120afb7c4a9aef8a5091b33f00": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 61
+  },
+  "05cd680bfc7793d5af051b09d5ed66fee13ea2a2052ae73566be2c191fee94e9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "05e508e20b02b9b6ad017a710dad2a6860db6c2bbe033a8082c5c3d3a360e3c9": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 4
+  },
+  "06ea6796a753b731a723fd54375ef6fbcd83d8c9b4ddaee7ebbfcf019da2c999": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "06fb07c24db2cf2a6b088db618b9974a9fe59cb4a509c010c690dc6f83b05795": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "07190978487f5710e30771f2ffbc371ff04ea43a65c36725ce1dec96f0e9edab": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "078522d10be37b5b8b17f7755239f22467029377724ea61d6aa7a6fa521b3eec": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "07de02d344336182543e7e7592f614d7acce0412ddf034a477195574c98a8aeb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 93
+  },
+  "080edd066e74d5481addde22c2eba36218f4234c787ddd64909b7dac40a83b83": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "087819713c83b250324c3e24b08cb6a5887550619d805339e9251fc00a5934aa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "0880c10339c6b4f62fa7a9e0b186fabe96baf119723d32027e64693a4292f593": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "08dbddd757fbfed6fe9e65a9e18dd886210cbdcddcd038f120ef19190625715a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "091bb077fc813f10cfa203a1c47dfd5cc132104a5eae568399625fabc8619df8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "0936224fd3514ce6f1086a247ad4cbc3ac59f77b3d722cb9808b0ef44e3b6709": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "098226828bd15d1649ce025d052a39e9481e1b326529149b9f755e98d1ce14dd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "099f5c873a1c0346401145fd790d1fdedd2186a8deaa90e37806341fd52c6d4e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "09b65655e4c923530611e027d959db80e7c891ca38f6817139443ca998d404e3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "09dcacde9b76f454caa922d1bf3a8da9448a626edae4772e2606d113014b654e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "0a050bcc3ace2ed3907d22f8dacc5adf0d960d8c5c5a692afd72a17da13b7ee4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "0a24e374b5fcaf773da5d76fe831e2f1aa1553fac4928693c8468838eb82630e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 63
+  },
+  "0a24fd6e359ed1a222847e4486aad76e1e14e54a72c9fa381b84a3ef7641a512": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "0ac527a7d9c3e3f174587d1ecb0dc99934f4b9c2eac1bda3c61f4fc3762cb473": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "0ad718adce140be3e12652efcc2a0b0988da802b465bfb10ade1ba1af49456d3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "0aecdb2c595e4ddc930e4995545f8171766db56acfb53e6d3ab13a590744d25d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 72
+  },
+  "0b206485ca669ab602f24a78f6a90a9bb91f2a1cf828a7456a510d0fbd35944e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "0ba31d96ec5733debf269c17e7d6a2ce61c6e3c49ce85aca42cade31f065811b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "0c2ac484f76bec9eed6ed5f8ae1451a67398c9921dbb42fb151c334252421014": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 65
+  },
+  "0c9e8bc21cffeb0a2792142ee61fd077fb519cc7319e8df470dd46b650d580af": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "0cc0562ae3b89037c593630b9483b5ae99f4b9b361cfba1a1cc10502a464b03b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "0d59771fa2536d6fa9a59f8d4a666562bb189b83f6f7fbf6bb485acc040ee981": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "0d5f678fc956a9767334efd996ccbd2e3ebb7ad750e518ccabfe1e4384678d5b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "0d85b8d9841ac536b2dac2e32cbb7380f199e1c36712378b0587f0cb5256e7ec": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "0d878fa0838688426bdaeb7243cd9f35f9f9ba43e0c1ed13855e91f6c7884842": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "0ded46ebe5bddd3a4a7567bd6a07805b476c8407e1833c5091a5a6509fc6bef3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "0e1343e24e8aee3c354c594f6c194e0541648b05bd5afe47a8d8ee34fcecc0bf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "0e3008db1915a75e6badd0d786759540521c72be2640d3a196fd25619f39ba61": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 70
+  },
+  "0e4d389ef7750bbfe3ab792f59cfd7a625070c5e6392a9e4e69daa398b0cf3b8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "0f30d5a7ff113a88bb61ad32473d9d790e60bb8b5a930b3259f4a34e2744dbd1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "0f5b0daef6dcecaf9ed14498e915c0be9834f9a6375f4ccc83f64fa2e1572512": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "0f8f46cefa25c31e0e64f8f46eb65ae3647c416c535e02da839f76c7ed3bd34a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "0faf76fc3ab48570a8d669a292c6dc6d4a980d447a4f4f0ce59aa35fd4c1a66f": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 1
+  },
+  "0fbc83a66a6aa02f369d880db42a714e9f7c0f85e8e40f534f8e41fc2d94a691": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 155
+  },
+  "102e99d9fdd1d0f520d70d47b05aac21e622e4591325ae5afa802bea216955f4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "10466f8b3a7d0db51201ccc70a410401bf9e8d830414b25ab94534f1604e8347": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "10709196059bbd9ca51196a9811ba3ae0636c0a883b687f1a801236422fc294c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "10c677ef1d5332d5171f13a15608fc4fc444a7fad90b07253b81a6e496045e85": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "10ff2df4e6e496fe25a2b9d4a718e695409839857e6abb8834faa76fc7986d57": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "114d791c999bac5668da1f40ff902eef59120a075c989a159b861abda6ac34a2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "114dbc2031d50cb03ed83ee2c175c7cf491fc105307f82611259a8b8b627d932": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "11863281f84f40588830e1029d702ec778fb202694a5310c7f684f9d406ba75e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "1196e42c1d34cb8e01f1464df33795fb0f880c56f515e5ffa0518b922ba739b4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "12591671affcfa14d8bd9ba4dc28a5ae248bcc45c44d771c927cd746b4a257b6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "127bd64653a251ffba01cf3fe3382f721f89923f6c9b6a0c67932b375761a08e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "12d6360ea92f0b7bede8a59b5c1463df3ee8ae34b9b71b7e13f2df3c692a7451": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "12d6a401a6d1153a38984e64570ebd6cfbd73fa92f7348724f4d3a9a9a94ede1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "130853a8443ef0dfeab9af9653c3e5c573dd41a04d8613ac089dbff850a7d780": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "136655da2e293aa6cefa10a1c6cbb46a94a6b775bdcd4ec9c3bf7fe348c50c67": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "137d3829b9ebf04532b061628f8c15aa622c7bd7f899e970f242fe69df85321d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "13ab0983636f06296117e7474bc0252cf65f4b985a8399a399863b80f9ac3f04": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "13d29dd11d0a2d711afd661e41361c6f0397a0e1131df5514d8d3f7b83eb3d91": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "13d5207c7fef50310df692bf0b26e86cfea8f3e99cb4d933e90100b5c320c72b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "13e26a7f54d219b8848aefbd4ba473f09ad5534e957bee1f9a3d3af23858f6a6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "14736b681997941842cdb3ab3ac3bdff07226bf660ea495021b32e86ced0ff66": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "14e0f7e958c5fb25ec808e31046e953def60e65df3b30d8b5aa64b9079464f76": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "14e129d3d21b53623ba9ccef8bc862ec3c3c34c71aaac7bd186623cbe466cd2e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "158acadb0f6f0b402c342dc99385a6d1fc7a0b31211a3b6f3b7332282693281b": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 4
+  },
+  "15a472dada2a233bb23bf71c894dfbc3be64ffa136aefd2b3b7f5694c6a0f6f2": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 1
+  },
+  "15e9bc1f1e77c80c808d8c078a0c08031613a7c0ee7c540f63c34201054f10f2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "162ef5271672c304fe031eaedf43e05467c10ca77b23d400df3c72dfe3e7c556": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 45
+  },
+  "1634f364501405cc2b1647ab8fbea659f04c4b0032937b294bf7346ae71c6687": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "167cf5ad98ebfd5496ebc2bad1436b3e231d8cfb6b77abc972de14eb156cbc92": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "167ddd60b2c029738a0bbe26d13a1490afc9064d75853af549c6b2a3227e9809": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "16d2af7f979c0aa8e43359c38b9ecebeac08d0014151ea8b355d6cff2ff9f240": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "16da435016e2a32fad03c02434d7ad333beb5cb4e21794519b3e57ce1c17c475": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "1704156ada87a4a8a7a3f213b5b4e1e17cd4af64ccd2884034cc460105f19070": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "17171e7761d0fd1108eb49921d3d10c8b5a792491d9adb9fb8263b83194a1f26": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "1811a212568ed883b7f092734383dd81cc975b9f4025e5c276d19139bf88eaac": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "1841ec885f50712601837b7d468e6ee7b17b889301c9db49d8f789220f9aba43": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "184698d58363bd78973d966b84cd3a6690f7c2f0be8ae5fa420ae1024d52a6ca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "18bd20a4d439a41b71bd06aa9021061bf937afdb04c6185cb4a1cce68ef7feb0": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "18e082546e186e9c526a5e8025112b5b1a7b49a267f0913af7411e3ca8161784": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "19071a9aebe16de0f7acbf1239a97d1910152008f63f38c7630741de117cd37a": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "19287012b4aa912827cf085f323b3c97c46fa951575eb960b055c17c420b7f24": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "194e08f252971e6a59cb6de8b0a08c45ea4306f5afb46cb654153413d0624010": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "19d3f25935e0ed0a58d07b7ccbbd8495f30f5f7252a8e6b574af4d345bc76245": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "1a1488bf54ff706081016368dc03d2e001922c159a42d0824b06f785981122b1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 67
+  },
+  "1a1bcf760dfc494acdbcc4662bdc2486778ac51bfe41fb26d030c3f0f06fda5a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "1a94e26eb46981524e0be87ab7b42a5b8883b1a32ecff62cb79b27ba0b0e7dd6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "1ab8b1c4f0bbb463686c528269faa1ef5dab2b09d2cb98d4dd6837c21405f940": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 40
+  },
+  "1aced29602a15fdb489c520d6f7a750c9fe250e0ac9e82df2d8a97ccc306e381": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "1b2977a7ef4ea4b139049df1b9925bf8f43682036fbc54efd181f5e60b801a99": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "1b5dd2214300f23cb6a968edeaa8720920a9de04717aac5c3355505f8d06060b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "1b909d3e854d09a80398ca5bd880148e07fcee339ed6cb372ce36758ee3b62b7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "1bd8350812f4bf0ce5a05ef8a6200a568c073e951bd09ef272cd249f525e6545": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "1bfd6ebc7c561a7e3183d0f90b015bbf510efe7cc5937f65b9497809b27889a2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "1c63295a909ece6297c537dadc46d5a298ba150b9343d2b2c404b0af3c1f144e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 45
+  },
+  "1c8aedd29e8b731049d3e0fe526b527a223d2a7fee5f4d601d114c3b415e7eac": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "1cddd9805f7ebc53030988543fa1d98ba63f8e3370bc8ee81737c4ad5e377ea6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 58
+  },
+  "1ceb62d1dc43c1d3511c14140c71462bddfec46e7395772602268103041a0b04": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 90
+  },
+  "1d752623731b1446f58b3ec87f8271b390b3240a0c8410a4a0d6ba1633268982": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "1d919ad1db3f8450476cc6873065d759eda9d3437b9474476f9758c197708652": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "1e0177fa726eaa47738bd5ad09657b0c2db9ded98bd1b288e118ca7b32e833f0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "1e51158bbe7e0c527cc44cccb98e3edca3c1e292983d135729d44c2c99164b8e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "1e6fcf56e81f8a5c6e297a25a19ae1930f1435633458ab92a42d33148dd7b9e3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "1e810c8f7fee35750949ac289bb465908f22ec88bbf8961ea11a6320aa933440": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "1e872df63ecc51cdadd27ca919217ea4fc9c5837c281a8906e0cfd79fb009ea7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "1eda4a772ddaa207b8303a51139c10372ef11186e09c4d9bc59c749b70fe63b9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "1ee06c95742574754c3f2e04b2513a9b7ed6d0b7a8cf8be8f900df1d281e45f9": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "1ee58ec3ec7735627a6489fa3274e5c3959a52e3a30342504bae1cacc62bcea1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "1f03a0ae5f4f665089c2c3ad07ffdf3a97a303505cab8728c21ae9f7ce1a0d91": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "1f6b7956786cc6c161db4b1466e2d6fc50d415ae07aeb7ff6cd0e917191f441a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "204bf0255d36b08a32a44a9eb469916d7f736e8ae5fcf83e3a991997d7893eab": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "2086d0b78a981549e37286f2dd6b83316440ff7e908eba2ca7f12e67dbdfe065": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 1
+  },
+  "20e99225c119afb7e980df1107e4dc2808aadb39e4d57decfd381bd227cf32a1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "21189096d0bdfd7453841fc9bc923112fbff4f764948f6e670590dc0422353fe": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 92
+  },
+  "2181b20f77c279aea0f9e0333c4ecb0e903d36c2d4802db7324c15250a0c0b4d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "2182d295ee85948409e035e49bddec9b806a32d53e8eede1a467105c33afd52b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "2194db6f99b0234aa68bf9ca162fa811b80f0fbf7c9db3ff7b4e2c14d7c0cd27": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "21b16c817d7b16ea1ecfeebc3df8aa24f3759966f5c1cda659aeaf7658eaa35d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "21e941b2e70d908c365e33e5ea75809a18e1d479892f432bf1f8354101d2b209": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "21f17ba7972eb7a4574959f6a9e4636ba4f6ad39654da1f65ba37ec8f479ed7c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "222af8d371b854ed5b0ccc792e22f0638c3e1bcf79ff45c10f02944c163b146b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "23820a6c849da693638ed23ac3b28461c40201485940fa240d64bcad354dde9c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "23c612609f9ce56e3caaecbbcb41f54e2f8e3b23f9ea185c06f379cd326c1d34": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "23f36806b34a9d75cfb2fa3195c5372b578f58e5a00315b9552cf98903aa0851": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "243094e5a61b31105faf78538a9683fc7295ea639954cf6dcd62dd882f6c192f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "2444285013161ac9deba52d78cb188bd5072c1f73a7281652822402eaa891bcd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 75
+  },
+  "2463e5aac947feffb7b4cd3d61ef09068db8db76c1f42d378764ba0a6f5e3697": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "24bf31458d3cc783fdfada131254200346f0aefdc520da7ae392cb421ccd7abe": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "24d10213c64587b5cefe91afcc8f24681c6a5035133c3a4f5e8e79eed81ed67a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "262d6b567f33ccfa2db7b22204fba23d6e29880336e5fa78955b7efae7929f7a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "263126d36ee8d7b24b5950781b8129a270bebaf3cacf3e7534a4d450ae124a3e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "2634a3231b4e3e40462a41c43c73cfdeff6fb6fd7f48a28780b80a99d72ce0c8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "26582baa2dce1c35212a01afda93dfcd89a1ffa4f118c9b01a8045ebe33a245a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "268b8a994247bc6399f7151731047b9afd8b41833c0b4ebce740d3fa15b48162": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "268f09f6cecdc447af8d8abcf59fda18e04636f46e50f20a91f8064a034f3126": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "268f35fb2fb90442f0062ff1163a52243e53c6a79afa7d1cf6b77b6eb2ddb483": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "269f8e6549c94f500125e398e2145daca1271269a8c9be9a48125b7ae57efc57": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "26a7504a478db03d107ad344bfd69eec631e354e3926ac741a7a527fc8c32feb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "26d2118a225e7442d193b8d09eddb1cc243df1ac042804c31c36fb6f17beb4f8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "26eeee97e3cc6c62e7b11969c5ef304c3c8be9f143edad96501b4bdcada57ed3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "2767df02f835f15a8fc60750984301749e45ba3b4e070d4778fdd385e481fd5a": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 5
+  },
+  "27801c787fd0bfae94e582d5441b3f9a532fedf85fb912d8861a6ddf1eee29c4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "279216109f7774da397ec67cda10f647886744d8a43888eeb5767c8c61571497": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "27ed759416d322b8f65b05a136da55b65ff5f6fdd349ba05d5b66eca47adb0a6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "28224b713ad7c05eeaa2dc1fb2204aa4509fafb71eaf2dd87f48cd467cc90ff4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "284421c4452924e883643ce87007a077dcafecfc2bda5da98c34adcdba38babf": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "28e975b2bd7c6c60c2ac0646b9f96c3842b014cb71794b6458ef5dc736ee4bc6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "28fc4b832f1cbe53d06fb5f50c39d9f69ec1b831734decab1efcc8dcb7a93a1a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "291ba6ae459fbab110b106b2da894bc1b397d38174c66aed51ca4d36586b74fc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "294697c3b20e427bc07275ba8dffad2682ca0a8388741554e2d63d8a93ce413f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "29e2c644eae2ad2a95a4a2bef62edb121a209b4bfdf7ee7e09048e6aad077bca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "2a2557266f0999262c7c5e672ef77ef8874094896ae97b4e55ef7d2de51194c2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "2aa967c27e6401e264c02611fcb563f7bf01adf74656536e1963e4f5980549d3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "2af47acb9615467da6c4db9cafee3d5122ebe07cbfae2f943e9fd48680fc3ec7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "2b40785b6fe27847085d652920dadcf320149be87cb58c8acb2841dfae9d66cf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "2b5aff8287be77f9a7f1f9ff4bec3812489bfbbf4e6247e6caa5f92c739e51b3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "2bd25a662ce1388d450024a4c2b5726c622fb2e159f5fe670c28c71d3f95ceb7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "2c478204ba7150ce560bf9b0d376875751901ce8bcf7147c337e05e67fa6d32f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "2c5b7b0f93935ac18a7593f78a635d4326df74bc4e6084b473a37acb51beef21": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "2ca1779e7f49d50e009a2dfdce9d61402371b91d20733f72dd014de89c3c8dbd": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 9
+  },
+  "2ccc47498eb070020d6d01ecde98b9339bc1942de7b0006c324bd55385a392dd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "2cde5fe5167308537b3f5f24ecb8a22d0679f78d8a69c990c68e6103e5cabd78": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "2d38a8372a50f2c219f8a258083b5a1dfa7a18ce3ca9125ca9a62ae0e41ab082": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "2d42fb5b8626c4184342bdc34c1b8fee06a11e85df19bff58a4cec26b5d5b6b2": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 9
+  },
+  "2d4c66552c4ea06f24e76dd7a725f6e0abc19d8966a816b76281cd9ec1a99942": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 47
+  },
+  "2d6016e3357a69ec321b33ba33080d26574759d7d6daef756dc0ec53bf0a70fc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "2dca5c3a026617a9e1b1a69fecc95631fce8f7d8147b8431922a8c53d2650a0d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "2ef38aca281f58a584ea2978b326d7b420802d49a600764c0f7d26f3b2609955": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "2f08156e95f2f6d2c043104a31dcf1af7c82f7bb0f924bc8946219b7df49bebb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 49
+  },
+  "2f2f8586f68dabab540156449d6b49d7e5f286b242530e5d298bfd21beabbe36": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "2f4aa0aae15f14f93023946402d650de1cad3918e3a3625a729d4e7c73694c66": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "2f7201f2836ea33199db8c23664dac16ee5b299ed0df9aec60dbeb6dbfa606fd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "2fc957dd4f765b226e60a3e8751a1dee3ba36f180a57603c958b21ab03175b02": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "2ff0df4b696813edc9568865ef2ae23cd05b45ede174602c4fcd00b57acd4c63": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 62
+  },
+  "2ff5aa17fc5c635cf90f5a453cbd8e5eb86c0f8bf455ecc4e1f6c213d6b0daa8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "303c1cfd674520578ea7d47521ad7aec206d79aef02ad5705fbc855e6fb3a303": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "30ddf8b5df2d9016b3132bf7a1d002d5e61555eb6d01a18406d6ed62074b6744": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 45
+  },
+  "3119ba4bfcafa16dc7354e2fe509aa07f1faf894d4e209256ec756c013042e96": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "3132d8388d46b9860fe3c381c03f9b0b8fd0568c3728cf832eb0342ec079670b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "31500118212f180740fbdaa686acc0a6d3e028246dc2c65bf5604ed49d4eebea": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "319ac60cda88d453dc63cc8237db0a47a50c1691467bf9942142b585e14f5ad5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "31c54c010d4f4a4ce5cb277446c21653b61ca97a0c43ba717ecb585af4c614fc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "320fa4c1b10101d6c5b56733731b9022597bbaa108db6e99801da318fb968ded": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "3231ecd308b8fcbeefae9d3f63fd67ee17435cbc950aef4ab1713db87d2288a4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "326198826eccb1c969f99625f1db4a1062d232c01e1d2fa185dce2bacd222969": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "32843884e85d50e438d43ce2d2d5b5b7e8d535577097f89e21601b1b48cf6e4c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "32b56dd2b76395ce867a5fa67b350eadd2c414dcedca958f59f99d99ef6a825a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "32cd8e1c322c26672f0a957958583c871ef5e2f80c1378ad330a0b334f4911a1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "33066cafa9081b3635d7b36cc780783a787186665a3e982260bf77ca55dfb40c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "33609a06e5ea7d3e848a1e038c9a13279917213c702c6e54f7860b70ae29c62f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "3448bff057e94d9fbf17c832798b6f09629dcf58332f0f2dcac8f6267d5904d9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 80
+  },
+  "345b9d970fd3efa3fbbc0af32afefc18f2683b6f72fc8ca5cba9f11931e22a6a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "347521987217b274e53c8c19470a13ec09d6d15471b7351897778b27f7e19112": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "34916655d5b492b330626cfd008d9c022fa0e75b7d73d2af3b2dd9e630df9b0b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "349d384d3468b161e9d189a8fe2168eaad8898c842542e3d921734204942c06b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "34b3e6269263078d869fccfa4e461b2460b61ff3bdb84e4541ee9b459bca81fc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "3510f47d3cd7b85314116c74c329908187f3e8917bd031ffdf4aa5712f1b5e5d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "35400d242a6241686f5b33f1f5204a724802d7c6d8664635d460adc38e9d4690": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "355d92b72229f1037dad429f5d330e88f0dc907d6a93e85b2e99720085710f10": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 64
+  },
+  "359a0af69dd11b4b523ef1279398d43ddec7bd7ff23fa3678c59cbc329991bda": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "35e8ea3bbde86ff2e59f771d56dfe99191ff2f90dc2d09185b448caf712c3725": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "35ee7a4bbf3604377de792e150356a3461f97b4fee3a55746768b7428cd43f1f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "375da54d3e383cbf103c1d94d05e0840c260c73d5b82f8a6bf1b53ab26c0bc9a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "37ece04a341abe5a639e92196a7064817a87b6cb5c2da22501df78ba87991b65": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 77
+  },
+  "383812c2e045c17e9827d414bced0f2e9787e093a6bd8ea175cb15ecf121617c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "38b904224d4036c544c7837344a8ae01b79f6ef7b7f446a336298066d11d47bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "38be3636c4b9bb42a9cee2247ee8083c9b742e5e2dff80984ad16a76e6967c72": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "390d8ace8bfcaee20b7e8ff71c5942a3bc658e0d8d6ae1a2430a7511962a9360": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "393cbf0397e5c294803b327714485b85b7f3513b1ab912db6d4706548811fcc1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "396cd2c1d1774cac2ad57ebd00450cba6a61b896a5f3122635d800575b5857b8": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 10
+  },
+  "397db27db991d68719c918b7920c1bd8a93b5026ba05f9d5e29929d7147d6944": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "39acdd7861a4a7b282d29bcfa28f1bf64761907e6d1c75af1afcadbc5028edbd": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "39b53c12902014518b7bc25f19d9bed42ad5d07267301e3fada21c374bf7b919": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "3a40cda031a7919f91eeccb49c3e5c630bb1600a894f21156ac513972d08d0cd": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "3a4f903a590358c8590940a011213b688c19cc00abf591c0ffdd0426fc5b0ae6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "3a60318d1f0c76d11c21bb56ba889b35106f3e0425294471f029e4d03830d6cc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "3ab365b3a53e7f5026ec5999b4b55068e0e817e0ef90e6288f9c635b4aafa7a9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "3afffaa2048c173226993c3eb1bf85183c43d5bae48aa335303484c90fcfbfa7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "3b1d46277ba6d036343a31abca5f942641e0809d50564ae419f7172e1bd6215a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "3b7295d97b05954aae101ac70df8f31ee7640994675b0a93a8b7f366adb50b08": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "3bcdeae313807d22208c5928810969bb48cdbffc77591b931afc216cfaaf393c": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "3bfe4087f70b6e717f303f3ebd8a9c909501f054bbb98f20ef6d833de6b94db4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 66
+  },
+  "3c197663a3350a7fc17f4cb070df3760d83724142b73c04a88a9a974e75a5ca0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "3c1bd1575477e63736288e3263336c41ae1010d94df9fcf825af1716eb616c0e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "3c44cac14fecd2f8b3cdb3be1847abaf0949d34aaea309c59a0f89769ade599d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "3c4947db11314bd60be3eee8e2527769ef7adb543e6c1ef320c9fb30c89f86ed": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "3c7ca1e4d38b97a36fb3b23fa7d0109a0d85053d040950e94050eefccc589f07": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 66
+  },
+  "3c96142dbf883d55fd870cb3e424985bd229f0480939b78e69af8fe4ebc2bef4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "3d5beb5b06b01756682922fc42d224aa61285ac79e8eff4c9b01e97d25c0a43e": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "3d7acfb90588f16cd083dfdd0259a500089be9017018774de890667a5848e644": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "3d903a525328f3aaa000581a93f811e4f43a8eb7574cec491af56869b3bbaea9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "3dc35587ba72b09a32ae11adfe1ef1cfcde22b6ce116dc06feddbc8ee0af5ffe": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "3e0ad2ac6e6b7e9611b2e104a36a18ebe3b0423aed5489e35a9b9de06d3259c3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "3e42c41b9fcb5fa9213308a7a1e0c182b08ef8ba8b996b10d0cd18fb6e50462b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "3e6000640ffdcb95cf49b16af814a147627509cb20812fc18eb02362cc3591fe": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "3e69622448948953080b0fa4f46d264ed00df630e0d4437eb5993817e476e386": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "3e784d65ad2798f3e313956d056dbb1bc6f67f7118ce8dff640eb22fe20828fc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "3f3dc3481aa8266fdcea0a972dbd3e94ee42515e91dbaee91d017a89f57c9927": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "404876f66143c1e17bacbe94038313a775b999b4ebf6bb1fd95552d7ab121365": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "4090026b1c4b1bdcf42076daeffd85a630ecfdecf1f65bec7e1ae2c2663f1fd5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "40bef911fadde092fc13eea393ec5fbbbc4ffa3e5f322fe602c324a239998c0f": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "4106fb3c9b4cdb31b641720483eb2455c6af293c9aadfc8f98c38f2c74a3e6b2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "4109807c339a6072610efe13fb3daf8d26f26f6b9908ea84856ef2011fb5cb34": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "410d48e5b44757f01f774a6596e37612675f7dad38c67de2cf3e96fe4713f39b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "416fb75a62601ef76f9ba76b155db86a36cc0ea65f49e597f7cbcbc1197915d7": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 8
+  },
+  "41cea847648f5e2411b9255d909b104e278a4b208eb69895de772c7abe4efd07": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "41e732c9728f009935d2b8fdac3ba3aa5059dfbe780831544b60d26f961ba276": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "4271b7c299a3fa4a1f4182edb3bc2de8795225e29cd0be05cc70b1e27a460324": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "42d1cbd4b26d754eaa1c5d0e1bbee286e0e9bee88b4942afdf1a1dc2b9889243": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "42d28e30aec4f0723e0ec3d90b556b26c4362730a8f201c134095286c9c6720d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "430ddc01e9c500f56280a46892a9c85370deeaf1acd9b192c87409191cfb39a5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "43929d2136146462dfe5376f6e5eaab32ac5a707c564252c00c0ae19984ce14d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "43c753234b5ba096bd7b1ac3e3f8d8940da36394fb1f4e5fb419d52583ee845d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "43dbcf889fd8b18fdc1fbab195a9b757a6915bcc8329fda59dd75f294338aea4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 75
+  },
+  "43e99e917ac78573e4cf1a2c3274d84c045c2d014471caf89408d7ace7c8f730": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "446a46dd99c85a2685d19728463ac38a6536101fc66e3e01979a4c60f868c18d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 50
+  },
+  "449f8740e48c9beff26a45d0a358f2bd23f49260547eac249df04a4de34ea929": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "44d942670719a289937438dd3d493e4aa2b61c75c3a63104298971bedaec4a66": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "44dfd60d5cc517481b1848cfd707aaabcd8c67e21d9332f09a409a7477294575": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "44e0ceab2ef1186296f9010e8d95dc3ab48f8a6d19afb1f2a099a7dbfec56f3e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "451b66831942044e04d699bbac223e196e61b35beb1dc4f67146c323cdadcf63": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "4534ffcab471646d572a5173c395ec870c69296c942769f74ae3912a999f0d99": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "453a88f2d2e62798c50dca3f0d99bcbe7b438218d4a79e40236e73aa7e08faf1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "45dbfc312f7e71c84c62de6c9bb0250d186415cb0fbfd37479b3c42ac64ed334": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "462ef0f5485863d6a4a292ba1376b862274aaf40e0e75d225b7079c5306afcdb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "46c0be582f784930f589802b509ef7e19993dade6f74c9e4e83ba2d10ea512b7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "47035d746bf7f8364b68028460f9f0cb171e185ce03657408533aa06a8dc79df": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "4754bdfac814550d2c84665b1933d262b9c69b45d671fc492280870490e47862": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "4775cb7286025d5957ad09cdfa4119aa0019f02366950b9a8cbc6476096a02bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "4777c42ee7c26f2f0ef72a5bc0d603d2b4aa62b3376805eff7a96e6241810c3b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "47c84067ad3e4153781c644281fb5b565bf05b0021d4a40a7cd85182d8858619": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 40
+  },
+  "488c56c5604c91d4c56a54e29a9078f8e377f356a17c31d45cb1b03cf562262d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "48fafc7739b3fa2d23e720f765cf3982b1ce6e490bcdb66ffedc296af7b88081": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "4946896de13accf647f6abaf521b83bfe2166933952643f321afb5d29080f852": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "496c75e592cfe5e4cca6ff9c3f94deda0d67693592bcce740604406d49b5b2f0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 96
+  },
+  "497baa9faaa33560c0e3af4c1ca0ee7ee8833b28b070f9ddade7836db52a23c9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "4a01e8f08964fbf5a681f79d55424cb005366188d0500b41c83c49ad02776f40": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "4a3609cd8a9f17b526fc8fe0ac395591a60936ff68d8bf1188204295a9477b44": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "4a5179d012a4fed50d33253b736edf5ae6197dc2d04046d1180cf5f0ae44bb8c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "4a5b8a99cdcf78bfa38e7761e65aac5292e2df5e0c52173c7f85acdbf596b46a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "4a6bc7cd390e49eab6397ac25092eea0ebaddf47caf7fea652047ec9f31aefa9": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "4b49aa08c538b877de31e5a4f0704e35cc125db09cfded361e671bc2be9fda41": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "4b599a0402029499fa990e994df630e94e7de8fd02356e6a6340bdb8ebfd9adc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 91
+  },
+  "4b921ea316b98f87dddcf6ee1a3bb593ac7a7499c6b978879ba9a319190da0e4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "4ba3bd5ba8a2a891421c8baa7dc70b9e5640b681ab181ba43cb94539d64133d5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "4c3214da40f96183f273ddc786bffd77cc91e3f5198101564089be07816cc82e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "4c35dfa51a66fd8804a2d433ee8e613a8fb85de9d98148b203474209341e2e43": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 4
+  },
+  "4c5cc106484f63cdaab378f6ceeb485f2213a822689907d815e2974c08765176": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "4c7d0934afd45f287c91a68e398c95a8c4ffea91c1c944b42466c4f6efd0eaa7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "4c948a38510f39a90ad58fefbd3371f3740506449bcfb7adf9689f704b55a988": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "4cad5f56aff64183d516e8e1771cb73eeed9585ed84a1695a7664db083abb022": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "4d8e932dd57af19f0b67e6b17c6b0d7066b39e05d89aadeccf73afd593bad2bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "4e12385a041f2c154d655d1c59b9eceb979e541697e3ed3483653dcde019e586": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "4e26361f37b6ba6e2390ad0319b3c5f46018e841648185235489cc1f4c95a893": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "4e8fb6562969e6564ac7c677e9948868954386af4a5f42d75d98ea005ab6aa6a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "4ee1daaa3cc3a1ea8c12b9abf7d61cab56457e2aae8080b3ebb5049a5acf88de": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "4f138421822d54778131577f513b448fc685e43a2787da5a2ccab4d34267ac88": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "4f1624d04828966b04220a03db7b75c562ab7466245512c678194ee52a3b54de": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "4f58333eb67052218d35a78991b27fa3c06f53fa505b279dab6587f96e872ba1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "501f85c3f4b4af26cd0c1ea2f25c2fdf6d7920033e27ef326f64b9d13cae0eb1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "5081e9c4c43df1fd06e5e1959666908712f015789be7a9ba4f4c5d40be7f7527": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "50dd0bcc3089eda39be8156400db853df97be8781930f5330db97989c95f764f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "50ddf714bbe9c5d68b4019e2fd9acf6f23f7b7292ba148112988bc81c359b319": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "5134143f02c557658dd940d527369e5b53a3106597685f7f7fc240b1f8fd8a6a": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "51345a7593eecf438442fa34524f2754ced7e1630cd639fb114c7c9c97454b7e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "5169a14af968780abfacf3f90aa7a1c522617b47464fd2e7185ceec0125b3247": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "519981f7da59f25ad55cd0c55e202dba2a60bfb828ef8a5ba7563531cffc45b5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "52af13358e51cf168b615336c946ad0351ea5f87804ba701b8d143b011629ad2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "52d82fbed86096177a43dfe002e5200c13ccb61afb35e30508f05119240b7c96": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "52e39ba6338494d6f1c7d5088009543735f5dec6522eec3d4b9c62f4358ad740": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "52f08c70fa01fcfac5cdcb96454a85fae2b7856743a942823a6e69aacfbb1fab": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "5308e2008baa1024d2a82a4b6755a21b6b42cd59376f10ef78e04e6a5d1e6771": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "530a6c00194eda4067c011478e309a8235eca5e2ca62861df3f3e03b6a81cb67": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "5320d42012065567d9914084b9aedcb682369958e74c322dff4fcd7fe6c0e2a5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "533963fd941ff6aa84b122a69931d8e18d13f2ca857909ff8cb9f9f80e4e6d72": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "53655dd00c33f41681fe671b0b8cceaec8d99e7810a83b764a31952ec5c508cc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "538e9c55413775158f649e388a15da8edf61b6f6e0d11eca0723c936e2ee188e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "539254344d0fcc32698fabbb0958c9368d113e899d07a91090bc80a828a8521c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "53b1eac0d2c07caca1e1fd851a39db93f41aeb4ccb92d105c6ad5cc6abe8b6f6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "543424cb3d740221b36503f76c224122b035b48bb3603802671c22cce8d50384": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "548f15e088168063f70c0c8cabfdacbacc541ebe0429ce92d90c0bdf1e4bbc7a": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "54abef8c818875cdab6ff604b1c2d1c736278767d98ce96bd8ae81c20f0957c7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "54d40f6e01e49c32ab4fcbceb57eafbd45a83b8460d4fed14dbad5eca646b642": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "553c9eb9dbe4ce7f31255d439320b76ad33801e802acadd3f82743b65ed3ad24": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "554fceb09b80b044b659bffaa33bd4fea0f7fcda52cc37ed2e5bf32cf02e5954": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "5552b8d412b4082276c05672afac19842be2e96f9e0c1e56902409c98433e3de": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "56499500c5f3a7174fc2aad2f3c2392fe54954c99ce370e2f8f24c8c38311443": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "574f18dff45a966a925397845bc4e731fc54fc8d405cced5b747fcf651d7a4c3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "5783cf8f6059ee6949d5dea35231dbfb5239a20c1f62f35611cacfa3ff20f5d2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "584d1c3f1aba0b389f279e13fb4ba18ce056af55a63e08ead40079bdc4b94ea3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "585cd542fef3ea752b04b682644fe708070df82dea6ec18cddb6ea5a5e92c693": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "588146733bca9325b616d7641010b6ab535f3b717ea9a08062101b0eaf0d2fad": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "58de7313ca8582b1a99583a56e384b3eb2642c6a56c3ea43d39c14d945408b77": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 49
+  },
+  "59c661a4b53eb8e1096c489b20d222a27cadced51a4feee01d74a5521d2c0c44": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 50
+  },
+  "59d3aa5bd28ceb867c10c01c807b4ffa8efb10aed27a4985969411261065d06d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "59e4ca6cbeed0027c9d8d5ec37420c18de6c7cc0d4d6f2940fede3abdaa668cd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "5a14c8cca6f84092ca63fb2f8bb7a58eaec8d068a19291e4864abf48e82e63ee": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 45
+  },
+  "5a26d194ec5705df14b90bf7c17dc5f801ef0fd58aa40be798cd58d83a16a556": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "5a409c543b6ddc74ba450fd8106bcdebcadd3fa8378500ed20fb00d6ab2a67ca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "5a58456c08ee67739cbfe2e13fe45d740dd86afe4c9bfeb92197ad93caaab7b1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 58
+  },
+  "5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "5ade657ed244f513dc440b383c2b4da4bcce0cda9bb2283339af75bd9c1a0e8f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "5aee2d4fb50e135e09607b48a71cfd688b589332d4f2c1b9cfd3843c30a106d1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "5af0cca4c8b6dffcae50e077a4e472b059001ffe006813c5e9d8d75df4376927": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "5b374617d2d127caecffb0d170db30a0a3971e082bfd450c6e3f339ba1eb3339": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "5ba8bf882303eab4046ef324208aa8f6f56769c6961cb1a0b68018a701f1cd98": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "5c390c8494146531feaff1de14e37e5429872f44ea1621bbdc1bc7f58806363f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "5c9befa2336e89d621efde9dfb845f40cf3537f8ba7411354e50c7102a02b0ad": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "5cb70e13e1093028fe2705248ac7130ade57bd746f5182242375f84ce140d9f7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "5d008d390121815225b91ccb053b8f5e9305cdf16e3229ac938347f113189a7a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 73
+  },
+  "5d2aa872d91192483bd4cb1480741c3b6836f2f75ed34eeb70dd1d6ac72ce492": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "5d4873763a78b4fbbb998552d9aa283b55e3aee021ac66fec8644ede590388b9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "5ddc90c28c4a0ad5b3ca90c004c36b19be90f1a1011e824aec414e6df11e277f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "5de8fe6bf3a29ce10716fb0a0e5da106ff33b6f420381045689e7ea0f41c3e9e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "5dea570742ed3267154ffef7019474abe9ad624538393ea2e3c0adcc9a4f6674": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "5dedcbc75b443b84271f47a08bf6eba016f367128d5be089ef4c4a51f81c05a3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 76
+  },
+  "5e2258e556a7ac25b820ecc9e6a713eabe9c4d7c8aa828521c424934c70c30f3": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "5e3dc8f71aa8f1f98bd3ae1d565fb7bdf8831d4d641c204ac1095ca19de08176": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "5e6afab04e51d6995ac485e59ff7c0c0db9f35ccba624e2aa4b58bef696a72a8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "5e84545674c15b1cfc25d8150b540ee56413f7a962fa56e69f06e73485cbaf2d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "5f01f8327c94c4fe5286d4391ef4892883243a4af8f92b485aaa278a49877b37": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 140
+  },
+  "5f237e8977a0bed1499f18a85ee27f35382042cf432eb786425872e99139704e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 92
+  },
+  "5f4e5037b5e82b0d1957566a7bdebf163ed3e6b6ba28739c0c150c0d7b7fba8c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "5fd676b92571b5947888df82122bbf64d20d5c6f13f6c139168685b027f0b80c": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 12
+  },
+  "601426305bd9524e8853799fab83547d808c383d4bd9fd55ec6d374237cd0107": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "602acf32d0beabcb8162b0f9b0a582547deb76f5196e4bd0be281a3781301bdc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "60c6857f2909ff4a81568f40d72cce8d43d8724f7c223128d00c2fa77083b88c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "60d34e8a7b0d954e8d74dbbbc5e3259fb13cd6b234d686b75553995c9b970478": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "60fcf51e4bcbe909f0406581954ed03516defe37a3a3394f41c0902e2d5f1db9": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "610e13e5f84fed7458414cb672c3c9244cc991ebae8810ca6d6371a384f43a27": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "61a19c7cb4050545ff18dd92970877794f7c11cdb84bc6fc114e8349d8950d8a": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "61b761d55b072fcb1a95e0018a39b12afe2c2f50bb6576cff0d9bc9d26e49652": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "626e7e0c2b90c43935189df4050196dbd3f786bac463df3922b0b6ccd417207f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "62dfeecfea61be21b57d5f5cb07fb5a36d7ed255c833ba7cf78e6b531cd89adf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "6308c46c131cff839a0216c70608a721e0db1672e59783f7815351fd9af2fc79": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "638dc90221f73ccbd8ab98323c5fa4aedac65d353011a8170420bbb4ce9f05bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "6417544989f284fec97aa7d769519afaf4d30d9d4459bd80936de8d4c71ed019": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "64a54bc2801c2efa57dc713e037d7ba40e83e77644010ef53622d8c925624a47": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "64a7dc14f83585965482a7bb78cc54413c29b747e45fd8b2e6c7f002784b6807": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "64bab82f8c0e0728ab435939df4baa0c027177f923ae239853a36008f286136a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "64cf57ab8a8d7a639d9f93768fd3535e1c982f3508e7a3047ca1427ff1cb4b0b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "6500a204b5310602554daec7c8f2cac6508ec5c2c4b954a43d186af370d2ce04": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 9
+  },
+  "654bc78bf375d193e163dea631ac998c7b618377e60d952f9b3b8dd6d6025b8c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "65ad70d7599cbe56064541de6c3f54585c9771b24948afa10b1f69617e387c66": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "65cc4dc17c0d92d4e21f3fa14d4feb53bd69566c17b9ec26ed4c8f0df0e2b8ee": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "65d42ad6f52246123d4bc54ecd71ff7c0a6e7ba0c8366aa7325bb91f7b60ec0b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "65fe625741c979df36971b8f38f49822f45a2d08a7e6ba7471a48b0606940fd9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "6615585b199ecaa92e92b3382effec4bd1c773187fa0d249fda2c039b67e4599": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "662d6bde6cbbb9a2d42e203fcab72fddf7897ffb3e7d411d7ecd10fd507927aa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "6653c01f5b210aa2af63af41180704dbd10d438beb8230fb9f8ee768a057bef5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "66927ea34e73ac3b0907eac5ca157d6270554b0146749853d9debf73e928267c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "66b9a411374fcd71ebdb16e9daa8d82a501366ffe10ebac66f95a90c8efaaf22": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "6788a6f5287c3d721b7cfc4b7f458069ec90c676320d15b825f8fcb2b4a8e992": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "67d1c05e921c075cfe88df020b3d7661672617ca3957a22fcb8fbb4e3f0edd2e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "687566a0796b38664bd30c0f944800b2f0229c3299586ecd569189904aa2e71c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "687bf6f49ee421180cfc6f68aba889b932cc36853efaa282eda5b79a3c0f92f9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 60
+  },
+  "68feb9007d9d947ffd165a8d746163223a991ab589c2ab7b9942d710d89f7b87": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "694c733cb359e9c11eefb22ab0be342e0f414f93a955c1375db46755c3efbf7d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "697fa5fdc79049d23e03b4b816c55daec640c0a5ae10121cf2442ed0d1afafe9": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "69ae1670dd5d135e02e4ee9765a869a4a0113a983f7d0685c3ad60e5714e72d8": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "69c9316f24ec31445af78d86b1089daad9da51ca850cd25e490a3488f790404b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "6a5984325efe1b14a563ee384fb88c3a8f5d1104aa6e67ca087c14fc89b1bd2d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "6a6b0d45b8fc9d6a7f62331987f205882ad8705929015196299db398ab1a5cfa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "6a86a51128ce54d7a0db38fd7ee9f7558fcd9987138ab5f5582516d389a26ac8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "6abce1dd5eef1b55caed08d866b823619c143d6ea38c72b4997c3dee0ea9c61b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "6ac44cf716048e205a64c3b245bf710d3fccf82684e6ffaf65f62ec20df19176": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "6acf68fb2abced8179d0e9a748ff4f273dfd038b58475fd6d480def2c40d0f6f": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 6
+  },
+  "6b21c0ead1c9c3beeed6ef19569a28fbd909caf770af1244827037474b9fe120": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "6b78ab07a8163b54bfd6ea91a2a22e8ad8606fc4dc5d83ba2c64ccf468baaf04": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "6bbf1c3bf6d338081aac181ba1252ce28664ca7d63d3f32cc6c1237cd9f683ac": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "6be32a5e44620b44afd628036e0d632df54dc58a3eef47d6ddb72f0814fe0e24": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "6c4a144e1c7b14b0b14113f6e32bf56f35f9c4b3908c75fa4ad26bf86dbf7c48": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "6c5de6a43d6675ccd4ee77bdea27961f8bd7b06f3d54d477fd74ac05c85a3346": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "6c648be958a179d394bd0d99e8816f5f984c78736a5e160461cfb02a6b4bc40b": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "6ccf7c51ec9e7f035ab070bb204dc2dbcc09187359d73741115585f3a2a6dab6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "6ce6f43e706fa97b7ed3ec9ee1a03f475a2a1e9e7757c86ec0f52dac25faff9d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "6d20768b63bd4f4d97f647ccebfc606bf618d8bb81917bb8d19e1cf4cca38eb8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "6d26a7b0c75d1712d057d5147bd59c5ae5475a6e1fc3a72541a91cf65bfffd74": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "6d6ab532995689c78267a15668cabc7e629a1886787d07ea786818b0643a7d88": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 65
+  },
+  "6da1ed3f7622d32408a0c281ba835e3ab6b334b68f5d5795407a8249782f6df9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "6e156c24f722fe12fcfc4956403553a56c6facae96f98cae19270d7a231115d6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "6e2c723b8e178c56adb2ecc479e062142dc99ac9df5e43ff7669b48214d56d85": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "6e87442d1980a0427e1dcb54b8b9cc44ce3c45e40cbb4affd3218933ca50b080": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "6ef725fde381a694cf92f9a9bdc2ec0eb02a706dd89258f7c03a0b050be80643": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "6f27d8a6b8474a70b86ec5a4943e211b82b80f8b4105dc322b4711cc250be969": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "6f283163d39ece5ed616d55cde4e65b60f5454c3c7faceb81832827a5815587a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "6f434bb030f5b80e4c114bb5f1878b1b2c51a71e4bd00378954b82895373ab85": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 36
+  },
+  "6f472769b1f4e1fd5c675708c35c0a4bfc63d26398751e0f4739222b62f45606": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "6f7b9103846d4bc7874b64ed5abf657f5a5e7200787ec1b5ca57fd5b22c70118": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "6fd6380b59cd0e91a5e7c6756242f9dfffde8c831d522330e4e74895ef1c77d3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "7071a984a0af6b239a0e36c60adcba8e1d0fbb635530dfc1031e7d40330e21a1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "70b72228fc6024dea84c043a42b0f18fdb8e3170faa08de150922b503f0f291a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 36
+  },
+  "71568e6dae9b8514e17bec4ea7cc13cd314f6814b200c06c205eebe8a059a4a0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "7244815f8f7deb0304965adcff6bf2ce46f3db8af997e0ccc06bf0246fe1d99d": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "7265c0ba8073eeae378457c6580bc8a7e41b8268d053d71afea442ac39282742": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "726fb9230c2be404e1c57c62fd75ca7f77a73b3ecae4b011070de0803338cc8e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "7277434bdf3d0f372d2c10be189099bac0a1cb2b2e2d4387cbc9c970c412ae9c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "733f3130918ab6e4eb0abbc7e9077933c688eeceadd3f2de75277be1d6c2325a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "73a01b81a8eacc2ef2ed3a76648fe615e3c5d5950db60ab3a72cc9479bfddb52": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "73c3bb752876e42f8224b29476d93fe1dd9c0f581c5e88baf85af866cccecc1f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 99
+  },
+  "7407f44e6736c449d792ab68b90c531dd6a8df5712627137f06b5bb1473a1979": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "74171971471d12f13ecd0f30396e50fd8fe83d4862e0eaf1b767a4d7e6039477": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "7425de6d1730da4c1cd4b57d7912d63e98ff245c728f0f896c10bd11e7c171bc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "74db4a9b4b847846977465352b32777d013c5238e9209bf02349b8b6a1fb0cdc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "7509da2afdf06cbade72e86e1edcd015a0ec9ed66d62ffd1a0646c65a77d24e9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "754545da7156357b0dfcc739ff23e60e1b317e06d486a9e81acf4977ee6e06f3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "75a58530e2cd358229cff0201c952f388dcec160312bf87a27d70c6d28a4daeb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "75a5e6476b3b5ceba7d7df5dbc1bcd0670f31d5d25672cff240d225c02c936a3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "75d1de355caf4b7a480d48ec1e723a07715af585fafcdcfa473e705c3591771e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "75da252a612c407deec1e0eaa2d1fb6fdad92bdd253356d702eaaa0d28deae92": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "75f212022355632c686e99e08a3295155bfb931ae5a581e1df13e85a21c067d8": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "762f37d4e68af9b56cd224923d59bf6a8b9e20d88bdbefd94996d341d20e3e23": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "768caf0a7c18b4bcef0e8e4759dd7cb508e7b779fb064b83d87f4e5f0a51082f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "76a901aef9e1bd78010c4c55a161dd96cf0d479d3eacee8393a9548c0a6f6680": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "76c7f276302a2ae24241be32af551428e46bb1aa75fab6440238147734bc9579": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 66
+  },
+  "773e7cd5812a31af6b9f2e5e3414d3f97688184dde0db2cde7913ce4ad48fa44": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "7796bb61c446890c9a9eb3f168fd3641dbf351056d9af2225740f23a43b95c76": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "779ae4177c9c522cb7fa83cfb8fc133792e4799f0ab26b1e81e470bab1829f15": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "77b4bfe5387b63583d009886adcf99b022c09119223213b8cb7338688d8742a7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "77ea40b2b279bb7546a226d5eabc33a4166d1a3f3c6c439d045bdd135755d882": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "781b0fcd529c7722a86c5f30469bda38b8c5b8f9990abb1f14b3dcc17aac5d1e": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 9
+  },
+  "785ad0b4da037b0ee214b87c2b6b8a12f018063d6b42183a223144b0667cca2e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "786c53ae3795be8afe77946afa7d20ba3c8c908ca958c7798b1abcb81868d01c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "7918134bdc2b0d1ce6575a68899fa530fbd956ae9d865d53ef75ace5fbd330c6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 52
+  },
+  "794c5190aadd9adc224f42c6bbf098a718efe675b6a0561b8760f0aac005bbee": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "795b6bd8fb724c5dc27326d97cc33f23488c22ef26b71480c5ddd3f2668387b9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "7977e5ba434627ad3d50b2d9f0a86337bd0344f92d5a72a7a062589b0f7d9d4c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "79dac464ee5a9592b34d217b279169128fd817c0e202ba20bdd8983c3796ccb0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "79e53ec7d66df451a21fe889bc98ec89c74d75e4a642862be4e75b578e78ca7a": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "7b89ee30cb031ba7269351f975d7097de0bb48961908b2b202c15759654b4d16": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "7ba3555882aa848966c6a4be26208f36f2bb5c2e638225f7601f7a0d12d3133c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "7bb35fb7e0ba81e649ab5348230bd3356ea84e174bfd1946cfbeae2bc6319169": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 52
+  },
+  "7bb448027ba299836c120e99ef5eb9e6b1002320a5487335f09c1252cb64e869": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "7c2476b9418db51b361d17add0df464ae5adf60f4e5b2711f10e6ebf3cb078f4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "7c7f80efcc7ebf99019f7cf4dfaddb5c8e44a23da1579166a3b48ab2b6368c0f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "7cafbf332b0827502135c8dde8f9b17ba8f98f4a4b0a18fd306659438692b26a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "7cce9d2d035ff9201712826d34b9c3598f1f9b5c9d2c5c48c69a0eee03f6e373": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "7cd2cfa6b4318353a79c937fd70330edaedf5691f66d63f46e648a154431616b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 86
+  },
+  "7cf6fb95625c5a4a489b8193d78246a70698853aa38bf689f0d7a00d9847b92b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "7d101df2986fe8a894049fc2e42febf8cfe9c0900af353f681d75b4768394ba0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 45
+  },
+  "7d6fa3c1a467e757a162b9be634287a7aba84a24102bce28a6bb06f931111981": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "7d875fd7641c0dd8cc4e891dbee8f8e81c5cbaedc444aa1939efbc068afc6282": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "7dc004e322fdf058c9b8a2d3f3716660de0061a2289785a2c521cc5398377299": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "7de08332be3fd919d2eedd7320367037d4988c3d107c6b4ddcda58454f5650a6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "7de64a727f63a00bed9a24770f28db2939c1595ebc0e697e68bc26a56ef60ab4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "7e159acbb59982fef482b344ce20923f1747602c71618071cb59e00c3611a667": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "7e5cf089ace7666a31047fd07bcd5432db845247c36bc750b6bbc980b0bf1749": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "7ea40763e0d9aba0a7de430624087d2d3c22f48c79da68385d4bf2cface3ab45": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "7f14d04c716303b20497608110fc0939393fb3e54ae40946fd5ef6f1525d2fab": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "7fbbf49788f18ee7f67412d318dc320b5ea0a07497300cc8bdb2e9f4be76f58c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "7ff55b6cc19c367e5033c011ff7606a7d8b58a70efb4b55058c4f9d79ff93954": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "806337b334563adc74190108518eec58e9d8db88773d8e25f17bfc80744771d5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 66
+  },
+  "806454331ef04adc6503a39600e610c0d8658b6ef5c3527acd0a074849fcfde4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "80a283757913a7100aa0b6aa7ac99dc9a51af19bf1623b7bdbe0a10753210f65": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 71
+  },
+  "80b3ff670a4d3e49ac90fee3f6ed63d53b57699503c47402710104bda513c5dd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "81016be0f843d6d313964843c33ecbf8a2bcc04cc360ea03bb7ce0625f3efcee": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 40
+  },
+  "810ceb8cb9185cfb874aab43498e7a97b33d8cdefd228206ed54b5a2f43b518a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 69
+  },
+  "811f1d0042bef0cede4c18b2b5b0827fe6a940e103d4daeff3261b65ab34dc2a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "814c7e31aa6c019f1abe0e9156741f56c186b568605278d5974fbe0ed44b9ecf": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "81b17017ce684ffd876d413c26bbb77e8b55d87d0e13d752fd146156d297063e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "81ee78ce9dbb54bc866504774777bf577917920c225fa76f2611de6775b504b7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "822802d54eee989f00fa3e586c7738bb5ed903d9264b2754c5ca04a28ec24ff4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "8240291e36bcb9c2f719a58ac7bcf06147f3ae2a264cda911ff97741d7622420": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "824ab9aebc9e9715f48771a6efb8cbcba9c689926050db2236271a7177a35242": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "8258311c1f9b8bec70a7fc35af3d76ca943cabe4eab50113c8e66157ed5dfe61": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "82bf785f250fb63a86df279e1a6061dad8d87d745bd3dd41edd9bd7e90377861": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "82c90c3c10e17ef8e82cf3ab53f8d5d6febea6e10e5b467c3fbfb0b29da5da49": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "8334f5378f0fb87dba74affeffb66a251a64246fb00550278645392b0c48883f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "8349f95445f28dad8eeda1ef89d36e5a71cd6d1e043a78cd57870371372bb364": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "83729abd0b834103ad1f46ee09c5ae0eef24d4ee289fc7b17a0a792773afa4b5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "8393cfd70f146799bcbe132b3890b211de82258fe7b3e84d7ca88070d53c1886": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "83c67ccbbe79306cbccdd06433eebcd5f15fcdadb7e6a1bc19c4a954ffb5e750": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "8412c888da1b31f809bec13b8cb59dbf8262875460f70197fed77d214000f86b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "8415e67ab4e1cb5ef71605bdf1c659cec9f0054e7e9becedf2c0a22698b239d6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "84b0fb39736e56a26a9694fc4c864e0616ed3f04b5c6397c2184677b3f436234": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "84f6be73e39c64c50bfffc44596a829bcb326879b831f76e4a63c1fbc26dfa1b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "8521e7125c5f2511d9f600e30817327ae9aa82cda5babca5bf9dc0ceb0be3cd4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "85ac34699ad8f2a81ce79efd00ac145cb5a680d718591f76e15b18766e526323": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "85ee3cd7316920630dadb6b76462969aa96f1ea7e89024519b5274d45bbaea2e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "865b8c1f77d776a3be0a4fd06a9d5f1ce0abf97795b3df701ee9af04157b19f8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "866f05d09c018384525adc4ab4e42fc51c044ba9edd037ac2a3fdee5f89249ec": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "86cb92c18f4b60f68c6d264a8ca4769a2e53df8aa6f3d57218546b4104b8e38c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "86fd6bbf3e855e383462622eda4851966cd45984d47d539cf6511f816a398512": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "8713cd3e25b2a247710e91f2085c0ce8dcbc770b20656cbe812f0b01411a23b3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "878723d28417bc3aead25ea06543f55cdfec049c9f82b5987596f7ba70d82314": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "8789365b2d98880b5be7a9252b63415c1706228d4f75bd92bf043eeb97b9139b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "87ee5472b1534f6e18887032123470acc0fa5181b3a12f050b8ed55e00ca2a40": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 40
+  },
+  "88114e686980da30d869ca28a165f7319324af1e122f728071db6a092630abd1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "88262c777c346231e74281cc7c286fecce8affe2b88563744140fe2ac20e2dea": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "884519d01b0c5541d337ada7fef973df697b4aa2a0b362c4310212427b2eafff": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "8846bb662fea9bff381f7a1650ef6caacea589d80984a84430eb1dccc8c26c58": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 57
+  },
+  "884e24ada00c2bc4135ce30c910f3f98d3b30602c0ff682b1a528b66e95c45c6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "885d5e1fe5d2cf537db2185a15b45f7e95dafb7b06ffeca879e5e9b303d4b13a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "88d138b34ef2966c29a2061574d65fcb2953f372f4b844f299457af3be3de125": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "88e1b6ff936d97fa67ae03f05d2dbdc85873962709948d1beaef1bc6cc9a1db1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "8910becbdb2b271e48c778b36a2a88447173581cd03995f336ff4766a6d39e70": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "891e4bc32e2992dc0ab359c674e47c349ab5a9df2ff68420d9e7c65657853c37": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "89617a8ad7e9bc722537609ad5c30ff96af2034ef4477a0713ca5f0ef6191bf2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "8983c0240c92bd4bc63f4e7a59479f8159718d94bdd5f9210729b8450f407847": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "899e5e56fd84c4b8c90d33f175806a09c539d4b763546a05404d2cfdfa8da972": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "8b0034742b2accfeb434b54291ddaee2c560297c6f0f58c398f222b0094563ca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "8b5c0cde3f897b42cb16ad19504baa1d65b50ad902dcbf404b27307095a32470": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "8b76ce118b556f1a0d7af3e63367678848b7259ee5a5b5d41a0fcda49e80e972": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "8b88971ff635e84b56a62bf1abcfa27a49a1b3cdf7c715c1e6c02abdbd63994f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "8c11d73ebddeb8c8a8f662cce8f768779b8dc55f4f21f1cef62195c5ee58e63c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "8c5caaf986a5c927ab12271f9a65568d5d57c84fd625a5537ec093e50fd0c20d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "8cafc469baeae8d6f9f7dc459621d933af5e741977e77769426245eea3de2fe3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "8d01298ff25eb2ea45c126541dc1f946896ab9c4ea6a364a8560f7ca38c67e21": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "8d1918ca0c66b0b26f5c8bc8bb1d1556e77c2efea342186620514e392c14ba67": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 64
+  },
+  "8d40eb4a776a0369bc2ed91e09458afa2cf63f7a07630d34d735789417c19082": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "8d55cc62d713f2b642e97952804dd9044af44a5eb8f38ce4965ad43aca33d4e5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "8de96d8d609a5abd6a00c37809588f41a067ea606d0dc2c329621867ef27393b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "8e23d428b204ecb3c014f7fb01531030c93b5b53102414670a0315a72928deb7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "8e80094ab55ef553524dd88654f7a7478ef9a46b998dfdaf24945f0df790f22c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "8e8e43a858d581f916df08ee569d86fcd714de512d37630fa390abbc1e651b83": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "8ef49da04c74c717c97ce2ec03782bf80773c084554b4032f3b66f5c2b501de2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "8ef6248892a15a9b3e6d28ac14b0b72e1062015d12f09109345e84900fbf7c72": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "8f6e2c1d4c5f150f02c83a90cd6bcb6b2d4d6b90c2777c09c4e7354852e3c127": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "902f4aa65d0b993ce5fb929cb0a061956c6ee8513bdb72d04ab2cc7e6452a3f3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "90ad09c9cd227e12452457bc9349b87b48fbaa3f396bfcbf26d61a369f96d1bf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "90b2026607ecec42cf58e7bda93253ce1d8738647c0e3f8a2e19175df32d684a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 36
+  },
+  "90c5f1417e0b5bcc83b2b1fb23d61a8e2233eaa2bc6936d2d991a99734289f5b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "90cb448b590669309b48f12bc07ac6070dee6a44bcf28afda573939fac49b070": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "90dd27d8f3f7782d2508d2a21b95a9ea1c4fb402193bdcf8bc110d0cc31da9de": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 61
+  },
+  "90e69ff9cc5e8acd2fa5c747e8fa5d534b04811ff1376d51c3668f7d2e252ed3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "911bec901e9fec345b2d904cdaa6f7fc89e56e3f7cd09af20f65f5094d218e57": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 53
+  },
+  "913fd801cf8a1db4f43295f0716a44013314122a862b96d9b2824e4c1e56966c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "91ad1cf615acd3ac9831836bb4a5ca0acde9df49b08aa1413f9e4c3a5bbbab52": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "91c7238b7262846116bed4c20740d087df7a0f63e4d6bda2276c17e2b397261f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "91d3fa11b7c406b9c140a40030c72014202b34d3c552c1a287f76020775097c3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "9238622086f8862b679ef850ce4ce5e3d26cecb9bbf5ab0d2f0bb5c6b5ff3e59": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "9272da64c20b1ea2635dc61e35831a77af8f0fffdc15bdd1fd40c15cf9690b9c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "928f1c8cf7bbce3fa536861ecb7ed3ddae0d737a51a5cd41c31256c415d3f36e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 97
+  },
+  "92ce22c4d43abefb90d310df410a1aca8e0f2c7a7412582e313895c77dd21460": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "92f61b6d9d712cde93abfcb93ce81ce0535a18d38d9ea9b56b693f1f6149dd4b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "941000507c6e0ac7a829f9357c368ef40c2d368d04a1788d23d8ccb50924a54a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "941993926b0c294c396228c7e84e9dc84441077cff4f96560d719f422a9629bf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "946ee5de49304fa59fc360226a529d2f023e111930c839b1ec50abc36eee3fbb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 62
+  },
+  "949a4e8dcaa3efdbbe63dd3e49b110c251cc076644212505c848d8e3131271b7": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "94c8fe3ace1071ab2f2a34dae52192ede7dcacdeaaef40c2b93672ceddca983a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 57
+  },
+  "95612d02c6dcd3a864f4f1d806e3b0f3aefac56825d3e2493c50338dfa5dec38": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "95bd9996a89d3a52fba5b9d1443078bf75e59ee88b598b39b4c7638f9814e6c0": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "95fbe7969eed1ae12ef3b29009eed3dc071e81987f32b368c557cd19832efaf8": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "96081df124d0f95dd156683c2353afda7e42c3cfe77fa806d31c6c5e05ef080b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "962b3ba115e63aa0ccc77ba6f1506bd20c3e0473d3a8151dfbaf2a0f9e4f34d2": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "967eb6f95d43024098c22d3ccbed2593be753a9bf77d5ff176248174d631949a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "97f530e8bc83b732a8c4bf38bd0167d90d2ebc936bb26f42838d6376b7a2dafe": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "980ef456e9ac4f6b0e792b85bd38cbb87029d9c2a9164fc289fd4c9c882b8888": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 50
+  },
+  "9828f6901623603463ab2b7615790dbe82bc4eae5dad771127442d86754a679b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "984bf78f41860a60d941a5ca614bde360f7bca16a21949bdcdbb2398ef7d96a9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 37
+  },
+  "9850490e941754c6148fa459f04874086f5f7bad0053c7918fc9d7972cf850d2": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "9884e094a852820417be19f60eb3cd92d3269698a9273ea81bdd27fe86687220": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "988b650d3ab217ea17e853bf40f5e19493fac50ab31134a9077c034c7df0ee17": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "98a720fa9c3227c7ba29b8f6f00e80a06316b964bde6b17f4a668841327aebb6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "9906975f044f805d6af2d5679c519abe2d881c5c098ed9dedd4896d4a96a34be": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "992700c36830ac2b9bb8ad4d04969988e818f4740e62a1088a5eaef73121d0e9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "9993d37e13c15f34147b1f9a31cfcedf63c966bd4e62b689d51233bbf1addda7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "9997fab90054479739e7325f900dcdd8a94ca4b7eeb9a29dd4cd6a8689314de2": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "99c3ade92f690f1190e7748a9cba994699ddfd44121f7c47e0f10b2cc40c97a5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "99fcc563c07074eecf8905dde897608830c28e9634ee0082366466ce3fe7510b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 67
+  },
+  "9aa0013771206f9b35873bc3c22a8844d31a12f07c1c0eb603a5ddbe0c7518ca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "9ac16cef4aebc48e38478d0781e26645d6bf326f5fb864e4e8e9eef1743812f7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "9ac7cb63c66605efdc811193cf2f23607c83c1ad29fa0e6fb16ae844e6651ab5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "9b06ddf3a4f22b987c56c05c11d80621a07a9112aa193b1380c36be2ebb6731d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "9bac96db331d7b532a5c47a1809b9d8cbd3d54eeadd6e9b7cb6c4cf7bc168b52": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 40
+  },
+  "9bc42a1e16bbf3f87504f9d9ef15c39511402cfdb35054dc215c79d877925b78": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "9c9403f2c7613c8f91c2bf0674624f4956c480e5a2b901d09111befa851a5b2f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "9c94b0910b4b0c5bbc96f90ffe7ce65cc70f8bbfb92890792746d081275fb1e3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "9cd8ae5be3d4e0e3aed900801a70fab1c9c9768a9753d1b6994b85b06a8796bd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "9e8a1d99845c42a482ff906238c4a94f728648e32166ee28ac821c815119c861": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "9efc9e1aed57db96ed6a0742325d14b739be9069c4f66319166cb21babc3f701": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "9f1aca29525851c527e02e81ee81d4fa04dd0743fe0986ef1013cc188f8e3c1d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "9f3df1e1a800a05391fdcf496baf42e3316bc4db4e77291a7f86635e5a2dad77": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "9f562531e8baf2fea54bda20f8147643a46a4b752aa4c940931b7f40ebfc8ee4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "9f7e12edc8008cfea0dc4f432f17de4ef3c4825b9e1666a2d62ce0774c22386c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "9f85586c52071fb719b88e851cdee45758c48f4e4937f3d5b59f8e354a00a92f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 67
+  },
+  "a08038f47f27b341e956dae311b653526729becede727d024e6a83f581cba2cc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "a0b0949ed80e3cb9dd531ea1de89ad0586a5ebd8793043857dde66b98e587623": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "a18f128e010a36814f9a6365ef41fd028f230a54ba9b6e38755ff313cf958be7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "a199b9ffcf3feb008b4120638d2ecd682e9fb60f2eaea056b73c4dbf76940bb3": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "a19b7547b5416e5a906efd4c89cb980dc1725055e7e28a4c4478c21fead80dd9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "a23ff315d8a02165cc9b60bf3fc9a54f61334f12ef7140cb79c949573dc1ae25": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "a27a31a2984e61d82752bfbd12ff43d58d21cd5709827e8e203b401162fc662f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "a29559487c8b4ddc0afbd13daa94ed12d8e401acf6b2bac54b1728ddc4f86ae9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "a2da58355c1b8f23ccd96501545d85c6e210640b7baa6370e1c3b1a2a9295b09": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "a328d241dcb8f2bc83e0bdb5473550769e6d92ee8a98290764f0e9fec9cb1637": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "a360d34c1c94448bb5c3417c5310167c07236e4a21106bce85661b04b8a1c1bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "a385128a0f7718b1886490d8f409ad7fd2db480d227f462e4c753b9168d1191a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "a3c7e565c840695fec3f14988079d47d21c626b0016c113a090ad77ba4797761": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "a3c931a1bec1ba3879117e11854fddc2344a8d3dbc4541c549f94a8be7524b7e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "a3da3656a0327fa871064896c91a28b8d7b68ff6161f5e74a2138c90bff71b0f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 44
+  },
+  "a4b8e9ddd554ee40d41ad4cd7a68b3182156bc78a6c39989280f526f118c58c2": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "a4e099a322fe7716aee8f097996979a1c8e01edcd2be1436b7df81a4505cf8c5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 47
+  },
+  "a56612cb08bf989e15d5a0d5e145daf5ac03de96435eebfdd8ecc44b48804957": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "a5e52b3ad999c51b93a7f07cdea6300510b2ab0185fb58feb772d52286d0ce6f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "a6143173036f2b15d9329e3324bf69e27ba77b91321bf52063359f810c3d272f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "a62e36a88f053cf2fce6ac1b11ed6803cdcb807404b117e58b9889dd15fccf4f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "a66fd59ac8e8b33a9990679ebc0419cf4eeffd954e4f5b49d00c0a619e5e2a7b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "a68126243a13ab2061607942506615ce80f3842d85831a96c9a5a22f9993cb94": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "a6f84ef7b0e799ed6b5bf42be6741cb7b6bede5f8f8276a2c3dfbdf637abf8e1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 60
+  },
+  "a742b9e48fffff20ce2edb35ad01179db38cee5f3096d3e7330e276165448078": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "a77cf6ee93b7962d735fcd0598a33477fa03bdda042a5b8b021e7cff9d82d1a9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "a78d38025699844b3f4923f26b5d6d2740815bdea40f8d929e4adc714dda2d3c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "a7e9b09e9c1358e6a1866aeb5aa94a4c3e4d3c652c9a0f38086b338d774fad1e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "a84eb1bf7425c61845df3f4935c3b0d5b27084835d36c2b6d0a082e2d4eeb76a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "a8c0701d7957c91186334dab27187920dc42bc116fb6c19cbdd3f9a5bc815d8a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "a8fadcba35968fab5cf7c42921aa2b80462d07c07b4bb9fd821d8504992a77b4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "a967b2ef66e6d400f87d60595227ffb0e6531deace21f9d523f10553630a5775": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "a9bf99ee18eb55791bacc7c77091bf2f529e25ca8bcd22a5bf5c7d553d083bd5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 66
+  },
+  "aa1486a4fe7ec5de2bee45bbd65d00ffacc53453b8fab3a572132990e6d823b8": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "aa16e92d7e5eb8dd1663f7694a867d496e7eb5a6e550f14dc334cf0455c9c5f0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 36
+  },
+  "aa35720ba3611f946c372cc99d8cd1d78e81265b8ceb51dcdb4672d196944c2b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 57
+  },
+  "aa46f45a73e205e52dd2fd7cb3657ce4a1ab43545099f50bfd833a858c2b1fec": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "aa7c58830d0e84f98e9fdec1bc9e131227f9b00106aa3c78bc8ea346cfb9eac0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "aa80068c3cfdb376e946a2f227c201cd3bff5766c28bf3c8921db9b81ac7b363": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "aaed61e79aa3edbae844f5775789ebb6aa1a94a23d9cb3468d2cfc974af304e5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 65
+  },
+  "aaf643426f0250efd10de3d9df63b407292f3fcc2aa335e399c37aca32443ea1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "abd4d7a08b8491e82fcdad49e243ba2dec18ad3b7a9a320504e428669fb2281a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "abdacffddcefffcc01f5d7971728527abd368126f8d2e4b5d1f238e1ee8a5a52": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "ac042c64d57fa72971757dba421d592817ba8ffbaf98bb0c19dbda060636093c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "ac0ea39f8262d6e0a2dafc03d68e502192deaf70803a0be916ed427fe071aad7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "ac34579dad0840fad1e209c0655ef78b9f09bca2c7d11ec69481ab5c8a5b847c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 147
+  },
+  "ac9efddb67f5a672ea6204172fb5ac65c9ec057af34937aa954e73cc3a6f37b4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 92
+  },
+  "acd971ed37ed83c1bb141d599b2b62f1211d130f7101308fad352fa7c0d77cd1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "ad3c4b8f943fff778a133c6696ad0dd4d78642b9727ccd811abdd62a02ab9ae7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "ad6716eeb53cd079ce6d6d1546eec9229edc73b61494591f8800d58856774e8b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "ad94fbf1fe5e6bc68d6a5dc43071420a41984a19c903cdba3e6adcf4dc88ea0c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "adadfdc915eedb5ef2a14cfd785e46872c9b5d83b983ac0338cc4343faf9fe1d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "adbc8d0b115c06a4b48600373f48df184a763047450e11643b108eab0edde124": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "adc5fc99de72e8d66100d0b6c0cd9bd6fd1e5e74d1e3c41a4ed9bd0867648364": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "add91243fea541de9be4cbb776dbd94a7e6bafa2023f8f20bf843e673fb8ee3d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "addfe6403158ee65c98de2c63dac61b8fc5d4172d9ddcd5e031f0edbf45cc770": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "ae0ac8bdadbb928620a07d7bafd3f2e69d16d77092b3e49e3a9904e85a53af0f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "aeb302db81b0a3397310f578574620d63d72cd0abe4dfed0506a5768b1cb9fd9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "aec65125af0231b503a368f4d2f3496cafb909039e8604fffcb93eddcb799eeb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 60
+  },
+  "aef5308e99863645b06aa0cff9767002681664bc62987a4e40fcab35ae558d05": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 62
+  },
+  "af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "af78f1356f0f7c1edaa2a9fcd0c2d89b7c2507d5dab4032ee740a40dde009990": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "afe94c7ed1f89cbb7fed696b1a234396922cc0ea31888aa4bbadded5f92ac0ad": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 57
+  },
+  "afff5139322cabb5053fa19f7a22b147702c877bf2fc208df3267c3f6cb6ca53": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "b0147f4919446b5004896f2a8fe4f95b47d8bacc0ad928627285734edf889718": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 49
+  },
+  "b0bf984b00f6f8c9fb97ed93a137464ebbdde549824d0b937448ce455c8ecefa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "b0facec17bce687a89871a7416b653c0339f5dab5ddc7be761bf178c74496ef4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "b148d0b569d2a4275f7744903881db19b0250d849b0912cc4ce172b04a77830b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "b16f679418ee1d22308335b498c17d50f675c583e96105e73ed57441c8915f84": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "b16fad26d58df4186e8d34ed9f7dc366da81ba9fa9d1004ed04ada2e9ced668d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "b29c44122095453c3da6069a6e3daaff0dd6c09553d69b66b26b6a5cff8dcce2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "b2eb1030a64c9497011703b77156457a4fb7734f5d357ddc0925f276f439cf83": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "b2fb63aa973ee1955868cfe1d7a31b7f4b189c1aa1f95fcb5af02c8f1bb629a9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "b359830d31a4f07c5a34c871b5c00e7b3dea6d17bcb29d318df91e805e9c58cf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "b44ed1d5ca215c9ac06dbab824a8ea32ca1a5454b3438f38f182f9d3fca7bbcf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "b46a3d0daa022904cd5e76e955a885644f6f07ef3349518ebf18e258c0e00428": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "b4fa54b98c45e6a7f72f5d3904cb003600c182a1ae77f3345998e629d094acd0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "b5636b5ea78af0f4fc54c9900378645845a29a21b70160d01dd908f056968982": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "b5c481aeb0ab3af52563039df5ee5d38abf0ab8bb6857db4f746ff1565bc8c10": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "b5dfc0b673ee5f2401dce094ebc76365b850543af78eb9176dbd560e5c284188": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "b62e301b17bfc6de2c0e96ff1b9b048017709d61a2c7cf6a5639b4fbe88f6d00": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "b689bedd7c37063e823155e9ce21ba5d2c8d39df0e37748284170132c3a0963e": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "b6c928417fb2378be5950134bf560268c6f3e4f3d75d0b90e15c03eb0f5863f6": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "b7085ca3d724ea06acfb3d80e0f2ebfabce33df95b3a7f197843cf544ed4f8db": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "b76e11d8624ad44b0b837260fb4e92cdfc66cd59328c00d7658d3f7f86df07c0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 90
+  },
+  "b7cef9efd856148951cf1a6aa2e33ab9548db4231b1125c5ce4c2bae6aa557c8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "b7d016f1fad0b8dbf66eced3f23aee5c95d3cb0f001dacc7e3420001eb8e42f5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "b7dbf1465b684758ca5b4555a16b90cdcef3499bc1b665a59a1edf7d03c73ad9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 36
+  },
+  "b7e06171c8d05f56a26924a6bd081098aae599f42c8f13b83a3fe9fc593d059b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "b806f77585be62df6bde173ce368ed466fe320724685d3c985a4dc8fec5f5e8e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "b8202aba7e16efdc401f1732638fb2ed4668795ff0784e6fd4c99ca24e2219ca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "b82f2fb3d86913aa9dfb360042af5a6fe7d23498c4a9ff34d895526e7677282e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "b8b1b070a3eb7d84d6c950097304f238d09bb52dfb27f1a3cb788cd841ed13cc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "b8d1e61dcc1db087ba6f951468ebf2bb716043f89947f288391e9330483455c9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "b910c743639f8c3f0535fc436d2105b2411616858d6d37e65442fb96194ffc1b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "b932f9cbeefbfd99c67342cd937cfcf7b651abd8232b5d5b209b2b11760a69f7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "b968ffd664f7d5d12ffb2c66b8e5424e192049e1d754b9ddf0300215441a7abf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "b9b88a71839b35ca226e819f7673a3bb2d1b07431fea38bf237977ce3288d65a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "ba5341c07e7cf4a5fc26e66aab1d481e289dcd24fc2ee8a8970ca1f0a2ce0132": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "ba62c7aa8c25d8faa037e6331dc1026472d5de1b2d441225f35d4a92cf81acc5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 71
+  },
+  "ba7d1712179aa03f5c28d459605d2a6806a2d25674326ef7b897a0c1a07acbc0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "ba8d4de39246f84779628c1ff1a2d493251c4159eb8eaa01a768a07fac8ccd84": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "ba90a6471772aa99644dc73fe6dfc6d2aac181ea60474ea4e14048a87c19be1b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "bb0a754d9ae7c5ceed68978dab33acd87c0b74902351810ab9d33f9a0efd5a40": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 57
+  },
+  "bb217732b58d5f025d02b6dccd0075eb35a2a379e5cafc6c5742000b2a32dde9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "bb23889860cd9159d0847b5dbcf3e9a932b1e09417eefce4a98eadf6744c367e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "bb81a8a5ffaef94d08c302694174f03646deb205f399e9b337d465a4d04bc95e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "bb9ffc2501a12a526edba68420a5ccbce235c1a49c426553394603bcd30bd01f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "bbb6b8580cb7b60cc8aa7e50e41584b4d0154e12f464caa536c169a1b2e5fc81": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "bbe262bd7f9f96864e594269cbea410a0581d5f2921662d5d96b554650346a34": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "bbef288ad59ece7773ed62c9003fd8afc522dd70c3ae373c19f5a5a37a614802": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 57
+  },
+  "bcf1807f4e013b1caf137a8b3cd54e6b2b2d4fcd9158e4919f6d5715ea42667a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "bcf788153bcc0b08e68bda2df762303628fe34859048967f826665d5760ba2fb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "bd88915eff276b940c61baba2e9230558940817026211021296aa33ed46cc119": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "be041071429a02bcc19de22829628349e903815b9c9034fad4f9304f111d2de2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "be27690ecd0bd00abcb186ce0cda8e2971579fa4c54cae8c0996598f857b0920": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "bf71a1167a51f54ba71fa5f958b313a55667bb2693a3d6c5bf4c52db7ed76d04": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "bf79f9ad3e1f8063ac269c431ce043d8081942db9cccc82bd859383e0baf5701": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 38
+  },
+  "bfcafd022aff595161edeeba0ba7e09c2461aa5bfcba7a13caee998a7e11b2ff": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "c08aa777a865588042566cfbe7331ac61057dfe677f118656394a3334b840649": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "c090ee11edecc6b514225679e84e5b07a557816d381813059f6ee414f6c23e3a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "c0983894e82b110333158fa9882fc130617f065e0afac5aa5b5a12967d10a343": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "c0ab237b0fab0b961e40855fcc77c5974698cd479cab82741ce09b6d23a20735": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 73
+  },
+  "c0c2aedb97f7ebecff35adee756a7aa062d142313f17286451aa7b4c526dc2bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "c0cc8a5ff65a0a1be0c56a274f89f157e5fe5ca9b8d687e0a5a10018a67d640e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 67
+  },
+  "c0fcbb4798dfafee5e14d0684a42dcb87ea914291e54019bbb15e73f7672da2c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "c10879ac8ac8a081e3c4d38ff7ceec1b699730cd7011917595e119b3f032842e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "c15053e0888236d19b16aa12f9b30049d5fdacfafc82158d4461dc34af8d33e5": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 8
+  },
+  "c1e2051ceccf5d98940c5bf17e26c59c0a918f6dba84ddef22c6dcda0330f16b": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "c1e2df9195ef04d5a83687431c09e98ec4d3e8d0b4e7a25a3bfc96863560a887": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 48
+  },
+  "c23067ce308fe648d344f45749664029cff1bb0708a41240e3be5731e00e4669": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "c23b582e893d68afdfd0508c787331a9d52746c90c1f5837144c61e0a5a17d29": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "c27b5ba6bcf38954bd3b45e22bb694c48bab20bd9587bb210c380494806f8020": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 92
+  },
+  "c2849520cc8265c86e1b95883561f0ab0fcc5c4858e18c3c00af11dd83eba5fd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "c2d0a55ad388dbd5b1bb861a97ce301f50cbfd940f37665c70b35eae2b756363": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "c2f708350c9a1cf7beb74c7babb60bb37557b7b9e4ec753665b9503a48244536": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "c305629e87c90b13f0bee9cac9ff1c38a48838e90dd63e4e452e968d43a435de": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "c31449a07953a351c64a8ddaf40f12e0c8004d047b8c2370919672e125b75c35": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "c351fd9278eadd2b51f03c12a5066c166fa6a45d5862e6c47e0ac13a7df01293": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "c3e2f7cbd11dd84a891ece4829f6f80f0fe684f97fa8ab0ade281a4f35beeea8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "c42d2affab21b443bfcb6e2652eb0472cc96f98713fae404d2d9a7a3f319eb32": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "c44596c8b4fc14fc5a7fb674a6afa9bad3130628401589ec036fc9781b83921d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "c45a31f0e5bf68fa3644fa7f0a699c134dc37cf0a270a194dfba330a1e2aa045": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 31
+  },
+  "c470de87b730758f95ee02e4002a280a75fceadc314ff4ea707c0464846b2885": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "c56413c43be7b785b1c78927e16bbd6c79d768de242ff2b3ac893cad77bb013d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "c594adcef83e0d1f885d21f423342c579e84c01ac1b2449f4a6f7b374d5cf3c5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "c5c494edd90914eefcd9c1d966608140b28c2e98bf58d2e8dba0bee00490e360": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "c5e1822cde1aafb2adaa5310f5a9d917cd2b0d5168ee3104e5b15d1dadbc8f43": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "c5fd8da4ddfc483f605fbcf9d52c8f8c12090c030ac8552a2a26591985a365ee": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "c622aff08ad25d8b93e071742f092b61f47e1a6cf21e1205c6ae1da106343379": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "c68e229b3c87521d55b37e9c5772e2106715cb97f8415d07f003ebd8c2dfc6ed": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 10
+  },
+  "c6d388290f007a260a02f61ed93a48915d52aa3010e9579cdb75be98ceff1566": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "c6ff2a779d0970d4ea0ba3c5c12818599d659608fc9a0d6fec70ed71cac3b16b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "c734a4165803a93cb88633fad1216750dec44a694f1e2425f85dfc2106fad484": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "c742320ee054700fa73658a8bd535264399a8c9ce41cf785daf3a01cf344d702": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "c7815165428614e86a58889fdba8968f8430fc3f1131ea31a08cc1aed0633179": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "c7ccf00f11e2336f0f308cb4b109e7c005f1427bdf5b0bbd72856cf82b0bc8b3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "c7d33250b81168874f1d228ea632f8a28a28bb199648fdb89c07c7d3b4d94835": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "c7f033135e85f33261fe14938e89ded6c3c273c20bd681472faffbf078777b9d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "c7fd72a6b717f164a963e564461d6305ac4f06f85c70182277dacebfed03f093": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "c80a03eb21d97b52e21a563e534c93e858bf3c5b1e6687087d4a58436a750996": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "c8ae50bbe504402b51c46ff1178274e9e03982443fabe5cba6c0b92e2df00f23": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "c926f97e265213d2f61dbf53542eca8d279dc225cb9f298105f0579b0aa600bf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "ca501554a5751007fd8819087eb0644489fff4bc0f2fbe582aaa5f53d67cfbf8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 52
+  },
+  "cb239befbb0424facce9d23491338f7d81d53924043b8402463bcb4ad1d46ddf": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "cb59edb175e978d3d77792e0b91f12ca7a6b113b81f57a595b8d904596422e84": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "cb5c44dade786717a133e52da5929436849f3a00f4ac93ef9d47ec306072908c": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 6
+  },
+  "cb641edd9d49d27ad1df2f4cecc9e1b939e3d75c4ce032c90ecc70716cd61602": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "cb96d6c0559bad6ac207687ef6a8b2e54d6620eda96ce2786136e203e5617a20": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "cbb3088bbb7a834a6986ae4f647fa42fa8ef5f41fd23430eb2c016fecce6b0ae": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "ccad743d733173ef0204c87177bb6c29cf9df043c3ea5037b5fcd7dcf7273598": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 40
+  },
+  "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "cd99ec035f2b64483aacea34eaef2545b3f45960c1c2747f27e8c3429e069007": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "cdb5e4c3abb364866fc5faa2153f2d12a25e97208062514c529fe4560a924a63": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "cdfcad0a2f12638467cd56b765bd31b70c3bc2b7042dc172c00ecc131697362b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "ce1b41a22ea39f67b3f0fe76de5a43d6e2ef37eba4cb16d23f3b6486cce5221d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "ce460c9ffc0040a83f16e56d64cb5f81edd4a336893a1dc26a37bdf5d0cf644a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "cebf56270decdf36afcc8dfbac7320f2c6f4d4a54f23553b7f54604dcb9c3fd5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "cec3970d17b42b3d77fd441c0bf993ab2d4323250fa4f8a342414a617294d82d": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "cefdfdd4091c1b3cf978581fd720f821a98a2f1f22c1a0eb4337ab3568f6bd50": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "cf07cae7478f71c780dc56beacc5c386e3d0beb1ae834a619415e83bb734b13c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 45
+  },
+  "cf43d0ff89386607afbc67d156b57bdf61297e9354969452d30a442406c2bb45": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "cf48e124a6d8f337f80ae01cc08701d2d77fadded96c81c94cc7197b1129895b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 64
+  },
+  "cf7e996beb2b4f385b483ce97e845afbe16d2f9cd9b882890216951d705255be": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 62
+  },
+  "cfb3055a533edab74f7a9f5f0f58c459f9148365127ae290959dd01caf285ac6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "d018f19bd66b7422b3ff58c5fbabcc11446987b349f5feb19fd79453ad6d641e": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "d087658a26147d9faaa33b5eeac48fab6c5f04c476700634c3d55185f23ab004": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "d0cd84813753be4e647c8f7a0a66c141c455f4f452a30bb6c2be1112e773c466": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 47
+  },
+  "d10ed6a3931a4da64ea12fc645c609fd5df12be9ba2648e7768c9e7e5191b4a7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "d14e49b7cd95fea6bc04716e2bf93223aa50ba12a6e5cb6c96d35913aeec52b6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "d19a0430017a7329a3d7512e14a78fbfa1fb28ca8c10cd8c3dc67bd849756cc9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 50
+  },
+  "d1f0e00fe54dbf8bb6f9368ac319200b3f1fd7fe88361284d531d4f94920b381": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "d212154f85e60e183c191f0da518be7c1e495b56cc0414da0c75dce63cc9faf0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "d27367eb07e0140854366df4ab4e552ae3cddf9b41c8a71ce488fd37e25c8874": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "d28c95726c8d1a776345e6ccb5acb176e3ec21ceead077f8f840b1e3d513bde5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "d3126e712afa7afe801f4b71973f24d4232fea25e1db77601c2627347fe1706a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "d317be776392edf4d1d1a94a67ad3feecdbe46d006bbb4baf88ac60c0aecad50": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "d32fddcc03baa83744335d8b0a1c8e343fce18e61258dd94d8ded0e9cd5807cc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "d3592d82121987faf1369de981cd7d0c5006d317c4c97714a99d4ff3d24111ce": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "d377dc45f7cd9ed2e0a83a306028128126ac653bd860084d07701255bdcd971f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "d390158db40e3a6e45d0ad5a379995f96fe7cdbb9435ea6f3a044f8851192372": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "d3cbd8a7303f596ab12f86ce69c2272af0c3fa9dfef70aaaa17d06c3ff8a9f19": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "d408d839532ee7cffd1e46233e6de5940f62e1d1d64dc9594f7f050daf855c38": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "d4406d04eed83ba1261b7a00ddc606eadc3299ad7632588a2f5cac690220cf26": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "d45681d4880c6b2054d35064c74ca7b7649e8c6eecaf26638d30c52f0325b2f4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "d46c6b975aad6d4b028d1a9cb0e14fb95e0e2cc85f16b271d43097084c9b078a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "d4bab0e728338e9a0327d7e334c2a7f3b1010ddc55ff297fd9238c208977ef8d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "d4e497793b303a1cab6ac4311b1a48dd5e2412c4371d2400710f2b43d013a0e1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "d5c289c9db3ecbe57842c03dad5cb3b6d1efe2b16da62e5c1026f95424876398": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "d5d86d37e373ac1c26bff2dee391bd80cbe8039087c8beb1fc2a1f2e79037fd0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "d61b5f13b3f0f91ac611fa272bd87d5c2407f6b12ac010c38f8889daa7469773": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "d63573d9c26bab4b2318c12bbc8f0314abb242f8c11e236e137a78e3483629a9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "d63cd9898ab522d47a08c8e684d110278f4a1fc565cbe3c3f3ca818a724996ae": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 100
+  },
+  "d663546a588b023bf1c3d9a0742ffcaa9d741434fe5a62741b2f5a1ce06a6db0": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 4
+  },
+  "d6903b258c395a207408889231d2e289f5d32d228c7dfab749704c7b498ad91c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "d6b6b52c152064d18a51b12e8a995c972d4b34d996d926b31c015803faa15d0c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "d6dc39bec7d1a7c5616b7f09115a7095043c4f5f88050bb29b6275047e8706e8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 2
+  },
+  "d6f65def3c4968c3ae18c8aec760f6b35a083e1a4ee92a173ff11842540a65a9": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "d758b99ffe4338d1c36b67706b1106a675d2fe19dbb7b2b98e85b15c79fc5cec": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "d7b7d91fa450fed4382cdc724dd2eff46239c7fd6daf9bc1658c090665443c49": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "d81ef66940dceb3383e01915fd272f305e1ed11d5889a1714193c1dbe67d4c3b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "d860b6676ef56eb6a02a055aa6c58593e6ae05286fe8389fdaf2e29dc201d8e3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "d8727ec1eb36a634b2507236b6c6b9404b051cab2e90cb0d6e412c291b63b782": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 30
+  },
+  "d8797f7f02249db8fb7aa2f0c1b10268c1f547879395a4e07d81f65b2b0e3ee8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 39
+  },
+  "d9534cf2e4a903846f315b4c8ccb4ad39387186e2d82c78d814393fccae68475": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "d9683b2ca2e4631da67f9ea64545b3d6445fb36f50d20e0a41adfd8915448bb8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "d9b4fd6f1d8fd8f28443a1c8bdd7435a3667c3e9aafd4e7544affbcfd2097c7a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "d9c23f8a3e2bc950bed1c147792c7909e9e9370651a613c313aa6eac289c344f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "d9d30738e77ee64d149aca297705dbf06d5293a43a0da9ce32a49845b2842134": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "d9f27acf16d91af3b6f5b5b45df22194c51c90f7a1999439c00352aa92e65551": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "da49bd3cf71c68b0002f57e7f25d0b194792012c95788e9d23da9c2fb07aa2f0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "da53113ad1f31738deb2952e016263deb4c3ea31d8a744cc47f92fbdf7a01302": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "dac2fd8b5f62813431deab0e7608f834579b0240547dca9d089cb08a54d2a712": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "dad41e57e1129efd34ab9d5e88dc9f5d11eab16bee87079156c175858a179cf6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 66
+  },
+  "dba261108c4adfedfc3db90c1d7624febf04219bd98af52ddf2354473c661e7b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "dba9cdb7f30849824f654f41b01a69893e1fde4ca9d6d5ecfb5427a0e3b4158e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 61
+  },
+  "dc0175873de658bfa74e48fcfb1f2a83eb383d340c9ef682a383b2e5222b3650": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "dc0682dd4f2030ec4247fa13484981ddbedab4d3253c8df38ad92bae47e7f2f1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "dc7230709c92d7d6c628719e34e35627948357abeb9155406cd5cb66f22a194f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 24
+  },
+  "dc7231ecb26d1b4402bcceed3ea2dc15ad65ae6672f35a382cb8b3cb8a472267": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "dc8022f59c4d8458aa59cd98ecae6408de989a271f4044a295f4ee6120e292ce": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "dc81c5baef9ae239be99ac577ae7411ca5d1762d34d54349f4fbbe4cf90fc660": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "dca82d78d651ce687a2e122610fd66c8179b7d1b269c22e8020863cfa5271040": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "dd390353ae6cda58bf23ea1b2e430512c918d73b486d3168842d4e60e3f78981": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "ddc81d3d0a8032460d9656b397439602453d70dbf9768b50957cc42edb7f4fe7": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "dde94b3b2172a024fdca4b07e2544447fd7bdbc77a85e6d303f72f2267600b33": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "de562a6865cfb8814e9168ab4a3fed3bbe12b47c1ea1542959bc58142a48ebc0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "de949ab9433af0e8cd0e92106bba85bbe439ec48147f9ce93dfa1fe3366b419f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "de979fbc2958d268520947eeabe1f598a971a357b72ecc7f31d4781db2ab186b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "deaf2ca878f6480fe5020d077ba37dfc06c640bce564e0258fbc55a518c3fb33": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "ded98d139c7ab78785cbdc410619420b41bab679fd47bbb3505f5ffe0f6c5ea1": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "df4f50c47ea8147f42d76b27d908b96951b040fa05b3d0bbfbfc89ea383d9fd6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "df6b0a4cf1908bb95be874e4efa59411c685095d7bb596879961563503b5c239": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "dfcccbb9662520dfc32b8c0f670d149fb134d26ae52a4fc869ffd170e68b11db": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "dfcd1235645db4bcf5d3028b414d2496b8031ee2455551f82105d58960f708fa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "e015af753157790913c2762488c0eaad7195dfa99bf040f7706ca1ed2e3555d0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "e02a8fc8e64bc217b17371f2fdccf7c1725a970639f36fc55b5a32302c8192aa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "e072065450d564f2390aca94eecbb9af8c7070c8b9bd89afa746610f432c72f7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "e0937a08e289ffeb6ac1fcc1c5ef09c001a4a993b506642ce7d6a37c115668d6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "e0aeab483001104eae1a21bd8178a8be5a2a62ad414452b26ec5a54791f46b5c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 35
+  },
+  "e186c278b50a9a39a98d9900456bdb92de96805f324630fa6df62e1a846053b8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 80
+  },
+  "e18b1ac400cf704602e695e95b024d19ddc2a0cf74611384ae3649896a6890d3": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "e21fd08a43924851831513ee9faa33677ce69a85c16c4852c293ec0d6f684f61": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "e299c6e978fcd0430eaf68d94cdf8e9ddb04750f89a82a66065978e200cdd41b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 23
+  },
+  "e2c9cf1c335f1da7ec83d8bdfe6ec5f4766b0426b5233ced9e7438d87edd0323": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "e30b6a89bffb7f112de7403a47134ca639267e2bae9275a49dacb0ad78c7b1f5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "e36519945b79c8b422d074ca1cde6eb50d0666f9e609f1a39a9c6f9c8d616224": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "e3670626ebb0000382866f8d96b52f1e94173e00af4cf66439ecb6e758871992": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "e3735c641c30e5e3d0d936398abc188b6a50da22bc86eb5581e81de0f6e4b86b": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 87
+  },
+  "e3b96e77200b6150cb434a07e7d3892a1f1840f925d03dab7ab1f388dcdbade0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "e3e59f6a60582667bce75119491c316fdb2887cd19162b5308e64898bb08f85e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "e4aa9b9792d9f104e976affb69ba222f6b908f514f974e9ad9aa6a9127341d22": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 56
+  },
+  "e55279fa4d36e7546fbd284ed9d2d31800ffb42078304cde1af6bbbbc44e07e4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "e580969c16cd0de45a8aa493640c45ea88349bfb1fbf1cd869722ea377d0c482": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 8
+  },
+  "e59b70eeaf8bdbbe1ac24f2627ba351621076cc3aca7973fd34038702018167c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "e5ced9575276bcb25226ec9a53e6de83b3db07b3e96785d768a91035eaaa72a3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "e62cf3f0494799001325cbe53ed33bf37a1c936607b8d0dc60b24b8e3a2522a8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "e6435f6bec17e76ad8cfa036d06d34df1d434cf40db83701fbbc5e59bab9ae1f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "e69cd262bba386288fe1b785422c52b3f7788b3f04d2d52e6247cbb775ed0ab7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "e6a7dbcbe67bce95f29d93544b5d48fc73850a2b3057d0f0ece321882058ed3f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "e6dbc7d8b69d60d5ff74e708949407500824e10bd039d6080529a4e0cc513b10": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 1
+  },
+  "e71cd69fe9f1b230bc43b09f7ddf9f483e3ca4e88886801b5f722dfc24d82602": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "e7893eb0df6de1dea1b859374a648938a37b049f700348b3c05894647a083ae2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "e7a266daa6a1fed254faee4c3e655e12124d57a2f70b7086e58185a13892c431": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 36
+  },
+  "e7d3f352c49ad993dd3a64d114fa00fcd4a4c4c87d6a1160d8cc56a3d37ce691": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "e7d540e917e49ff7344c9b6f6727ae61958fc9ef7d461167eccf56dcd5ec5ccc": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "e87ba2bdde113985b4f5aec4bcbf94969f68540c4d5dc515a77fcf8ae2b4d9c0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 6
+  },
+  "e88a13f0e968120ea97ff068465e1d20bf43888193537926a9913607c2d25ea6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 43
+  },
+  "e8b0c7ceb3bfa7b96c717a10cbc2a8a29c182360c278002354e0ed42af66552a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "e8bb3c68f50f71f6798190fcba4bcfd54d79893c167413a73800e867d797e39c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "e8ecd5433b8df215c3160e123bdeb9ea8763e41a111b74d2b11fc805e71c7b94": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 60
+  },
+  "e94052d93712804e0875ffda191bfc1df844bd1546a1fe1af5280b2307e2cf4c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 21
+  },
+  "e944d6541381ba6772795350445c3fa6102feb85241b5bf61510b51bae8fb335": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 63
+  },
+  "e999db741e2b38da0bf2dc05f3f30fdbe33a55d1f7385373457614e024eb0bb7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "e9be7e4a335cc7066dfc31c7b24b6007c30c6085d090a268db55f7ee31f3d2b7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "ea331d4338514b7949c5771be1550d14b2d6e634418e5fb8dcf15bd3cc2f3eed": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 5
+  },
+  "ea3c32e8bdf3b6c1f620990b157f1fe844e48b9cce53262f0ff3c37a3e4a7c43": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "ea40c1949ff8817516001a00b6f17f8a949762da19cc3db4a61565813ca73e30": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "ea62c38cc8efa85ea1459cbc34368b8048df72577d893bb62744c0a2bb698cf9": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "ea9896984f00b3f045190df057c8541f316f13d084652fe5fbea85820edf7329": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "eae4d9c12c236de60880148401ceabec550d89a2a7cda55a3a03ac680bb4e4cb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "eb59301969fccf9951794170a7745e6647dba7e115367c6920421aea07065798": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "eb786dce492a980b5a1b34db735cce9d223d1f5d56841c8be1bab4b4d6c9c255": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "ebf064e59bcf6088563273429462f39b6f4333ceee86c3eddae0591f9d0f9392": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 27
+  },
+  "ec0c8f5d7d73c83ffc9e5710c19fd756e2e3e5bcfdfb0d3ecee4fa384cef3c27": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 51
+  },
+  "ec38e4345979e0881143cc54a740427315668b0390956ddf2d2067e9bb072bb5": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 50
+  },
+  "ec9fc3f9bda2121bd7efa31e2e51086bd894938b19ad03f6b9ae29ebdbab74c3": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "ecbfc0e206485b360c2642e545f245d9b0a091116201da6a884fba1c9fd3a076": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "ecf7fdc6965c105a2e3a5291da60e76572db49725e91131b741e2bc34e6759e4": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "ed2d53ca932626ea3a5e18f4920087d443f661ddfa2def4bc6f6ec0fe53cc4e8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "ed5eb89368fd0fd0f8d8d68bda52bbd55ab0d71d6d9b80b648f20f9ba783cb84": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "edd591007ebb7aacb1540d0c628374fe6541cf66c696ab03a475e56f8dc0a930": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 26
+  },
+  "eddbb4970d56744f47a062a58bf2e3032cd949e91489e5dcd3ad9c1999fec0f0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 41
+  },
+  "ee1e7a2fae247012e848f1741d0b22631bcf243151bd0232b9b7483505ff6b9f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "ef0fe3eff10a05a7532c3058cae76f429f05ce48bdf685fb8f53bf357cb2f4ea": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 15
+  },
+  "efb52497e5219aec4699cd18d6fa47a191f8a252328faf51bacf4a8c22a1efb7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 154
+  },
+  "efc7468875a54c1becf94cc01fa01ee732adc095a438b6044d7e901ba71b6344": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "efd2cef0756a58d6c8907bb6b2b72d5181a86bd997f360e2a2125a7ec1e3b3cf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "eff70486ac6ba2111364e1188d7a477fc0ff7da3fac5a3fed82ef70eac51c215": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "f04e042b52055e682996794c13ac765e5224ab0ef77dba7308a49bfd72ca75fa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "f075e3bdf7766a99e22f2ae3379598562d9f8aa8ec1595c72441bb25869cbf85": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "f07f70a3b1b999265f69408d66979b6262487462a6994a9133b1a8b3b080d8d2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "f0c6ba21ddde0ec4853923305aa8d61ff48d43a82aaf16e4f9ed7efb5cb9cbbf": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 5
+  },
+  "f155e771dd7d6eccf5dd1f52b5eb68b9ad4133f2d49cf40ddc7a92cdecb3860e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "f16a65113b9e54ac505c7b8acbde327b1bbba1291f01dca4141d5cdc62be51c8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "f1919dec8ae9a8586a426fc80bc0f965c77c5d88330926cc2299f033686a7145": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "f1cc358a1a5cae0ab486336af67a681bbdda4064721561aa82418199610f4556": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "f1d3a2cd289ef4c6dcad9e36e849f1df0ca3b43ad7cebad0c752a0d50ae47c31": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "f20bdbaf73a16dccb111ad3e0e06a76d2c8811715b69aa2b0a21157e73dca6aa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 25
+  },
+  "f25550a28791eeb08b81a3233478457a85b23cf0185df46490ae5c2d8bb4ae44": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "f276faa21dc9c40ef3dcde04f6364fde22849f408fe42820ebd39a40f22d179d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "f27d9c7c8de95d69fa98db7f4cbf5e14e39ea604455d1ad2f1410bb1a4a9e6e3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 102
+  },
+  "f32cd4819d7b9ba913d8e2010127801e22e4d7834dfecc6297a7670ce517b779": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "f353f23a052aa16481da7c44b51cba31b8f7b74d1bdb8ff629d51bd2eb637747": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "f37ae25fce802afb032be59bf7c1c55a4bff089f528710e1b94f3722588240c2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "f37b82c4a874480897903009f2ff110aad8ad77e9d5fd28300d2d3889781b268": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "f38082f844c78171af0026f501f0dd4406302ee74b57770b00fdf1fbd39ff58c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 73
+  },
+  "f3daec05b2c611c58c53be2838f6b9ec7aa522aa9bcf304c9acb9761da33edc6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "f3fd1eec798e3ec1b7a995eb1a7bc0c0113f38ab1be75aa5b1a6765c662fa429": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 42
+  },
+  "f40108c31662235b7847047bd4f58181f40cdc5043410de7d4e394f70b9559cd": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "f4ab8ff180855f28c673514f382f9f5c1fa5c6d90398f23fe0554b7bce907a5d": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 49
+  },
+  "f4b532fa3571cb3c997fda64469b7e647a787e14afff1ddb41b42f0c93e04689": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 52
+  },
+  "f4b7636e605a65b28cecdc7d8b82aca961dcba48a0ed0a06d7eb007f69ebc08a": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 12
+  },
+  "f4e51230f6b8e42c874118fa692f28dc3490e5bf343a032a4c09da52325afd95": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 8
+  },
+  "f62463fe735ab6606701443408cefbe833780993f7d45a42975c3920d5035d91": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "f6344af5a9ccf3c9c3f5ca7eff495fefcdbcb713a52c1d46ac61162e14664566": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 63
+  },
+  "f636105120e23f935d60703ed50aa248fd9d28260ef6f612a2285a58892792c4": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "f66d6b21e730ab3c23d0b5069f86c56b75087a9b24696b9646ad8d44fcdc90e2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 50
+  },
+  "f67562be7266caaaca598e6b4a6e08519455b8dffa830986a07a819b2588bad0": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 20
+  },
+  "f683e8119ce2dffdfb6fe4dfd52435d6140e872274cbe496700bd6886f9bcaa3": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 52
+  },
+  "f71082553cfbd1bb3178c9651183b09ea856836088b25c81ac0ad7318ddafc70": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 7
+  },
+  "f75609a450ff13874b07de3ad48aa762f2bb443a859ded04fd822c528b9eb472": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "f76ffd74412092a6327bb1d9d3c7dfce5fc591799e031854e8aa0641699679e6": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 14
+  },
+  "f7be244375aa7599f88ff8c30edfcf8b1261571dc64ee9365f8026b314fdf8db": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "f7c1b966844ff64b91b77b8a9be709e746ec266c6a56e0396e22bc01c5004c96": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 18
+  },
+  "f7e004a2dbfd203e9aa200bb81a94794388cdf7eb5b39fd54aa19c5066dd2f40": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 11
+  },
+  "f7f3c0c4745e942f0d9a962058c994a9f3b2c1fc0225a97369c52ef858d5bc0e": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "f8270cdc4699266bfa4f53619b7999426bd06b99bd25e56f642cb26b4eede252": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 4
+  },
+  "f85a6f7be5c40bf7547e429c8fff4591e1b0b44222e19eddc8bfd372ef3f8201": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  },
+  "f92d29562326fa4214bda5edac103b992f523c4483408890c0caa671314239ca": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "f956a0cc3e42495b4b2cd99fce71cec0c118c0bd8ab585dbc075b7e7b5a2f251": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 28
+  },
+  "f9a9430f2a04eedead473b9ea1083b8534066e14ada4d6c6fc4b7bb1f9d80559": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "f9f5b02e71e4920bff15abda0bdd63716cf547c27445c0143f561a830a1218e4": {
+    "cluster": "Cluster_1_Sparse",
+    "n_boxes": 0
+  },
+  "fa09885752fe275426cb6516ca058be5a3620b55564f69cdb035adc63102f0ba": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "fa1a077973ee9776dc62028eb7701fb36ca9493a1329dc25bd58155016308f60": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 9
+  },
+  "fa4db97880b4dfbec6c94bbe374a3938bc9d555441be2d460201145f36c3a580": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 29
+  },
+  "fa627b73abc31f216ace64b14d941598d06a97f0e1df2cf80f468fbb8c7028ce": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 59
+  },
+  "faa5d71172e2e9959b41a5aec4fd2ab700534d1b2729484d2d5f26472cd56cfa": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 13
+  },
+  "fb418efabb06a8872e3fb900e5b91247383bc745c88021b1ef29b067e1fe2f07": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "fb447d1859e432129db44d789d4a2d08e8123ed12595ef7ad93fa26d8652fa85": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 33
+  },
+  "fb57faccf8fe8a25d518f8931bcbb4ec7b79d619f1277a5ef12bcd9262979329": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 17
+  },
+  "fb9a1c25ed377960780f56b36b51f7109a79037200ae1f3752e8b04f1b4e9f9c": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 22
+  },
+  "fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 32
+  },
+  "fbecc68af629a9e585e88f14c59fca40aec5cb6e5994b8492ffccf322131f3ea": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 4
+  },
+  "fc20f2173d54aa2f9afcb5107af50ba2aa3bb8f3f1cca79c53574c817e7d279f": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 3
+  },
+  "fddd51fea563b589977c76cd26563451725d1b387ce323c05135f36adcfbade8": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "fe44a6966e696f0a4868de49a8aea47655a15a7103a6c3fdc653f75d56271a27": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 49
+  },
+  "fe9c59a2ec46ef8980b64cec393e8f67205bda867dbd687a19fe5d12df40b143": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 69
+  },
+  "feaf84d435bd46100db82de51f5a989ff4d39fdcdb040a7044720b943e34b7d7": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 19
+  },
+  "feb2c4b21388318c7a51cc0aaf0e7c673a07f5204a40549a281bef065bb77925": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 46
+  },
+  "fed79c68507028f03e9d05be7cae23d6efc1c39009e4a6888cefed13918707bb": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 10
+  },
+  "fee88e98bf7cd9f83777c74bc54727d92f76636af6b0262af3564527be4a2b99": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 16
+  },
+  "ffe462e43b9dff12e78ea8fb69332abfb789da171a8597f5bb961853e06e6fa2": {
+    "cluster": "Cluster_0_Dense",
+    "n_boxes": 34
+  }
+}

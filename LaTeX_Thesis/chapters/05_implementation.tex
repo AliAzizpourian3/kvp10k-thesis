@@ -79,7 +79,7 @@ serialised as Python list-of-lists strings, following the benchmark style used
 by the corrected Stage~3 pipeline.
 
 \paragraph{V4: Word-level splitting.}
-Diagnostic analysis (Section~\ref{sec:diagnostic-experiments}) revealed that
+Diagnostic analysis (Section~\ref{sec:exp567}) revealed that
 the LMDX text format stores entire OCR text blocks --- often multi-word
 phrases such as \texttt{"1~lb.\ shelled \$15.00"} --- as single ``words''
 with a single bounding box. This is problematic for LayoutLMv3, which expects
@@ -246,8 +246,7 @@ latency.
 
 \paragraph{Stage~3 (Mistral QLoRA).}
 We used QLoRA with 4-bit NF4 quantisation due to memory constraints on the
-available 40\,GB A100 GPU (see Section~\ref{sec:hardware} for a detailed
-discussion of the implications).
+available 40\,GB A100 GPU.
 
 \paragraph{Stage~4a -- Entity Classifier Pre-training.}
 Stage~4a trains the LayoutLMv3 encoder together with the entity classification
@@ -286,7 +285,7 @@ span grouping filter that only excludes $[0,0,0,0]$ bounding boxes (previously,
 the filter $x_1 < x_2 \wedge y_1 < y_2$ rejected $\sim$50\% of valid tokens
 whose LayoutLMv3-normalised coordinates had $x_1 = x_2$), the V4 pipeline
 achieves 79\% word-level and 70\% span-level link label recovery on the test
-set (Section~\ref{sec:diagnostic-results}).
+set (Section~\ref{sec:res567}).
 
 \subsection{Checkpointing}
 \label{sec:checkpointing}
