@@ -109,12 +109,23 @@ To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Fig
     \label{fig:stage2_feature_distributions}
 \end{figure}
 
-\begin{figure}[H]
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.70\textwidth]{figures/stage2/cluster_statistics_table.png}
-    \caption{Summary statistics of selected layout features per cluster (mean and standard deviation).}
+    \small
+    \caption{Summary statistics of selected layout features per cluster (mean\,$\pm$\,std).}
     \label{fig:stage2_cluster_stats}
-\end{figure}
+    \begin{tabular}{lrrrrrrrr}
+        \toprule
+        \textbf{Cluster} & \textbf{$n_{\text{boxes}}$ mean} & \textbf{$n_{\text{boxes}}$ std}
+            & \textbf{area mean} & \textbf{area std}
+            & \textbf{mean\,area mean} & \textbf{mean\,area std}
+            & \textbf{density mean} & \textbf{density std} \\
+        \midrule
+        0 (text-rich)   & 25.3622 & 20.5338 & 0.0582 & 0.0467 & 0.0029 & 0.0030 & 0.0582 & 0.0467 \\
+        1 (text-sparse) &  0.0619 &  0.6941 & 0.0001 & 0.0009 & 0.0000 & 0.0002 & 0.0001 & 0.0009 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 \begin{itemize}
     \item \textbf{PC1} (71.8\% variance): Captures overall content density (the number of extractable text boxes and their coverage); this dominant axis separates the text-rich cluster from the text-sparse cluster.
     \item \textbf{PC2} (10.8\% variance): Captures secondary geometric variation beyond density
