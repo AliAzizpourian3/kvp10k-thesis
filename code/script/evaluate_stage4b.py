@@ -36,6 +36,10 @@ from layoutlm_model import create_model as create_model_v1
 from layoutlm_model_v2 import create_model as create_model_v2
 from stage4_kvp_dataset import LayoutLMv3PreparedDataset, PaddedBatchCollator
 
+# Reuse the EXACT text-matching function from the official KVP10k evaluation so
+# link-pair matching is consistent with the headline entity metric.
+from evaluate_mistral import _ned
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -116,12 +120,14 @@ def _get_gt_kvps(json_path):
     return pairs, data.get("hash_name", "")
 
 
-def _text_overlap(pred_text, gt_text):
-    """Check if predicted text and ground truth text have significant overlap.
+def _text_overlap(pred_text, gt_text, ned_thresh=0.5):
+    """Decide whether a predicted text matches a ground-truth text.
 
-    The model predicts at the token level and reconstructs text from individual
-    tokens, so exact match is too strict. We check bidirectional containment
-    or word-level F1 >= 0.5 instead.
+    Uses the SAME normalised edit distance (NED) criterion as the official
+    KVP10k evaluation (``evaluate_mistral._ned``): a match requires
+    ``NED(pred, gt) <= ned_thresh``. This replaces the previous ad-hoc rule
+    (bidirectional substring containment OR word-level F1 >= 0.5), which was
+    more lenient than the headline metric and therefore inflated link F1.
     """
     pred_text = pred_text.strip().lower()
     gt_text = gt_text.strip().lower()
@@ -129,26 +135,7 @@ def _text_overlap(pred_text, gt_text):
     if not pred_text or not gt_text:
         return False
 
-    # Exact match
-    if pred_text == gt_text:
-        return True
-
-    # Containment
-    if pred_text in gt_text or gt_text in pred_text:
-        return True
-
-    # Word-level F1
-    pred_words = set(pred_text.split())
-    gt_words = set(gt_text.split())
-    if not pred_words or not gt_words:
-        return False
-    common = pred_words & gt_words
-    if not common:
-        return False
-    precision = len(common) / len(pred_words)
-    recall = len(common) / len(gt_words)
-    f1 = 2 * precision * recall / (precision + recall)
-    return f1 >= 0.5
+    return _ned(pred_text, gt_text) <= ned_thresh
 
 
 def _span_to_text(start, end, word_ids, words):
@@ -312,11 +299,12 @@ def compute_entity_metrics(model, dataloader, device):
     return {"entity_precision": precision, "entity_recall": recall, "entity_f1": f1}
 
 
-def compute_link_metrics(model, dataset, dataloader, device, score_threshold=0.5):
+def compute_link_metrics(model, dataset, dataloader, device, score_threshold=0.5, ned_thresh=0.5):
     """Compute link-level P/R/F1 by comparing predicted pairs to GT pairs.
 
     A predicted pair (pred_key, pred_val) matches a GT pair (gt_key, gt_val) if
-    both _text_overlap(pred_key, gt_key) and _text_overlap(pred_val, gt_val).
+    both ``_text_overlap(pred_key, gt_key)`` and ``_text_overlap(pred_val, gt_val)``
+    hold under the official NED criterion (NED <= ned_thresh).
     Each GT pair can be matched at most once (greedy, best-score first).
     """
     tp = 0
@@ -354,7 +342,7 @@ def compute_link_metrics(model, dataset, dataloader, device, score_threshold=0.5
                 for j, (gk, gv) in enumerate(gt_pairs):
                     if gt_matched[j]:
                         continue
-                    if _text_overlap(pk, gk) and _text_overlap(pv, gv):
+                    if _text_overlap(pk, gk, ned_thresh) and _text_overlap(pv, gv, ned_thresh):
                         tp += 1
                         gt_matched[j] = True
                         break
@@ -387,6 +375,8 @@ def main():
                         help="Path to data/prepared/")
     parser.add_argument("--score_threshold", type=float, default=0.5,
                         help="Link score threshold for pair extraction")
+    parser.add_argument("--ned_thresh", type=float, default=0.5,
+                        help="NED threshold for key/value text matching (official metric: <=0.5)")
     parser.add_argument("--batch_size", type=int, default=1,
                         help="Evaluation batch size")
     parser.add_argument("--model_version", type=str, default="v1",
@@ -435,7 +425,7 @@ def main():
     # Link metrics
     logger.info("Computing link metrics...")
     link_metrics = compute_link_metrics(
-        model, dataset, dataloader, device, args.score_threshold
+        model, dataset, dataloader, device, args.score_threshold, args.ned_thresh
     )
     logger.info(f"Link   P={link_metrics['link_precision']:.4f}  "
                 f"R={link_metrics['link_recall']:.4f}  "
@@ -446,7 +436,7 @@ def main():
 
     # Save results
     results = {**entity_metrics, **link_metrics, "checkpoint_dir": args.checkpoint_dir,
-               "score_threshold": args.score_threshold}
+               "score_threshold": args.score_threshold, "ned_thresh": args.ned_thresh}
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_path = Path(args.checkpoint_dir) / f"eval_results_{timestamp}.json"
     with open(out_path, "w") as f:

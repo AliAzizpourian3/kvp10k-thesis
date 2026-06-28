@@ -1,6 +1,16 @@
 """
 Main orchestration script for KVP10k experiments.
 Runs complete experimental pipeline from data loading to evaluation.
+
+Note on Stage 4:
+    The final, reported Stage 4b model (V4) was NOT produced by this file.
+    It was trained by the dedicated scripts ``train_stage4b.py`` /
+    ``train_stage4b_v2.py`` / ``train_stage4b_v3.py`` (V4 = the V3
+    "linker-only on predicted entities" run) and saved to
+    ``data/outputs/stage4b_v4/best_model``. Evaluate it with
+    ``evaluate_stage4b.py --checkpoint_dir data/outputs/stage4b_v4 --model_version v2``.
+    The ``run_stage_4()`` helper below is the legacy in-pipeline prototype
+    (token-level V1, ``train_kvp``) kept only for the small smoke-test flow.
 """
 
 import os
@@ -364,24 +374,6 @@ def run_stage_3(dataset_subset, test_subset=None, output_dir="outputs/stage3_bas
     return results
 
 
-def run_stage_4():
-    """
-    Stage 4: Implement LayoutLMv3 + Linker.
-    TODO: Implement model
-    """
-    print("\n" + "="*80)
-    print("STAGE 4: Implement LayoutLMv3 + Linker")
-    print("="*80)
-    
-    print("Model architecture:")
-    print("  - Encoder: LayoutLMv3 (microsoft/layoutlmv3-base)")
-    print("  - Decoder: T5/Mistral for generative KV extraction")
-    print("  - Linker: Attention-based key-value linking")
-    
-    print("\nStage 4: NOT YET IMPLEMENTED")
-    return None
-
-
 def run_full_pipeline(stages=[0, 1, 2]):
     """
     Run the complete experimental pipeline.
@@ -418,7 +410,11 @@ def run_full_pipeline(stages=[0, 1, 2]):
     
     # Stage 4: Main model
     if 4 in stages:
-        results['stage_4'] = run_stage_4()
+        # The final Stage 4b model is trained by the dedicated train_stage4b_v*.py
+        # scripts, not from inside run_full_pipeline. See module docstring.
+        print("\nStage 4: run the dedicated trainer instead, e.g.\n"
+              "  python train_stage4b_v3.py   (final V4 -> data/outputs/stage4b_v4)")
+        results['stage_4'] = None
     
     print("\n" + "="*80)
     print("PIPELINE COMPLETE")
