@@ -182,13 +182,30 @@ def _extract_predicted_pairs(model, batch, device, dataset, idx_start, score_thr
     (key_text, val_text, score, key_bbox, val_bbox), where the bboxes are in
     the same coordinate space as the ground-truth boxes (or None if unknown).
     """
+def _extract_predicted_pairs(model, batch, device, dataset, idx_start,
+                             score_threshold=0.5, oracle=False):
+    """Run model inference and extract predicted key-value text pairs.
+
+    Works with both V1 (token-level indices) and V2 (span tuples).
+    Returns a list of lists (one per batch item) of
+    (key_text, val_text, score, key_bbox, val_bbox), where the bboxes are in
+    the same coordinate space as the ground-truth boxes (or None if unknown).
+
+    When ``oracle`` is True, the linker groups spans from the GROUND-TRUTH
+    entity labels instead of the model's predicted labels. This isolates
+    linker quality from entity-detection quality (an upper bound on link F1
+    given perfect entity detection).
+    """
     input_ids = batch["input_ids"].to(device)
     attention_mask = batch["attention_mask"].to(device)
     bbox = batch["bbox"].to(device)
     pixel_values = batch["pixel_values"].to(device) if "pixel_values" in batch else None
+    entity_labels = (batch["entity_labels"].to(device)
+                     if oracle and "entity_labels" in batch else None)
 
     with torch.no_grad():
-        outputs = model(input_ids, attention_mask, bbox, pixel_values)
+        outputs = model(input_ids, attention_mask, bbox, pixel_values,
+                        entity_labels=entity_labels)
 
     entity_logits = outputs["entity_logits"]
     link_scores = outputs["link_scores"]
@@ -347,11 +364,15 @@ def _bbox_ok(pred_bbox, gt_bbox, iou_thresh):
     return _iou(pred_bbox, gt_bbox) >= iou_thresh
 
 
-def _collect_link_pairs(model, dataset, dataloader, device, score_threshold=0.5):
+def _collect_link_pairs(model, dataset, dataloader, device, score_threshold=0.5,
+                        oracle=False):
     """Run model inference ONCE and collect (pred_pairs, gt_pairs) per document.
 
     Separating inference from scoring lets us evaluate several matching modes
     (text-only, text+bbox) and thresholds without re-running the GPU model.
+
+    ``oracle`` forwards GT entity labels to the linker (see
+    ``_extract_predicted_pairs``) for the entity-detection upper bound.
     """
     model.eval()
     collected = []
@@ -359,7 +380,7 @@ def _collect_link_pairs(model, dataset, dataloader, device, score_threshold=0.5)
     for batch in tqdm(dataloader, desc="Link eval (inference)"):
         batch_size = batch["input_ids"].size(0)
         pred_pairs_batch = _extract_predicted_pairs(
-            model, batch, device, dataset, idx_start, score_threshold
+            model, batch, device, dataset, idx_start, score_threshold, oracle=oracle
         )
         for b in range(batch_size):
             sample_idx = idx_start + b
@@ -437,6 +458,10 @@ def main():
     parser.add_argument("--model_version", type=str, default="v1",
                         choices=["v1", "v2"],
                         help="Model version: v1 (token-level) or v2 (span-level)")
+    parser.add_argument("--oracle", action="store_true",
+                        help="Oracle linking: derive spans from GT entity labels "
+                             "instead of predicted entities (upper bound on link "
+                             "F1 given perfect entity detection)")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -479,7 +504,10 @@ def main():
 
     # Link metrics: run inference once, then score both matching modes.
     logger.info("Computing link metrics (single inference pass)...")
-    collected = _collect_link_pairs(model, dataset, dataloader, device, args.score_threshold)
+    if args.oracle:
+        logger.info("ORACLE mode: linker uses GROUND-TRUTH entity spans")
+    collected = _collect_link_pairs(model, dataset, dataloader, device,
+                                    args.score_threshold, oracle=args.oracle)
 
     text_only = _score_link_pairs(collected, args.ned_thresh, args.iou_thresh, use_bbox=False)
     text_bbox = _score_link_pairs(collected, args.ned_thresh, args.iou_thresh, use_bbox=True)
@@ -505,9 +533,10 @@ def main():
     # Save results
     results = {**entity_metrics, **link_metrics, "checkpoint_dir": args.checkpoint_dir,
                "score_threshold": args.score_threshold, "ned_thresh": args.ned_thresh,
-               "iou_thresh": args.iou_thresh}
+               "iou_thresh": args.iou_thresh, "oracle": args.oracle}
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_path = Path(args.checkpoint_dir) / f"eval_results_{timestamp}.json"
+    suffix = "_oracle" if args.oracle else ""
+    out_path = Path(args.checkpoint_dir) / f"eval_results{suffix}_{timestamp}.json"
     with open(out_path, "w") as f:
         json.dump(results, f, indent=2)
     logger.info(f"Results saved to {out_path}")
@@ -515,7 +544,8 @@ def main():
     # Print summary table
     print("\n" + "=" * 50)
     print(f"EVALUATION: {args.checkpoint_dir}")
-    print(f"  NED<={args.ned_thresh}  IoU>={args.iou_thresh}  score_thr={args.score_threshold}")
+    print(f"  NED<={args.ned_thresh}  IoU>={args.iou_thresh}  score_thr={args.score_threshold}"
+          f"{'  [ORACLE: GT entities]' if args.oracle else ''}")
     print("=" * 50)
     print(f"  Entity F1:        {entity_metrics['entity_f1']:.4f}  "
           f"(P={entity_metrics['entity_precision']:.4f}, R={entity_metrics['entity_recall']:.4f})")
