@@ -82,26 +82,28 @@ Broken down by layout cluster, however, a serious weakness emerges:
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1 error analysis by layout cluster.}
+  \caption{Experiment~1 error analysis by layout cluster (entity-level,
+  NED $<0.2$ and IoU $>0.3$, the same matching as Table~\ref{tab:exp1-overall}).}
   \label{tab:exp1-cluster}
   \begin{tabular}{@{}lcccc@{}}
     \toprule
     \textbf{Cluster} & \textbf{Docs} & \textbf{Correct (\%)} & \textbf{Hallucination (\%)} & \textbf{Missed (\%)} \\
     \midrule
-    0 (Dense)  & 521 & 48.7 & 40.7 & 31.3 \\
-    1 (Sparse) &  60 &  2.7 & \textbf{54.4} & 54.5 \\
+    0 (Dense)  & 521 & 58.6 & 41.4 & 32.5 \\
+    1 (Sparse) &  60 &  3.0 & \textbf{97.0} & 38.1 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 On sparse-layout documents (receipts, simple forms), the model hallucinates
-over half the time: it generates KVP predictions that have no correspondence
-in the actual document. Layout clusters here are the \emph{actual} Stage~2
+almost continuously: \textbf{97\%} of its predictions on sparse pages have no
+correspondence in the actual document. Layout clusters here are the
+\emph{actual} Stage~2
 assignments, obtained by recomputing each test page's 13 layout features and
 applying the trained Stage~2 scaler and $k$-means model. With very few KVPs
-per page in sparse documents, the model over-generates (667 predictions vs.\
-44 ground-truth for Cluster~1), producing a $15.2\times$ over-generation
-ratio. This is a
+per page in sparse documents, the model over-generates (1{,}301 predicted
+entities vs.\ 63 ground-truth for Cluster~1), producing a $20.6\times$
+over-generation ratio. This is a
 fundamental limitation of text-only generation without spatial grounding.
 
 \textbf{Motivation for Experiment 2:} A model that reads spatial positions
@@ -359,7 +361,7 @@ experiments.
     \textbf{Model} & \textbf{Entity F1} & \textbf{Link F1} & \textbf{Key Finding} \\
     \midrule
     KVP10k paper baseline     & ---   & 0.659 & Published generative system \\
-    Exp 1: Mistral-7B (text+loc) & --- & 0.600 & 54.4\% hallucination on sparse layouts \\
+    Exp 1: Mistral-7B (text+loc) & --- & 0.600 & 97\% hallucination on sparse layouts \\
     Exp 2: Stage~4a (entity only) & 0.847 & --- & Strong entity classification \\
     Exp 3: V1 (token linking) & 0.841 & 0.008 & 450:1 imbalance kills linking \\
     Exp 4: V2 (span linking)  & 0.847 & 0.007 & Bugs mask span-level benefit \\

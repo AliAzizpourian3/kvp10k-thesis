@@ -9,6 +9,7 @@ Output: per-cluster error tables for thesis Chapter 7.
 """
 
 import os
+import sys
 import json
 import logging
 from pathlib import Path
@@ -17,6 +18,13 @@ from collections import defaultdict
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
+
+# Reuse the EXACT matching logic from the official evaluation so the error
+# taxonomy stays consistent with the headline benchmark metric.
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
+from evaluate_mistral import _extract_entities, match_entities  # noqa: E402
 
 
 # ============================================================================
@@ -51,44 +59,39 @@ def load_cluster_map(path: str = DEFAULT_CLUSTER_MAP) -> Dict[str, str]:
 # Error categorization
 # ============================================================================
 
-def categorize_errors(pred_kvps: List[Dict], gt_kvps: List[Dict]) -> Dict[str, int]:
+def categorize_errors(
+    pred_kvps: List[Dict],
+    gt_kvps: List[Dict],
+    ned_thresh: float = 0.5,
+    iou_thresh: float = 0.5,
+) -> Dict[str, int]:
     """
-    Categorize predicted vs GT KVPs into error types:
-    - Correct: matched in evaluation
-    - Hallucinated: predicted but no GT match
-    - Missed: GT exists but not predicted
-    - Wrong_text: text mismatch but location match
-    - Wrong_location: text match but location mismatch
-    
-    For now, use simple heuristic: compare extracted text sets.
+    Categorize predicted vs GT entities into correct / hallucinated / missed
+    using the SAME NED+IoU greedy matching as the official evaluation
+    (``evaluate_mistral.match_entities``, text+bbox mode). This guarantees the
+    error taxonomy is consistent with the headline benchmark metric:
+
+      - correct      = true positives  (matched: NED <= 0.5 AND IoU >= 0.5)
+      - hallucinated = false positives (predicted entity with no GT match)
+      - missed       = false negatives (GT entity with no predicted match)
+
+    Counts are at the ENTITY level: each KVP contributes one or two key/value
+    entities, exactly as ``evaluate_mistral`` computes precision/recall/F1.
+    With this definition ``correct / pred_total`` equals precision and
+    ``correct / gt_total`` equals recall.
     """
-    pred_texts = set()
-    gt_texts = set()
-    
-    for kvp in pred_kvps:
-        if kvp.get("type") == "kvp":
-            text = f"{kvp.get('key',{}).get('text','')}|||{kvp.get('value',{}).get('text','')}"
-        else:
-            text = kvp.get('key', {}).get('text', '')
-        pred_texts.add(text)
-    
-    for kvp in gt_kvps:
-        if kvp.get("type") == "kvp":
-            text = f"{kvp.get('key',{}).get('text','')}|||{kvp.get('value',{}).get('text','')}"
-        else:
-            text = kvp.get('key', {}).get('text', '')
-        gt_texts.add(text)
-    
-    correct = len(pred_texts & gt_texts)
-    hallucinated = len(pred_texts - gt_texts)
-    missed = len(gt_texts - pred_texts)
-    
+    pred_ents = _extract_entities(pred_kvps)
+    gt_ents = _extract_entities(gt_kvps)
+    res = match_entities(
+        pred_ents, gt_ents,
+        ned_thresh=ned_thresh, iou_thresh=iou_thresh, use_bbox=True,
+    )
     return {
-        "correct": correct,
-        "hallucinated": hallucinated,
-        "missed": missed,
-        "pred_total": len(pred_kvps),
-        "gt_total": len(gt_kvps),
+        "correct": res["tp"],
+        "hallucinated": res["fp"],
+        "missed": res["fn"],
+        "pred_total": len(pred_ents),
+        "gt_total": len(gt_ents),
     }
 
 
@@ -119,6 +122,13 @@ def analyze_stage3_errors(
     # Load evaluation summary
     with open(eval_json) as f:
         eval_data = json.load(f)
+
+    # Use the SAME NED/IoU thresholds as the headline evaluation run so the
+    # per-cluster error taxonomy is consistent with the reported F1.
+    eval_summary = eval_data.get("summary", {})
+    ned_thresh = eval_summary.get("ned_threshold", 0.5)
+    iou_thresh = eval_summary.get("iou_threshold", 0.5)
+    logger.info(f"Matching thresholds from eval summary: NED<={ned_thresh}, IoU>={iou_thresh}")
 
     per_doc = eval_data.get("per_document", [])
     logger.info(f"Loaded {len(per_doc)} document evaluations")
@@ -162,7 +172,7 @@ def analyze_stage3_errors(
             cluster = "Unknown"
         
         # Categorize errors
-        errors = categorize_errors(pred_kvps, gt_kvps)
+        errors = categorize_errors(pred_kvps, gt_kvps, ned_thresh, iou_thresh)
         
         # Accumulate statistics
         stats = cluster_stats[cluster]
