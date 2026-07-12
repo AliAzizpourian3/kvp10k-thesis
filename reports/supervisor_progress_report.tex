@@ -2,6 +2,7 @@
 
 \usepackage[margin=2.2cm]{geometry}
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{hyperref}
@@ -106,6 +107,8 @@ The evaluation protocol is adopted directly from the KVP10k paper (Naparstek et 
   \item \textbf{Text + Location:} NED $< 0.2$ \emph{and} bounding-box IoU $> 0.3$.
 \end{itemize}
 
+\noindent The primary metric is \textbf{F1} (harmonic mean of precision and recall), and all linking results are reported under both metrics above. A key-value pair counts as correct only if \emph{both} its key and its value satisfy the criterion. The \textbf{text-only} F1 is the number directly comparable to the published KVP10k baseline.
+
 \noindent
 The IoU threshold of $0.3$ is adopted directly from Naparstek et al.\ (2024), who chose this value to permit minor spatial imprecision in predicted bounding boxes while still ensuring that the prediction is located in the correct spatial region of the page.
 This is the same threshold used in their published evaluation, so all results in this thesis are directly comparable to the KVP10k paper baseline.
@@ -133,6 +136,10 @@ Test  & 5{,}255  & 1{,}051 & 581    & 55.3\% \\
 \end{tabular}
 \end{center}
 
+\noindent\textbf{Ground truth.} The key/value labels are \emph{not} produced by us: KVP10k ships human annotations (each key and value region, its text, and the key$\to$value link). Our preparation only \emph{reconstructs the word-level supervision} by fusing those annotations with PyMuPDF-extracted words.
+
+\noindent\textbf{Data loss ($\sim$45\%).} The pages not prepared are lost overwhelmingly to \emph{broken or inaccessible source-PDF links} (the dataset ships URLs, not the PDFs themselves), not to filtering. Only a small minority are scanned pages with no digital text layer --- these are the only losses attributable to using PyMuPDF text extraction instead of Tesseract OCR. The preparation code does not separate the two causes, so an exact split is not recorded.
+
 \subsection{Stage 2: Layout Clustering \& Analysis}
 
 K-means clustering on 13 layout features identified two dominant document clusters:
@@ -142,15 +149,69 @@ K-means clustering on 13 layout features identified two dominant document cluste
 \toprule
 \textbf{Cluster} & \textbf{Documents} & \textbf{Avg.\ KVPs/page} & \textbf{Character} \\
 \midrule
-0 --- Dense   & 465 (80\%) & 17.6 & Invoices, complex forms \\
-1 --- Sparse  & 116 (20\%) & 1.9  & Receipts, simple documents \\
+0 --- Dense   & 521 (90\%) & 16.0 & Invoices, complex forms \\
+1 --- Sparse  &  60 (10\%) & 0.7  & Receipts, simple documents \\
 \bottomrule
 \end{tabular}
 \end{center}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.60\textwidth]{figures/pca_clusters.png}
+    \caption{Stage~2 layout clustering ($k=2$), \textbf{PCA} projection of the
+    standardized layout features (two components, 82.7\% of variance). This is
+    the primary visualization: it is linear, uses the same standardized
+    features as the clustering, and places each page at a single deterministic
+    location. The text-rich (dense) and text-sparse clusters separate along the
+    dominant density axis.}
+    \label{fig:pr-clusters-pca}
+\end{figure}
+
+\noindent\textbf{On the projection method.} As a secondary check we also show
+non-linear t-SNE and UMAP projections (Figure~\ref{fig:pr-clusters-manifold}).
+These differ from the PCA above in three ways: (i)~they apply a $\log(1+x)$
+transform to the heavy-tailed count/area features before robust scaling;
+(ii)~t-SNE is run on a stratified 3{,}000-page subsample (UMAP on all 25{,}692
+pages); and (iii)~a small random jitter ($\sigma=0.01$) is added because
+$\sim$16{,}568 of the sparse pages have \emph{identical} all-zero features and
+would otherwise collapse to a single point. Consequently the apparent internal
+``spread'' of the sparse cluster in t-SNE/UMAP is a jitter artifact, not real
+structure. They are therefore confirmatory, not pixel-comparable to the PCA;
+all three nonetheless show the same two-way text-rich vs.\ text-sparse split.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{figures/tsne_clusters.png}
+    \hfill
+    \includegraphics[width=0.46\textwidth]{figures/umap_clusters.png}
+    \caption{Secondary non-linear projections: \textbf{t-SNE} on a stratified
+    3{,}000-page subsample (left) and \textbf{UMAP} on all 25{,}692 pages
+    (right). Both confirm the PCA separation but use different preprocessing
+    ($\log(1+x)$ $+$ robust scaling $+$ jitter), so they are not directly
+    comparable to the PCA plot.}
+    \label{fig:pr-clusters-manifold}
+\end{figure}
+
 \subsection{Stage 3: Generative Baseline (Mistral-7B QLoRA)}
 
-Mistral-7B-Instruct-v0.2 fine-tuned with 4-bit QLoRA (NF4) on LMDX-formatted document prompts.
+Mistral-7B-Instruct-v0.2 fine-tuned with 4-bit QLoRA (NF4) on LMDX-formatted document prompts. The exact prompt template is shown below. It reproduces the LMDX \emph{format and output contract} used by the KVP10k baseline (document $+$ per-word coordinates $\to$ Python list-of-lists); it is not guaranteed to be token-identical to the paper's unpublished prompt, and word text/coordinates come from PyMuPDF rather than Tesseract OCR.
+
+\begin{quote}\small
+\begin{verbatim}
+<Document>
+{lmdx_text}
+</Document>
+<Task>
+From the document, extract the text keys and values.
+Please provide the response in the form of a Python list of lists.
+Each inner list should contain exactly two strings: the first string
+is the key and the second string is the value.
+Each key and value should be followed by its bounding box in the
+format: left|top|right|bottom.
+</Task>
+### Response:
+\end{verbatim}
+\end{quote}
 
 \begin{center}
 \begin{tabular}{lcccc}
@@ -168,6 +229,8 @@ KVP10k paper baseline (Naparstek et al., 2024) & --- & --- & 0.612 & --- \\
 \end{tabular}
 \end{center}
 
+\noindent\textbf{Why our baseline matches the paper with $\sim$55\% of the data.} First, this is measured on \emph{our} 581-page test subset, not the paper's full test set, so it is an approximate rather than identical comparison. Second, the missing pages are lost to random dead PDF links (not adversarial filtering), so the retained sample is representative, and large-model fine-tuning is sample-efficient. Finally, PyMuPDF produces \emph{cleaner} word text than Tesseract OCR (no OCR character errors), which slightly helps text-only NED matching and plausibly explains why our text-only F1 (0.671) is marginally above the paper's (0.643). This ``match'' applies only to the generative text-only baseline; on \emph{linking}, our corrected V4 (0.342) is below the paper's headline 0.659.
+
 \subsubsection*{Error Analysis by Cluster}
 
 \begin{center}
@@ -175,13 +238,13 @@ KVP10k paper baseline (Naparstek et al., 2024) & --- & --- & 0.612 & --- \\
 \toprule
 \textbf{Cluster} & \textbf{Correct Rate} & \textbf{Hallucination Rate} & \textbf{Missed Rate} \\
 \midrule
-0 --- Dense   & 48.7\% & 40.5\% & 31.2\% \\
-1 --- Sparse  & 14.4\% & 52.9\% & 41.1\% \\
+0 --- Dense   & 58.6\% & 41.4\% & 32.5\% \\
+1 --- Sparse  &  3.0\% & 97.0\% & 38.1\% \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Mistral struggles catastrophically with sparse-layout documents (52.9\% hallucination rate), directly motivating the layout-aware discriminative approach in Stage~4.
+Mistral struggles catastrophically with sparse-layout documents (97\% hallucination rate), directly motivating the layout-aware discriminative approach in Stage~4.
 
 \subsection{Stage 4: Discriminative Model (LayoutLMv3 + Biaffine Linker) --- Complete}
 
@@ -224,14 +287,16 @@ Applying all three fixes and retraining (30 epochs, $\lambda = 5.0$, early stop 
 \midrule
 V1 (token-level) & 0.841 & 0.008 & $\sim$450:1 & Token imbalance \\
 V2 (span-level)  & 0.847 & 0.007 & $\sim$5:1   & Pipeline bugs \\
-\textbf{V4 (corrected)} & \textbf{0.827} & \textbf{0.673} & $\sim$5:1 & Bugs fixed \\
+\textbf{V4 (corrected)} & \textbf{0.827} & \textbf{0.342 / 0.309} & $\sim$5:1 & Bugs fixed \\
 KVP10k paper baseline & ---   & 0.659 & ---         & Published result \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-The corrected V4 model achieves \textbf{link F1 = 0.673}, matching the KVP10k published baseline (0.659 text-only) with a 125M-parameter discriminative model.
+The corrected V4 model achieves \textbf{link F1 = 0.342} (text-only, NED\,$<0.2$) / \textbf{0.309} (text+location, NED\,$<0.2$, IoU\,$>0.3$), below the KVP10k published baseline (0.659 text-only); diagnostic analyses localize the remaining gap to relation modeling rather than entity detection.
 Crucially, entity F1 = 0.827 reflects the discriminative model's ability to classify only tokens that actually exist in the document, \textbf{eliminating the hallucination problem} that plagued the generative Mistral baseline on sparse layouts.
+
+\noindent\textbf{Entity F1 vs.\ link F1 (two different tasks).} Entity F1 (0.827) measures token classification --- ``finding'' which words are keys and values. Link F1 (0.342) measures the harder pairing of each detected key with its correct value. A strong entity score therefore does \emph{not} imply a strong link score; the two numbers are not directly comparable.
 
 % ============================================================
 \section{Technical Challenges Encountered}
@@ -268,26 +333,25 @@ Crucially, entity F1 = 0.827 reflects the discriminative model's ability to clas
 \end{itemize}
 
 % ============================================================
-\section{What Is Left to Do}
+\section{What Is Left to Do and Questions for the Supervisor}
 % ============================================================
 
+All five pipeline stages, the full experimental programme (V1--V4), the
+per-cluster analysis, and the Experiments and Discussion chapters are now
+\textbf{complete}. The remaining writing item is:
+
 \begin{enumerate}[leftmargin=1.5em]
-
-\item \textbf{Per-cluster analysis of V4.}
-  The Cluster~0 (dense) vs.\ Cluster~1 (sparse) breakdown for V4 needs to be computed and reported, directly comparing with Stage~3 Mistral hallucination rates.
-
-\item \textbf{Thesis writing --- Results and Discussion chapters.}
-  The combined Experiments~\& Results chapter needs to be written in story-driven form (Exp~$\to$~Res~$\to$~Exp~$\to$~Res), with a narrative summary. The Discussion chapter needs to interpret findings and address the original research questions.
-
-\item \textbf{German Abstract (Zusammenfassung).}
-  FAU requires a German abstract; this needs to be written and added.
-
 \item \textbf{Final proofreading and formatting.}
   Full LaTeX compilation, cross-reference checks, bibliography cleanup, and formatting for FAU submission requirements.
+\end{enumerate}
 
-\item \textbf{Optional --- Robustness and OCR-free analysis (scope TBC with supervisor).}
-  Robustness experiments (rotation, occlusion) and OCR-free comparison were in the original proposal but may be descoped given timeline.
+\noindent\textbf{Questions for the supervisor:}
+\begin{enumerate}[leftmargin=1.5em]
+\item Based on the current results, what would you like the next steps to be?
 
+\item The robustness (rotation, occlusion) and OCR-free comparisons from the
+  original proposal are still open. Keep them in scope, or descope given the
+  timeline?
 \end{enumerate}
 
 % ============================================================
@@ -303,9 +367,9 @@ Stages 0--2 (data + layout analysis)         & \textcolor{completed}{\textbf{Com
 Stage 3 (generative baseline)                & \textcolor{completed}{\textbf{Complete}} & --- \\
 Literature review                            & \textcolor{completed}{\textbf{Complete}} & --- \\
 Stage 4 implementation, training, evaluation & \textcolor{completed}{\textbf{Complete}} & --- \\
-Per-cluster V4 analysis                      & \textcolor{inprogress}{\textbf{Pending}} & 1 week \\
-Thesis writing (Exp+Results, Discussion)     & \textcolor{inprogress}{\textbf{In Progress}} & 2--3 weeks \\
-German abstract                              & \textcolor{inprogress}{\textbf{Pending}} & 1 week \\
+Per-cluster V4 analysis                      & \textcolor{completed}{\textbf{Complete}} & --- \\
+Thesis writing (Exp+Results, Discussion)     & \textcolor{completed}{\textbf{Complete}} & --- \\
+German abstract                              & \textcolor{completed}{\textbf{Complete}} & --- \\
 Robustness \& OCR-free analysis              & Planned & TBD (scope TBC) \\
 Final submission                             & --- & TBD \\
 \bottomrule
@@ -323,7 +387,7 @@ Final submission                             & --- & TBD \\
   \item \textbf{Dataset Analysis} --- KVP10k dataset, data preparation pipeline, layout clustering (before Methodology so readers understand the data first)
   \item \textbf{Methodology} --- Pipeline overview, evaluation protocol, model architectures (Mistral QLoRA + LayoutLMv3 + Biaffine Linker)
   \item \textbf{Implementation} --- System architecture, HPC setup, training procedures
-  \item \textbf{Experiments \& Results} --- Story-driven paired blocks: generative baseline $\to$ hallucination problem $\to$ discriminative model motivated $\to$ V1 token linking (imbalance) $\to$ V2 span linking (bugs) $\to$ diagnostic analysis $\to$ V4 corrected model (link F1 = 0.673). Ends with narrative summary.
+  \item \textbf{Experiments \& Results} --- Story-driven paired blocks: generative baseline $\to$ hallucination problem $\to$ discriminative model motivated $\to$ V1 token linking (imbalance) $\to$ V2 span linking (bugs) $\to$ diagnostic analysis $\to$ V4 corrected model (link F1 = 0.342 text-only / 0.309 text+location). Ends with narrative summary.
   \item \textbf{Discussion} --- Interpretation, generative vs.\ discriminative trade-offs, limitations
   \item \textbf{Conclusion} --- Summary of contributions, future work
 \end{enumerate}

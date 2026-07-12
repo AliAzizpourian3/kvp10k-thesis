@@ -100,7 +100,33 @@ Principal Component Analysis (PCA) \cite{pca} with two components explains 82.7\
     \label{fig:stage2_pca}
 \end{figure}
 
-To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Figure~\ref{fig:stage2_cluster_stats} summarize how key layout statistics differ across clusters.
+As a qualitative robustness check, we also project the features with two
+non-linear embeddings, t-SNE~\cite{tsne} and UMAP~\cite{umap}
+(Figure~\ref{fig:stage2_tsne_umap}). Unlike the linear PCA above (standardized
+features), these projections apply a $\log(1+x)$ transform to the heavy-tailed
+count/area features followed by robust scaling, and add a small Gaussian jitter
+($\sigma=0.01$) so that the $\sim$16{,}757 identical empty-layout pages render as
+a visible region rather than collapsing to a single point; t-SNE is computed on a
+stratified 3{,}000-page subsample and UMAP on all 25{,}692 pages. They are
+therefore exploratory visualizations rather than pixel-comparable to the PCA
+plot, but all three consistently show the same two-way text-rich vs.\
+text-sparse separation. The apparent internal spread of the sparse cluster is an
+artifact of the added jitter (those pages share identical zero-valued features).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{figures/stage2/tsne_clusters.png}
+    \hfill
+    \includegraphics[width=0.48\textwidth]{figures/stage2/umap_clusters.png}
+    \caption{Non-linear projections of the $k=2$ layout clusters: t-SNE on a
+    stratified 3{,}000-page subsample (left) and UMAP on all 25{,}692 pages
+    (right). Features are $\log(1+x)$-transformed, robust-scaled, and jittered
+    ($\sigma=0.01$); the sparse cluster's spread is a jitter artifact, not real
+    structure. Both reproduce the separation observed in the PCA projection.}
+    \label{fig:stage2_tsne_umap}
+\end{figure}
+
+To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Table~\ref{tab:stage2_cluster_stats} summarize how key layout statistics differ across clusters.
 
 \begin{figure}[H]
     \centering
@@ -112,17 +138,18 @@ To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Fig
 \begin{table}[H]
     \centering
     \small
-    \caption{Summary statistics of selected layout features per cluster (mean\,$\pm$\,std).}
-    \label{fig:stage2_cluster_stats}
-    \begin{tabular}{lrrrrrrrr}
+    \caption{Summary statistics of selected layout features per cluster (mean\,$\pm$\,std).
+    The page-coverage feature (total box area) is used as the layout density measure,
+    so it is reported once.}
+    \label{tab:stage2_cluster_stats}
+    \begin{tabular}{@{}lrrrrrr@{}}
         \toprule
         \textbf{Cluster} & \textbf{$n_{\text{boxes}}$ mean} & \textbf{$n_{\text{boxes}}$ std}
-            & \textbf{area mean} & \textbf{area std}
-            & \textbf{mean\,area mean} & \textbf{mean\,area std}
-            & \textbf{density mean} & \textbf{density std} \\
+            & \textbf{coverage mean} & \textbf{coverage std}
+            & \textbf{mean\,area mean} & \textbf{mean\,area std} \\
         \midrule
-        0 (text-rich)   & 25.3622 & 20.5338 & 0.0582 & 0.0467 & 0.0029 & 0.0030 & 0.0582 & 0.0467 \\
-        1 (text-sparse) &  0.0619 &  0.6941 & 0.0001 & 0.0009 & 0.0000 & 0.0002 & 0.0001 & 0.0009 \\
+        0 (text-rich)   & 25.3622 & 20.5338 & 0.0582 & 0.0467 & 0.0029 & 0.0030 \\
+        1 (text-sparse) &  0.0619 &  0.6941 & 0.0001 & 0.0009 & 0.0000 & 0.0002 \\
         \bottomrule
     \end{tabular}
 \end{table}

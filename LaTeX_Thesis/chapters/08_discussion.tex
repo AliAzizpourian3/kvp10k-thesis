@@ -33,9 +33,10 @@ a text-only generative approach.  The diagnostic analysis
 (Section~\ref{sec:res567}) revealed that V2's failure was caused
 not by the span-level architecture itself but by three compounding data
 pipeline bugs.  Once all three pipeline bugs were corrected, the V4 model
-achieves link F1~$= 0.448$ under the text-only metric comparable to the
-published baseline (and $0.309$ under the stricter text+location metric).
-This \emph{approaches} but does not reach the KVP10k paper's published
+achieves link F1~$= 0.342$ under the text-only metric (NED\,$<0.2$, the same
+threshold as the published benchmark), and $0.309$ under the stricter
+text+location metric.
+This remains below the KVP10k paper's published
 baseline of $0.659$, using a 125M-parameter discriminative model versus their
 proprietary generative system. Two diagnostic analyses
 (Section~\ref{sec:linker-diagnostics}) show the residual gap is driven by

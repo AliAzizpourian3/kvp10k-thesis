@@ -19,8 +19,7 @@ catastrophic hallucination on text-sparse layouts motivates a shift to a
 layout-aware discriminative model. We then investigate two linking
 granularities, discover a structural imbalance problem, and through systematic
 diagnostic experiments identify and fix three compounding data-pipeline bugs --
-arriving at a final corrected model whose text-only link F1 = 0.448 approaches
-but does not reach the published KVP10k baseline (0.659), with diagnostic
+arriving at a final corrected model whose text-only link F1 = 0.342 (NED\,$<0.2$, same threshold as the benchmark) remains substantially below the published KVP10k baseline (0.659), with diagnostic
 analyses localizing the remaining gap to relation modeling.
 
 \subsection*{Evaluation Setup}
@@ -49,6 +48,40 @@ LoRA rank $r=4$, $\alpha=4$) on LMDX-formatted document prompts, where each
 word in the document is represented as \texttt{word x1|y1|x2|y2} in
 normalised coordinates. The model generates KVP predictions as structured text
 output and is trained for 8 epochs with learning rate $5 \times 10^{-4}$.
+
+The exact prompt template is shown in Figure~\ref{fig:stage3-prompt}. It follows
+the LMDX paradigm~\cite{lmdx} used by the KVP10k baseline --- a document
+representation with per-word coordinates followed by a task instruction
+requesting a Python list-of-lists output. It is not guaranteed to be
+token-identical to the (unpublished) prompt of Naparstek et al.; we reproduce
+the format and output contract rather than a verbatim string. The one
+documented deviation from the original pipeline is that word text and
+coordinates are obtained from PyMuPDF's native text layer rather than Tesseract
+OCR.
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}{0.9\textwidth}
+\small
+\begin{verbatim}
+<Document>
+{lmdx_text}
+</Document>
+<Task>
+From the document, extract the text keys and values.
+Please provide the response in the form of a Python list of lists.
+Each inner list should contain exactly two strings: the first string
+is the key and the second string is the value.
+Each key and value should be followed by its bounding box in the
+format: left|top|right|bottom.
+</Task>
+### Response:
+\end{verbatim}
+\end{minipage}
+\caption{Stage~3 LMDX prompt template. \texttt{\{lmdx\_text\}} is replaced by the
+per-word text-and-coordinate representation of the page.}
+\label{fig:stage3-prompt}
+\end{figure}
 
 \subsection*{Result 1: Competitive Performance, but Spatial Hallucination on Text-Sparse Layouts}
 \label{sec:res1}
@@ -321,35 +354,47 @@ All three bugs are fixed and a corrected V4 model is trained from scratch with:
   \item Early stopping patience = 10, maximum 30 epochs; best model at epoch 13
 \end{itemize}
 
-\subsection*{Result 8: Link F1 = 0.448 (text-only) / 0.309 (text+location) --- Approaching the KVP10k Baseline}
+\subsection*{Result 8: Link F1 = 0.342 (text-only) / 0.309 (text+location) --- Below the KVP10k Baseline}
 \label{sec:res8}
 
 \begin{table}[ht]
   \centering
   \caption{Experiment~8: V4 corrected model results. Link F1 is reported under
-  both the text-only metric (comparable to the published baseline) and the
-  stricter text+location metric (NED $<0.2$, IoU $>0.3$).}
+  both the text-only metric (NED $<0.2$, the same threshold as the published
+  baseline) and the stricter text+location metric (NED $<0.2$, IoU $>0.3$).}
   \label{tab:exp8-results}
   \begin{tabular}{@{}lccc@{}}
     \toprule
     \textbf{Model} & \textbf{Entity F1} & \textbf{Link F1} \\
     \midrule
-    V4 (corrected, text-only)             & 0.827 & \textbf{0.448} \\
+    V4 (corrected, text-only)             & 0.827 & \textbf{0.342} \\
     V4 (corrected, text+location)         & 0.827 & 0.309 \\
     KVP10k paper baseline (Naparstek et al., 2024; text-only) & --- & 0.659 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-With all three bugs corrected, the V4 model achieves link F1 = 0.448 under the
-text-only metric comparable to the published baseline, and 0.309 under the
-stricter text+location metric (NED $<0.2$, IoU $>0.3$). This \emph{approaches}
-but does not reach the published KVP10k baseline (0.659, text-only), and is
-obtained with a 125M-parameter discriminative model trained on 55\% of the
-available training data. While the model does not surpass the proprietary
-generative baseline, it is far more competitive at KVP linking than the KVP10k
-paper assumed encoder-based models could be. Two diagnostic analyses
-(Section~\ref{sec:linker-diagnostics}) characterize the remaining gap.
+With all three bugs corrected, the V4 model achieves link F1 = 0.342 under the
+text-only metric (NED\,$<0.2$, identical to the published benchmark's threshold),
+and 0.309 under the text+location metric (NED\,$<0.2$, IoU\,$>0.3$). This does
+not reach the published KVP10k baseline (0.659, text-only) --- a gap of 0.317
+points --- and is obtained with a 125M-parameter discriminative model trained on
+55\% of the available training data. While the model does not surpass the
+proprietary generative baseline, it demonstrates that encoder-based models are
+substantially more capable at KVP linking than the KVP10k paper assumed. Two
+diagnostic analyses (Section~\ref{sec:linker-diagnostics}) characterize the
+remaining gap.
+
+\paragraph{Note on the two metrics.}
+Entity F1 and link F1 measure two different tasks and are not directly
+comparable. \emph{Entity F1} measures whether the model correctly labels each
+token as key, value, or other (finding the pieces), whereas \emph{link F1}
+measures the harder task of pairing each detected key with its correct value
+(connecting the pieces). A high entity F1 of 0.847 therefore does not imply a
+high link F1: entity detection is comparatively strong, while linking remains
+difficult. The full V4 model reports entity F1 $= 0.827$, slightly below the
+0.847 of entity-only Stage~4a, because joint training with the linker trades a
+small amount of entity accuracy for the linking objective.
 
 \paragraph{Per-cluster breakdown: the remaining gap is still layout-sensitive.}
 \label{sec:stage4-per-cluster}
@@ -383,7 +428,7 @@ baseline, we run two post-hoc analyses on the trained V4 model. These are
 We sweep the link decision threshold on a held-out validation slice (a fixed
 10\% of the training pages, never used for linker updates) from 0.05 to 0.90.
 Link F1 is essentially flat across the entire range (text-only F1 stays near
-0.46; text+location near 0.258), and the number of recovered true links does
+0.34; text+location near 0.26), and the number of recovered true links does
 not change materially. Recall is therefore not throttled by the score cut: it
 is bounded by which candidate pairs the linker generates at all. Threshold
 tuning is not a lever for this model.
@@ -393,7 +438,7 @@ We replace the predicted entity spans with the ground-truth key/value spans and
 re-run linking, isolating linker quality from entity-detection quality.
 Table~\ref{tab:oracle-linking} reports the result. Perfect entities raise link
 F1 by only $\sim$0.02--0.05 in every setting; even with flawless spans the
-linker reaches just 0.345 (text+location) / 0.494 (text-only). The entity
+linker reaches just 0.345 (text+location) / 0.365 (text-only). The entity
 detector is therefore \emph{not} the dominant limitation --- the linker
 (relation modeling) is.
 
@@ -407,7 +452,7 @@ detector is therefore \emph{not} the dominant limitation --- the linker
     \toprule
     \textbf{Setting} & \textbf{End-to-end} & \textbf{Oracle entities} \\
     \midrule
-    Link F1 (text-only, NED$\le$0.5)                  & 0.448 & 0.494 \\
+    Link F1 (text-only, NED$<$0.2)                    & 0.342 & 0.365 \\
     Link F1 (text+location, NED$\le$0.2, IoU$\ge$0.3) & 0.309 & 0.345 \\
     \bottomrule
   \end{tabular}
@@ -443,7 +488,7 @@ experiments.
     Exp 3: V1 (token linking) & 0.841 & 0.008 & 450:1 imbalance kills linking \\
     Exp 4: V2 (span linking)  & 0.847 & 0.007 & Bugs mask span-level benefit \\
     Exp 5--7: Diagnostics     & ---   & ---   & 3 pipeline bugs identified \& fixed \\
-    Exp 8: V4 (corrected)     & 0.827 & 0.448 / 0.309 & Approaches baseline; linker is the bottleneck \\
+    Exp 8: V4 (corrected)     & 0.827 & 0.342 / 0.309 & Below baseline; linker is the bottleneck \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -459,6 +504,6 @@ linking is defeated by class imbalance, and span-level linking only works
 after three latent data-pipeline bugs are diagnosed and corrected.
 The final corrected model demonstrates that a 125M-parameter discriminative
 model, with the right supervision, becomes substantially competitive at KVP
-linking (text-only link F1 = 0.448), though it does not surpass the large
+linking (text-only link F1 = 0.342), though it does not surpass the large
 generative baseline (0.659). Diagnostic analyses localize the remaining gap to
 relation modeling rather than entity detection.
