@@ -196,14 +196,21 @@ sbatch logs/stage4b_lambda20.sbatch   # λ=2.0
 ### Evaluation
 
 ```bash
-# Evaluate a trained checkpoint (entity F1 + link F1)
+# Internal checkpoint diagnostic (entity F1 + pooled regular-link F1)
 sbatch slurm/submit_eval.sh data/outputs/stage4b_canary_B
 
-# Results saved to:
-cat data/outputs/stage4b_canary_B/eval_results.json
+# Official KVP10k pair-level macro evaluation of saved predictions
+PYTHONPATH=code/script env/kvp10k_env/bin/python \
+  code/script/evaluate_kvp10k_benchmark.py \
+  --prediction_dir data/outputs/stage4b_v4/predictions \
+  --ground_truth_dir data/prepared/test \
+  --cluster_map data/outputs/stage2/test_cluster_map.json \
+  --output data/outputs/stage4b_v4/evaluation_kvp10k_official.json
 ```
 
-`evaluate_stage4b.py` computes token-level entity F1 and word-level pair-matching link F1 (requires word-level F1 ≥ 0.5 for a match to handle subword tokenisation boundaries).
+`evaluate_stage4b.py` retains pooled regular-link metrics for checkpoint
+diagnosis. Reported benchmark comparisons use `evaluate_kvp10k_benchmark.py`,
+which implements IBM's type-aware, per-document macro evaluation.
 
 ---
 
@@ -220,7 +227,9 @@ kvp10k_thesis/
 │   ├── prepare_data.py             # Stage 3: PDF → prepared JSON
 │   ├── baselines.py                # Stage 3: nearest-neighbour baseline
 │   ├── mistral_baseline.py         # Stage 3: Mistral-7B LoRA baseline
-│   ├── evaluate_mistral.py         # Stage 3: inference + evaluation
+│   ├── evaluate_mistral.py         # Stage 3: legacy pooled entity diagnostic
+│   ├── evaluate_kvp10k_benchmark.py # Official pair-level macro evaluation
+│   ├── kvp10k_official_eval.py     # IBM-compatible metric implementation
 │   ├── analyze_results.py          # Stage 3: results analysis vs ground truth
 │   ├── analyze_stage3_errors.py    # Stage 3: per-cluster error breakdown
 │   ├── visualize_baseline.py       # Stage 3: baseline result visualisation

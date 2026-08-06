@@ -165,7 +165,7 @@ def main():
     # -------------------------------------------------------------------------
     # Print summary table
     print("\n" + "=" * 80)
-    print(f"V4 PER-CLUSTER RESULTS  NED<={args.ned_thresh}  IoU>={args.iou_thresh}")
+    print(f"V4 PER-CLUSTER RESULTS  NED<{args.ned_thresh}  IoU>{args.iou_thresh}")
     print("=" * 80)
     print(f"{'Cluster':<30} {'Docs':>5} {'EntityF1':>9} {'LinkF1(to)':>11} "
           f"{'LinkF1(tb)':>11} {'TP/GT(to)':>12}")

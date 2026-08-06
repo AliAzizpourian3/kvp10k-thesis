@@ -20,8 +20,7 @@ LaTeX_Thesis/
 │   ├── 07_results.tex
 │   ├── 08_discussion.tex
 │   ├── 09_conclusion.tex
-│   ├── appendix_a_code.tex
-│   └── appendix_b_data.tex
+│   └── appendix_a_code.tex
 └── figures/                    # Figures (to be added)
 ```
 

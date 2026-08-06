@@ -13,14 +13,14 @@ contributions are:
     layout clustering, revealing two distinct layout types and strong spatial
     proximity patterns in \kvps{} (Chapter~\ref{ch:dataset}).
 
-    \item \textbf{Generative Baseline}: Reproduced the KVP10k Mistral-7B
-    baseline and identified its failure modes: hallucination on sparse layouts
+    \item \textbf{Generative Baseline}: Re-implemented the KVP10k Mistral-7B
+    approach and identified its failure modes: hallucination on sparse layouts
     (97\% hallucination rate) and weak spatial grounding
     (Chapter~\ref{ch:exresults}).
 
     \item \textbf{Discriminative Architecture}: Implemented a LayoutLMv3-based
-    entity classifier achieving F1~$= 0.827$, eliminating spatial
-    hallucination through grounded token classification
+    entity classifier achieving F1~$= 0.827$. Grounded token classification
+    prevents generation of text absent from the OCR input
     (Chapter~\ref{ch:methodology}).
 
     \item \textbf{Linking Granularity Analysis}: Demonstrated that token-level
@@ -31,9 +31,9 @@ contributions are:
     \item \textbf{Pipeline Debugging and V4 Results}: Diagnosed three
     compounding data-pipeline bugs (missing teacher forcing, over-strict
     bounding-box filter, cross-product link label explosion) that masked
-    span-level linking performance. The corrected V4 model achieves
-    link F1~$= 0.342$ (text-only) / $0.309$ (text+location), below but
-    not reaching the published KVP10k baseline (0.659); diagnostic analyses
+    span-level linking performance. The corrected V4 model achieves regular-KVP
+    macro F1~$=0.334$ (text) / $0.309$ (text+location), below the corresponding
+    published scores ($0.659/0.611$); diagnostic analyses
     localize the remaining gap to relation modeling rather than entity
     detection (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
 
@@ -51,10 +51,12 @@ strong spatial proximity (mean distance = 0.10 normalised units), confirming
 that spatial features are essential for accurate linking.
 
 \subsection{RQ2: Discriminative vs.\ Generative}
-The discriminative LayoutLMv3 model achieves entity F1~$= 0.827$ with no
-spatial hallucination, compared to Mistral's text+location F1~$= 0.600$ with
-significant hallucination. Layout-aware discriminative models outperform
-text-only generative approaches on spatially-grounded extraction.
+The discriminative LayoutLMv3 model achieves entity F1~$=0.827$ without
+generating text outside the OCR input. For regular pair extraction, V4 reaches
+combined macro F1 $=0.309$, compared with $0.521$ for reconstructed Mistral;
+the latter nevertheless produces substantial unsupported text on sparse pages.
+These are complementary trade-offs rather than evidence that one formulation
+dominates both entity detection and linking.
 
 \subsection{RQ3: Linking Granularity}
 Token-level linking (V1) fails decisively (F1~$= 0.008$) due to the
@@ -62,10 +64,12 @@ $\sim$450:1 class imbalance inherent in token-to-token scoring. Span-level
 linking (V2) reduces this to $\sim$5:1 by grouping contiguous tokens before
 scoring. However, three data-pipeline bugs initially masked this benefit,
 producing link F1 of only 0.007. After systematic diagnosis and correction,
-the V4 model achieves link F1~$= 0.342$ (text-only) / $0.309$ (text+location).
+the V4 model achieves regular-KVP macro F1~$=0.334$ (text) / $0.309$
+(text+location).
 Span-level linking, paired with correct supervision, is far more effective
 than token-level linking, but still does not reach the
-published baseline (0.659); an oracle-entity analysis shows the remaining gap
+published regular-KVP scores ($0.659/0.611$); an internal oracle-entity
+diagnostic shows the remaining gap
 is dominated by relation modeling rather than entity detection.
 
 \subsection{RQ4: Success and Failure Factors}
@@ -73,18 +77,20 @@ Model performance depends strongly on document layout type. Text-rich layouts
 benefit from rich contextual signals; text-sparse layouts challenge both
 generative (hallucination) and discriminative (fewer training examples)
 approaches. Relation modeling --- the linker itself --- rather than entity
-detection or model capacity, is the primary bottleneck for key-value
-association: supplying ground-truth entities raises link F1 by only
-$\sim$0.03--0.05.
+detection or threshold choice, is the primary bottleneck for key-value
+association: supplying ground-truth entities raises pooled diagnostic link F1
+by only $\sim$0.03--0.05.
 
 \section{Practical Implications}
 \label{sec:implications}
 
-This work demonstrates that discriminative multimodal models are well-suited
-for enterprise document processing: they provide spatially grounded
-predictions, eliminate hallucination, and operate efficiently on modest
-hardware (single GPU, 125M parameters). The modular pipeline design enables
-adaptation to new document types with minimal re-engineering.
+This work shows a useful trade-off for discriminative multimodal models: they
+provide OCR-grounded predictions and operate with 125M parameters on a single
+GPU, but the present linker remains substantially below the KVP10k baseline.
+A decode-time recovery of unlinked spans extends coverage to the unkeyed and
+unvalued categories at markedly lower accuracy (All F1 $0.199\!\to\!0.237$)
+without retraining, and the modular pipeline provides a foundation for closing
+the remaining gap.
 
 \section{Closing Remarks}
 \label{sec:closing}
@@ -96,7 +102,7 @@ problem demands careful attention to data pipeline correctness, class
 imbalance, and task structure. The progression from V1 through V4 illustrates
 that architectural improvements --- such as span-level linking --- can only
 realise their potential when the supervision signal is correct. The final
-V4 model achieves link F1~$= 0.342$ (text-only) / $0.309$ (text+location),
-below the published KVP10k baseline (0.659) with a compact
-125M-parameter discriminative model; diagnostic analyses identify relation
-modeling as the remaining bottleneck.
+V4 model achieves regular-KVP macro F1~$=0.334$ (text) / $0.309$
+(text+location), below the published $0.659/0.611$. The result establishes
+feasibility for a compact 125M-parameter discriminative model while identifying
+relation modeling and missing singleton-category decoding as remaining work.

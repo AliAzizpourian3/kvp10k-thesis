@@ -81,7 +81,7 @@ by the corrected Stage~3 pipeline.
 \paragraph{V4: Word-level splitting.}
 Diagnostic analysis (Section~\ref{sec:exp567}) revealed that
 the LMDX text format stores entire OCR text blocks --- often multi-word
-phrases such as \texttt{"1~lb.\ shelled \$15.00"} --- as single ``words''
+phrases such as \texttt{1~lb.\ shelled \$15.00} --- as single ``words''
 with a single bounding box. This is problematic for LayoutLMv3, which expects
 individual words, and for ground-truth label generation, because a key-value
 pair whose key and value text reside within the same OCR block cannot produce
@@ -89,9 +89,9 @@ distinct entity labels or link labels at the block level.
 
 The V4 data pipeline splits each OCR block into whitespace-separated words and
 estimates horizontal sub-bounding boxes proportional to character count. For
-example, the block \texttt{"1~lb.\ shelled \$15.00"} with bounding box
-$[x_1, y_1, x_2, y_2]$ is split into four words (\texttt{"1"},
-\texttt{"lb."}, \texttt{"shelled"}, \texttt{"\$15.00"}), each assigned a
+example, the block \texttt{1~lb.\ shelled \$15.00} with bounding box
+$[x_1, y_1, x_2, y_2]$ is split into four words (\texttt{1},
+\texttt{lb.}, \texttt{shelled}, \texttt{\$15.00}), each assigned a
 horizontal slice of the original bbox. This increased the average word count
 per document from $\sim$35 (block-level) to $\sim$200 (word-level) and
 enabled the entity labels and link labels to reach word-level granularity.
@@ -203,8 +203,9 @@ Stage~3 implements a fully automated 5-step evaluation pipeline:
   \item \textbf{Prediction Generation:} Run baseline on test set (apply spatial
   pairing algorithm, save predictions in IBM-compatible format).
   \item \textbf{Benchmark Evaluation:} Automatically execute IBM's official
-  benchmark (compute precision, recall, F1; evaluate text-only, location-only,
-  and combined metrics).
+  benchmark semantics (type-aware greedy pair matching; evaluate text-only,
+  location-only, and combined metrics; average precision and recall per page,
+  then compute F1 from those macro averages).
   \item \textbf{Results Analysis:} Generate detailed statistics (type
   distribution, per-document statistics, sample examples).
   \item \textbf{Visualisation:} Create publication-ready plots at 300\,DPI.
@@ -320,19 +321,28 @@ Intersection over Union (IoU) measures spatial accuracy:
   \text{IoU}(B_p, B_t) = \frac{\text{Area}(B_p \cap B_t)}{\text{Area}(B_p \cup B_t)}
   \tag{5.2}
 \]
-where $B_p$ is predicted box, $B_t$ is target box. Threshold: $\text{IoU} > 0.3$.
+where $B_p$ is predicted box and $B_t$ is target box. The paper states
+$\text{IoU}>0.3$, but IBM's released evaluator checks
+$\text{IoU}\geq0.3$; reported benchmark results follow the released code.
 
 \subsection{Overall Metric: F1 Score}
 \label{sec:f1}
 
-A prediction matches ground truth if both $\text{NED} < 0.2$ and
-$\text{IoU} > 0.3$.
+A regular pair matches only if both key and value satisfy
+$\text{NED}<0.2$ and, for combined evaluation, $\text{IoU}\geq0.3$.
+Predicted and ground-truth KVP types must agree, and greedy matching assigns
+each ground-truth item at most once. For each scored page $i$, precision $P_i$
+and recall $R_i$ are computed from pair-level counts. The released evaluator
+then reports
 \[
-  \text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}, \quad
-  \text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}, \quad
-  F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
+  \bar P = \frac{1}{D}\sum_{i=1}^{D} P_i, \qquad
+  \bar R = \frac{1}{D}\sum_{i=1}^{D} R_i, \qquad
+  F_1 = \frac{2\bar P\bar R}{\bar P+\bar R},
   \tag{5.3}
 \]
+where $D$ contains pages with non-empty ground truth after category filtering.
+Text-only, location-only, and combined metrics are reported separately for
+regular, unkeyed, unvalued, and All categories.
 
 % ---------------------------------------------------------------------------
 \section{Code Organisation}

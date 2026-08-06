@@ -15,13 +15,15 @@ negative-to-positive ratio). Span-level linking (V2) reduces this to
 $\sim$5:1 but initially produces link F1 of only 0.007 due to three
 compounding data-pipeline bugs identified through systematic diagnostic
 experiments. After correcting these bugs, the final V4 model achieves
-entity F1~$= 0.827$ and link F1~$= 0.342$ under the text-only metric
-(NED\,$<0.2$, the same threshold as the published KVP10k baseline of 0.659),
-and $0.309$ under the stricter text+location metric. The discriminative model
-thus does not reach the generative baseline on linking; diagnostic analyses
-localize the remaining gap to relation modeling rather than entity detection,
-while the layout-grounded architecture eliminates hallucination on
-text-sparse layouts.
+entity F1~$=0.827$ and, under the released KVP10k macro benchmark, regular-KVP
+F1~$=0.334$ for text and $0.309$ for text+location. The corresponding
+published scores are $0.659$ and $0.611$. In its primary configuration V4 emits
+regular linked pairs only; a post-hoc decode-time recovery optionally extends
+coverage to the benchmark's unkeyed and unvalued categories at markedly lower
+accuracy.
+Diagnostic analyses localize the remaining regular-pair gap primarily to
+relation modeling, while the layout-grounded architecture prevents generation
+of text absent from the OCR input.
 
 \textbf{Keywords:} Document Understanding, Key-Value Pair Extraction,
 LayoutLMv3, Span-Level Linking, Biaffine Linker, Multimodal Learning,

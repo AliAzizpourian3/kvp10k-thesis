@@ -125,9 +125,9 @@ def _get_gt_kvps(json_path):
 def _text_overlap(pred_text, gt_text, ned_thresh=0.5):
     """Decide whether a predicted text matches a ground-truth text.
 
-    Uses the SAME normalised edit distance (NED) criterion as the official
-    KVP10k evaluation (``evaluate_mistral._ned``): a match requires
-    ``NED(pred, gt) <= ned_thresh``. This replaces the previous ad-hoc rule
+    Uses the paper-literal pooled diagnostic NED criterion
+    (``evaluate_mistral._ned``): a match requires
+    ``NED(pred, gt) < ned_thresh``. This replaces the previous ad-hoc rule
     (bidirectional substring containment OR word-level F1 >= 0.5), which was
     more lenient than the headline metric and therefore inflated link F1.
     """
@@ -137,7 +137,8 @@ def _text_overlap(pred_text, gt_text, ned_thresh=0.5):
     if not pred_text or not gt_text:
         return False
 
-    return _ned(pred_text, gt_text) <= ned_thresh
+    # The pooled diagnostic follows the paper's strict boundary wording.
+    return _ned(pred_text, gt_text) < ned_thresh
 
 
 def _span_to_text(start, end, word_ids, words):
@@ -306,12 +307,164 @@ def _extract_predicted_pairs(model, batch, device, dataset, idx_start,
                     val_text = ""
 
             if key_text and val_text:
-                pairs.append((key_text.lower(), val_text.lower(),
+                pairs.append((key_text, val_text,
                               best_scores[i].item(), key_bbox, val_bbox))
 
         all_pairs.append(pairs)
 
     return all_pairs
+
+
+def _extract_all_type_predictions(model, batch, device, dataset, idx_start,
+                                  score_threshold=0.5):
+    """Decode regular pairs AND recover unlinked spans as unvalued/unkeyed.
+
+    The entity head is trained on every key/value span (including those in
+    unvalued/unkeyed ground-truth pairs), but the headline export keeps only
+    linker-consumed pairs. This function additionally emits:
+      - a key span whose top link score stays below ``score_threshold`` as an
+        ``unvalued`` prediction, and
+      - a value span never chosen by any above-threshold key as an ``unkeyed``
+        prediction.
+
+    Regular ``kvp`` predictions are produced by the same span-decoding path as
+    ``_extract_predicted_pairs`` (same order, same threshold), so the Regular
+    category is unaffected. Returns one list of prediction dicts per batch item;
+    each dict has ``type`` in {kvp, unvalued, unkeyed}, ``key``/``value`` with
+    ``text``/``bbox``, and ``confidence``. Leftover-span confidence is the
+    span's best available link logit (a monotone entity-salience proxy), used
+    only to order predictions for the greedy matcher.
+    """
+    input_ids = batch["input_ids"].to(device)
+    attention_mask = batch["attention_mask"].to(device)
+    bbox = batch["bbox"].to(device)
+    pixel_values = batch["pixel_values"].to(device) if "pixel_values" in batch else None
+
+    with torch.no_grad():
+        outputs = model(input_ids, attention_mask, bbox, pixel_values)
+
+    link_scores = outputs["link_scores"]
+    key_indices = outputs["key_indices"]
+    value_indices = outputs["value_indices"]
+
+    is_v2 = (key_indices is not None
+             and len(key_indices) > 0
+             and key_indices[0] is not None
+             and len(key_indices[0]) > 0
+             and isinstance(key_indices[0][0], tuple))
+
+    batch_size = input_ids.size(0)
+    all_preds = []
+
+    for b in range(batch_size):
+        preds = []
+        sample_idx = idx_start + b
+        if sample_idx >= len(dataset):
+            all_preds.append(preds)
+            continue
+
+        json_file = dataset.json_files[sample_idx]
+        try:
+            with open(json_file) as f:
+                data = json.load(f)
+            lmdx_text = data.get("lmdx_text", "")
+            words, _ = dataset._parse_lmdx_text(lmdx_text, data)
+        except Exception:
+            all_preds.append(preds)
+            continue
+
+        try:
+            image_width = data.get("image_width", 1)
+            image_height = data.get("image_height", 1)
+            _, word_bboxes = dataset._parse_lmdx_text(lmdx_text, data)
+            bboxes_norm = dataset._normalize_bboxes(word_bboxes, image_width, image_height)
+            from PIL import Image
+            dummy_img = Image.new("RGB", (224, 224), (255, 255, 255))
+            encoded = dataset.processor(
+                images=dummy_img, text=words, boxes=bboxes_norm,
+                return_tensors="pt", padding="max_length",
+                max_length=dataset.max_seq_length, truncation=True
+            )
+            word_ids = encoded.word_ids()
+        except Exception:
+            all_preds.append(preds)
+            continue
+
+        if link_scores is None or link_scores[b] is None:
+            all_preds.append(preds)
+            continue
+
+        scores_b = link_scores[b]  # [nk, nv]
+        k_idx = key_indices[b]
+        v_idx = value_indices[b]
+
+        def _span_text_bbox(span):
+            if is_v2:
+                text = _span_to_text(span[0], span[1], word_ids, words)
+                box = _span_to_bbox(span[0], span[1], word_ids, word_bboxes)
+                return text, box
+            token = span.item() if hasattr(span, "item") else int(span)
+            if token < len(word_ids) and word_ids[token] is not None:
+                wid = word_ids[token]
+                text = words[wid] if wid < len(words) else ""
+                box = word_bboxes[wid] if wid < len(word_bboxes) else None
+                return text, box
+            return "", None
+
+        keys_above = set()
+        consumed_values = set()
+        if len(k_idx) > 0 and len(v_idx) > 0:
+            best_val_pos = torch.argmax(scores_b, dim=1)
+            best_scores = torch.sigmoid(scores_b[range(len(k_idx)), best_val_pos])
+            for i, ki in enumerate(k_idx):
+                if best_scores[i].item() < score_threshold:
+                    continue
+                keys_above.add(i)
+                vi = v_idx[best_val_pos[i].item()]
+                key_text, key_bbox = _span_text_bbox(ki)
+                val_text, val_bbox = _span_text_bbox(vi)
+                if key_text and val_text:
+                    consumed_values.add(best_val_pos[i].item())
+                    preds.append({
+                        "type": "kvp",
+                        "key": {"text": key_text, "bbox": key_bbox},
+                        "value": {"text": val_text, "bbox": val_bbox},
+                        "confidence": best_scores[i].item(),
+                    })
+
+        # Leftover key spans (no above-threshold link) -> unvalued.
+        for i, ki in enumerate(k_idx):
+            if i in keys_above:
+                continue
+            key_text, key_bbox = _span_text_bbox(ki)
+            if not key_text:
+                continue
+            conf = (torch.sigmoid(scores_b[i].max()).item()
+                    if len(v_idx) > 0 else 0.0)
+            preds.append({
+                "type": "unvalued",
+                "key": {"text": key_text, "bbox": key_bbox},
+                "confidence": conf,
+            })
+
+        # Value spans never consumed by a regular pair -> unkeyed.
+        for vpos, vi in enumerate(v_idx):
+            if vpos in consumed_values:
+                continue
+            val_text, val_bbox = _span_text_bbox(vi)
+            if not val_text:
+                continue
+            conf = (torch.sigmoid(scores_b[:, vpos].max()).item()
+                    if len(k_idx) > 0 else 0.0)
+            preds.append({
+                "type": "unkeyed",
+                "value": {"text": val_text, "bbox": val_bbox},
+                "confidence": conf,
+            })
+
+        all_preds.append(preds)
+
+    return all_preds
 
 
 # ---------------------------------------------------------------------------
@@ -361,7 +514,8 @@ def _bbox_ok(pred_bbox, gt_bbox, iou_thresh):
         return True
     if len(pred_bbox) < 4 or len(gt_bbox) < 4:
         return True
-    return _iou(pred_bbox, gt_bbox) >= iou_thresh
+    # The pooled diagnostic follows the paper's strict boundary wording.
+    return _iou(pred_bbox, gt_bbox) > iou_thresh
 
 
 def _collect_link_pairs(model, dataset, dataloader, device, score_threshold=0.5,
@@ -396,9 +550,9 @@ def _collect_link_pairs(model, dataset, dataloader, device, score_threshold=0.5,
 def _score_link_pairs(collected, ned_thresh=0.5, iou_thresh=0.5, use_bbox=True):
     """Score collected pairs under one matching mode.
 
-    A predicted pair matches a GT pair if NED(key)<=ned_thresh and
-    NED(value)<=ned_thresh (text mode), and additionally IoU(key)>=iou_thresh
-    and IoU(value)>=iou_thresh when ``use_bbox`` is True. Greedy, best-score
+    A predicted pair matches a GT pair if NED(key)<ned_thresh and
+    NED(value)<ned_thresh (text mode), and additionally IoU(key)>iou_thresh
+    and IoU(value)>iou_thresh when ``use_bbox`` is True. Greedy, best-score
     first; each GT pair matched at most once.
     """
     tp = 0
@@ -450,7 +604,7 @@ def main():
     parser.add_argument("--score_threshold", type=float, default=0.5,
                         help="Link score threshold for pair extraction")
     parser.add_argument("--ned_thresh", type=float, default=0.5,
-                        help="NED threshold for key/value text matching (official metric: <=0.5)")
+                        help="NED threshold for pooled diagnostic key/value matching")
     parser.add_argument("--iou_thresh", type=float, default=0.5,
                         help="IoU threshold for key/value box matching in text+bbox mode")
     parser.add_argument("--batch_size", type=int, default=1,
@@ -544,7 +698,7 @@ def main():
     # Print summary table
     print("\n" + "=" * 50)
     print(f"EVALUATION: {args.checkpoint_dir}")
-    print(f"  NED<={args.ned_thresh}  IoU>={args.iou_thresh}  score_thr={args.score_threshold}"
+    print(f"  NED<{args.ned_thresh}  IoU>{args.iou_thresh}  score_thr={args.score_threshold}"
           f"{'  [ORACLE: GT entities]' if args.oracle else ''}")
     print("=" * 50)
     print(f"  Entity F1:        {entity_metrics['entity_f1']:.4f}  "

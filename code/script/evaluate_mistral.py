@@ -1,14 +1,13 @@
-"""
-Evaluate Mistral-7B predictions against prepared ground truth.
+"""Legacy pooled entity-level diagnostic for Mistral predictions.
 
-Compares prediction JSONs (from mistral_baseline.py predict) against
-ground truth KVPs (from prepare_data.py).
+This script flattens pairs into separate key/value entities and is not the
+pair-level KVP10k benchmark. Use ``evaluate_kvp10k_benchmark.py`` for reported
+benchmark results.
 
 Metrics:
   - Precision, Recall, F1 at entity level (key and value separately)
-  - Text-only matching (NED ≤ threshold)
-  - Text+bbox matching (NED ≤ threshold AND IoU ≥ threshold)
-  - Per-type breakdown (kvp, unkeyed, unvalued)
+    - Text-only matching (NED < threshold)
+    - Text+bbox matching (NED < threshold AND IoU > threshold)
 
 Usage:
   python evaluate_mistral.py \
@@ -119,12 +118,13 @@ def match_entities(
                 continue
 
             ned = _ned(p_text.lower(), g_text.lower())
-            if ned > ned_thresh:
+            # This legacy diagnostic follows the paper's strict boundary wording.
+            if ned >= ned_thresh:
                 continue
 
             if use_bbox and p_bbox and g_bbox:
                 iou = _iou(p_bbox, g_bbox)
-                if iou < iou_thresh:
+                if iou <= iou_thresh:
                     continue
                 score = (1 - ned) + iou
             else:

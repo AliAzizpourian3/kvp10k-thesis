@@ -71,7 +71,7 @@ def categorize_errors(
     (``evaluate_mistral.match_entities``, text+bbox mode). This guarantees the
     error taxonomy is consistent with the headline benchmark metric:
 
-      - correct      = true positives  (matched: NED <= 0.5 AND IoU >= 0.5)
+      - correct      = true positives  (matched: NED < 0.5 AND IoU > 0.5)
       - hallucinated = false positives (predicted entity with no GT match)
       - missed       = false negatives (GT entity with no predicted match)
 
@@ -128,7 +128,7 @@ def analyze_stage3_errors(
     eval_summary = eval_data.get("summary", {})
     ned_thresh = eval_summary.get("ned_threshold", 0.5)
     iou_thresh = eval_summary.get("iou_threshold", 0.5)
-    logger.info(f"Matching thresholds from eval summary: NED<={ned_thresh}, IoU>={iou_thresh}")
+    logger.info(f"Matching thresholds from eval summary: NED<{ned_thresh}, IoU>{iou_thresh}")
 
     per_doc = eval_data.get("per_document", [])
     logger.info(f"Loaded {len(per_doc)} document evaluations")

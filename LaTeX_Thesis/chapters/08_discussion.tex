@@ -8,10 +8,11 @@
 
 The LayoutLMv3 V4 entity classifier achieves F1~$= 0.827$, demonstrating that
 the multimodal encoder effectively distinguishes key, value, and other tokens
-using joint text-layout-image representations. This result validates the
-choice of a discriminative formulation over the generative baseline: by
-constraining predictions to existing OCR tokens, the model eliminates
-spatial hallucination entirely.
+using joint text-layout-image representations. This demonstrates the strength
+of the discriminative formulation for entity detection: by
+constraining predictions to existing OCR tokens, the model prevents the
+generation of text absent from the OCR input. It can still falsely label an
+existing token as a key or value.
 
 \subsection{Token-Level Linking Failure}
 
@@ -20,27 +21,27 @@ thesis. The failure is attributable to the granularity mismatch between the
 linking formulation (token-to-token) and the task structure (span-to-span).
 With $\sim$450:1 negative-to-positive ratio at the token level, the BCE loss
 is dominated by negative examples even with \texttt{pos\_weight} correction.
-This finding aligns with SPADE~\cite{spade} and BROS~\cite{bros}, which both
+This is consistent with SPADE~\cite{spade} and BROS~\cite{bros}, which both
 operate at the segment/span level rather than the token level.
 
 \subsection{Comparison to Baselines}
 
-Compared to the Stage~3 Mistral baseline (text+location F1~$= 0.600$),
-the discriminative LayoutLMv3 model provides strong entity extraction but
-the initial V2 span-level linker fails to improve linking over V1 (both near
-zero).  The published KVP10k baseline achieves linking F1~$= 0.659$ using
-a text-only generative approach.  The diagnostic analysis
+Under the released pair-level macro benchmark, reconstructed Mistral reaches
+regular-KVP F1 $=0.598$ for text and $0.521$ for text+location. The published
+regular-KVP values are $0.659$ and $0.611$. The initial V2 span-level linker
+fails under the internal pooled diagnostic, remaining near V1's zero score.
+The diagnostic analysis
 (Section~\ref{sec:res567}) revealed that V2's failure was caused
 not by the span-level architecture itself but by three compounding data
-pipeline bugs.  Once all three pipeline bugs were corrected, the V4 model
-achieves link F1~$= 0.342$ under the text-only metric (NED\,$<0.2$, the same
-threshold as the published benchmark), and $0.309$ under the stricter
-text+location metric.
-This remains below the KVP10k paper's published
-baseline of $0.659$, using a 125M-parameter discriminative model versus their
-proprietary generative system. Two diagnostic analyses
-(Section~\ref{sec:linker-diagnostics}) show the residual gap is driven by
-relation modeling rather than entity detection or threshold choice.
+pipeline bugs. Once corrected, V4 reaches regular-KVP F1 $=0.334$ for text
+and $0.309$ for text+location, below both reconstructed Mistral and the
+published baseline. Its All score is lower ($0.214/0.199$) because its decoder
+emits only regular pairs. Internal diagnostic analyses
+(Section~\ref{sec:linker-diagnostics}) show the residual regular-pair gap is
+driven by relation modeling rather than entity detection or threshold choice;
+a decode-time recovery of unlinked spans (Analysis~C) cheaply extends coverage
+to unkeyed and unvalued at lower accuracy, raising All F1 to $0.257/0.237$
+without retraining.
 
 \subsection{Per-Cluster Performance}
 
@@ -50,27 +51,28 @@ layout type. On text-rich pages (Cluster~0) the generative baseline reaches
 58.6\% correct entities; on text-sparse pages (Cluster~1) it collapses to
 3.0\% correct with a 97\% hallucination rate, over-generating entities
 $20.6\times$ relative to ground truth. The discriminative LayoutLMv3 model
-removes this hallucination by construction, since it can only label tokens
-that exist in the page. Text-sparse pages --- those with very few extractable
-OCR tokens --- thus remain the hardest regime for any text-conditioned
-generative approach, and are the clearest beneficiary of layout-grounded
-discriminative modeling.
+cannot generate text beyond the OCR input, since it only labels tokens that
+exist on the page. For the Stage~3 generative baseline, text-sparse pages are
+therefore the most difficult regime observed in this study.
 
 \begin{table}[ht]
   \centering
-  \caption{Stage~4 per-cluster results for the corrected V4 model (same matching as Table~\ref{tab:exp8-results}).}
+  \caption{Stage~4 regular-KVP macro F1 by layout cluster (same benchmark matching as Table~\ref{tab:exp8-results}).}
   \label{tab:stage4-cluster}
   \begin{tabular}{@{}lcccc@{}}
     \toprule
     \textbf{Cluster} & \textbf{Docs} & \textbf{Entity F1} & \textbf{Link F1 (text-only)} & \textbf{Link F1 (text+location)} \\
     \midrule
-    0 (text-rich)   & 521 & 0.828 & 0.341 & 0.309 \\
-    1 (text-sparse) &  60 & 0.723 & 0.467 & 0.333 \\
+    0 (text-rich)   & 521 & 0.828 & 0.334 & 0.310 \\
+    1 (text-sparse) &  60 & 0.723 & 0.343 & 0.227 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-The Stage~4 results mirror the earlier cluster story, but with a crucial difference: the corrected linker no longer collapses on either cluster. Instead, the text-rich cluster dominates the aggregate score because it contains most test pages, while the text-sparse cluster is too small to alter the overall trend materially. The remaining gap is therefore not a cluster-specific failure mode but a general relation-modeling ceiling.
+V4's text-only score is similar across clusters, but its combined score is
+lower on the text-sparse subset. That subset contains only 60 documents and
+16 regular ground-truth links, so the estimate has high variance. It should
+not be interpreted as evidence that sparse layouts are generally easier.
 
 \section{Root-Cause Analysis}
 \label{sec:root-cause-analysis}
@@ -102,11 +104,11 @@ sufficient to prevent learning:
   span-level collapse produce near-uniform positive labels.
 \end{enumerate}
 
-\noindent The critical insight is that Bug~3 was invisible at the token level
+\noindent Bug~3 was invisible at the token level
 (V1), where the dense $n_k \times n_v$ matrix already had many positives.
-It only became observable when the span-level collapse was introduced in V2,
+It became observable only when the span-level collapse was introduced in V2,
 because the small $K \times V$ matrix should have been sparse but was not.
-This underscores the value of the span-level reformulation as a diagnostic
+The span-level reformulation therefore served as a diagnostic
 tool, not only an architectural improvement.
 
 \section{Error Analysis}
@@ -141,11 +143,14 @@ link supervision (Bug~3), which trained the linker to associate nearly any
 span pair.  With the V4 corrections, the linker receives correct sparse
 supervision where each KVP produces exactly one positive span link.
 
-A supplementary experiment---V3 (linker-only), where the encoder and
+A supplementary diagnostic experiment---V3 (linker-only), where the encoder and
 entity classifier were frozen and only the linker was trained---achieved
 83\% link accuracy on the validation set, demonstrating that the
 \texttt{SpanBiaffineLinker} architecture itself is capable of learning
-correct associations when given clean input representations.  The test-set
+correct associations when given clean input representations.  This check is
+not listed as a separate row in the main experimental progression
+(Table~\ref{tab:full-progression}), as it isolates the linker for diagnosis
+rather than defining a headline model.  The test-set
 link F1 of V3 (0.018) remained low because it inherited the same sparse
 entity spans from the bbox-filtered entity classifier (Bug~2).
 
@@ -173,34 +178,26 @@ the segment/span level --- is validated by our V1 failure analysis.
 
 \subsection{Current Limitations}
 
-\begin{itemize}
-    \item \textbf{Training data coverage}: Our training set covers only
-    55.8\% of unique KVP10k pages due to PDF download failures and
-    scanned documents lacking text layers. An OCR-based pipeline (e.g.,
-    Tesseract) would increase coverage.
-
-    \item \textbf{LoRA rank}: Hardware constraints (40\,GB A100) forced
-    the Mistral baseline to use LoRA rank $r = 4$ instead of the
-    estimated $r \geq 16$ in the official baseline. This limits the
-    fairness of the Stage~3 vs.\ paper comparison.
-
-    \item \textbf{Single-page limitation}: The current pipeline processes
-    one page at a time; multi-page documents with cross-page key-value
-    pairs cannot be handled.
-\end{itemize}
+Three limitations of the present work should be noted. First, our training set
+covers only 55.8\% of the unique KVP10k pages, owing to PDF download failures
+and scanned documents lacking a text layer; an OCR-based pipeline (for example
+Tesseract) would increase coverage. Second, hardware constraints (a 40\,GB
+A100) forced the Mistral baseline to use LoRA rank $r = 4$ rather than the
+$r \geq 16$ estimated for the official baseline, which limits the fairness of
+the Stage~3 versus paper comparison. Third, the current pipeline processes a
+single page at a time, so multi-page documents with cross-page key--value pairs
+cannot yet be handled.
 
 \subsection{Future Directions}
-\begin{itemize}
-    \item Segment-graph relation decoders (SPADE~\cite{spade}, BROS~\cite{bros})
-    for the linker head. Our oracle analysis
-    (Section~\ref{sec:linker-diagnostics}) localizes the main performance
-    bottleneck to relation modeling rather than entity detection, making
-    span/segment-graph linkers --- which model directed key$\to$value
-    dependencies explicitly --- the most promising next step. This was scoped
-    as future work rather than implemented, as it requires a new decoder head
-    and full retraining.
-    \item Multi-page document handling with cross-page linking
-    \item End-to-end OCR integration to increase data coverage
-    \item Cross-lingual evaluation on XFUND
-    \item Contrastive pre-training for the linker head
-\end{itemize}
+
+Several directions follow naturally from these findings. The most promising is
+to replace the linker head with a segment-graph relation decoder such as
+SPADE~\cite{spade} or BROS~\cite{bros}: our oracle analysis
+(Section~\ref{sec:linker-diagnostics}) localizes the main performance
+bottleneck to relation modeling rather than entity detection, making linkers
+that model directed key$\to$value dependencies explicitly the natural next
+step. This was scoped as future work rather than implemented, since it requires
+a new decoder head and full retraining. Further directions include handling
+multi-page documents with cross-page linking, integrating end-to-end OCR to
+increase data coverage, evaluating cross-lingual performance on XFUND, and
+exploring contrastive pre-training for the linker head.

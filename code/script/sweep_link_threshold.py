@@ -127,7 +127,7 @@ def main():
 
     # Report
     print("\n" + "=" * 78)
-    print(f"LINK THRESHOLD SWEEP  split={args.split}  NED<={args.ned_thresh}  IoU>={args.iou_thresh}")
+    print(f"LINK THRESHOLD SWEEP  split={args.split}  NED<{args.ned_thresh}  IoU>{args.iou_thresh}")
     print("=" * 78)
     print(f"{'thr':>5} | {'text-only F1':>12} {'P':>6} {'R':>6} {'pred':>6} "
           f"| {'txt+box F1':>10} {'P':>6} {'R':>6}")

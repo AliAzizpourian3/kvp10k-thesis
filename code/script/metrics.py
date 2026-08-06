@@ -156,8 +156,8 @@ def match_prediction_to_ground_truth(
         # Compute NED
         ned = normalized_edit_distance(pred_text, gt_text)
         
-        # Check if both criteria are met
-        if iou >= iou_threshold and ned <= ned_threshold:
+        # This helper follows the paper's strict boundary wording.
+        if iou > iou_threshold and ned < ned_threshold:
             # Use combined score for best match
             score = iou - ned  # Higher IoU, lower NED = better
             if score > best_score:

@@ -25,6 +25,7 @@ by the entity-classification head and the biaffine linker head.
 
 \begin{figure}[ht]
   \centering
+  \begin{adjustbox}{max width=\textwidth}
   \begin{tikzpicture}[
     block/.style={rectangle, draw, rounded corners, minimum height=1cm, minimum width=2.8cm, align=center, font=\small},
     io/.style={rectangle, draw, minimum height=0.8cm, minimum width=2.2cm, align=center, font=\small, fill=gray!10},
@@ -52,12 +53,11 @@ by the entity-classification head and the biaffine linker head.
     \draw[arrow] (encoder) -| (entity);
     \draw[arrow] (encoder) -| (linker);
     \draw[arrow] (entity) -- (spans);
-    \draw[arrow] (spans) -| (linker);
+    \draw[arrow] (spans) -| node[pos=0.25, above=2pt, fill=white,
+      inner sep=1.5pt, font=\scriptsize\itshape] {contiguous merge} (linker);
     \draw[arrow] (linker) |- (output);
-
-    % Labels
-    \node[font=\scriptsize\itshape, right=0.1cm of spans] {contiguous merge};
   \end{tikzpicture}
+  \end{adjustbox}
   \caption{Overview of the proposed LayoutLMv3 + Biaffine Linker architecture.
     Token representations produced by the encoder are fed to two heads:
     an entity classifier (token-level labelling) and a biaffine linker
@@ -160,10 +160,12 @@ after the first projection.
 Generative baselines (Stage~3 Mistral) demonstrated strong text recall but
 poor spatial grounding and systematic over-prediction on sparse layouts
 (Section~\ref{sec:stage3-per-cluster}). Token classification is grounded by
-construction — predictions are tied to OCR tokens with known bounding boxes —
-eliminating the spatial anchoring problem entirely.
+construction: predictions are tied to OCR tokens with known bounding boxes.
+This prevents the model from generating text absent from the OCR input,
+although it can still assign an incorrect entity label to an existing token.
 
 % ---------------------------------------------------------------------------
+\needspace{8\baselineskip}
 \section{Biaffine Linker (V1: Token-Level)}
 \label{sec:biaffine-linker}
 
@@ -247,6 +249,7 @@ Figure~\ref{fig:span-grouping} illustrates the span grouping process.
 
 \begin{figure}[ht]
   \centering
+  \begin{adjustbox}{max width=\textwidth}
   \begin{tikzpicture}[
     tok/.style={rectangle, draw, minimum height=0.7cm, minimum width=1.2cm,
                 align=center, font=\scriptsize},
@@ -293,6 +296,7 @@ Figure~\ref{fig:span-grouping} illustrates the span grouping process.
     \draw[arrow] (t8.south) -- (s3.north);
     \draw[arrow] (t9.south) -- (s4.north);
   \end{tikzpicture}
+  \end{adjustbox}
   \caption{Span grouping: contiguous tokens with the same entity label are
     merged into spans. The span representation is the mean pool of constituent
     token hidden states; the span bounding box is the union of constituent
@@ -328,10 +332,10 @@ $\sim$450:1.
 \label{sec:v2-training}
 
 V2 uses the same joint loss as V1:
-\[
+\begin{equation}
+  \label{eq:joint-loss}
   \mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda\,\mathcal{L}_{\text{link}}
-  \tag{3.1}
-\]
+\end{equation}
 The entity loss is unchanged. The link loss is binary cross-entropy over the
 $K \times V$ span-level score matrix. Because the class imbalance is
 manageable at this granularity, \texttt{pos\_weight} is computed dynamically
@@ -346,7 +350,7 @@ in V1.
 \label{sec:loss-function}
 
 The model is trained with a joint loss combining entity classification and
-linking (Equation~3.1, repeated here for convenience):
+linking (Equation~\ref{eq:joint-loss}, repeated here for convenience):
 \[
   \mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda\,\mathcal{L}_{\text{link}}
 \]
@@ -430,9 +434,9 @@ matrix and the highest-scoring match for each key span is selected.
 \subsection{Post-processing}
 \label{sec:post-processing}
 
-Unmatched keys are emitted as \emph{unvalued-key} annotations and unmatched
-values as \emph{unkeyed-value} annotations, matching the KVP10k annotation
-convention. No beam search or constrained decoding is applied: the
-discriminative formulation avoids the need for autoregressive search entirely.
-Bounding boxes are inherited directly from the OCR input, eliminating the
-hallucinated bounding boxes that arise in generative approaches.
+The implemented decoder emits linked key--value span pairs above the fixed
+link-score threshold. Unmatched key and value spans are not converted into
+\emph{unvalued} or \emph{unkeyed} predictions; consequently, the discriminative
+experiments directly cover the regular-KVP category of the KVP10k benchmark,
+not its two singleton categories. No beam search or constrained decoding is
+applied. Bounding boxes are inherited directly from the OCR input.

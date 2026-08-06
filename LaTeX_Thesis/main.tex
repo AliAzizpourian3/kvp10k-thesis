@@ -39,6 +39,21 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{float}
+\usepackage{needspace}
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny,
+  xleftmargin=1.8em,
+  framexleftmargin=1.4em
+}
 
 % TikZ libraries used in chapters
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc, backgrounds}
@@ -55,6 +70,9 @@
 \newcommand{\kvps}{key-value pairs}
 \newcommand{\KVP}{Key-Value Pair}
 \newcommand{\KVPs}{Key-Value Pairs}
+
+% Abbreviations printed in the back matter.
+\input{lmedoc/abbreviations_kvp}
 
 % Suppress underfull hbox warnings
 \hbadness=10000
@@ -150,11 +168,11 @@ Erlangen, den 03.08.2026 \hfill Ali Azizpourian
 % ------------------------------------------------------------
 \appendix
 \input{chapters/appendix_a_code}
-\input{chapters/appendix_b_data}
 
 % ------------------------------------------------------------
 % BACK MATTER: abbreviations, LoF, LoT, bibliography
 % ------------------------------------------------------------
+\glsaddall[types={abbreviations}]
 \printunsrtglossary[type=abbreviations]
 \cleardoublepage
 

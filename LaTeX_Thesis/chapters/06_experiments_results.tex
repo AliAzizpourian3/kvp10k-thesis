@@ -2,37 +2,43 @@
 \label{ch:exresults}
 
 % ---------------------------------------------------------------------------
-\section{Overview: The Story of This Research}
+\section{Overview and Chapter Structure}
 \label{sec:story-overview}
 % ---------------------------------------------------------------------------
 
-This chapter presents the experiments and results of this thesis as a coherent
-narrative. Each experiment was motivated by the findings of the previous one,
-forming a logical chain from a simple generative baseline to a fully corrected
-discriminative model and an honest assessment of where it stands relative to
-the published KVP10k benchmark.
+This chapter reports the experiments and results of the thesis. Each experiment
+was motivated by the findings of the previous one, forming a chain from a
+generative baseline to a corrected discriminative model and an assessment of
+where it stands relative to the published KVP10k benchmark.
 
-The journey proceeds as follows: we begin with a generative baseline
-(Mistral-7B) to establish a competitive reference point and understand the
-failure modes of text-only generation on spatial documents. The discovery of
-catastrophic hallucination on text-sparse layouts motivates a shift to a
-layout-aware discriminative model. We then investigate two linking
-granularities, discover a structural imbalance problem, and through systematic
-diagnostic experiments identify and fix three compounding data-pipeline bugs --
-arriving at a final corrected model whose text-only link F1 = 0.342 (NED\,$<0.2$, same threshold as the benchmark) remains substantially below the published KVP10k baseline (0.659), with diagnostic
-analyses localizing the remaining gap to relation modeling.
+The experiments proceed as follows. We begin with a generative baseline
+(Mistral-7B) to establish a reference point and characterise the failure
+modes of text-only generation on spatial documents. Catastrophic hallucination
+on text-sparse layouts motivates a shift to a layout-aware discriminative
+model. We then investigate two linking granularities, identify a structural
+imbalance problem, and through diagnostic experiments identify and correct
+three compounding data-pipeline bugs. Under the released KVP10k benchmark, the
+final corrected model reaches regular-KVP F1 of 0.334 (text-only) and 0.309
+(text+location), below the corresponding published values of 0.659 and 0.611;
+diagnostic analyses localise the remaining gap to relation modeling.
 
 \subsection*{Evaluation Setup}
 
 All experiments use the same evaluation set: \textbf{581 unique test pages}
 from the KVP10k test split (55\% of 1{,}051 unique pages; limited by PDF
 download failures and scanned pages without text layers). The evaluation
-protocol follows Naparstek et al.\ (2024) exactly:
-\begin{itemize}[nosep]
-  \item \textbf{NED $< 0.2$} for text accuracy
-  \item \textbf{IoU $> 0.3$} for location accuracy, using the same threshold as the KVP10k paper, which chose this value to permit minor spatial imprecision while still requiring the prediction to be in the correct spatial region of the page
-  \item \textbf{F1} (primary metric) combining precision and recall
-\end{itemize}
+follows IBM's released KVP10k benchmark implementation. Matching is greedy and
+one-to-one, requires equal KVP types, and uses NED $<0.2$ for text. The paper
+describes the location criterion as IoU $>0.3$, whereas the released code uses
+IoU $\geq0.3$; benchmark-comparison results follow the executable code and
+record this discrepancy. Precision and recall are calculated per page and
+macro-averaged over pages with non-empty ground truth after category filtering;
+F1 is the harmonic mean of the two macro averages. Results are reported for
+regular KVPs, unkeyed values, unvalued keys, and their aggregate, under
+text-only, location-only, and combined matching. Pooled regular-link counts
+used during V1--V4 diagnosis are identified separately and are not compared
+directly with the published macro scores. Preprocessing and input-text
+differences are described in Section~\ref{sec:data-preprocessing}.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 1: Generative Baseline (Mistral-7B QLoRA)}
@@ -41,8 +47,8 @@ protocol follows Naparstek et al.\ (2024) exactly:
 
 \subsection*{Setup}
 
-The starting point of the experimental work is to establish a competitive
-generative baseline that reproduces the approach used in the KVP10k paper.
+The starting point of the experimental work is a generative re-implementation
+of the approach used in the KVP10k paper; it is not a strict reproduction.
 Mistral-7B-Instruct-v0.2 is fine-tuned with 4-bit QLoRA (NF4 quantisation,
 LoRA rank $r=4$, $\alpha=4$) on LMDX-formatted document prompts, where each
 word in the document is represented as \texttt{word x1|y1|x2|y2} in
@@ -52,12 +58,16 @@ output and is trained for 8 epochs with learning rate $5 \times 10^{-4}$.
 The exact prompt template is shown in Figure~\ref{fig:stage3-prompt}. It follows
 the LMDX paradigm~\cite{lmdx} used by the KVP10k baseline --- a document
 representation with per-word coordinates followed by a task instruction
-requesting a Python list-of-lists output. It is not guaranteed to be
-token-identical to the (unpublished) prompt of Naparstek et al.; we reproduce
-the format and output contract rather than a verbatim string. The one
-documented deviation from the original pipeline is that word text and
-coordinates are obtained from PyMuPDF's native text layer rather than Tesseract
-OCR.
+requesting a Python list-of-lists output. Because Naparstek et al.\ do not
+publish their prompt, we reproduce its format and output contract rather than a
+verbatim string. The reconstruction differs from the published system in
+several respects. Word text and coordinates come from PyMuPDF's native text
+layer rather than Tesseract OCR; pages without a usable text layer are
+excluded; the resulting train and test subsets differ; the unpublished prompt
+is reconstructed; LoRA rank is limited to $r=4$; and the paper does not report
+enough training detail to reproduce its setup exactly. Numerical proximity
+must therefore be read as an indicative comparison, not evidence of strict
+reproduction.
 
 \begin{figure}[ht]
 \centering
@@ -83,33 +93,42 @@ per-word text-and-coordinate representation of the page.}
 \label{fig:stage3-prompt}
 \end{figure}
 
-\subsection*{Result 1: Competitive Performance, but Spatial Hallucination on Text-Sparse Layouts}
+\subsection*{Result 1: Competitive text-only F1, but hallucination on text-sparse layouts}
 \label{sec:res1}
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1: Mistral-7B QLoRA results vs.\ KVP10k paper baseline ($n = 581$ test pages).}
+  \caption{Experiment~1: pair-level macro F1 under the released KVP10k benchmark ($n=581$ available test pages). Published values are from Naparstek et al.\ (2024), Table~1.}
   \label{tab:exp1-overall}
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}llccc@{}}
     \toprule
-    \textbf{System} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{TP / Pred / GT} \\
+    \textbf{Category} & \textbf{System} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
-    \multicolumn{5}{l}{\textit{Text-only (NED $< 0.2$)}} \\
-    KVP10k paper baseline & --- & --- & 0.643 & --- \\
-    Mistral-7B (ours)     & 0.604 & 0.755 & \textbf{0.671} & 9{,}482 / 15{,}707 / 12{,}552 \\
+    Regular  & KVP10k paper & 0.659 & 0.650 & 0.611 \\
+             & Mistral (ours) & 0.598 & 0.547 & 0.521 \\
     \midrule
-    \multicolumn{5}{l}{\textit{Text + Location (NED $< 0.2$, IoU $> 0.3$)}} \\
-    KVP10k paper baseline & --- & --- & 0.612 & --- \\
-    Mistral-7B (ours)     & 0.539 & 0.675 & \textbf{0.600} & 8{,}473 / 15{,}707 / 12{,}552 \\
+    Unkeyed  & KVP10k paper & 0.601 & 0.653 & 0.584 \\
+             & Mistral (ours) & 0.000 & 0.000 & 0.000 \\
+    \midrule
+    Unvalued & KVP10k paper & 0.601 & 0.618 & 0.588 \\
+             & Mistral (ours) & 0.744 & 0.699 & 0.672 \\
+    \midrule
+    All      & KVP10k paper & 0.643 & 0.661 & 0.612 \\
+             & Mistral (ours) & 0.513 & 0.478 & 0.455 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Our Mistral baseline achieves text-only F1 = 0.671, slightly above the
-published KVP10k baseline (0.643). This confirms our data preparation pipeline
-and evaluation protocol are correctly implemented. The text+location F1 is
-lower (0.600 vs.\ 0.612), primarily because a generative model outputs
-approximate bounding boxes rather than exact pixel-level coordinates.
+For regular KVPs, the reconstructed Mistral baseline reaches text-only
+F1 $=0.598$, compared with $0.659$ in the paper, and combined F1 $=0.521$,
+compared with $0.611$. Its unvalued-key score is strong, but the reconstructed
+output parser emits no unkeyed-value predictions, giving zero for that category
+and reducing the All score to $0.513$ text-only and $0.455$ combined. These
+results are substantially different from the earlier pooled entity-level
+calculation and replace it as the benchmark comparison. Given the data,
+text-source, prompt, adapter-rank, and training-detail differences above, they
+show that the reconstruction is competitive on regular pairs but do not
+constitute a reproduction of the paper's baseline.
 
 \paragraph{Per-cluster breakdown: the hallucination problem.}
 \label{sec:stage3-per-cluster}
@@ -117,8 +136,9 @@ Broken down by layout cluster, however, a serious weakness emerges:
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1 error analysis by layout cluster (entity-level,
-  NED $<0.2$ and IoU $>0.3$, the same matching as Table~\ref{tab:exp1-overall}).}
+  \caption{Experiment~1 supplementary error analysis by layout cluster
+  (pooled entity-level matching, distinct from the pair-level macro benchmark
+  in Table~\ref{tab:exp1-overall}).}
   \label{tab:exp1-cluster}
   \begin{tabular}{@{}lcccc@{}}
     \toprule
@@ -138,13 +158,13 @@ assignments, obtained by recomputing each test page's 13 layout features and
 applying the trained Stage~2 scaler and $k$-means model. With very few KVPs
 per page in text-sparse documents, the model over-generates (1{,}301 predicted
 entities vs.\ 63 ground-truth for Cluster~1), producing a $20.6\times$
-over-generation ratio. This is a
-fundamental limitation of text-only generation without spatial grounding.
+over-generation ratio. In this experiment, text-only generation without
+spatial grounding is therefore particularly unreliable on sparse pages.
 
 \textbf{Motivation for Experiment 2:} A model that reads spatial positions
 directly -- rather than generating approximate coordinates -- should be able
-to predict only tokens that actually exist in the document, eliminating
-hallucination by design.
+to predict only tokens that exist in the OCR input, preventing the generation
+of unsupported text.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 2: Layout-Aware Entity Classification (Stage 4a)}
@@ -167,7 +187,7 @@ representations before the more complex linking task is introduced.
   \centering
   \caption{Experiment~2: Stage~4a entity classification results (best epoch).}
   \label{tab:exp2-results}
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}lccc@{}}
     \toprule
     \textbf{Model} & \textbf{Precision} & \textbf{Recall} & \textbf{Entity F1} \\
     \midrule
@@ -179,8 +199,10 @@ representations before the more complex linking task is introduced.
 Entity F1 = 0.847 confirms that LayoutLMv3 effectively classifies tokens as
 keys, values, or other. Unlike Mistral, the discriminative model can only
 predict labels for tokens that actually appear in the document -- there is
-no mechanism for hallucinating text that does not exist. This establishes
-strong entity representations as a foundation for the linking stage.
+no mechanism for generating text that does not exist in the OCR input. It can,
+however, still produce false positives by assigning an incorrect label to an
+existing token. The resulting entity representations provide the foundation
+for the linking stage.
 
 \textbf{Motivation for Experiment 3:} With good entity classification in place,
 the next challenge is linking: pairing each predicted key span with its
@@ -203,14 +225,14 @@ only $\sim$20 true positives ($\sim$450:1 neg:pos ratio). A
 to counteract the imbalance. A $\lambda$ sweep over $\{0.5, 1.0, 2.0\}$
 controls the relative weight of the linking objective.
 
-\subsection*{Result 3: Token-Level Imbalance Kills Linking}
+\subsection*{Result 3: Token-level class imbalance prevents linking}
 \label{sec:res3}
 
 \begin{table}[ht]
   \centering
   \caption{Experiment~3: V1 token-level linking results ($\lambda$ sweep).}
   \label{tab:exp3-results}
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}lccc@{}}
     \toprule
     \textbf{$\lambda$} & \textbf{Entity F1} & \textbf{Link F1} & \textbf{TP / Pred / GT} \\
     \midrule
@@ -222,7 +244,7 @@ controls the relative weight of the linking objective.
 \end{table}
 
 Link F1 remains near zero across all $\lambda$ values. The model predicts only
-200 links against 3{,}776 ground-truth links, of which only 15 are correct.
+200 links against 3{,}776 ground-truth links,\footnote{The 3{,}776 ground-truth links are counted over the full 581-page evaluation test set. This is a different data slice from the 200-page annotation subsample (755 links) analysed in Chapter~\ref{ch:dataset} and from the per-cluster counts in Table~\ref{tab:exp8-cluster}; these are not conflicting counts of the same set.} of which only 15 are correct.
 The $\lambda$ sweep confirms this is not a hyperparameter issue: the failure
 is \textbf{structural}. With a $\sim$450:1 neg:pos ratio, even aggressive
 class-weighting cannot force the linker to make positive predictions reliably.
@@ -241,15 +263,13 @@ entries and the imbalance from 450:1 to 5:1.
 \subsection*{Setup}
 
 In V2, contiguous same-label tokens are grouped into spans, and the linker
-scores key spans against value spans. This reformulation reduces:
-\begin{itemize}[nosep]
-  \item Candidates per page: $\sim$10{,}000 $\to$ $\sim$225
-  \item Neg:Pos ratio: $\sim$450:1 $\to$ $\sim$5:1
-\end{itemize}
+scores key spans against value spans. This reformulation cuts the number of
+candidate pairs per page from roughly 10{,}000 to about 225 and, correspondingly,
+reduces the negative-to-positive ratio from about 450:1 to about 5:1.
 V2 warm-starts from the best Stage~4a checkpoint with teacher forcing enabled
 (ground-truth entity labels passed to the linker during training).
 
-\subsection*{Result 4: Imbalance Resolved, But Near-Zero Link F1 Persists}
+\subsection*{Result 4: Imbalance resolved, but link F1 remains near zero}
 \label{sec:res4}
 
 \begin{table}[ht]
@@ -354,36 +374,43 @@ All three bugs are fixed and a corrected V4 model is trained from scratch with:
   \item Early stopping patience = 10, maximum 30 epochs; best model at epoch 13
 \end{itemize}
 
-\subsection*{Result 8: Link F1 = 0.342 (text-only) / 0.309 (text+location) --- Below the KVP10k Baseline}
+\subsection*{Result 8: Regular-KVP F1 = 0.334 (text-only) / 0.309 (text+location)}
 \label{sec:res8}
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~8: V4 corrected model results. Link F1 is reported under
-  both the text-only metric (NED $<0.2$, the same threshold as the published
-  baseline) and the stricter text+location metric (NED $<0.2$, IoU $>0.3$).}
+  \caption{Experiment~8: pair-level macro F1 under the released KVP10k
+  benchmark. V4 emits regular linked pairs only; the All row additionally
+  includes unkeyed and unvalued ground truth.}
   \label{tab:exp8-results}
-  \begin{tabular}{@{}lccc@{}}
+  \begin{tabular}{@{}llccc@{}}
     \toprule
-    \textbf{Model} & \textbf{Entity F1} & \textbf{Link F1} \\
+    \textbf{Category} & \textbf{System} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
-    V4 (corrected, text-only)             & 0.827 & \textbf{0.342} \\
-    V4 (corrected, text+location)         & 0.827 & 0.309 \\
-    KVP10k paper baseline (Naparstek et al., 2024; text-only) & --- & 0.659 \\
+    Regular & KVP10k paper & 0.659 & 0.650 & 0.611 \\
+            & V4 (ours)    & 0.334 & 0.456 & 0.309 \\
+    \midrule
+    All     & KVP10k paper & 0.643 & 0.661 & 0.612 \\
+            & V4 (ours)    & 0.214 & 0.310 & 0.199 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-With all three bugs corrected, the V4 model achieves link F1 = 0.342 under the
-text-only metric (NED\,$<0.2$, identical to the published benchmark's threshold),
-and 0.309 under the text+location metric (NED\,$<0.2$, IoU\,$>0.3$). This does
-not reach the published KVP10k baseline (0.659, text-only) --- a gap of 0.317
-points --- and is obtained with a 125M-parameter discriminative model trained on
-55\% of the available training data. While the model does not surpass the
-proprietary generative baseline, it demonstrates that encoder-based models are
-substantially more capable at KVP linking than the KVP10k paper assumed. Two
-diagnostic analyses (Section~\ref{sec:linker-diagnostics}) characterize the
-remaining gap.
+With all three bugs corrected, V4 achieves regular-KVP F1 $=0.334$ for text,
+$0.456$ for location, and $0.309$ for their combination. The corresponding
+published scores are $0.659$, $0.650$, and $0.611$. V4 therefore remains
+$0.325$ below the paper on text and $0.302$ below it on the combined metric.
+The model emits only linked regular pairs, so it necessarily scores zero on
+unkeyed and unvalued categories; including those categories lowers its All F1
+to $0.214$ text-only and $0.199$ combined. A post-hoc decode-time recovery of
+unlinked spans raises All F1 to $0.257$/$0.237$ without retraining and leaves
+the regular scores unchanged (Analysis~C, Table~\ref{tab:alltype-recovery}).
+These results are obtained with a
+125M-parameter discriminative model trained on 55\% of the available training
+data. They show that encoder-based linking is feasible, but do not support
+parity with the published generative baseline. The entity classifier retains
+F1 $=0.827$; two internal diagnostics (Section~\ref{sec:linker-diagnostics})
+investigate why regular-pair linking remains weaker.
 
 \paragraph{Note on the two metrics.}
 Entity F1 and link F1 measure two different tasks and are not directly
@@ -401,19 +428,57 @@ small amount of entity accuracy for the linking objective.
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~8: V4 per-cluster results on the test set (same matching as Table~\ref{tab:exp8-results}). Cluster assignments are the Stage~2 layout clusters propagated to Stage~4.}
+  \caption{Experiment~8: V4 regular-KVP macro F1 by layout cluster (same
+  benchmark matching as Table~\ref{tab:exp8-results}).}
   \label{tab:exp8-cluster}
   \begin{tabular}{@{}lcccc@{}}
     \toprule
     \textbf{Cluster} & \textbf{Docs} & \textbf{Entity F1} & \textbf{Link F1 (text-only)} & \textbf{Link F1 (text+location)} \\
     \midrule
-    0 (text-rich)   & 521 & 0.828 & 0.341 & 0.309 \\
-    1 (text-sparse) &  60 & 0.723 & 0.467 & 0.333 \\
+    0 (text-rich)   & 521 & 0.828 & 0.334 & 0.310 \\
+    1 (text-sparse) &  60 & 0.723 & 0.343 & 0.227 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-The Stage~4 model remains strongest on the text-rich cluster, which dominates the test set and therefore drives the overall score. The text-sparse cluster is small (60 documents, 16 ground-truth links), so its higher apparent link F1 should be read cautiously; the main conclusion is that the corrected linker now performs consistently across both clusters instead of collapsing entirely on one of them.
+Text-only performance is similar across clusters, but combined F1 falls from
+$0.310$ on text-rich pages to $0.227$ on text-sparse pages. The sparse subset
+contains only 60 documents and 16 regular ground-truth links, so this difference
+has high variance and should not be generalized. It nevertheless provides no
+evidence that sparse layouts are easier for V4; location-sensitive matching is
+weaker on that subset.
+
+\subsection*{Effect of Matching Thresholds}
+\label{sec:threshold-effect}
+
+To separate text and location sensitivity, the same fixed V4 predictions are
+re-scored under three benchmark-compatible variants. Table~\ref{tab:threshold-grid}
+uses regular-KVP macro F1 throughout; no threshold is tuned on the test set.
+
+\begin{table}[ht]
+  \centering
+  \caption{V4 regular-KVP macro F1 for identical predictions under diagnostic
+  matching variants. The official row follows the released code's
+  NED $<0.2$ and IoU $\geq0.3$ comparisons.}
+  \label{tab:threshold-grid}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Setting} & \textbf{NED} & \textbf{IoU} & \textbf{F1} \\
+    \midrule
+    Official combined & $<0.2$ & $\geq0.3$ & 0.309 \\
+    Relaxed location  & $<0.2$ & $\geq0.1$ & 0.321 \\
+    Relaxed text      & $<0.3$ & $\geq0.3$ & 0.321 \\
+    Text only         & $<0.2$ & ---        & 0.334 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Relaxing either axis yields almost the same gain ($+0.013$), while removing the
+location condition entirely adds $0.025$. Boundary-near text and location
+errors therefore contribute comparably, but neither explains most of the gap
+to the published regular-KVP scores. The large residual consists of incorrect
+or missing relations rather than predictions narrowly failing one acceptance
+threshold.
 
 % ---------------------------------------------------------------------------
 \section{Linker Diagnostic Analyses}
@@ -436,36 +501,72 @@ tuning is not a lever for this model.
 \paragraph{Analysis B: Oracle entities (upper bound).}
 We replace the predicted entity spans with the ground-truth key/value spans and
 re-run linking, isolating linker quality from entity-detection quality.
-Table~\ref{tab:oracle-linking} reports the result. Perfect entities raise link
-F1 by only $\sim$0.02--0.05 in every setting; even with flawless spans the
-linker reaches just 0.345 (text+location) / 0.365 (text-only). The entity
-detector is therefore \emph{not} the dominant limitation --- the linker
-(relation modeling) is.
+Table~\ref{tab:oracle-linking} reports the legacy pooled regular-link diagnostic,
+which is retained to compare end-to-end and oracle conditions within one
+scorer but is not directly comparable with the macro benchmark tables. Perfect
+entities raise F1 by only $\sim$0.02--0.05 in that diagnostic, indicating that
+relation modeling remains the larger internal bottleneck.
 
 \begin{table}[ht]
   \centering
-  \caption{Analysis~B: end-to-end vs.\ oracle-entity linking on the test set
-  (V4 model). Oracle linking uses ground-truth entity spans, isolating linker
-  quality from entity detection.}
+  \caption{Analysis~B: end-to-end vs.\ oracle-entity linking under the legacy
+  pooled regular-link diagnostic. These values are not KVP10k macro scores.}
   \label{tab:oracle-linking}
   \begin{tabular}{@{}lcc@{}}
     \toprule
     \textbf{Setting} & \textbf{End-to-end} & \textbf{Oracle entities} \\
     \midrule
-    Link F1 (text-only, NED$<$0.2)                    & 0.342 & 0.365 \\
-    Link F1 (text+location, NED$\le$0.2, IoU$\ge$0.3) & 0.309 & 0.345 \\
+    Link F1 (text-only)     & 0.342 & 0.365 \\
+    Link F1 (text+location) & 0.309 & 0.345 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Together, Analyses~A and~B establish that the residual gap to the published
+Analyses~A and~B together indicate that the residual gap to the published
 baseline is a \emph{relation-modeling} limitation rather than a threshold or
 entity-detection artifact. This motivates the future-work direction of
 segment-graph linkers such as SPADE and BROS
 (Section~\ref{sec:limitations}).
 
+\paragraph{Analysis C: Decode-time recovery of unkeyed and unvalued spans.}
+The primary V4 model emits only linker-consumed regular pairs. The entity
+classifier is nonetheless trained on every key and value span --- including
+those belonging to unvalued keys and unkeyed values --- so these spans are
+detected but discarded at decode time. As a post-hoc decoding change (no
+retraining), we additionally emit each detected key span with no
+above-threshold link as an \emph{unvalued} prediction and each value span never
+selected by a regular pair as an \emph{unkeyed} prediction. The regular
+predictions are byte-identical to the headline export (2{,}601 pairs), plus
+1{,}211 recovered unvalued and 1{,}747 unkeyed predictions.
+Table~\ref{tab:alltype-recovery} reports the resulting macro F1: regular scores
+are unchanged by construction, while All F1 rises from $0.214/0.199$
+(text / text+location) to $0.257/0.237$. The recovered categories are weak in
+absolute terms --- unkeyed values are genuinely floating text with no anchoring
+key --- so we retain the regular-only configuration as the headline and present
+this recovery only as a lower-cost coverage extension.
+
+\begin{table}[ht]
+  \centering
+  \caption{Analysis~C: macro F1 with decode-time recovery of unkeyed/unvalued
+  spans (no retraining). Regular is the headline configuration and is unchanged
+  by construction; ``All (regular only)'' is the primary model and ``All (with
+  recovery)'' adds the recovered spans.}
+  \label{tab:alltype-recovery}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Category} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
+    \midrule
+    Regular (headline)     & 0.334 & 0.456 & 0.309 \\
+    Unvalued (recovered)   & 0.271 & 0.369 & 0.242 \\
+    Unkeyed (recovered)    & 0.178 & 0.325 & 0.165 \\
+    All (regular only)     & 0.214 & 0.310 & 0.199 \\
+    All (with recovery)    & 0.257 & 0.392 & 0.237 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 % ---------------------------------------------------------------------------
-\section{Summary and Narrative}
+\section{Summary}
 \label{sec:narrative-summary}
 % ---------------------------------------------------------------------------
 
@@ -474,36 +575,34 @@ experiments.
 
 \begin{table}[ht]
   \centering
-  \caption{Full experimental progression. For V4, link F1 is reported as
-  text-only / text+location.}
+  \caption{Full experimental progression. Published, Mistral, and V4 rows use
+  regular-KVP macro F1 (text-only / text+location); V1 and V2 retain pooled
+  regular-link diagnostic F1 and are not directly comparable.}
   \label{tab:full-progression}
   \small
   \begin{tabular}{@{}lccl@{}}
     \toprule
     \textbf{Model} & \textbf{Entity F1} & \textbf{Link F1} & \textbf{Key Finding} \\
     \midrule
-    KVP10k paper baseline     & ---   & 0.659 & Published generative system \\
-    Exp 1: Mistral-7B (text+loc) & --- & 0.600 & 97\% hallucination on text-sparse layouts \\
+    KVP10k paper baseline     & ---   & 0.659 / 0.611 & Published generative system \\
+    Exp 1: Mistral-7B        & ---   & 0.598 / 0.521 & Re-implementation; no unkeyed outputs \\
     Exp 2: Stage~4a (entity only) & 0.847 & --- & Strong entity classification \\
-    Exp 3: V1 (token linking) & 0.841 & 0.008 & 450:1 imbalance kills linking \\
+    Exp 3: V1 (token linking) & 0.841 & 0.008 & 450:1 imbalance prevents linking \\
     Exp 4: V2 (span linking)  & 0.847 & 0.007 & Bugs mask span-level benefit \\
     Exp 5--7: Diagnostics     & ---   & ---   & 3 pipeline bugs identified \& fixed \\
-    Exp 8: V4 (corrected)     & 0.827 & 0.342 / 0.309 & Below baseline; linker is the bottleneck \\
+    Exp 8: V4 (corrected)     & 0.827 & 0.334 / 0.309 & Regular KVPs only; below baseline \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-The story of this research is one of progressive problem-solving. We began
-with the question of whether a layout-aware discriminative model could match
-a generative system that had not been benchmarked against encoder models.
-We found that the generative approach, while competitive overall, fails
-qualitatively on text-sparse documents due to hallucination -- a problem that
-discriminative models avoid by construction. We then discovered that making
-the discriminative model link key-value pairs is non-trivial: token-level
-linking is defeated by class imbalance, and span-level linking only works
-after three latent data-pipeline bugs are diagnosed and corrected.
-The final corrected model demonstrates that a 125M-parameter discriminative
-model, with the right supervision, becomes substantially competitive at KVP
-linking (text-only link F1 = 0.342), though it does not surpass the large
-generative baseline (0.659). Diagnostic analyses localize the remaining gap to
-relation modeling rather than entity detection.
+This section summarises the experimental progression. The work began with the
+question of whether a layout-aware discriminative model could match a
+generative system that had not been benchmarked against encoder models. The
+generative approach, while competitive overall, fails qualitatively on
+text-sparse documents due to unsupported text generation, which token-grounded
+discriminative models prevent. Making the discriminative model link key-value pairs proved
+non-trivial: token-level linking is defeated by class imbalance, and span-level
+linking works only after three latent data-pipeline bugs are diagnosed and
+corrected. The final 125M-parameter model reaches regular-KVP macro F1 $=0.334$
+for text and $0.309$ for text+location, below the paper's $0.659$ and $0.611$.
+Internal diagnostics localise the remaining gap primarily to relation modeling.
