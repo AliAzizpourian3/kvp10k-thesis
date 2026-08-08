@@ -41,6 +41,8 @@ SPADE (Spatial Dependency Parsing for Semi-Structured Document Information Extra
 
 BROS (BERT Relying On Spatiality)~\cite{bros} extends the entity linking approach with a pre-trained language model that encodes 2D positional information. BROS introduces two innovations relevant to this thesis: (i)~an area-based 2D positional encoding that captures spatial relationships between text segments more expressively than point-based position embeddings, and (ii)~an \emph{initial token linking} objective that predicts, for each entity's initial token, which other entity's initial token it should be linked to. This reduces the linking problem to a sparse prediction over entity-initial positions rather than a dense token-to-token matrix, addressing the class imbalance problem inherent in token-level linking. BROS achieves strong results on FUNSD and CORD entity linking benchmarks and demonstrates that pre-training with spatial awareness significantly benefits the linking task. Both the span-level granularity and the spatial encoding strategy of BROS inform the design of our V2 linker (Section~\ref{sec:v2-span-linking}).
 
+More recent relation-focused methods further show that strong entity representations alone do not resolve document relation extraction. GeoLayoutLM explicitly pre-trains geometric relations and relation heads~\cite{geolayoutlm}; KVPFormer casts keys as questions and predicts values through a coarse-to-fine decoder with a spatial compatibility bias~\cite{kvpformer}; and LayoutPointer combines relative 2D context and adaptive spatial constraints with a pointer-based relation formulation for multi-line entities~\cite{layoutpointer}. Collectively, these methods motivate objectives and decoders designed specifically for spatial entity association rather than treating linking as a lightweight extension of entity recognition.
+
 \section{Information Extraction from Forms}
 \label{sec:form_extraction}
 
@@ -95,7 +97,7 @@ these newer trends.
 The literature review reveals several research gaps that motivate the approach in this thesis:
 
 \begin{enumerate}
-    \item \textbf{Layout-aware architectures for KVP extraction}: While LayoutLMv3 achieves strong performance on sequence labeling tasks, its application to open-vocabulary generative KVP extraction remains understudied. The combination of LayoutLMv3 with explicit learned linking mechanisms is novel.
+    \item \textbf{Controlled comparison and diagnosis on KVP10k}: This thesis evaluates a LayoutLMv3-based discriminative linker on KVP10k using the released benchmark evaluator, compares token-level and span-level linking, and diagnoses data-pipeline and relation-modeling limitations.
     
     \item \textbf{Spatial localization vs.\ text accuracy trade-offs}: Generative baselines (such as Mistral-7B in KVP10k) excel at text extraction but struggle with precise spatial grounding. Understanding and addressing this trade-off is central to this thesis.
     
