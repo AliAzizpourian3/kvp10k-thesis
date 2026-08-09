@@ -4,7 +4,7 @@
 \section{Motivation}
 \label{sec:motivation}
 
-Business document processing is a fundamental task in enterprise automation, affecting industries from finance to healthcare. Organizations process millions of invoices, forms, and receipts annually, requiring extraction of structured information such as \kvps{} (e.g., ``Invoice Number: 12345'', ``Total: \$137''). Manual processing is time-consuming, error-prone, and costly, motivating the need for automated solutions.
+Business document processing is an important task in enterprise automation, affecting industries from finance to healthcare. Organizations process millions of invoices, forms, and receipts annually, requiring extraction of structured information such as \kvps{} (e.g., ``Invoice Number: 12345'', ``Total: \$137''). Manual processing is time-consuming, error-prone, and costly, motivating the need for automated solutions.
 
 Traditional approaches rely on template matching or rule-based systems, which lack generalization to diverse document layouts and formats. Recent advances in deep learning, particularly multimodal pre-trained models like LayoutLMv3 \cite{layoutlmv3}, offer promising solutions by jointly modeling text, layout, and visual features.
 
@@ -21,7 +21,7 @@ This thesis addresses the following research questions:
 \begin{enumerate}
     \item \textbf{RQ1}: How do layout characteristics vary across business documents, and how can this inform model design?
     
-    \item \textbf{RQ2}: Can a discriminative approach using LayoutLMv3 with a learned biaffine linker serve as a viable alternative to generative baselines for \kvp{} extraction on the KVP10k benchmark, which did not empirically evaluate such encoder-based models?
+    \item \textbf{RQ2}: To what extent can a LayoutLMv3-based discriminative model with a learned biaffine linker perform regular \kvp{} linking on KVP10k relative to the published generative baseline?
     
     \item \textbf{RQ3}: How does linking granularity (token-level vs.\ span-level) affect key-value association accuracy?
     
@@ -34,13 +34,13 @@ This thesis addresses the following research questions:
 This thesis makes the following contributions:
 
 \begin{enumerate}
-    \item \textbf{Dataset Analysis}: Comprehensive characterization of KVP10k dataset including layout clustering, spatial pattern analysis, and annotation statistics (Chapter~\ref{ch:dataset})
+    \item \textbf{Dataset Analysis}: Analysis of the KVP10k dataset, including layout clustering, spatial pattern analysis, and annotation statistics (Chapter~\ref{ch:dataset})
     
-    \item \textbf{Architecture}: Implementation of LayoutLMv3 + Biaffine Linker for discriminative \kvp{} extraction with explicit key-value association, in both token-level (V1) and span-level (V2/V4) variants (Chapter~\ref{ch:methodology})
+    \item \textbf{Architecture}: Implementation of LayoutLMv3 + Biaffine Linker for discriminative \kvp{} extraction with explicit key-value association, using token-level (V1) and span-level (V2) linking, including the corrected V4 pipeline (Chapter~\ref{ch:methodology})
     
-    \item \textbf{Empirical Evaluation on KVP10k}: Systematic benchmark on the KVP10k test set using the dual-threshold evaluation protocol (NED, IoU) from Naparstek et al.\ (2024), directly testing the claim that encoder-based models are insufficient for this task (Chapter~\ref{ch:exresults})
+    \item \textbf{Empirical Evaluation on KVP10k}: Systematic evaluation on the 581 usable pages of the KVP10k test split using the released benchmark evaluator, which applies type-aware one-to-one matching, $\mathrm{NED}<0.2$, $\mathrm{IoU}\geq0.3$, and macro per-page aggregation. This evaluates whether a LayoutLMv3-based discriminative linker can provide a useful alternative to the published generative baseline (Chapter~\ref{ch:exresults})
     
-    \item \textbf{Linking Granularity Analysis}: Detailed investigation of why token-level linking fails ($\sim$450:1 class imbalance) and how span-level linking addresses this (Chapter~\ref{ch:exresults})
+    \item \textbf{Linking Granularity Analysis}: Detailed investigation of why token-level linking fails ($\sim$450:1 class imbalance) and how span-level linking reduces the candidate-space imbalance (Chapter~\ref{ch:exresults})
     
     \item \textbf{Diagnostic Pipeline Analysis}: Systematic identification and correction of three compounding data-pipeline bugs, yielding regular-KVP macro F1\,=\,0.334 (text) / 0.309 (text+location) for corrected V4 (Chapter~\ref{ch:exresults})
     
