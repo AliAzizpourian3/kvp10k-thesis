@@ -11,7 +11,7 @@
 
 {\selectlanguage{german}
 
-Diese Arbeit pr\"asentiert eine umfassende Untersuchung zur automatischen Extraktion von Schl\"ussel-Wert-Paaren (Key-Value Pairs, KVPs) aus Gesch\"aftsdokumenten mithilfe eines layoutbasierten diskriminativen Ansatzes. Wir entwickeln und evaluieren einen LayoutLMv3-basierten Encoder, der Text- und Layout-Eingaben verarbeitet und durch einen gelernten Verkn\"upfungsmechanismus zur pr\"azisen Zuordnung von Schl\"ussel- und Wert-Entit\"aten erg\"anzt wird.
+Diese Arbeit pr\"asentiert eine umfassende Untersuchung zur automatischen Extraktion von Schl\"ussel-Wert-Paaren (Key-Value Pairs, KVPs) aus Gesch\"aftsdokumenten mithilfe eines layoutbewussten diskriminativen Ansatzes. Wir entwickeln und evaluieren einen LayoutLMv3-basierten Encoder, der Text- und Layout-Eingaben verarbeitet und durch einen gelernten Verkn\"upfungsmechanismus zur pr\"azisen Zuordnung von Schl\"ussel- und Wert-Entit\"aten erg\"anzt wird.
 
 \textbf{Hintergrund:} Die automatische Verarbeitung von Gesch\"aftsdokumenten stellt eine erhebliche Herausforderung im Bereich des Dokumentenverstehens dar. Traditionelle Ans\"atze basieren auf Vorlagen- oder regelbasierten Systemen, die nur begrenzt auf vielf\"altige Dokumenttypen verallgemeinern. Neuere generative Ans\"atze mit gro{\ss}en Sprachmodellen erzielen zufriedenstellende Ergebnisse bei der Texterkennung, weisen jedoch keine r\"aumliche Verankerung auf, was bei sparsam strukturierten Dokumenten zu Halluzinationen f\"uhrt.
 
@@ -21,7 +21,7 @@ Diese Arbeit pr\"asentiert eine umfassende Untersuchung zur automatischen Extrak
 
 \textbf{Ergebnisse:} Das diskriminative LayoutLMv3-Modell erreicht einen Entit\"ats-F1-Wert von 0,827. Da es ausschlie{\ss}lich vorhandene OCR-Token klassifiziert, kann es keinen Text erzeugen, der nicht in der OCR-Eingabe enthalten ist; Fehlklassifikationen vorhandener Token bleiben jedoch m\"oglich. Nach der Korrektur von drei Datenpipeline-Fehlern erreicht V4 f\"ur regul\"are KVPs einen makrogemittelten F1-Wert von $0{,}334$ (Text) beziehungsweise $0{,}309$ (Text und Lage), gegen\"uber $0{,}659$ und $0{,}611$ in der KVP10k-Publikation. In seiner Grundkonfiguration erzeugt V4 nur regul\"are verkn\"upfte Paare; eine nachgelagerte Dekodierungserweiterung deckt die Kategorien unkeyed und unvalued optional bei deutlich geringerer Genauigkeit ab. Diagnostische Analysen identifizieren die Relationsmodellierung innerhalb der aktuellen Biaffine-Linker-Pipeline als wichtigsten verbleibenden Engpass.
 
-\textbf{Stichw\"orter:} Dokumentenverstehen, Schl\"ussel-Wert-Paar-Extraktion, LayoutLMv3, Span-Ebenen-Verkn\"upfung, Layoutbasiertes Lernen, Informationsextraktion
+\textbf{Stichw\"orter:} Dokumentenverstehen, Schl\"ussel-Wert-Paar-Extraktion, LayoutLMv3, Span-Ebenen-Verkn\"upfung, Layoutbewusstes Lernen, Informationsextraktion
 }
 
 \clearpage
