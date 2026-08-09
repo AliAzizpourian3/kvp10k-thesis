@@ -339,7 +339,7 @@ applied at the span level.
 \subsection{Span-Level Scoring}
 \label{sec:span-scoring}
 
-The span-level biaffine scorer operates identically to V1
+The span-level projected dot-product scorer operates identically to V1
 (Section~\ref{sec:kv-attention}) but over span representations instead of
 token representations. For $K$ key spans and $V$ value spans, the linker
 produces a $K \times V$ score matrix. On typical KVP10k pages, $K \approx 15$
@@ -453,7 +453,7 @@ highest-scoring valid pair).
 
 In V2, spans are first formed by the grouping step
 (Section~\ref{sec:span-grouping}), then span representations are computed via
-mean-pooling. The span-level biaffine scorer produces a $K \times V$ score
+mean-pooling. The span-level projected dot-product scorer produces a $K \times V$ score
 matrix and the highest-scoring match for each key span is selected.
 
 \subsection{Post-processing}
