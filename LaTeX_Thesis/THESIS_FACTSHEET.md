@@ -29,6 +29,20 @@ Key wording rule: raw "rows" are **duplicated annotations of the same page**, no
 unique documents. Report unique pages, not rows. Main loss source = broken /
 inaccessible source PDFs, not random filtering. ✅
 
+**Stage 2 clustering unit:** the saved clustering used 25,692 raw training rows
+with non-empty annotation lists, representing 9,124 unique page hashes. Exactly
+one row per represented page had usable polygon coordinates; 16,568 duplicate
+rows produced all-zero feature vectors. The reported $k=2$ split is therefore
+primarily a coordinate-availability/density audit, not a discovery of unique
+page genres or visual-layout classes. Later test assignment groups rows by
+`hash_name` and uses the copy with the most coordinate boxes. ✅
+
+**Chapter 4 spatial audit:** the notebook selected the first 200 training rows
+with non-empty annotation lists, representing 70 unique page hashes and 69
+coordinate-bearing rows. The subset contains 3,595 annotations, of which 755
+(21.0%) carry linking values. Recomputed linked-center distances are mean
+0.1204, median 0.0951, and 90th percentile 0.2393 in normalized coordinates. ✅
+
 **V4 train/val split** (`stage4_kvp_dataset.create_stage4_dataloaders`):
 `random_split` of the 5,389 prepared train pages, `val_fraction=0.1`,
 `torch.Generator().manual_seed(42)` ⇒ **4,851 train / 538 val**. Test = 581 pages. ✅
