@@ -19,15 +19,6 @@ This thesis presents a comprehensive study on automatic \kvp{} extraction from b
 
 \textbf{Results:} The discriminative LayoutLMv3 model achieves entity F1 of 0.827 and prevents generation of text absent from the OCR input. Token-level linking (V1) yields near-zero pooled diagnostic F1 (0.008) under extreme class imbalance ($\sim$450:1). Span-level linking reduces the imbalance but initially fails because of three compounding data-pipeline bugs. After correction, V4 reaches regular-KVP macro F1 $=0.334$ for text and $0.309$ for text+location, compared with the paper's $0.659$ and $0.611$. In its primary configuration V4 emits regular linked pairs only; a post-hoc decode-time recovery optionally extends coverage to the unkeyed and unvalued categories at markedly lower accuracy. Diagnostics identify relation modeling within the current biaffine-linker pipeline as the main remaining bottleneck.
 
-\textbf{Contributions:}
-\begin{itemize}
-    \item Comprehensive analysis of KVP10k dataset layout characteristics and spatial patterns
-    \item Implementation and comparison of token-level (V1) and span-level (V2) linking architectures
-    \item Systematic diagnosis of three compounding data-pipeline bugs and a corrected V4 model achieving regular-KVP macro F1 $=0.334$ (text) / $0.309$ (text+location)
-    \item Detailed failure analysis identifying relation modeling within the current biaffine-linker pipeline as the main remaining bottleneck, supported by an oracle-entity analysis
-    \item Per-cluster error analysis showing that token-grounded encoding prevents generation outside the OCR input
-\end{itemize}
-
 \textbf{Keywords:} Document Understanding, Key-Value Pair Extraction, LayoutLMv3, Span-Level Linking, Layout-Aware Learning, Information Extraction
 
 \clearpage
