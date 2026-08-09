@@ -15,7 +15,7 @@ Convolutional neural networks were first applied to document images for classifi
 
 Multimodal pre-training in the document domain seeks to learn joint representations of text, layout, and visual information, enabling transfer learning to downstream tasks. The LayoutLM family of models has emerged as the dominant architecture in this space.
 
-LayoutLM~\cite{layoutlm} was the first model to jointly pre-train text and 2D layout information for document understanding. It extends BERT by adding 2D positional embeddings derived from bounding box coordinates, allowing the model to learn spatial relationships between tokens. Pre-trained on IIT-CDIP with masked language modeling, it achieved strong results on form understanding benchmarks including FUNSD and SROIE. LayoutLM demonstrated that layout is a first-class feature for document tasks, not merely an accessory to text.
+LayoutLM~\cite{layoutlm} was the first model to jointly pre-train text and 2D layout information for document understanding. It extends BERT by adding 2D positional embeddings derived from bounding box coordinates, allowing the model to learn spatial relationships between tokens. Pre-trained on IIT-CDIP with masked language modeling, it achieved strong results on form understanding benchmarks including FUNSD and SROIE~\cite{sroie}. LayoutLM demonstrated that layout is a first-class feature for document tasks, not merely an accessory to text.
 
 LayoutLMv2~\cite{layoutlmv2} extended the original by incorporating visual features from the document image using a CNN backbone, enabling true multimodal fusion of text, layout, and vision within a single pre-training objective. It introduced a spatial-aware self-attention mechanism that conditions attention on relative 2D positions between tokens, rather than only adding absolute position embeddings. This architectural change improved performance across all downstream document understanding tasks and established the design pattern followed by later models.
 
@@ -26,18 +26,18 @@ LayoutLMv3~\cite{layoutlmv3} unifies text and image representation through a sin
 
 Key-value pair extraction is the core task addressed in this thesis: given a document image, extract structured pairs of semantically-linked keys and values with spatial localization. Multiple algorithmic approaches have emerged, each with distinct trade-offs.
 
-The dominant early paradigm for key-value extraction treats the problem as token classification using BIO tagging schemes (Begin, Inside, Outside), where each token is labeled as the beginning or continuation of a key or value span. Models such as LayoutLM and LayoutLMv2 are typically fine-tuned in this manner on datasets like FUNSD. While effective for predefined entity types, sequence labeling requires a fixed ontology of field names and cannot generalize to unseen key types --- a significant limitation for open-vocabulary business documents.
+The dominant early paradigm for key-value extraction treats the problem as token classification using BIO tagging schemes (Begin, Inside, Outside), where each token is labeled as the beginning or continuation of a key or value span. Models such as LayoutLM and LayoutLMv2 are typically fine-tuned in this manner on datasets like FUNSD. Many sequence-labeling formulations use predefined semantic categories and therefore depend on a task-specific label schema. A generic key/value labeling scheme can identify open-vocabulary spans, but it still requires a separate mechanism to determine which keys and values are linked.
 
 Generative approaches formulate extraction as a text generation task: given a document's text and layout representation as input, the model generates all key-value pairs as a structured output string. This framing allows open-vocabulary extraction without a predefined field schema. The KVP10k baseline~\cite{kvp10k} adopts this paradigm using Mistral-7B~\cite{mistral} fine-tuned to output Python list-of-lists representations of key-value pairs. Generative models offer flexibility but introduce hallucination risk --- predicting plausible-sounding pairs that have no grounding in the document.
 
-Graph neural networks have been applied to document understanding by treating detected text regions as nodes and spatial or semantic proximity as edges. Models such as PICK~\cite{pick} construct document graphs and propagate information between nodes to infer key-value relationships. These approaches can naturally model non-local dependencies but require graph construction as a preprocessing step and typically rely on OCR-produced bounding boxes. They are generally competitive with sequence-labeling approaches on structured datasets but have seen less adoption since the rise of large multimodal pre-trained models~\cite{gcn}.
+Graph neural networks have been applied to document understanding by treating detected text regions as nodes and spatial or semantic proximity as edges. Models such as PICK~\cite{pick} construct document graphs and propagate information between nodes to infer key-value relationships. These approaches can naturally model non-local dependencies but require graph construction as a preprocessing step.
 
 \subsection{Entity Linking Approaches}
 \label{subsec:entity_linking}
 
 A distinct line of work formulates key-value extraction as an entity linking problem: first identify entity spans (keys and values), then predict which spans are semantically linked. This two-stage decomposition separates the ``what'' (entity recognition) from the ``who-with-whom'' (relationship prediction), enabling specialised modules for each sub-task.
 
-SPADE (Spatial Dependency Parsing for Semi-Structured Document Information Extraction)~\cite{spade} was the first model to frame document entity linking as dependency parsing over text segments. Rather than classifying individual tokens, SPADE groups OCR outputs into \emph{segments} (contiguous text regions) and predicts directed edges between segments to form a dependency graph. The parsing formulation naturally handles one-to-many and many-to-one key-value relationships. Crucially, SPADE operates at the \emph{segment level}, not the token level, reducing the number of candidate pairs from $O(n^2_{\text{tokens}})$ to $O(n^2_{\text{segments}})$ and producing a much more balanced positive-to-negative ratio in the link labels. SPADE achieves state-of-the-art results on CORD and a Japanese receipt dataset, demonstrating that explicit relational modelling at the segment level is both effective and efficient. The segment-level linking insight directly motivates the span-level linking design in our V2 architecture (Section~\ref{sec:v2-span-linking}).
+SPADE (Spatial Dependency Parsing for Semi-Structured Document Information Extraction)~\cite{spade} formulates document entity linking as dependency parsing over text segments. Rather than classifying individual tokens, SPADE groups OCR outputs into \emph{segments} (contiguous text regions) and predicts directed edges between segments to form a dependency graph. The parsing formulation naturally handles one-to-many and many-to-one key-value relationships. Crucially, SPADE operates at the \emph{segment level}, not the token level, reducing the number of candidate pairs from $O(n^2_{\text{tokens}})$ to $O(n^2_{\text{segments}})$ and producing a much more balanced positive-to-negative ratio in the link labels. SPADE achieves state-of-the-art results on CORD and a Japanese receipt dataset, demonstrating that explicit relational modelling at the segment level is both effective and efficient. The segment-level linking insight directly motivates the span-level linking design in our V2 architecture (Section~\ref{sec:v2-span-linking}).
 
 BROS (BERT Relying On Spatiality)~\cite{bros} extends the entity linking approach with a pre-trained language model that encodes 2D positional information. BROS introduces two innovations relevant to this thesis: (i)~an area-based 2D positional encoding that captures spatial relationships between text segments more expressively than point-based position embeddings, and (ii)~an \emph{initial token linking} objective that predicts, for each entity's initial token, which other entity's initial token it should be linked to. This reduces the linking problem to a sparse prediction over entity-initial positions rather than a dense token-to-token matrix, addressing the class imbalance problem inherent in token-level linking. BROS achieves strong results on FUNSD and CORD entity linking benchmarks and demonstrates that pre-training with spatial awareness significantly benefits the linking task. Both the span-level granularity and the spatial encoding strategy of BROS inform the design of our V2 linker (Section~\ref{sec:v2-span-linking}).
 
@@ -62,39 +62,24 @@ Rigorous evaluation of information extraction systems requires metrics that capt
 
 Multiple benchmarks have been introduced for document understanding and information extraction, each emphasizing different aspects of the problem space.
 
-KVP10k~\cite{kvp10k} is a large-scale benchmark for open-vocabulary key-value pair extraction from business documents, introduced at ICDAR 2024. It contains 48,280 training and 5,255 test samples spanning invoices, forms, and receipts collected from real-world sources by IBM Research. Each sample includes polygon bounding box annotations and explicit linking attributes connecting keys to their corresponding values. Unlike FUNSD and CORD, KVP10k provides both a large-scale training set and an official evaluation benchmark with a Mistral-7B generative baseline, making it the most suitable existing benchmark for the task addressed in this thesis.
+KVP10k~\cite{kvp10k} is a large-scale benchmark for open-vocabulary key-value pair extraction from business documents, introduced at ICDAR 2024. It contains 10,707 unique pages (9,656 training and 1,051 test pages) spanning invoices, forms, and receipts collected from real-world sources by IBM Research. Its released data include 48,280 training and 5,255 test annotation rows because pages have multiple annotator copies. Each page includes polygon bounding box annotations and explicit linking attributes connecting keys to their corresponding values. Of the 1,051 test pages, 581 were usable in this thesis after data preparation; the experiments therefore evaluate this subset rather than the complete test split. Unlike FUNSD and CORD, KVP10k provides both a large-scale training set and an official evaluation benchmark with a Mistral-7B generative baseline, making it the most suitable existing benchmark for the task addressed in this thesis.
 
-DocVQA~\cite{docvqa} (Document Visual Question Answering, Mathew et al., 2021) frames document understanding as visual question answering over document images, testing a model's ability to locate and extract specific information given a natural language question. RVL-CDIP is a large-scale document classification benchmark of 400,000 scanned document images across 16 categories. XFUND extends FUNSD to multilingual form understanding across eight languages. While these datasets are not directly used in this thesis, they represent the broader evaluation landscape within which the KVP10k benchmark is positioned.
+DocVQA~\cite{docvqa} (Document Visual Question Answering, Mathew et al., 2021) frames document understanding as visual question answering over document images, testing a model's ability to locate and extract specific information given a natural language question. RVL-CDIP~\cite{rvlcdip} is a large-scale document classification benchmark of 400,000 scanned document images across 16 categories. XFUND~\cite{xfund} extends form understanding to seven non-English languages. While these datasets are not directly used in this thesis, they represent the broader evaluation landscape within which the KVP10k benchmark is positioned.
 
-\section{Time-Bounded State of the Art}
-\label{sec:time_bounded_sota}
+\section{Scope of Experimental Design}
+\label{sec:experimental_scope}
 
-At the start of this project (February~2026), the state of the art for key--value
-pair extraction from business documents was largely shaped by multimodal
-pre-training approaches (such as the LayoutLM family) and the recently
-introduced KVP10k benchmark~\cite{kvp10k}. The KVP10k paper provides both a
-large-scale dataset and an official generative baseline based on a
-Mistral-7B language model fine-tuned to output structured key--value pairs.
+The experimental design was scoped at project start to a LayoutLMv3 encoder
+with a biaffine linker and the KVP10k Mistral baseline. Although other
+relation-extraction architectures were available, implementing and evaluating
+them would have required separate model designs and full experimental
+pipelines. They are therefore included as methodological context and future
+alternatives rather than additional experimental baselines.
 
-In this thesis we adopt a \emph{time-bounded} view of the literature: the
-experimental design, choice of baselines, and model architecture are fixed
-with respect to the methods that were publicly available and well-documented
-up to this starting date. In particular, our baseline suite is anchored on
-the official KVP10k benchmark and its Mistral-based text-only model, which we
-regard as the representative strong baseline at project start.
-
-To maintain clarity and reproducibility, we separate this ``project-start''
-snapshot from later developments. New models or training strategies that
-appeared after February~2026 are not used to re-design the core method or
-re-run the full experimental pipeline. Instead, they are briefly discussed
-in a dedicated state-of-the-art update in the Discussion chapter
-(Section~\ref{sec:sota_update}), where we position our results relative to
-these newer trends.
-
-\section{Summary and Research Gaps}
+\section{Summary, Research Gaps, and Thesis Scope}
 \label{sec:lit_summary}
 
-The literature review reveals several research gaps that motivate the approach in this thesis:
+The review motivates the following research gaps and thesis objectives:
 
 \begin{enumerate}
     \item \textbf{Controlled evaluation and diagnosis on KVP10k}: This thesis evaluates a LayoutLMv3-based discriminative linker on KVP10k using the released benchmark evaluator, compares token-level and span-level linking, and diagnoses data-pipeline limitations and relation-modeling limitations within the current biaffine-linker pipeline.

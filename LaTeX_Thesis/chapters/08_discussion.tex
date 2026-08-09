@@ -154,24 +154,24 @@ rather than defining a headline model.  The test-set
 link F1 of V3 (0.018) remained low because it inherited the same sparse
 entity spans from the bbox-filtered entity classifier (Bug~2).
 
-\section{Update to the State of the Art at Submission}
-\label{sec:sota_update}
+\section{Relation-Modeling Context and Experimental Scope}
+\label{sec:relation_context}
 
-The literature review in Chapter~\ref{ch:literature} adopts a
-time-bounded view of the state of the art, fixed at the start of the
-project (February~2026). During the execution of this thesis, we identified
-two additional models --- SPADE~\cite{spade} and BROS~\cite{bros} --- that
-are directly relevant to our linking methodology. Both models were published
-before our project start but were not included in the original literature
-survey. They have been integrated into the literature review
-(Section~\ref{subsec:entity_linking}) and directly informed the design of the
-V2 span-level linker.
+The experimental comparisons in this thesis remain anchored to the KVP10k
+Mistral baseline and the LayoutLMv3 encoder with a biaffine linker. As discussed
+in Section~\ref{sec:experimental_scope}, other relation-extraction methods were
+available before the project started, but implementing them would have required
+separate model designs and full experimental pipelines. SPADE~\cite{spade},
+BROS~\cite{bros}, GeoLayoutLM~\cite{geolayoutlm},
+KVPFormer~\cite{kvpformer}, and LayoutPointer~\cite{layoutpointer} are therefore
+included as methodological context and future alternatives rather than as
+additional experimental baselines.
 
-From an evaluation perspective, our experimental comparisons remain anchored
-to the KVP10k baseline. SPADE and BROS are evaluated on CORD and FUNSD
-respectively, not on KVP10k, so direct numerical comparison is not possible.
-However, their architectural insight --- that entity linking should operate at
-the segment/span level --- is validated by our V1 failure analysis.
+SPADE and BROS are evaluated on CORD and FUNSD respectively, not on KVP10k,
+so direct numerical comparison is not possible.
+Their segment/span-level formulations provide context for the V2 design and
+its reduction of the candidate-space imbalance observed in V1, but do not make
+the reported results directly comparable across benchmarks.
 
 \section{Limitations and Future Work}
 \label{sec:limitations}
@@ -192,15 +192,15 @@ cannot yet be handled.
 
 Several directions follow naturally from these findings. The most promising is
 to replace the linker head with a segment-graph relation decoder such as
-SPADE~\cite{spade} or BROS~\cite{bros}: our oracle analysis
-(Section~\ref{sec:linker-diagnostics}) localizes the main performance
-bottleneck to relation modeling rather than entity detection, making linkers
-that model directed key$\to$value dependencies explicitly the natural next
-step. This was scoped as future work rather than implemented, since it requires
+SPADE~\cite{spade} or BROS~\cite{bros}: within the current biaffine-linker
+pipeline, our oracle analysis (Section~\ref{sec:linker-diagnostics}) identifies
+relation modeling as the main remaining bottleneck, making linkers that model
+directed key$\to$value dependencies explicitly the natural next step. This was
+scoped as future work rather than implemented, since it requires
 a new decoder head and full retraining. Relation-focused designs from
 GeoLayoutLM~\cite{geolayoutlm}, KVPFormer~\cite{kvpformer}, and
 LayoutPointer~\cite{layoutpointer} are additional alternatives to the current
 biaffine linker. Further directions include handling
 multi-page documents with cross-page linking, integrating end-to-end OCR to
-increase data coverage, evaluating cross-lingual performance on XFUND, and
+increase data coverage, evaluating cross-lingual performance on XFUND~\cite{xfund}, and
 exploring contrastive pre-training for the linker head.
