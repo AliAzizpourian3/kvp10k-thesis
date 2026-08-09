@@ -33,9 +33,9 @@ contributions are:
     bounding-box filter, cross-product link label explosion) that masked
     span-level linking performance. The corrected V4 model achieves regular-KVP
     macro F1~$=0.334$ (text) / $0.309$ (text+location), below the corresponding
-    published scores ($0.659/0.611$); diagnostic analyses
-    localize the remaining gap to relation modeling rather than entity
-    detection (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
+    published scores ($0.659/0.611$); diagnostic analyses identify relation
+    modeling within the current biaffine-linker pipeline as the main remaining
+    bottleneck (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
 
     \item \textbf{Implementation}: Released a modular, reproducible codebase
     with CONFIG-controlled experiments.
@@ -69,22 +69,22 @@ the V4 model achieves regular-KVP macro F1~$=0.334$ (text) / $0.309$
 Span-level linking, paired with correct supervision, is far more effective
 than token-level linking, but still does not reach the
 published regular-KVP scores ($0.659/0.611$); an internal oracle-entity
-diagnostic shows the remaining gap
-is dominated by relation modeling rather than entity detection.
+diagnostic shows that, within the current pipeline, relation scoring rather
+than entity detection accounts for most of the observed gap.
 
 \subsection{RQ4: Success and Failure Factors}
 Model performance depends strongly on document layout type. Text-rich layouts
 benefit from rich contextual signals; text-sparse layouts challenge both
 generative (hallucination) and discriminative (fewer training examples)
-approaches. Relation modeling --- the linker itself --- rather than entity
-detection or threshold choice, is the primary bottleneck for key-value
-association: supplying ground-truth entities raises pooled diagnostic link F1
-by only $\sim$0.03--0.05.
+approaches. Diagnostics identify relation modeling within the current
+biaffine-linker pipeline as the main remaining bottleneck: supplying
+ground-truth entities raises pooled diagnostic link F1 by only
+$\sim$0.03--0.05.
 
 \section{Practical Implications}
 \label{sec:implications}
 
-This work shows a useful trade-off for discriminative multimodal models: they
+This work shows a useful trade-off for layout-aware discriminative models: they
 provide OCR-grounded predictions and operate with 125M parameters on a single
 GPU, but the present linker remains substantially below the KVP10k baseline.
 A decode-time recovery of unlinked spans extends coverage to the unkeyed and

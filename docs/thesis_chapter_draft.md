@@ -21,7 +21,7 @@
   - Reduces ~200 tokens → ~30 initial-token candidates
 
 - **KVP10k** (Friedman et al., ICDAR 2024, arXiv:2405.00505)
-  - Dataset: 10,707 documents, diverse templates
+  - Dataset: 10,707 unique pages, diverse templates
   - Baseline: Mistral-7B with LMDX prompting
   - Regular KVP text-only F1 = 0.659 (Table 1)
 
@@ -91,7 +91,7 @@
 - KVP10k dataset and LMDX prompting baseline
 
 ### Chapter 3: Dataset & Preprocessing
-- KVP10k: 10,707 documents, 5,389 train / 581 test
+- KVP10k: 10,707 unique pages, 9,656 train / 1,051 test
 - LMDX text format: word positions with bounding boxes
 - Normalization and tokenization pipeline
 
