@@ -125,7 +125,7 @@ text 0.365 / text+bbox 0.345 — perfect entities barely help ⇒ linker is the 
 - **Warm start:** `--pretrained_encoder data/outputs/stage4b_canary_B/best_model/pytorch_model.bin` (**not** from scratch). ⚠️ fix any "trained from scratch" prose.
 - batch_size 1, gradient_accumulation_steps 8 (**effective batch 8**), lr 2e-5,
   linker_loss_weight 5.0, early_stopping_patience 10, val_fraction 0.1.
-- **No `--include_images`** ⇒ trained **without page pixels** despite the multimodal backbone (`pixel_values=None`). ⚠️ do not claim visual features were used at train time.
+- **No `--include_images`** ⇒ trained **without page-image content** despite the multimodal backbone. The dataset supplied blank white placeholder pixel tensors, not actual page pixels (so `pixel_values` was not `None`). ⚠️ do not claim page-image features were used at train time.
 - Best checkpoint selected by **validation entity F1**, not pair/link F1. ⚠️ state this.
 - GPU: A100 (training); RTX 3080 used for later inference/diagnostics.
 - **Epochs:** target **30** across initial + resume + resume-2 runs. Exact completed
