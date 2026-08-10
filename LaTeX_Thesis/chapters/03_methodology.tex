@@ -165,7 +165,7 @@ after the first projection.
 
 \paragraph{Why token classification instead of generation?}
 Generative baselines (Stage~3 Mistral) demonstrated strong text recall but
-poor spatial grounding and systematic over-prediction on sparse layouts
+poor spatial grounding and systematic unsupported generation
 (Section~\ref{sec:stage3-per-cluster}). Token classification is grounded by
 construction: predictions are tied to OCR tokens with known bounding boxes.
 This prevents the model from generating text absent from the OCR input,

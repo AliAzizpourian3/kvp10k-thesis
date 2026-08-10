@@ -9,8 +9,11 @@ running them through the *saved* Stage 2 StandardScaler + KMeans model.
 This replaces the previous density heuristic in analyze_stage3_errors.py, which
 invented its own threshold and ignored Stage 2 entirely.
 
+Pages whose annotator copies contain no usable polygons are labelled
+Geometry_Unavailable rather than projected from an out-of-distribution zero vector.
+
 Output: data/outputs/stage2/test_cluster_map.json
-  { hash_name: {"cluster": "Cluster_0_Dense"|"Cluster_1_Sparse", "n_boxes": int} }
+    { hash_name: {"cluster": "Cluster_<n>"|"Geometry_Unavailable", "n_boxes": int} }
 
 Run from repo root:
   HF_DATASETS_OFFLINE=1 env/kvp10k_env/bin/python code/script/build_test_cluster_map.py
@@ -42,12 +45,8 @@ def main(split: str = "test"):
         s2 = pickle.load(f)
     scaler = s2["clustering_result"]["scaler"]
     kmeans = s2["clustering_result"]["kmeans"]
-
-    # Identify which kmeans label corresponds to the dense cluster
-    # (the one with the larger n_boxes center, feature index 0).
-    centers_unscaled = scaler.inverse_transform(kmeans.cluster_centers_)
-    dense_label = int(np.argmax(centers_unscaled[:, 0]))
-    logger.info(f"KMeans center n_boxes = {centers_unscaled[:, 0]} -> dense_label = {dense_label}")
+    feature_names = s2.get("feature_names", list(config.LAYOUT_FEATURE_NAMES))
+    feature_indices = [config.LAYOUT_FEATURE_NAMES.index(name) for name in feature_names]
 
     # ── 2. Load raw KVP10k split and group annotator copies by hash_name ─────
     from datasets import load_dataset
@@ -70,9 +69,13 @@ def main(split: str = "test"):
             feat = extract_layout_features(ds[i])
             if feat[0] > best_nb:
                 best_nb, best_feat = float(feat[0]), feat
-        x_scaled = scaler.transform(best_feat.reshape(1, -1))
+        if best_nb <= 0:
+            mapping[h] = {"cluster": "Geometry_Unavailable", "n_boxes": 0}
+            continue
+        selected_feat = best_feat[feature_indices]
+        x_scaled = scaler.transform(selected_feat.reshape(1, -1))
         label = int(kmeans.predict(x_scaled)[0])
-        cluster = "Cluster_0_Dense" if label == dense_label else "Cluster_1_Sparse"
+        cluster = f"Cluster_{label}"
         mapping[h] = {"cluster": cluster, "n_boxes": int(round(best_nb))}
 
     # ── 4. Save ──────────────────────────────────────────────────────────────
@@ -80,11 +83,10 @@ def main(split: str = "test"):
     with open(OUT_JSON, "w") as f:
         json.dump(mapping, f, indent=2)
 
-    n_dense  = sum(1 for v in mapping.values() if v["cluster"] == "Cluster_0_Dense")
-    n_sparse = len(mapping) - n_dense
     logger.info(f"Saved {len(mapping)} pages -> {OUT_JSON}")
-    logger.info(f"  Cluster_0_Dense  : {n_dense} ({100*n_dense/len(mapping):.1f}%)")
-    logger.info(f"  Cluster_1_Sparse : {n_sparse} ({100*n_sparse/len(mapping):.1f}%)")
+    for cluster in sorted({item["cluster"] for item in mapping.values()}):
+        count = sum(1 for item in mapping.values() if item["cluster"] == cluster)
+        logger.info(f"  {cluster}: {count} ({100*count/len(mapping):.1f}%)")
 
 
 if __name__ == "__main__":

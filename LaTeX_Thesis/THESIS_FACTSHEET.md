@@ -29,13 +29,23 @@ Key wording rule: raw "rows" are **duplicated annotations of the same page**, no
 unique documents. Report unique pages, not rows. Main loss source = broken /
 inaccessible source PDFs, not random filtering. ✅
 
-**Stage 2 clustering unit:** the saved clustering used 25,692 raw training rows
-with non-empty annotation lists, representing 9,124 unique page hashes. Exactly
-one row per represented page had usable polygon coordinates; 16,568 duplicate
-rows produced all-zero feature vectors. The reported $k=2$ split is therefore
-primarily a coordinate-availability/density audit, not a discovery of unique
-page genres or visual-layout classes. Later test assignment groups rows by
-`hash_name` and uses the copy with the most coordinate boxes. ✅
+**Corrected Stage 2 clustering:** raw training rows are grouped by `hash_name`,
+and the annotator copy with the most usable polygon boxes is retained per page.
+Of 9,656 unique training pages, 9,124 have coordinate-bearing copies and 532 are
+excluded as geometry unavailable. Clustering uses 12 distinct features: the
+historical `density` column was removed because it exactly duplicated
+`total_area`. Features are standardized with `StandardScaler`; K-means uses
+seed 42 and `n_init=10`. A sweep over $k=2,\ldots,10$ selects $k=2$ by the
+prespecified silhouette criterion (0.22214; modest separation). Cluster 0 has
+5,617 pages (higher box count, broad spread); Cluster 1 has 3,507 pages (lower
+box count, larger boxes, compact spread). PCA PC1/PC2 explain 30.15%/22.68%
+(52.83% total). These are annotation-geometry regimes, not document genres or
+OCR-density classes. ✅
+
+**Corrected test assignment:** apply the frozen training scaler/K-means model
+after the same richest-copy selection. All 1,051 unique test pages: Cluster 0 =
+588, Cluster 1 = 396, geometry unavailable = 67. Prepared 581-page evaluation
+subset: 319 / 213 / 49. Unavailable pages are not projected from zero vectors. ✅
 
 **Chapter 4 spatial audit:** the notebook selected the first 200 training rows
 with non-empty annotation lists, representing 70 unique page hashes and 69
@@ -86,8 +96,10 @@ Exact (for tables): Regular text P/R/F1 = 0.38195 / 0.29644 / 0.33380;
 location F1 = 0.45603; combined P/R/F1 = 0.35184 / 0.27473 / 0.30854. ✅
 All: text F1 0.21400, location 0.30996, combined 0.19908. ✅
 
-Per-cluster (Regular): Dense (521 docs) text/combined 0.334 / 0.310;
-Sparse (60 docs) text/combined 0.343 / 0.227. ✅ (small sparse subset — high variance)
+Corrected per-cluster Regular results (assigned/scored pages): Cluster 0
+(319/304) text/combined 0.28975 / 0.26365; Cluster 1 (213/179)
+0.40642 / 0.38281. Geometry unavailable (49/0) is not scored. Overall result
+hash is unchanged; only assignment-conditioned results changed. ✅
 
 Threshold sensitivity (Regular, fixed predictions): official combined 0.309;
 relaxed location (IoU≥0.1) 0.321; relaxed text (NED<0.3) 0.321; text-only 0.334. ✅
@@ -114,6 +126,12 @@ Export counts: kvp = 2,601 (identical to headline), + 1,211 unvalued + 1,747 unk
 Exact: Regular text P/R/F1 = 0.48761 / 0.77418 / 0.59835; location F1 0.54711;
 combined 0.52057. All text F1 0.51312, location 0.47804, combined 0.45508.
 Unvalued text F1 0.74401. Unkeyed = 0 (parser emits no unkeyed predictions). ✅
+
+Corrected per-cluster Regular results (assigned/scored pages): Cluster 0
+(319/304) text/combined 0.65058 / 0.56916; Cluster 1 (213/179)
+0.49777 / 0.42891. Geometry unavailable (49/0) is not scored. Overall result
+hash is unchanged. A separate pooled error audit gives unsupported-prediction
+rates of 37.1% and 53.0% for Clusters 0 and 1, respectively. ✅
 
 ### 3d. Published paper (Naparstek et al., KVP10k) — comparison only, **F1 only** ✅
 | Category | Text | Location | Text+Location |

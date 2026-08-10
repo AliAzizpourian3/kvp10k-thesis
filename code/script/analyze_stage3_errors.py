@@ -209,8 +209,14 @@ def analyze_stage3_errors(
         
         correct_rate = stats["correct"] / max(1, stats["pred_total"])
         hallucinate_rate_of_preds = stats["hallucinated"] / max(1, stats["pred_total"])
-        hallucinate_rate_of_gt = stats["hallucinated"] / max(1, stats["gt_total"])
-        missed_rate = stats["missed"] / max(1, stats["gt_total"])
+        hallucinate_rate_of_gt = (
+            stats["hallucinated"] / stats["gt_total"]
+            if stats["gt_total"] else None
+        )
+        missed_rate = (
+            stats["missed"] / stats["gt_total"]
+            if stats["gt_total"] else None
+        )
         
         summary[cluster] = {
             "n_docs": stats["docs"],
@@ -221,8 +227,11 @@ def analyze_stage3_errors(
             "missed_kvps": stats["missed"],
             "correct_rate": round(correct_rate, 4),
             "hallucinate_rate_of_preds": round(hallucinate_rate_of_preds, 4),
-            "hallucinate_rate_of_gt": round(hallucinate_rate_of_gt, 4),
-            "missed_rate": round(missed_rate, 4),
+            "hallucinate_rate_of_gt": (
+                round(hallucinate_rate_of_gt, 4)
+                if hallucinate_rate_of_gt is not None else None
+            ),
+            "missed_rate": round(missed_rate, 4) if missed_rate is not None else None,
         }
     
     with open(summary_file, "w") as f:
@@ -240,8 +249,16 @@ def analyze_stage3_errors(
         print(f"  Predicted KVPs: {s['n_pred_kvps']}")
         print(f"  GT KVPs: {s['n_gt_kvps']}")
         print(f"  Correct: {s['correct_kvps']} ({s['correct_rate']:.1%})")
-        print(f"  Hallucinated: {s['hallucinated_kvps']} ({s['hallucinate_rate_of_preds']:.1%} of predictions, {s['hallucinate_rate_of_gt']:.1%} of GT)")
-        print(f"  Missed: {s['missed_kvps']} ({s['missed_rate']:.1%} of GT)")
+        gt_hallucination = (
+            f"{s['hallucinate_rate_of_gt']:.1%} of GT"
+            if s["hallucinate_rate_of_gt"] is not None else "GT rate N/A"
+        )
+        missed = (
+            f"{s['missed_rate']:.1%} of GT"
+            if s["missed_rate"] is not None else "GT rate N/A"
+        )
+        print(f"  Hallucinated: {s['hallucinated_kvps']} ({s['hallucinate_rate_of_preds']:.1%} of predictions, {gt_hallucination})")
+        print(f"  Missed: {s['missed_kvps']} ({missed})")
     print("="*80)
     
     return error_details

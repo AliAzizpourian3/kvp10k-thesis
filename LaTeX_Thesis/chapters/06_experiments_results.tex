@@ -14,7 +14,7 @@ where it stands relative to the published KVP10k benchmark.
 The experiments proceed as follows. We begin with a generative baseline
 (Mistral-7B) to establish a reference point and characterise the failure
 modes of text-only generation on spatial documents. Catastrophic hallucination
-on text-sparse layouts motivates a shift to a layout-aware discriminative
+and approximate spatial grounding motivate a shift to a layout-aware discriminative
 model. We then investigate two linking granularities, identify a structural
 imbalance problem, and through diagnostic experiments identify and correct
 three compounding data-pipeline bugs. Under the released KVP10k benchmark, the
@@ -93,7 +93,7 @@ per-word text-and-coordinate representation of the page.}
 \label{fig:stage3-prompt}
 \end{figure}
 
-\subsection*{Result 1: Competitive text-only F1, but hallucination on text-sparse layouts}
+\subsection*{Result 1: Competitive text-only F1, but unsupported generation}
 \label{sec:res1}
 
 \begin{table}[ht]
@@ -130,36 +130,38 @@ text-source, prompt, adapter-rank, and training-detail differences above, they
 show that the reconstruction is competitive on regular pairs but do not
 constitute a reproduction of the paper's baseline.
 
-\paragraph{Per-cluster breakdown: the hallucination problem.}
+\paragraph{Per-cluster breakdown.}
 \label{sec:stage3-per-cluster}
-Broken down by layout cluster, however, a serious weakness emerges:
+The corrected Stage~2 model assigns each coordinate-bearing test page using
+the training-fitted scaler and K-means model. Table~\ref{tab:exp1-cluster}
+recomputes the official regular-pair metrics from saved predictions and ground
+truth; it does not rerun or retrain Mistral.
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1 supplementary error analysis by layout cluster
-  (pooled entity-level matching, distinct from the pair-level macro benchmark
-  in Table~\ref{tab:exp1-overall}).}
+  \caption{Experiment~1 regular-KVP macro F1 by corrected page-level
+  annotation-geometry cluster. ``Scored'' counts pages with non-empty regular
+  ground truth, following the released benchmark.}
   \label{tab:exp1-cluster}
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}lrrrr@{}}
     \toprule
-    \textbf{Cluster} & \textbf{Docs} & \textbf{Correct (\%)} & \textbf{Hallucination (\%)} & \textbf{Missed (\%)} \\
+    \textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text F1} & \textbf{Text+location F1} \\
     \midrule
-    0 (text-rich)   & 521 & 58.6 & 41.4 & 32.5 \\
-    1 (text-sparse) &  60 &  3.0 & \textbf{97.0} & 38.1 \\
+    Cluster 0 (higher count, broad spread) & 319 & 304 & 0.651 & 0.569 \\
+    Cluster 1 (lower count, compact)       & 213 & 179 & 0.498 & 0.429 \\
+    Geometry unavailable                    &  49 &   0 & ---   & ---   \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-On text-sparse documents (pages with very few extractable OCR tokens), the
-model hallucinates almost continuously: \textbf{97\%} of its predictions on
-text-sparse pages have no correspondence in the actual document. Layout clusters here are the
-\emph{actual} Stage~2
-assignments, obtained by recomputing each test page's 13 layout features and
-applying the trained Stage~2 scaler and $k$-means model. With very few KVPs
-per page in text-sparse documents, the model over-generates (1{,}301 predicted
-entities vs.\ 63 ground-truth for Cluster~1), producing a $20.6\times$
-over-generation ratio. In this experiment, text-only generation without
-spatial grounding is therefore particularly unreliable on sparse pages.
+Regular-pair performance is higher in Cluster~0 than Cluster~1, but the groups
+describe annotation-box geometry rather than OCR density or document genre. A
+separate pooled error audit shows unsupported-prediction rates of 37.1\% in
+Cluster~0 and 53.0\% in Cluster~1. The 49 geometry-unavailable prepared pages
+contain no regular ground truth and are therefore excluded from the official
+per-cluster F1 calculation. These pages must not be interpreted as a third
+performance regime. The overall benchmark values in Table~\ref{tab:exp1-overall}
+are unchanged because only the grouping was recomputed.
 
 \textbf{Motivation for Experiment 2:} A model that reads spatial positions
 directly -- rather than generating approximate coordinates -- should be able
@@ -244,7 +246,7 @@ controls the relative weight of the linking objective.
 \end{table}
 
 Link F1 remains near zero across all $\lambda$ values. The model predicts only
-200 links against 3{,}776 ground-truth links,\footnote{The 3{,}776 ground-truth links are counted over the full 581-page evaluation test set. This is a different data slice from the 200-page annotation subsample (755 links) analysed in Chapter~\ref{ch:dataset} and from the per-cluster counts in Table~\ref{tab:exp8-cluster}; these are not conflicting counts of the same set.} of which only 15 are correct.
+200 links against 3{,}776 ground-truth links,\footnote{The 3{,}776 ground-truth links are counted over the full 581-page evaluation test set. This is a different data slice from the 200-row exploratory annotation subset (755 links) analysed in Chapter~\ref{ch:dataset} and from the per-cluster counts in Table~\ref{tab:exp8-cluster}; these are not conflicting counts of the same set.} of which only 15 are correct.
 The $\lambda$ sweep confirms this is not a hyperparameter issue: the failure
 is \textbf{structural}. With a $\sim$450:1 neg:pos ratio, even aggressive
 class-weighting cannot force the linker to make positive predictions reliably.
@@ -423,30 +425,32 @@ difficult. The full V4 model reports entity F1 $= 0.827$, slightly below the
 0.847 of entity-only Stage~4a, because joint training with the linker trades a
 small amount of entity accuracy for the linking objective.
 
-\paragraph{Per-cluster breakdown: the remaining gap is still layout-sensitive.}
+\paragraph{Per-cluster breakdown.}
 \label{sec:stage4-per-cluster}
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~8: V4 regular-KVP macro F1 by layout cluster (same
-  benchmark matching as Table~\ref{tab:exp8-results}).}
+  \caption{Experiment~8: V4 regular-KVP macro F1 by corrected page-level
+  annotation-geometry cluster (same benchmark matching as
+  Table~\ref{tab:exp8-results}).}
   \label{tab:exp8-cluster}
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}lrrrr@{}}
     \toprule
-    \textbf{Cluster} & \textbf{Docs} & \textbf{Entity F1} & \textbf{Link F1 (text-only)} & \textbf{Link F1 (text+location)} \\
+    \textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text F1} & \textbf{Text+location F1} \\
     \midrule
-    0 (text-rich)   & 521 & 0.828 & 0.334 & 0.310 \\
-    1 (text-sparse) &  60 & 0.723 & 0.343 & 0.227 \\
+    Cluster 0 (higher count, broad spread) & 319 & 304 & 0.290 & 0.264 \\
+    Cluster 1 (lower count, compact)       & 213 & 179 & 0.406 & 0.383 \\
+    Geometry unavailable                    &  49 &   0 & ---   & ---   \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Text-only performance is similar across clusters, but combined F1 falls from
-$0.310$ on text-rich pages to $0.227$ on text-sparse pages. The sparse subset
-contains only 60 documents and 16 regular ground-truth links, so this difference
-has high variance and should not be generalized. It nevertheless provides no
-evidence that sparse layouts are easier for V4; location-sensitive matching is
-weaker on that subset.
+V4 performs better on Cluster~1 under both regular-pair modes. This association
+does not show that a semantic document type is easier: the clusters are based
+only on annotation-box geometry, and no causal mechanism is tested. The 49
+geometry-unavailable pages have no scored regular ground truth. Recomputing the
+breakdown changes neither predictions nor the overall F1 values in
+Table~\ref{tab:exp8-results}.
 
 \subsection*{Effect of Matching Thresholds}
 \label{sec:threshold-effect}
@@ -599,7 +603,7 @@ This section summarises the experimental progression. The work began with the
 question of whether a layout-aware discriminative model could match a
 generative system that had not been benchmarked against encoder models. The
 generative approach, while competitive overall, fails qualitatively on
-text-sparse documents due to unsupported text generation, which token-grounded
+some documents through unsupported text generation, which token-grounded
 discriminative models prevent. Making the discriminative model link key-value pairs proved
 non-trivial: token-level linking is defeated by class imbalance, and span-level
 linking works only after three latent data-pipeline bugs are diagnosed and

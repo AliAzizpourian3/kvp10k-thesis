@@ -56,11 +56,15 @@ def intersection_over_union(box1, box2):
     return intersection / union if union else 0.0
 \end{lstlisting}
 
-\section{Applying Training-Fitted Layout Clusters}
+\section{Applying Training-Fitted Geometry Clusters}
 \label{app:cluster-assignment}
 
 \begin{lstlisting}[language=Python,
   caption={Assignment of test pages with the frozen Stage~2 scaler and k-means model}]
+feature_names = stage2_artifact["feature_names"]
+feature_indices = [
+        LAYOUT_FEATURE_NAMES.index(name) for name in feature_names
+]
 mapping = {}
 for hash_name, indices in groups.items():
     best_features, largest_box_count = None, -1.0
@@ -70,8 +74,12 @@ for hash_name, indices in groups.items():
             largest_box_count = float(features[0])
             best_features = features
 
-    scaled = scaler.transform(best_features.reshape(1, -1))
+    if largest_box_count <= 0:
+        mapping[hash_name] = {"cluster": "Geometry_Unavailable"}
+        continue
+
+    distinct_features = best_features[feature_indices]
+    scaled = scaler.transform(distinct_features.reshape(1, -1))
     label = int(kmeans.predict(scaled)[0])
-    cluster = "text-rich" if label == dense_label else "text-sparse"
-    mapping[hash_name] = {"cluster": cluster}
+    mapping[hash_name] = {"cluster": f"Cluster_{label}"}
 \end{lstlisting}

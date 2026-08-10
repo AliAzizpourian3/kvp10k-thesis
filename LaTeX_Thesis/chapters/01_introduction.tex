@@ -25,7 +25,7 @@ This thesis addresses the following research questions:
     
     \item \textbf{RQ3}: How does linking granularity (token-level vs.\ span-level) affect key-value association accuracy?
     
-    \item \textbf{RQ4}: What are the key factors contributing to model success and failure cases, and how do they vary across document layout types?
+    \item \textbf{RQ4}: What are the key factors contributing to model success and failure cases, and how do observed outcomes vary across page-level annotation-geometry regimes?
 \end{enumerate}
 
 \section{Contributions}
@@ -34,7 +34,7 @@ This thesis addresses the following research questions:
 This thesis makes the following contributions:
 
 \begin{enumerate}
-    \item \textbf{Dataset Analysis}: Analysis of the KVP10k dataset, including layout clustering, spatial pattern analysis, and annotation statistics (Chapter~\ref{ch:dataset})
+    \item \textbf{Dataset Analysis}: Page-level clustering of annotation-box geometry on 9{,}124 unique coordinate-bearing KVP10k training pages, together with a separate exploratory spatial-link audit and annotation statistics (Chapter~\ref{ch:dataset})
     
     \item \textbf{Architecture}: Implementation of LayoutLMv3 + Biaffine Linker for discriminative \kvp{} extraction with explicit key-value association, using token-level (V1) and span-level (V2) linking, including the corrected V4 pipeline (Chapter~\ref{ch:methodology})
     
@@ -44,10 +44,10 @@ This thesis makes the following contributions:
     
     \item \textbf{Diagnostic Pipeline Analysis}: Systematic identification and correction of three compounding data-pipeline bugs, yielding regular-KVP macro F1\,=\,0.334 (text) / 0.309 (text+location) for corrected V4 (Chapter~\ref{ch:exresults})
     
-    \item \textbf{Error Analysis}: Per-cluster breakdown showing layout-dependent failure modes for both generative and discriminative approaches (Chapter~\ref{ch:exresults})
+    \item \textbf{Error Analysis}: Per-cluster breakdown showing how performance varies across exploratory annotation-geometry regimes for both generative and discriminative approaches (Chapter~\ref{ch:exresults})
 \end{enumerate}
 
 \section{Thesis Structure}
 \label{sec:structure}
 
-The remainder of this thesis is organized as follows. Chapter~\ref{ch:literature} reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training. Chapter~\ref{ch:dataset} presents the KVP10k dataset together with the layout clustering analysis and spatial pattern characterization. Chapter~\ref{ch:methodology} describes the proposed approach, including the LayoutLMv3 encoder, the biaffine linker architecture, and the evaluation protocol. Chapter~\ref{ch:implementation} details the implementation, covering data preprocessing, model architecture, the training procedure, and the HPC setup. Chapter~\ref{ch:exresults} presents the experiments and results in a story-driven format, moving from the generative baseline through token-level and span-level linking and the diagnostic analysis to the corrected V4 model. Chapter~\ref{ch:discussion} discusses the findings, the generative-versus-discriminative trade-offs, limitations, and future work, and Chapter~\ref{ch:conclusion} summarizes the contributions and conclusions.
+The remainder of this thesis is organized as follows. Chapter~\ref{ch:literature} reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training. Chapter~\ref{ch:dataset} presents KVP10k together with page-level annotation-geometry clustering and spatial-link characterization. Chapter~\ref{ch:methodology} describes the proposed approach, including the LayoutLMv3 encoder, the biaffine linker architecture, and the evaluation protocol. Chapter~\ref{ch:implementation} details the implementation, covering data preprocessing, model architecture, the training procedure, and the HPC setup. Chapter~\ref{ch:exresults} presents the experiments and results in a story-driven format, moving from the generative baseline through token-level and span-level linking and the diagnostic analysis to the corrected V4 model. Chapter~\ref{ch:discussion} discusses the findings, the generative-versus-discriminative trade-offs, limitations, and future work, and Chapter~\ref{ch:conclusion} summarizes the contributions and conclusions.

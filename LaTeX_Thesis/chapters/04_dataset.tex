@@ -11,19 +11,19 @@ The dataset was collected by IBM Research from real-world business documents, wi
 
 The downstream preparation pipeline operates on unique page hashes and produced 5{,}389 usable training pages and 581 usable test pages. These prepared pages are distinct from the duplicated raw rows used by the Stage~2 analysis below.
 
-\section{Annotation-Geometry Clustering Analysis}
+\section{Page-Level Annotation-Geometry Clustering}
 \label{sec:layout_clustering}
 
-We perform exploratory unsupervised clustering of annotation-box geometry. This provides a compact way to audit coordinate availability and density and to stratify evaluation in later stages. As detailed below, the fitted clusters are annotation-row regimes rather than document genres or independently validated visual-layout classes.
+We perform exploratory unsupervised clustering of page-level annotation-box geometry. Raw rows are first grouped by \texttt{hash\_name}. For each unique training page, we retain the annotator copy with the largest number of usable polygon coordinates. Pages for which no copy contains usable coordinates are excluded rather than represented by an all-zero vector. This yields 9{,}124 coordinate-bearing pages from the 9{,}656 unique training pages; 532 pages have unavailable annotation geometry. The fitted groups are geometric regimes, not document genres or independently validated semantic document types.
 
 \subsection{Feature Extraction}
 \label{subsec:features}
 
-We extract 13 geometric summary features per raw annotation row (see Table \ref{tab:features}). A row represents one annotator copy of a page; if its annotations contain no usable polygon coordinates, the feature extractor returns an all-zero vector.
+We extract 12 distinct geometric summary features per selected page (Table~\ref{tab:features}). The original extractor emitted 13 columns, but its \texttt{density} column was exactly equal to \texttt{total\_area}; removing that duplicate avoids assigning page coverage twice the weight during standardization and clustering.
 
 \begin{table}[h]
 \centering
-\caption{Geometric summary features extracted from each raw annotation row}
+\caption{Distinct geometric summary features extracted from each selected page}
 \label{tab:features}
 \begin{tabular}{@{}ll@{}}
 \toprule
@@ -37,23 +37,18 @@ $\mu_h$ & Mean box height \\
 $\mu_r$ & Mean aspect ratio (width/height) \\
 $\mu_x$ & Mean x-position (horizontal center) \\
 $\mu_y$ & Mean y-position (vertical center) \\
-$\rho$ & Box density (total coverage) \\
 $s_v$ & Vertical spread (max$_y$ - min$_y$) \\
 $s_h$ & Horizontal spread (max$_x$ - min$_x$) \\
 $d_{\text{spacing}}$ & Mean inter-box Euclidean distance \\ \bottomrule
 \end{tabular}
 \end{table}
 
-In the checked-in extractor, $\rho$ is assigned exactly the same value as $A_{\text{total}}$. The saved 13-column representation therefore contains 12 distinct signals; the duplicate is retained here to describe the executed analysis faithfully.
-
 \subsection{K-means Clustering}
 \label{subsec:kmeans}
 
-We apply K-means clustering \cite{kmeans} on standardized geometry features. To select the number of clusters, we sweep $k \in \{2,\dots,10\}$ and evaluate multiple complementary criteria: (i) Silhouette score (primary), (ii) Davies--Bouldin index, (iii) Calinski--Harabasz score, and (iv) the inertia curve (elbow). We use a fixed random seed and standardization to make the selection reproducible.
+We standardize the 12 features with a training-fitted \texttt{StandardScaler} and apply K-means clustering \cite{kmeans} with seed 42 and 10 initializations. To select the number of clusters, we sweep $k \in \{2,\dots,10\}$ and evaluate the silhouette score (primary), Davies--Bouldin index, Calinski--Harabasz score, and inertia curve.
 
-Figure~\ref{fig:stage2_optimal_k} summarizes the selection outcome. Across the considered range, the criteria favor a small number of clusters. In particular, the silhouette score peaks at \textbf{0.763} for $k=2$ (0.7627), and we therefore choose \textbf{$k=2$}. This high separation must be interpreted together with the duplicate-row and all-zero-feature effect described below.
-
-The Stage~2 input consists of 25{,}692 training annotation rows selected because their annotation lists are non-empty. These rows correspond to 9{,}124 unique page hashes and are separate from the later PyMuPDF-prepared data. For every represented page, exactly one row contains usable polygon coordinates; the other annotator copies do not. Consequently, 16{,}568 duplicate rows produce all-zero feature vectors. The analysis therefore identifies two coordinate-availability regimes: rows with substantial annotation-box geometry and rows with little or no usable geometry. It does not establish distinct document genres or visual-layout types.
+Figure~\ref{fig:stage2_optimal_k} summarizes the selection outcome. The prespecified primary criterion peaks at $k=2$, with silhouette $0.222$; the Calinski--Harabasz score is also largest at $k=2$. Davies--Bouldin continues to improve for larger $k$, so the evidence for a clean two-group partition is limited. We retain $k=2$ as the simplest primary-criterion solution and treat the resulting groups as exploratory strata rather than sharply separated document classes.
 
 \begin{figure}[H]
     \centering
@@ -64,49 +59,44 @@ The Stage~2 input consists of 25{,}692 training annotation rows selected because
 
 \begin{table}[H]
 \centering
-\caption{Coordinate-regime distribution for $k=2$ over raw training annotation rows}
+\caption{Page-level geometry-cluster distribution for $k=2$}
 \label{tab:clusters}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-\textbf{Cluster} & \textbf{Rows} & \textbf{\%} & \textbf{Characteristics} \\ \midrule
-0 & 8{,}935 & 34.8\% & Geometry-rich rows (mean $n_{\text{boxes}}\approx 25.36$) \\
-1 & 16{,}757 & 65.2\% & Little/no usable geometry (mean $n_{\text{boxes}}\approx 0.062$) \\ \bottomrule
+\textbf{Cluster} & \textbf{Pages} & \textbf{\%} & \textbf{Characteristics} \\ \midrule
+0 & 5{,}617 & 61.6\% & Higher box count and broader spatial spread \\
+1 & 3{,}507 & 38.4\% & Lower box count, larger boxes, and more compact spread \\ \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{PCA Visualization}
 \label{subsec:pca}
 
-Principal Component Analysis (PCA) \cite{pca} with two components explains 82.7\% of the variance (PC1: 71.8\%, PC2: 10.8\%). Figure~\ref{fig:stage2_pca} visualizes the separation between the two annotation-row regimes.
+Principal Component Analysis (PCA) \cite{pca} with two components explains 52.8\% of the standardized-feature variance (PC1: 30.1\%, PC2: 22.7\%). Figure~\ref{fig:stage2_pca} shows substantial overlap between the groups, consistent with the modest silhouette score.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.80\textwidth]{figures/stage2/pca_clusters.png}
-    \caption{PCA visualization of the $k=2$ annotation-row regimes based on standardized geometry features.}
+    \caption{PCA visualization of the $k=2$ unique-page geometry clusters.}
     \label{fig:stage2_pca}
 \end{figure}
 
-As a qualitative check, we also project the features with t-SNE~\cite{tsne}
-(Figure~\ref{fig:stage2_tsne}). Unlike the standardized features used for PCA,
-this exploratory projection applies a $\log(1+x)$ transform to heavy-tailed
-count and area features, robust scaling, and small Gaussian jitter
-($\sigma=0.01$). It is computed on a stratified 3{,}000-row subsample. The
-jitter makes the 16{,}568 identical all-zero rows visible rather than collapsing
-them to one point; any apparent internal spread of that group is therefore an
-artifact, not evidence of additional structure.
+As a qualitative check, we also project a fixed random sample of 3{,}000
+unique pages with t-SNE~\cite{tsne} (Figure~\ref{fig:stage2_tsne}), using the
+same standardized features as K-means. This nonlinear visualization is
+descriptive only and is not used to select $k$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.72\textwidth]{figures/stage2/tsne_clusters.png}
-    \caption{Exploratory t-SNE projection of a stratified 3{,}000-row
-    subsample; jitter makes identical all-zero rows visible.}
+    \caption{Exploratory t-SNE projection of 3{,}000 unique coordinate-bearing training pages.}
     \label{fig:stage2_tsne}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.90\textwidth]{figures/stage2/feature_distributions.png}
-    \caption{Feature distributions by coordinate regime for selected geometry features (Stage 2).}
+    \caption{Selected geometry-feature distributions for the unique-page clusters.}
     \label{fig:stage2_feature_distributions}
 \end{figure}
 
@@ -121,29 +111,29 @@ To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Tab
         \toprule
         \textbf{Cluster}
             & \shortstack{\textbf{$n_{\text{boxes}}$}\\\textbf{mean $\pm$ std}}
-            & \shortstack{\textbf{Coverage}\\\textbf{mean $\pm$ std}}
-            & \shortstack{\textbf{Mean box area}\\\textbf{mean $\pm$ std}} \\
+            & \shortstack{\textbf{Vertical spread}\\\textbf{mean $\pm$ std}}
+            & \shortstack{\textbf{Horizontal spread}\\\textbf{mean $\pm$ std}} \\
         \midrule
-        0 (geometry-rich) & $25.3622 \pm 20.5338$ & $0.0582 \pm 0.0467$ & $0.0029 \pm 0.0030$ \\
-        1 (little/no geometry) & $ 0.0619 \pm  0.6941$ & $0.0001 \pm 0.0009$ & $0.0000 \pm 0.0002$ \\
+        0 & $31.659 \pm 22.460$ & $0.714 \pm 0.261$ & $0.739 \pm 0.122$ \\
+        1 & $14.206 \pm 10.016$ & $0.421 \pm 0.289$ & $0.372 \pm 0.202$ \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-PC1 primarily reflects annotation-box density, whereas PC2 captures secondary geometric variation. Because duplicate rows without coordinates map to all-zero vectors, the PCA separation should not be interpreted as evidence of distinct visual document classes.
+Cluster~0 contains more boxes distributed across a broader portion of the page. Cluster~1 contains fewer boxes with larger mean dimensions and more compact horizontal and vertical spread. These descriptions concern annotation polygons only: they do not establish OCR-token density, document genre, or visual appearance outside the annotated regions.
 
 \subsection{Use in Later Stages}
 \label{subsec:cluster_use}
 
-The scaler and $k$-means model are fitted on the 25{,}692 raw training rows
-described above. For later evaluation, the model is kept fixed, but test rows
-are first grouped by page hash and the annotator copy with the largest number
-of coordinate boxes is selected for each unique page. Its features are then
-transformed by the training-fitted scaler and assigned to the nearest cluster.
-This avoids assigning a page from an empty duplicate copy. Per-cluster results
-in Stages~3--4 are measured on held-out test pages, but should be interpreted as
-stratification by annotation-geometry density rather than document genre (see
-Section~\ref{sec:stage3-per-cluster}).
+The scaler and K-means model are fitted only on the 9{,}124 coordinate-bearing
+training pages. Test rows are grouped by page hash and reduced with the same
+largest-coordinate-count rule. The frozen scaler and K-means model assign 588
+of the 1{,}051 unique test pages to Cluster~0 and 396 to Cluster~1. The 67 pages
+with no usable polygon geometry are marked \emph{geometry unavailable} rather
+than projected from an out-of-distribution zero vector. In the 581-page prepared
+evaluation set, the corresponding counts are 319, 213, and 49. Per-cluster
+results in later chapters are recomputed from saved predictions and ground truth;
+the overall benchmark scores are unchanged (Section~\ref{sec:stage3-per-cluster}).
 
 \section{Key-Value Link Analysis}
 \label{sec:kv_analysis}
@@ -185,4 +175,4 @@ Percentage with linking & 21.0\% \\ \bottomrule
 \section{Summary}
 \label{sec:dataset_summary}
 
-The analysis yields three main observations. First, the original clustering primarily separates coordinate-bearing annotation rows from duplicate rows with little or no usable geometry, so it should not be interpreted as document-genre discovery. Second, linked \kvps{} in the sampled rows tend to be spatially proximate, suggesting that spatial features may aid linking. Third, the 200-row subset contains substantial key--value linking annotation. These findings motivate spatial encoding in the linker while placing clear limits on the interpretation of the clustering results.
+The analysis yields three main observations. First, unique coordinate-bearing pages form two weakly separated annotation-geometry regimes: a higher-count, broad-spread group and a lower-count, compact group. Second, these groups are exploratory geometric strata rather than document types or OCR-density classes. Third, the separate 200-row spatial audit finds that linked \kvps{} tend to be proximate, suggesting that spatial features may aid linking. These findings motivate spatial encoding while keeping the clustering interpretation appropriately limited.

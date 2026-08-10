@@ -44,10 +44,11 @@ logger = logging.getLogger(__name__)
 
 # Canonical cluster names for reporting (map from raw map values)
 CLUSTER_LABELS = {
-    "Cluster_0_Dense": "Cluster 0 (text-rich)",
-    "Cluster_1_Sparse": "Cluster 1 (text-sparse)",
-    0: "Cluster 0 (text-rich)",
-    1: "Cluster 1 (text-sparse)",
+    "Cluster_0": "Cluster 0 (high box count, broad spread)",
+    "Cluster_1": "Cluster 1 (lower box count, compact spread)",
+    "Geometry_Unavailable": "Geometry unavailable",
+    0: "Cluster 0 (high box count, broad spread)",
+    1: "Cluster 1 (lower box count, compact spread)",
 }
 
 

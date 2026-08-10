@@ -142,15 +142,18 @@ Test  & 5{,}255  & 1{,}051 & 581    & 55.3\% \\
 
 \subsection{Stage 2: Layout Clustering \& Analysis}
 
-K-means clustering on 13 layout features identified two dominant document clusters:
+Training rows were grouped by page hash and the coordinate-richest annotation
+copy was retained. Of 9{,}656 unique training pages, 9{,}124 contain usable
+polygon geometry. K-means on 12 distinct standardized geometry features
+selected $k=2$ from a sweep over $k=2,\ldots,10$ (silhouette 0.222):
 
 \begin{center}
 \begin{tabular}{lccl}
 \toprule
-\textbf{Cluster} & \textbf{Documents} & \textbf{Avg.\ KVPs/page} & \textbf{Character} \\
+\textbf{Cluster} & \textbf{Pages} & \textbf{Share} & \textbf{Geometric character} \\
 \midrule
-0 --- Dense   & 521 (90\%) & 16.0 & Invoices, complex forms \\
-1 --- Sparse  &  60 (10\%) & 0.7  & Receipts, simple documents \\
+0 & 5{,}617 & 61.6\% & Higher box count, broad spread \\
+1 & 3{,}507 & 38.4\% & Lower box count, larger boxes, compact spread \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -158,37 +161,22 @@ K-means clustering on 13 layout features identified two dominant document cluste
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.60\textwidth]{figures/pca_clusters.png}
-    \caption{Stage~2 layout clustering ($k=2$), \textbf{PCA} projection of the
-    standardized layout features (two components, 82.7\% of variance). This is
-    the primary visualization: it is linear, uses the same standardized
-    features as the clustering, and places each page at a single deterministic
-    location. The text-rich (dense) and text-sparse clusters separate along the
-    dominant density axis.}
+    \caption{Stage~2 page-level geometry clustering ($k=2$), projected with
+    PCA. The first two components explain 52.8\% of standardized-feature
+    variance. Modest overlap is consistent with the silhouette score.}
     \label{fig:pr-clusters-pca}
 \end{figure}
 
-\noindent\textbf{On the projection method.} As a secondary check we also show
-non-linear t-SNE and UMAP projections (Figure~\ref{fig:pr-clusters-manifold}).
-These differ from the PCA above in three ways: (i)~they apply a $\log(1+x)$
-transform to the heavy-tailed count/area features before robust scaling;
-(ii)~t-SNE is run on a stratified 3{,}000-page subsample (UMAP on all 25{,}692
-pages); and (iii)~a small random jitter ($\sigma=0.01$) is added because
-$\sim$16{,}568 of the sparse pages have \emph{identical} all-zero features and
-would otherwise collapse to a single point. Consequently the apparent internal
-``spread'' of the sparse cluster in t-SNE/UMAP is a jitter artifact, not real
-structure. They are therefore confirmatory, not pixel-comparable to the PCA;
-all three nonetheless show the same two-way text-rich vs.\ text-sparse split.
+\noindent\textbf{Interpretation.} The clusters describe annotation-box geometry,
+not OCR density, semantic document type, or genre. The secondary t-SNE view is
+computed from the same standardized 12-feature representation on a seeded
+3{,}000-page subsample.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.46\textwidth]{figures/tsne_clusters.png}
-    \hfill
-    \includegraphics[width=0.46\textwidth]{figures/umap_clusters.png}
-    \caption{Secondary non-linear projections: \textbf{t-SNE} on a stratified
-    3{,}000-page subsample (left) and \textbf{UMAP} on all 25{,}692 pages
-    (right). Both confirm the PCA separation but use different preprocessing
-    ($\log(1+x)$ $+$ robust scaling $+$ jitter), so they are not directly
-    comparable to the PCA plot.}
+    \includegraphics[width=0.60\textwidth]{figures/tsne_clusters.png}
+    \caption{Secondary t-SNE projection of 3{,}000 unique coordinate-bearing
+    training pages. It is descriptive and does not establish semantic classes.}
     \label{fig:pr-clusters-manifold}
 \end{figure}
 
@@ -234,17 +222,21 @@ KVP10k paper baseline (Naparstek et al., 2024) & --- & --- & 0.612 & --- \\
 \subsubsection*{Error Analysis by Cluster}
 
 \begin{center}
-\begin{tabular}{lccc}
+\begin{tabular}{lrrrr}
 \toprule
-\textbf{Cluster} & \textbf{Correct Rate} & \textbf{Hallucination Rate} & \textbf{Missed Rate} \\
+\textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text F1} & \textbf{Combined F1} \\
 \midrule
-0 --- Dense   & 58.6\% & 41.4\% & 32.5\% \\
-1 --- Sparse  &  3.0\% & 97.0\% & 38.1\% \\
+Cluster 0 & 319 & 304 & 0.651 & 0.569 \\
+Cluster 1 & 213 & 179 & 0.498 & 0.429 \\
+Geometry unavailable & 49 & 0 & --- & --- \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Mistral struggles catastrophically with sparse-layout documents (97\% hallucination rate), directly motivating the layout-aware discriminative approach in Stage~4.
+These official regular-pair macro scores were recomputed from saved predictions
+and ground truth; no model was retrained. The geometry clusters do not support
+claims about semantic document types. A separate pooled audit finds
+unsupported-prediction rates of 37.1\% and 53.0\% for Clusters 0 and 1.
 
 \subsection{Stage 4: Discriminative Model (LayoutLMv3 + Biaffine Linker) --- Complete}
 
@@ -294,7 +286,7 @@ KVP10k paper baseline & ---   & 0.659 & ---         & Published result \\
 \end{center}
 
 The corrected V4 model achieves \textbf{link F1 = 0.342} (text-only, NED\,$<0.2$) / \textbf{0.309} (text+location, NED\,$<0.2$, IoU\,$>0.3$), below the KVP10k published baseline (0.659 text-only); diagnostic analyses localize the remaining gap to relation modeling rather than entity detection.
-Crucially, entity F1 = 0.827 reflects the discriminative model's ability to classify only tokens that actually exist in the document, \textbf{eliminating the hallucination problem} that plagued the generative Mistral baseline on sparse layouts.
+Crucially, entity F1 = 0.827 reflects the discriminative model's ability to classify only tokens that actually exist in the document, preventing unsupported text generation by construction.
 
 \noindent\textbf{Entity F1 vs.\ link F1 (two different tasks).} Entity F1 (0.827) measures token classification --- ``finding'' which words are keys and values. Link F1 (0.342) measures the harder pairing of each detected key with its correct value. A strong entity score therefore does \emph{not} imply a strong link score; the two numbers are not directly comparable.
 

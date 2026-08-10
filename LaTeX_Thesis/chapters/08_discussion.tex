@@ -45,34 +45,38 @@ without retraining.
 
 \subsection{Per-Cluster Performance}
 
-Stratifying Stage~3 results by the Stage~2 layout clusters
-(Table~\ref{tab:exp1-cluster}) shows that performance depends strongly on
-layout type. On text-rich pages (Cluster~0) the generative baseline reaches
-58.6\% correct entities; on text-sparse pages (Cluster~1) it collapses to
-3.0\% correct with a 97\% hallucination rate, over-generating entities
-$20.6\times$ relative to ground truth. The discriminative LayoutLMv3 model
-cannot generate text beyond the OCR input, since it only labels tokens that
-exist on the page. For the Stage~3 generative baseline, text-sparse pages are
-therefore the most difficult regime observed in this study.
+Stratifying Stage~3 results by the corrected Stage~2 annotation-geometry
+clusters (Table~\ref{tab:exp1-cluster}) shows an association between polygon
+geometry and performance. The generative baseline reaches regular-pair text
+F1 of 0.651 in the higher-count, broad-spread cluster and 0.498 in the
+lower-count, compact cluster; combined F1 is 0.569 and 0.429, respectively.
+A separate pooled error audit gives unsupported-prediction rates of 37.1\%
+and 53.0\%. These clusters do not measure OCR density or document genre, so
+the difference should not be described as a failure on a semantic document
+type. The discriminative LayoutLMv3 model cannot generate text beyond the OCR
+input because it only labels tokens that exist on the page.
 
 \begin{table}[ht]
   \centering
-  \caption{Stage~4 regular-KVP macro F1 by layout cluster (same benchmark matching as Table~\ref{tab:exp8-results}).}
+  \caption{Stage~4 regular-KVP macro F1 by corrected page-level annotation-geometry cluster.}
   \label{tab:stage4-cluster}
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}lrrrr@{}}
     \toprule
-    \textbf{Cluster} & \textbf{Docs} & \textbf{Entity F1} & \textbf{Link F1 (text-only)} & \textbf{Link F1 (text+location)} \\
+    \textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text F1} & \textbf{Text+location F1} \\
     \midrule
-    0 (text-rich)   & 521 & 0.828 & 0.334 & 0.310 \\
-    1 (text-sparse) &  60 & 0.723 & 0.343 & 0.227 \\
+    Cluster 0 (higher count, broad spread) & 319 & 304 & 0.290 & 0.264 \\
+    Cluster 1 (lower count, compact)       & 213 & 179 & 0.406 & 0.383 \\
+    Geometry unavailable                    &  49 &   0 & ---   & ---   \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-V4's text-only score is similar across clusters, but its combined score is
-lower on the text-sparse subset. That subset contains only 60 documents and
-16 regular ground-truth links, so the estimate has high variance. It should
-not be interpreted as evidence that sparse layouts are generally easier.
+V4 performs better on Cluster~1 under both regular-pair modes, the reverse of
+the Stage~3 ordering. This is an association over annotation geometry, not
+evidence that a semantic layout class is generally easier. The 49 pages with
+unavailable geometry have empty regular ground truth and are excluded by the
+official macro evaluator. Overall benchmark scores remain unchanged because
+only the test-page grouping was corrected.
 
 \section{Root-Cause Analysis}
 \label{sec:root-cause-analysis}
