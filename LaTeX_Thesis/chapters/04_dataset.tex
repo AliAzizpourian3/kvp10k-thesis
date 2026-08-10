@@ -81,6 +81,19 @@ Principal Component Analysis (PCA) \cite{pca} with two components explains 52.8\
     \label{fig:stage2_pca}
 \end{figure}
 
+To make the interpretation concrete, Figure~\ref{fig:stage2_cluster_examples}
+shows representative test pages from each cluster. The left panel exemplifies
+the higher-count, broader-spread regime (Cluster~0), while the right panel
+shows the lower-count, more compact regime (Cluster~1). Red outlines indicate
+the annotated polygons that define the geometry features used for clustering.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/stage2/stage2_cluster_examples.png}
+    \caption{Examples of page-level annotation-geometry clusters. Cluster 0 typically contains a larger number of annotation polygons distributed across a broader page area, whereas Cluster 1 contains fewer polygons concentrated in a more compact region. The clusters reflect annotation geometry and should not be interpreted as semantic document genres, OCR density, or visual document types.}
+    \label{fig:stage2_cluster_examples}
+\end{figure}
+
 As a qualitative check, we also project a fixed random sample of 3{,}000
 unique pages with t-SNE~\cite{tsne} (Figure~\ref{fig:stage2_tsne}), using the
 same standardized features as K-means. This nonlinear visualization is

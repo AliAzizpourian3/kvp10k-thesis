@@ -29,7 +29,7 @@ Key wording rule: raw "rows" are **duplicated annotations of the same page**, no
 unique documents. Report unique pages, not rows. Main loss source = broken /
 inaccessible source PDFs, not random filtering. ✅
 
-**Corrected Stage 2 clustering:** raw training rows are grouped by `hash_name`,
+**Stage 2 page-level annotation-geometry clustering:** raw training rows are grouped by `hash_name`,
 and the annotator copy with the most usable polygon boxes is retained per page.
 Of 9,656 unique training pages, 9,124 have coordinate-bearing copies and 532 are
 excluded as geometry unavailable. Clustering uses 12 distinct features: the
