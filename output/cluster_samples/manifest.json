@@ -1,0 +1,1172 @@
+{
+  "split": "test",
+  "cluster_map": "data/outputs/stage2/test_cluster_map.json",
+  "random_seed": 42,
+  "requested_per_group": 50,
+  "groups": [
+    "Cluster_0",
+    "Cluster_1",
+    "Geometry_Unavailable"
+  ],
+  "samples": [
+    {
+      "group": "Cluster_0",
+      "sample_number": 1,
+      "hash_name": "47c84067ad3e4153781c644281fb5b565bf05b0021d4a40a7cd85182d8858619",
+      "n_boxes": 40,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/099f69ee-9157-4290-a223-cd573f85d3f7/0a716b31-8d10-4194-9d75-ab080d2a968b.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 2,
+      "hash_name": "2444285013161ac9deba52d78cb188bd5072c1f73a7281652822402eaa891bcd",
+      "n_boxes": 75,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/2d3eb6a8-f743-5765-6de4-532c2d3fdba8/2d0018a9-f244-453a-925d-973d86b3b043.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 3,
+      "hash_name": "c351fd9278eadd2b51f03c12a5066c166fa6a45d5862e6c47e0ac13a7df01293",
+      "n_boxes": 7,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/d65fc0a3-32ae-b10a-b390-5991d0e906be/37cda459-040a-47d6-b766-89fceaaa77fe.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 4,
+      "hash_name": "b16f679418ee1d22308335b498c17d50f675c583e96105e73ed57441c8915f84",
+      "n_boxes": 38,
+      "image_file": "output/cluster_samples/Cluster_0/04_b16f679418ee1d22308335b498c17d50f675c583e96105e73ed57441c8915f84.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 5,
+      "hash_name": "99fcc563c07074eecf8905dde897608830c28e9634ee0082366466ce3fe7510b",
+      "n_boxes": 67,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/b02c4742-4474-a6bc-55b6-3ac12c3d9a9e/3a9839de-a438-48af-bd63-1d421743acf4.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 6,
+      "hash_name": "268f09f6cecdc447af8d8abcf59fda18e04636f46e50f20a91f8064a034f3126",
+      "n_boxes": 26,
+      "image_file": "output/cluster_samples/Cluster_0/06_268f09f6cecdc447af8d8abcf59fda18e04636f46e50f20a91f8064a034f3126.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 7,
+      "hash_name": "48fafc7739b3fa2d23e720f765cf3982b1ce6e490bcdb66ffedc296af7b88081",
+      "n_boxes": 17,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.etsu.edu/financial-aid-and-scholarships/documents/loandischargenew.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 8,
+      "hash_name": "7e159acbb59982fef482b344ce20923f1747602c71618071cb59e00c3611a667",
+      "n_boxes": 8,
+      "image_file": "output/cluster_samples/Cluster_0/08_7e159acbb59982fef482b344ce20923f1747602c71618071cb59e00c3611a667.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 9,
+      "hash_name": "902f4aa65d0b993ce5fb929cb0a061956c6ee8513bdb72d04ab2cc7e6452a3f3",
+      "n_boxes": 14,
+      "image_file": null,
+      "error": "Downloaded content from https://kcc.edu/student-resources/uploads/docs/2022-2023-KCC-Catering-Guide.pdf is not a PDF"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 10,
+      "hash_name": "6b78ab07a8163b54bfd6ea91a2a22e8ad8606fc4dc5d83ba2c64ccf468baaf04",
+      "n_boxes": 24,
+      "image_file": null,
+      "error": "Downloaded content from https://chtm.unm.edu/staff/documents/chtm-travel-order-form.pdf is not a PDF"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 11,
+      "hash_name": "bcf1807f4e013b1caf137a8b3cd54e6b2b2d4fcd9158e4919f6d5715ea42667a",
+      "n_boxes": 8,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/af494f86-0e47-2bc9-2753-40d4c2dbbeda/02bce840-89c1-41cb-991c-ff56ddf31445.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 12,
+      "hash_name": "60d34e8a7b0d954e8d74dbbbc5e3259fb13cd6b234d686b75553995c9b970478",
+      "n_boxes": 28,
+      "image_file": "output/cluster_samples/Cluster_0/12_60d34e8a7b0d954e8d74dbbbc5e3259fb13cd6b234d686b75553995c9b970478.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 13,
+      "hash_name": "d14e49b7cd95fea6bc04716e2bf93223aa50ba12a6e5cb6c96d35913aeec52b6",
+      "n_boxes": 16,
+      "image_file": "output/cluster_samples/Cluster_0/13_d14e49b7cd95fea6bc04716e2bf93223aa50ba12a6e5cb6c96d35913aeec52b6.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 14,
+      "hash_name": "9bac96db331d7b532a5c47a1809b9d8cbd3d54eeadd6e9b7cb6c4cf7bc168b52",
+      "n_boxes": 40,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/d88f9310-1fa3-0a76-e174-15c940ec2f80/07742210-9104-4264-97b2-af0e31a226f4.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 15,
+      "hash_name": "7b89ee30cb031ba7269351f975d7097de0bb48961908b2b202c15759654b4d16",
+      "n_boxes": 37,
+      "image_file": "output/cluster_samples/Cluster_0/15_7b89ee30cb031ba7269351f975d7097de0bb48961908b2b202c15759654b4d16.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 16,
+      "hash_name": "00f57e0f4c758e7b964743232134f77fba56cc8a6dc5d1cb81e9a24b8c1a60ef",
+      "n_boxes": 13,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/2f1e493d-9d95-9eaf-699b-8d486c245b9a/30fb50c8-7575-4bc9-9a3e-826c0caf7ec9.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 17,
+      "hash_name": "ecf7fdc6965c105a2e3a5291da60e76572db49725e91131b741e2bc34e6759e4",
+      "n_boxes": 7,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/f9553898-577d-0ccf-99e9-470025a2821c/3a2a34bb-3562-4adb-a79f-bdc0be230cf3.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 18,
+      "hash_name": "cbb3088bbb7a834a6986ae4f647fa42fa8ef5f41fd23430eb2c016fecce6b0ae",
+      "n_boxes": 19,
+      "image_file": "output/cluster_samples/Cluster_0/18_cbb3088bbb7a834a6986ae4f647fa42fa8ef5f41fd23430eb2c016fecce6b0ae.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 19,
+      "hash_name": "822802d54eee989f00fa3e586c7738bb5ed903d9264b2754c5ca04a28ec24ff4",
+      "n_boxes": 19,
+      "image_file": "output/cluster_samples/Cluster_0/19_822802d54eee989f00fa3e586c7738bb5ed903d9264b2754c5ca04a28ec24ff4.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 20,
+      "hash_name": "b29c44122095453c3da6069a6e3daaff0dd6c09553d69b66b26b6a5cff8dcce2",
+      "n_boxes": 13,
+      "image_file": null,
+      "error": "502 Server Error: Bad Gateway for url: https://cj.ua.edu/wp-content/uploads/2021/08/CV-Chua-Sept-13-2021.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 21,
+      "hash_name": "ad6716eeb53cd079ce6d6d1546eec9229edc73b61494591f8800d58856774e8b",
+      "n_boxes": 9,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: http://qou.edu/ar/aboutQOU/pdf/dr_A_Shawabkeh.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 22,
+      "hash_name": "2463e5aac947feffb7b4cd3d61ef09068db8db76c1f42d378764ba0a6f5e3697",
+      "n_boxes": 27,
+      "image_file": "output/cluster_samples/Cluster_0/22_2463e5aac947feffb7b4cd3d61ef09068db8db76c1f42d378764ba0a6f5e3697.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 23,
+      "hash_name": "f85a6f7be5c40bf7547e429c8fff4591e1b0b44222e19eddc8bfd372ef3f8201",
+      "n_boxes": 34,
+      "image_file": "output/cluster_samples/Cluster_0/23_f85a6f7be5c40bf7547e429c8fff4591e1b0b44222e19eddc8bfd372ef3f8201.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 24,
+      "hash_name": "6a6b0d45b8fc9d6a7f62331987f205882ad8705929015196299db398ab1a5cfa",
+      "n_boxes": 12,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/a8b67b3f-f137-f6a8-8e91-8abedf80f5f1/199de7a6-47d1-4256-a8d0-77720c7fa636.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 25,
+      "hash_name": "9f85586c52071fb719b88e851cdee45758c48f4e4937f3d5b59f8e354a00a92f",
+      "n_boxes": 67,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.cwu.edu/about/mission-vision/sites/cts.cwu.edu.mission/files/documents/specialized-accred/etac-abet/eet/1_CWU-EET-ETAC-ABET-2015-Self-Study.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 26,
+      "hash_name": "355d92b72229f1037dad429f5d330e88f0dc907d6a93e85b2e99720085710f10",
+      "n_boxes": 64,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/144f5ceb-8cf2-9e93-27a0-3f2ba64af369/42bca72d-c481-4fed-894a-401375c109c0.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 27,
+      "hash_name": "b0147f4919446b5004896f2a8fe4f95b47d8bacc0ad928627285734edf889718",
+      "n_boxes": 49,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/acf85fe1-f19f-19db-09f2-ff02b860ec50/197e648a-047c-4bdb-96ed-62896c7709d1.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 28,
+      "hash_name": "b76e11d8624ad44b0b837260fb4e92cdfc66cd59328c00d7658d3f7f86df07c0",
+      "n_boxes": 90,
+      "image_file": "output/cluster_samples/Cluster_0/28_b76e11d8624ad44b0b837260fb4e92cdfc66cd59328c00d7658d3f7f86df07c0.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 29,
+      "hash_name": "e8ecd5433b8df215c3160e123bdeb9ea8763e41a111b74d2b11fc805e71c7b94",
+      "n_boxes": 60,
+      "image_file": "output/cluster_samples/Cluster_0/29_e8ecd5433b8df215c3160e123bdeb9ea8763e41a111b74d2b11fc805e71c7b94.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 30,
+      "hash_name": "4775cb7286025d5957ad09cdfa4119aa0019f02366950b9a8cbc6476096a02bb",
+      "n_boxes": 28,
+      "image_file": "output/cluster_samples/Cluster_0/30_4775cb7286025d5957ad09cdfa4119aa0019f02366950b9a8cbc6476096a02bb.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 31,
+      "hash_name": "74171971471d12f13ecd0f30396e50fd8fe83d4862e0eaf1b767a4d7e6039477",
+      "n_boxes": 27,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.lsus.edu/Documents/Financial%20Aid/PTAX%20Parent%20Tax%20Return%20Status%202021-2022%20Rev.%20April%2013%202021.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 32,
+      "hash_name": "b46a3d0daa022904cd5e76e955a885644f6f07ef3349518ebf18e258c0e00428",
+      "n_boxes": 34,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/b98fe62c-00f6-d426-6e60-497f5aa47322/0000e428-38da-43b0-a84d-ec91a09d5030.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 33,
+      "hash_name": "1c63295a909ece6297c537dadc46d5a298ba150b9343d2b2c404b0af3c1f144e",
+      "n_boxes": 45,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/4223f3aa-b83c-bf6a-182e-dc307fab54db/2512e8b2-2421-4b81-b916-01ddb748c7ac.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 34,
+      "hash_name": "222af8d371b854ed5b0ccc792e22f0638c3e1bcf79ff45c10f02944c163b146b",
+      "n_boxes": 7,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/259789e5-b379-eae0-d80d-a02ba03d63d0/13797738-63ad-4890-8f61-e2c0d3b1a91a.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 35,
+      "hash_name": "1b2977a7ef4ea4b139049df1b9925bf8f43682036fbc54efd181f5e60b801a99",
+      "n_boxes": 27,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/9330c51e-0665-579c-8d09-3f05a5f59a0b/20d85986-e775-4d0a-8166-8fc748d39c99.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 36,
+      "hash_name": "f27d9c7c8de95d69fa98db7f4cbf5e14e39ea604455d1ad2f1410bb1a4a9e6e3",
+      "n_boxes": 102,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/a0bdc5eb-3a0a-33a8-2dee-187459d777c4/039e3bd8-ddf0-482b-92b0-1b7a4265f5b8.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 37,
+      "hash_name": "0c2ac484f76bec9eed6ed5f8ae1451a67398c9921dbb42fb151c334252421014",
+      "n_boxes": 65,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/45157f8a-b334-5ea3-1990-7f9e33af7fdf/046853db-c39f-4a38-b2c8-165d306f79b4.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 38,
+      "hash_name": "b5dfc0b673ee5f2401dce094ebc76365b850543af78eb9176dbd560e5c284188",
+      "n_boxes": 11,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/ba73bae6-f457-2d7b-19bc-52702b979d84/2d7e974d-f2ae-4c19-bb2a-e8a86bff7d7d.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 39,
+      "hash_name": "501f85c3f4b4af26cd0c1ea2f25c2fdf6d7920033e27ef326f64b9d13cae0eb1",
+      "n_boxes": 21,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://www.esd.whs.mil/Portals/54/Documents/FOID/Reading%20Room/Selected_Acquisition_Reports/FY_2014_SARS/15-F-0540_LCS_MM_SAR_Dec_2014.PDF"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 40,
+      "hash_name": "638dc90221f73ccbd8ab98323c5fa4aedac65d353011a8170420bbb4ce9f05bb",
+      "n_boxes": 12,
+      "image_file": "output/cluster_samples/Cluster_0/40_638dc90221f73ccbd8ab98323c5fa4aedac65d353011a8170420bbb4ce9f05bb.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 41,
+      "hash_name": "a8fadcba35968fab5cf7c42921aa2b80462d07c07b4bb9fd821d8504992a77b4",
+      "n_boxes": 59,
+      "image_file": "output/cluster_samples/Cluster_0/41_a8fadcba35968fab5cf7c42921aa2b80462d07c07b4bb9fd821d8504992a77b4.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 42,
+      "hash_name": "7bb35fb7e0ba81e649ab5348230bd3356ea84e174bfd1946cfbeae2bc6319169",
+      "n_boxes": 52,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/20e1d904-fff6-d445-8f1a-7d258849302c/3197baf5-27aa-4564-816b-63404b2d774f.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 43,
+      "hash_name": "90ad09c9cd227e12452457bc9349b87b48fbaa3f396bfcbf26d61a369f96d1bf",
+      "n_boxes": 25,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/0a312ba2-bc78-be7b-8920-d4f59fc40dcd/1b892555-ed21-47d8-8e7d-530216dc56d6.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 44,
+      "hash_name": "519981f7da59f25ad55cd0c55e202dba2a60bfb828ef8a5ba7563531cffc45b5",
+      "n_boxes": 22,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.ric.edu/documents/4145311-30-2016kellyfloorpdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 45,
+      "hash_name": "b910c743639f8c3f0535fc436d2105b2411616858d6d37e65442fb96194ffc1b",
+      "n_boxes": 28,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.bellarmine.edu/_migrated-binaries/docs/default-source/Institutional-Research-Effectiveness-Docs/common-data-set-2016-2017.pdf?sfvrsn=dc026c80_8"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 46,
+      "hash_name": "eddbb4970d56744f47a062a58bf2e3032cd949e91489e5dcd3ad9c1999fec0f0",
+      "n_boxes": 41,
+      "image_file": "output/cluster_samples/Cluster_0/46_eddbb4970d56744f47a062a58bf2e3032cd949e91489e5dcd3ad9c1999fec0f0.jpg"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 47,
+      "hash_name": "21f17ba7972eb7a4574959f6a9e4636ba4f6ad39654da1f65ba37ec8f479ed7c",
+      "n_boxes": 6,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6d0177e2-f1f1-0181-72ff-f210cd7e1e78/0589640c-5aaf-4efb-b00b-9b6a9a227f4a.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 48,
+      "hash_name": "0076ee917456f69ad3d054ae138d711c5fa6fdaa6189a86c058933166fe04538",
+      "n_boxes": 44,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.nwmissouri.edu/trio/pdf/ub/newsletters/January%2011%20Newsletter.pdf"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 49,
+      "hash_name": "f1919dec8ae9a8586a426fc80bc0f965c77c5d88330926cc2299f033686a7145",
+      "n_boxes": 8,
+      "image_file": null,
+      "error": "Downloaded content from https://www.uthct.edu/wp-content/uploads/phlet-2018-submission-information-and-instructions-with-2019-updates-signed.pdf is not a PDF"
+    },
+    {
+      "group": "Cluster_0",
+      "sample_number": 50,
+      "hash_name": "c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d",
+      "n_boxes": 27,
+      "image_file": "output/cluster_samples/Cluster_0/50_c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 1,
+      "hash_name": "a7e9b09e9c1358e6a1866aeb5aa94a4c3e4d3c652c9a0f38086b338d774fad1e",
+      "n_boxes": 6,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.uwlax.edu/globalassets/offices-services/human-resources/recruitment/new-employee-welcome-guide.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 2,
+      "hash_name": "84f6be73e39c64c50bfffc44596a829bcb326879b831f76e4a63c1fbc26dfa1b",
+      "n_boxes": 34,
+      "image_file": "output/cluster_samples/Cluster_1/02_84f6be73e39c64c50bfffc44596a829bcb326879b831f76e4a63c1fbc26dfa1b.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 3,
+      "hash_name": "d9534cf2e4a903846f315b4c8ccb4ad39387186e2d82c78d814393fccae68475",
+      "n_boxes": 11,
+      "image_file": "output/cluster_samples/Cluster_1/03_d9534cf2e4a903846f315b4c8ccb4ad39387186e2d82c78d814393fccae68475.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 4,
+      "hash_name": "248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970",
+      "n_boxes": 17,
+      "image_file": "output/cluster_samples/Cluster_1/04_248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 5,
+      "hash_name": "0936224fd3514ce6f1086a247ad4cbc3ac59f77b3d722cb9808b0ef44e3b6709",
+      "n_boxes": 7,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/c2c9fe9a-efdd-af8f-ce8e-21c01ddddead/2fe514f9-eddb-4753-b123-dde44a511521.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 6,
+      "hash_name": "451b66831942044e04d699bbac223e196e61b35beb1dc4f67146c323cdadcf63",
+      "n_boxes": 25,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.fordham.edu/download/downloads/id/1537/cv_barry_rosenfeld.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 7,
+      "hash_name": "8ef6248892a15a9b3e6d28ac14b0b72e1062015d12f09109345e84900fbf7c72",
+      "n_boxes": 9,
+      "image_file": "output/cluster_samples/Cluster_1/07_8ef6248892a15a9b3e6d28ac14b0b72e1062015d12f09109345e84900fbf7c72.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 8,
+      "hash_name": "b0bf984b00f6f8c9fb97ed93a137464ebbdde549824d0b937448ce455c8ecefa",
+      "n_boxes": 10,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.clemson.edu/cecas/departments/me/people/faculty/CV/Wang.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 9,
+      "hash_name": "1d919ad1db3f8450476cc6873065d759eda9d3437b9474476f9758c197708652",
+      "n_boxes": 3,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://ctei.jhu.edu/files_ta/Goucher_CTFP2019.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 10,
+      "hash_name": "70b72228fc6024dea84c043a42b0f18fdb8e3170faa08de150922b503f0f291a",
+      "n_boxes": 10,
+      "image_file": "output/cluster_samples/Cluster_1/10_70b72228fc6024dea84c043a42b0f18fdb8e3170faa08de150922b503f0f291a.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 11,
+      "hash_name": "263126d36ee8d7b24b5950781b8129a270bebaf3cacf3e7534a4d450ae124a3e",
+      "n_boxes": 7,
+      "image_file": "output/cluster_samples/Cluster_1/11_263126d36ee8d7b24b5950781b8129a270bebaf3cacf3e7534a4d450ae124a3e.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 12,
+      "hash_name": "d9b4fd6f1d8fd8f28443a1c8bdd7435a3667c3e9aafd4e7544affbcfd2097c7a",
+      "n_boxes": 15,
+      "image_file": "output/cluster_samples/Cluster_1/12_d9b4fd6f1d8fd8f28443a1c8bdd7435a3667c3e9aafd4e7544affbcfd2097c7a.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 13,
+      "hash_name": "61b761d55b072fcb1a95e0018a39b12afe2c2f50bb6576cff0d9bc9d26e49652",
+      "n_boxes": 8,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.uta.edu/business-affairs/training/files/utshare-financial/ProCard/PowerPoint/Procard.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 14,
+      "hash_name": "a23ff315d8a02165cc9b60bf3fc9a54f61334f12ef7140cb79c949573dc1ae25",
+      "n_boxes": 10,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://dental.ufl.edu/files/2012/06/drymouth.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 15,
+      "hash_name": "19d3f25935e0ed0a58d07b7ccbbd8495f30f5f7252a8e6b574af4d345bc76245",
+      "n_boxes": 6,
+      "image_file": null,
+      "error": "HTTPSConnectionPool(host='archives.iupui.edu', port=443): Max retries exceeded with url: /bitstream/handle/2450/3458/2009_enterprise-02-20.pdf?sequence=1&isAllowed=y (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)')))"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 16,
+      "hash_name": "a77cf6ee93b7962d735fcd0598a33477fa03bdda042a5b8b021e7cff9d82d1a9",
+      "n_boxes": 7,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/2367a089-b1f0-3658-272c-d0210e2e0620/0fb58572-c84a-47e1-a936-89d3f95e46e4.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 17,
+      "hash_name": "fddd51fea563b589977c76cd26563451725d1b387ce323c05135f36adcfbade8",
+      "n_boxes": 10,
+      "image_file": "output/cluster_samples/Cluster_1/17_fddd51fea563b589977c76cd26563451725d1b387ce323c05135f36adcfbade8.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 18,
+      "hash_name": "6acf68fb2abced8179d0e9a748ff4f273dfd038b58475fd6d480def2c40d0f6f",
+      "n_boxes": 6,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://library.e.abb.com/public/443080f324974a2e9199e5a4abf0c2ff/Brochure_ABB_Rail%20and%20urban%20transportation_Final_EN_spread.pdf?x-sign=V+entWVxx7zlVbOM+EC14iC+3IVtyaixgBzQFZaaSE0WAxz5T5dYlyz1C6ERaigV"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 19,
+      "hash_name": "7407f44e6736c449d792ab68b90c531dd6a8df5712627137f06b5bb1473a1979",
+      "n_boxes": 4,
+      "image_file": "output/cluster_samples/Cluster_1/19_7407f44e6736c449d792ab68b90c531dd6a8df5712627137f06b5bb1473a1979.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 20,
+      "hash_name": "6ac44cf716048e205a64c3b245bf710d3fccf82684e6ffaf65f62ec20df19176",
+      "n_boxes": 16,
+      "image_file": null,
+      "error": "404 Client Error: Not found for url: https://www.wiu.edu/cas/mathematics_and_philosophy/mero/Presentation%20Request%20fillable%20form%20rev.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 21,
+      "hash_name": "1f03a0ae5f4f665089c2c3ad07ffdf3a97a303505cab8728c21ae9f7ce1a0d91",
+      "n_boxes": 18,
+      "image_file": "output/cluster_samples/Cluster_1/21_1f03a0ae5f4f665089c2c3ad07ffdf3a97a303505cab8728c21ae9f7ce1a0d91.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 22,
+      "hash_name": "3e6000640ffdcb95cf49b16af814a147627509cb20812fc18eb02362cc3591fe",
+      "n_boxes": 9,
+      "image_file": "output/cluster_samples/Cluster_1/22_3e6000640ffdcb95cf49b16af814a147627509cb20812fc18eb02362cc3591fe.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 23,
+      "hash_name": "794c5190aadd9adc224f42c6bbf098a718efe675b6a0561b8760f0aac005bbee",
+      "n_boxes": 9,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/7612c0b5-28a6-4fb7-8854-20c8691f7240/14340d74-0bef-4cd6-af40-a04d45188670.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 24,
+      "hash_name": "9884e094a852820417be19f60eb3cd92d3269698a9273ea81bdd27fe86687220",
+      "n_boxes": 32,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.luc.edu/media/lucedu/politicalscience/MClaar%20Curriculum%20Vitae.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 25,
+      "hash_name": "9f3df1e1a800a05391fdcf496baf42e3316bc4db4e77291a7f86635e5a2dad77",
+      "n_boxes": 13,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://sc.edu/study/colleges_schools/artsandsciences/internal/for_faculty_staff/offices_depts/human_resources/search_committee/documents/affirmative_action_recruiting_sources_guide.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 26,
+      "hash_name": "6fd6380b59cd0e91a5e7c6756242f9dfffde8c831d522330e4e74895ef1c77d3",
+      "n_boxes": 9,
+      "image_file": "output/cluster_samples/Cluster_1/26_6fd6380b59cd0e91a5e7c6756242f9dfffde8c831d522330e4e74895ef1c77d3.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 27,
+      "hash_name": "d4406d04eed83ba1261b7a00ddc606eadc3299ad7632588a2f5cac690220cf26",
+      "n_boxes": 3,
+      "image_file": "output/cluster_samples/Cluster_1/27_d4406d04eed83ba1261b7a00ddc606eadc3299ad7632588a2f5cac690220cf26.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 28,
+      "hash_name": "fee88e98bf7cd9f83777c74bc54727d92f76636af6b0262af3564527be4a2b99",
+      "n_boxes": 16,
+      "image_file": null,
+      "error": "HTTPConnectionPool(host='cran.fhcrc.org', port=80): Max retries exceeded with url: /web/packages/RProtoBuf/vignettes/RProtoBuf-paper.pdf (Caused by ConnectTimeoutError(<HTTPConnection(host='cran.fhcrc.org', port=80) at 0x7b5aa80e1610>, 'Connection to cran.fhcrc.org timed out. (connect timeout=60)'))"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 29,
+      "hash_name": "2b5aff8287be77f9a7f1f9ff4bec3812489bfbbf4e6247e6caa5f92c739e51b3",
+      "n_boxes": 13,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://archives.dickinson.edu/sites/all/files/files_document/oc2000-10_f01_1.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 30,
+      "hash_name": "243094e5a61b31105faf78538a9683fc7295ea639954cf6dcd62dd882f6c192f",
+      "n_boxes": 4,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/e143f6df-cebd-931f-34d2-51d5af3045e7/207218e2-7940-4741-8684-cc5594d208c6.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 31,
+      "hash_name": "aa16e92d7e5eb8dd1663f7694a867d496e7eb5a6e550f14dc334cf0455c9c5f0",
+      "n_boxes": 36,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.irs.gov/pub/irs-schema/ty-2021-form-1065-ats-scenario-3.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 32,
+      "hash_name": "f71082553cfbd1bb3178c9651183b09ea856836088b25c81ac0ad7318ddafc70",
+      "n_boxes": 7,
+      "image_file": "output/cluster_samples/Cluster_1/32_f71082553cfbd1bb3178c9651183b09ea856836088b25c81ac0ad7318ddafc70.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 33,
+      "hash_name": "bb217732b58d5f025d02b6dccd0075eb35a2a379e5cafc6c5742000b2a32dde9",
+      "n_boxes": 15,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://artsci.utk.edu/wp-content/uploads/2017/06/Remote-Advising-Appointment-Request.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 34,
+      "hash_name": "f0c6ba21ddde0ec4853923305aa8d61ff48d43a82aaf16e4f9ed7efb5cb9cbbf",
+      "n_boxes": 5,
+      "image_file": null,
+      "error": "HTTPConnectionPool(host='webapp.agron.ksu.edu', port=80): Max retries exceeded with url: /agr_social/eupdates/eUpdate032417.pdf (Caused by ConnectTimeoutError(<HTTPConnection(host='webapp.agron.ksu.edu', port=80) at 0x7b5aa80e1a00>, 'Connection to webapp.agron.ksu.edu timed out. (connect timeout=60)'))"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 35,
+      "hash_name": "e30b6a89bffb7f112de7403a47134ca639267e2bae9275a49dacb0ad78c7b1f5",
+      "n_boxes": 11,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.umkc.edu/finadmin/docs/access_request_form.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 36,
+      "hash_name": "5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222",
+      "n_boxes": 9,
+      "image_file": "output/cluster_samples/Cluster_1/36_5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 37,
+      "hash_name": "9c94b0910b4b0c5bbc96f90ffe7ce65cc70f8bbfb92890792746d081275fb1e3",
+      "n_boxes": 7,
+      "image_file": "output/cluster_samples/Cluster_1/37_9c94b0910b4b0c5bbc96f90ffe7ce65cc70f8bbfb92890792746d081275fb1e3.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 38,
+      "hash_name": "6417544989f284fec97aa7d769519afaf4d30d9d4459bd80936de8d4c71ed019",
+      "n_boxes": 2,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/25795ec0-dfba-2afe-070e-b3ea7f78d118/2abc5ba8-fdc0-45f2-84c3-7fe90e2e15a7.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 39,
+      "hash_name": "66927ea34e73ac3b0907eac5ca157d6270554b0146749853d9debf73e928267c",
+      "n_boxes": 23,
+      "image_file": "output/cluster_samples/Cluster_1/39_66927ea34e73ac3b0907eac5ca157d6270554b0146749853d9debf73e928267c.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 40,
+      "hash_name": "c23067ce308fe648d344f45749664029cff1bb0708a41240e3be5731e00e4669",
+      "n_boxes": 16,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/a0ce8754-406e-f7a9-81dc-8fde8762a465/36704a37-ffb0-44d0-b475-95c1fba3b210.pdf"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 41,
+      "hash_name": "f32cd4819d7b9ba913d8e2010127801e22e4d7834dfecc6297a7670ce517b779",
+      "n_boxes": 10,
+      "image_file": "output/cluster_samples/Cluster_1/41_f32cd4819d7b9ba913d8e2010127801e22e4d7834dfecc6297a7670ce517b779.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 42,
+      "hash_name": "f3daec05b2c611c58c53be2838f6b9ec7aa522aa9bcf304c9acb9761da33edc6",
+      "n_boxes": 13,
+      "image_file": "output/cluster_samples/Cluster_1/42_f3daec05b2c611c58c53be2838f6b9ec7aa522aa9bcf304c9acb9761da33edc6.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 43,
+      "hash_name": "5ba8bf882303eab4046ef324208aa8f6f56769c6961cb1a0b68018a701f1cd98",
+      "n_boxes": 2,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://library.e.abb.com/public/6f20a96618394fb3a2a4c66fe1e5b5a2/2CDC003075B0101_Rev_F_Smarter_City_Innovation_Magazine_DE_Magazin_042020.pdf.pdf?x-sign=gWqwE2jumNC8DGZU20F1AJ55LkRjOUNr/zuh4p5rgd8eLeA0GFLtvWeQN391iA0P"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 44,
+      "hash_name": "ed2d53ca932626ea3a5e18f4920087d443f661ddfa2def4bc6f6ec0fe53cc4e8",
+      "n_boxes": 8,
+      "image_file": "output/cluster_samples/Cluster_1/44_ed2d53ca932626ea3a5e18f4920087d443f661ddfa2def4bc6f6ec0fe53cc4e8.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 45,
+      "hash_name": "15e9bc1f1e77c80c808d8c078a0c08031613a7c0ee7c540f63c34201054f10f2",
+      "n_boxes": 8,
+      "image_file": null,
+      "error": "HTTPSConnectionPool(host='www.umf.maine.edu', port=443): Max retries exceeded with url: /grad-studies/wp-content/uploads/sites/154/2020/10/Recommendation-Form-Initial-Licensure-Track.pdf (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1000)')))"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 46,
+      "hash_name": "2d38a8372a50f2c219f8a258083b5a1dfa7a18ce3ca9125ca9a62ae0e41ab082",
+      "n_boxes": 15,
+      "image_file": "output/cluster_samples/Cluster_1/46_2d38a8372a50f2c219f8a258083b5a1dfa7a18ce3ca9125ca9a62ae0e41ab082.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 47,
+      "hash_name": "a84eb1bf7425c61845df3f4935c3b0d5b27084835d36c2b6d0a082e2d4eeb76a",
+      "n_boxes": 5,
+      "image_file": null,
+      "error": "Downloaded content from https://hr.eku.edu/sites/hr.eku.edu/files/files/myEKU%20Proxy%20Instructions.pdf is not a PDF"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 48,
+      "hash_name": "e7893eb0df6de1dea1b859374a648938a37b049f700348b3c05894647a083ae2",
+      "n_boxes": 7,
+      "image_file": "output/cluster_samples/Cluster_1/48_e7893eb0df6de1dea1b859374a648938a37b049f700348b3c05894647a083ae2.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 49,
+      "hash_name": "9ac16cef4aebc48e38478d0781e26645d6bf326f5fb864e4e8e9eef1743812f7",
+      "n_boxes": 16,
+      "image_file": "output/cluster_samples/Cluster_1/49_9ac16cef4aebc48e38478d0781e26645d6bf326f5fb864e4e8e9eef1743812f7.jpg"
+    },
+    {
+      "group": "Cluster_1",
+      "sample_number": 50,
+      "hash_name": "1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c",
+      "n_boxes": 37,
+      "image_file": "output/cluster_samples/Cluster_1/50_1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c.jpg"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 1,
+      "hash_name": "114dbc2031d50cb03ed83ee2c175c7cf491fc105307f82611259a8b8b627d932",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/d41ce003-d07c-6153-74d0-44841b54a2df/38ba6c18-ee65-4ca9-8c17-13d1287f4216.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 2,
+      "hash_name": "18bd20a4d439a41b71bd06aa9021061bf937afdb04c6185cb4a1cce68ef7feb0",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/fcf1c0a1-15e7-2030-c990-67ed6b100361/3ba265c7-7ed7-4199-b5a3-142f7d66109e.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 3,
+      "hash_name": "64a7dc14f83585965482a7bb78cc54413c29b747e45fd8b2e6c7f002784b6807",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/830140cc-3a6a-4485-be18-9af53e407433/13fc858d-f934-4d68-ba34-3c19d5c8bf6e.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 4,
+      "hash_name": "6f472769b1f4e1fd5c675708c35c0a4bfc63d26398751e0f4739222b62f45606",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/34b3d1d0-202a-12bf-9b73-ab6770e90cac/43395afe-33bf-4769-bd8d-69a5e9c5a4da.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 5,
+      "hash_name": "4f138421822d54778131577f513b448fc685e43a2787da5a2ccab4d34267ac88",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/7ad39cc5-ed5e-1441-8952-330d482de3b2/434bc3c6-5e62-4fb5-849b-80c7d4809a26.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 6,
+      "hash_name": "c1e2051ceccf5d98940c5bf17e26c59c0a918f6dba84ddef22c6dcda0330f16b",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/c7d11bda-cbd7-e016-364f-916829bd1ef0/362eab97-9060-4c2c-b6b0-aa7136dc9c66.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 7,
+      "hash_name": "cefdfdd4091c1b3cf978581fd720f821a98a2f1f22c1a0eb4337ab3568f6bd50",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/b2928b2c-b0a1-022b-bc1b-b938df09e9a6/41c26d10-4756-4b71-b1d2-cd243f66250e.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 8,
+      "hash_name": "2194db6f99b0234aa68bf9ca162fa811b80f0fbf7c9db3ff7b4e2c14d7c0cd27",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6022409a-5256-0ca9-3d7f-905a217b112a/016d3095-b49e-4973-a841-56bdb263036a.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 9,
+      "hash_name": "034087b09b065698ac9f9564402febcfa5374436b78f96ae4f332dcf45d61ef1",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/919cc45f-6783-4600-1b83-415afc44498e/05e5336d-dd0b-410b-9d74-084782d45eab.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 10,
+      "hash_name": "b6c928417fb2378be5950134bf560268c6f3e4f3d75d0b90e15c03eb0f5863f6",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6261d936-9cae-0cd9-3db2-0f891ef5aab9/347cc4c9-8aaa-4391-bcb2-6a5cf2ce7a7b.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 11,
+      "hash_name": "c23b582e893d68afdfd0508c787331a9d52746c90c1f5837144c61e0a5a17d29",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/c4c69413-43bd-4cfe-bb6f-83f72714cd49/1c0c5f60-3903-4c99-9cf3-ec691a25c3f5.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 12,
+      "hash_name": "69ae1670dd5d135e02e4ee9765a869a4a0113a983f7d0685c3ad60e5714e72d8",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/add3c556-c0ff-b5f9-7ef9-684a5699e75c/2b04249a-adee-44ab-831a-a65e3b6327fc.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 13,
+      "hash_name": "3a40cda031a7919f91eeccb49c3e5c630bb1600a894f21156ac513972d08d0cd",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/47a5dc64-f5ed-0cff-f6f3-5e89c5068e59/03f9a771-e541-44e8-9f80-a9871104dd05.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 14,
+      "hash_name": "9efc9e1aed57db96ed6a0742325d14b739be9069c4f66319166cb21babc3f701",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/7a521ef7-b207-5636-3d23-e5056c5f72b2/0d9cd64c-e483-4c03-9f1a-3cc2b07d70de.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 15,
+      "hash_name": "79e53ec7d66df451a21fe889bc98ec89c74d75e4a642862be4e75b578e78ca7a",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/e70ec91c-c1d8-c089-d0d6-37ace815a470/284d161e-c34a-4116-90ea-c819ecf7c945.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 16,
+      "hash_name": "39b53c12902014518b7bc25f19d9bed42ad5d07267301e3fada21c374bf7b919",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/c4c69413-43bd-4cfe-bb6f-83f72714cd49/1c0c5f60-3903-4c99-9cf3-ec691a25c3f5.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 17,
+      "hash_name": "a742b9e48fffff20ce2edb35ad01179db38cee5f3096d3e7330e276165448078",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/bd5306df-fce5-22fe-2c74-8bb250918205/0113ce60-9b4a-44fc-9c1d-df49bdaa31b7.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 18,
+      "hash_name": "aa80068c3cfdb376e946a2f227c201cd3bff5766c28bf3c8921db9b81ac7b363",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/0e9e8216-740d-05ca-ab27-313ea9c14058/3a4a7aa6-cadb-47a2-a3f7-a7ef3c23e4fa.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 19,
+      "hash_name": "40bef911fadde092fc13eea393ec5fbbbc4ffa3e5f322fe602c324a239998c0f",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "404 Client Error: Not Found for url: https://www.ursinus.edu/live/files/3201-sptq-directions-for-entering-your-own-personalized"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 20,
+      "hash_name": "95fbe7969eed1ae12ef3b29009eed3dc071e81987f32b368c557cd19832efaf8",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/5447cdd3-fc92-75c6-b23e-b7217869f9ba/02c76fc6-e424-4a14-aa56-1c94b7916e58.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 21,
+      "hash_name": "18e082546e186e9c526a5e8025112b5b1a7b49a267f0913af7411e3ca8161784",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/568d96f2-1436-c5db-7c77-dfff864070df/09dae8cb-cd33-4305-bec7-7369bdfefab7.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 22,
+      "hash_name": "c42d2affab21b443bfcb6e2652eb0472cc96f98713fae404d2d9a7a3f319eb32",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/bfdcf865-dabd-9b5e-588b-ef015dda18b2/1ba7e648-2413-4f64-9e73-d12a78720aa2.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 23,
+      "hash_name": "884519d01b0c5541d337ada7fef973df697b4aa2a0b362c4310212427b2eafff",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/5a0dcba3-204d-18d2-5107-874c89af7eb4/1117b6ae-8ec8-4f3b-911c-f7bd7d4af927.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 24,
+      "hash_name": "9850490e941754c6148fa459f04874086f5f7bad0053c7918fc9d7972cf850d2",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/c72484bd-06d3-08be-1bc3-016f11fb0d80/231ab87d-32d4-44a0-aedc-afbf10dc8ebd.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 25,
+      "hash_name": "7244815f8f7deb0304965adcff6bf2ce46f3db8af997e0ccc06bf0246fe1d99d",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/472c2dcb-f762-4a29-8cae-8007b8c54ff9/2577e347-17ae-44ff-8f68-d6cfd99e3efd.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 26,
+      "hash_name": "aa1486a4fe7ec5de2bee45bbd65d00ffacc53453b8fab3a572132990e6d823b8",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/ccf1a4c9-93e2-57f7-d833-d8c5b5a225aa/0fef2823-ca9d-4169-9588-7a53684e3398.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 27,
+      "hash_name": "f9f5b02e71e4920bff15abda0bdd63716cf547c27445c0143f561a830a1218e4",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/9a1d1c28-d758-b8e8-9dc6-4801821d9253/09e0c576-d10b-44a2-a31b-1519551437e8.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 28,
+      "hash_name": "d6f65def3c4968c3ae18c8aec760f6b35a083e1a4ee92a173ff11842540a65a9",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/56192200-4025-a0e7-c161-266e42a0d3fd/1aac9f82-e1cb-47fe-baf9-d824121c801b.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 29,
+      "hash_name": "3d5beb5b06b01756682922fc42d224aa61285ac79e8eff4c9b01e97d25c0a43e",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/ed1b251f-6a7e-f91b-bda8-17448bfd5c35/0442d96c-1c56-4461-bd1b-93b44a15d266.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 30,
+      "hash_name": "cb239befbb0424facce9d23491338f7d81d53924043b8402463bcb4ad1d46ddf",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/d9f124bf-8af9-9d5f-38bf-553000d6b169/3693085b-7088-46e6-90f0-423ab25b5b58.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 31,
+      "hash_name": "016cebb2a9a28b90713606aa3959e0a9f122a809ffd974aca4a20b06b88f30b4",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/c72484bd-06d3-08be-1bc3-016f11fb0d80/231ab87d-32d4-44a0-aedc-afbf10dc8ebd.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 32,
+      "hash_name": "8910becbdb2b271e48c778b36a2a88447173581cd03995f336ff4766a6d39e70",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/47a5dc64-f5ed-0cff-f6f3-5e89c5068e59/03f9a771-e541-44e8-9f80-a9871104dd05.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 33,
+      "hash_name": "e18b1ac400cf704602e695e95b024d19ddc2a0cf74611384ae3649896a6890d3",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/170dd0fa-7edd-7ac9-4dad-17fccdbd40ef/0c208769-6c78-46ed-aec9-ff162ca24074.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 34,
+      "hash_name": "cec3970d17b42b3d77fd441c0bf993ab2d4323250fa4f8a342414a617294d82d",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/8eee96e3-7b5b-5648-2893-7b534ac57d36/0dfb9976-78c3-44aa-866a-26c115fc16ff.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 35,
+      "hash_name": "b689bedd7c37063e823155e9ce21ba5d2c8d39df0e37748284170132c3a0963e",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/4f25086d-a918-8f42-9756-f3f7449a86bb/1c088b74-bb74-4152-a990-84a3d9429bcc.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 36,
+      "hash_name": "f636105120e23f935d60703ed50aa248fd9d28260ef6f612a2285a58892792c4",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6022409a-5256-0ca9-3d7f-905a217b112a/016d3095-b49e-4973-a841-56bdb263036a.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 37,
+      "hash_name": "284421c4452924e883643ce87007a077dcafecfc2bda5da98c34adcdba38babf",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/0a2a666e-a0ef-8cbc-2e11-b53434d7cdeb/1e3bf390-7bb3-4633-85e6-aebf74a437b7.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 38,
+      "hash_name": "6c648be958a179d394bd0d99e8816f5f984c78736a5e160461cfb02a6b4bc40b",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/da86a287-ac94-e5b2-efe0-697dbb10f297/15dfa06e-0810-47b4-9307-c57b0eed564b.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 39,
+      "hash_name": "39acdd7861a4a7b282d29bcfa28f1bf64761907e6d1c75af1afcadbc5028edbd",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6261d936-9cae-0cd9-3db2-0f891ef5aab9/347cc4c9-8aaa-4391-bcb2-6a5cf2ce7a7b.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 40,
+      "hash_name": "a4b8e9ddd554ee40d41ad4cd7a68b3182156bc78a6c39989280f526f118c58c2",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/eb43d667-d494-318e-5106-4cf8f3dac0a8/43e02e66-eecf-409a-8032-52c87859a740.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 41,
+      "hash_name": "9997fab90054479739e7325f900dcdd8a94ca4b7eeb9a29dd4cd6a8689314de2",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/43a3b133-639a-70e6-2270-46ea1f01e591/3ef7dd4c-54d3-40dd-9dd3-d49d939b3d03.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 42,
+      "hash_name": "697fa5fdc79049d23e03b4b816c55daec640c0a5ae10121cf2442ed0d1afafe9",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/0ffb8736-8052-9f30-81b6-77d6d95beafa/0885cf20-483a-4cc5-b3d4-d7be88c71027.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 43,
+      "hash_name": "6b21c0ead1c9c3beeed6ef19569a28fbd909caf770af1244827037474b9fe120",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6464bbfb-4a99-81ff-b14d-94fa233f28cd/31bd279f-c5d8-4aab-8eb7-e6b4c6eda258.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 44,
+      "hash_name": "d018f19bd66b7422b3ff58c5fbabcc11446987b349f5feb19fd79453ad6d641e",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/da86a287-ac94-e5b2-efe0-697dbb10f297/15dfa06e-0810-47b4-9307-c57b0eed564b.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 45,
+      "hash_name": "4a3609cd8a9f17b526fc8fe0ac395591a60936ff68d8bf1188204295a9477b44",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/a06dbbe7-cf36-f957-684d-13af462f40f0/3f9ba443-c539-41b2-83cc-44c20a6c0fc2.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 46,
+      "hash_name": "7dc004e322fdf058c9b8a2d3f3716660de0061a2289785a2c521cc5398377299",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/47e3458d-25a8-470a-492d-9166665e78be/08f89fb0-7987-4794-a8f0-9aa3f631d87d.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 47,
+      "hash_name": "a199b9ffcf3feb008b4120638d2ecd682e9fb60f2eaea056b73c4dbf76940bb3",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/ead9f9cc-328f-46f4-b9dc-c9a706421762/1f047b92-2e71-478e-ae03-a582d0c04399.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 48,
+      "hash_name": "1ee06c95742574754c3f2e04b2513a9b7ed6d0b7a8cf8be8f900df1d281e45f9",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/0fa3a642-5a03-7f0c-bdfe-fb16b9222da0/1d47ee59-8e17-4b5f-b164-8176bfc1b48d.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 49,
+      "hash_name": "5134143f02c557658dd940d527369e5b53a3106597685f7f7fc240b1f8fd8a6a",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/67ddc257-a421-30ca-5e9c-4f7cc3b87212/40b4159d-9fce-4f85-8314-d14da8a8932f.pdf"
+    },
+    {
+      "group": "Geometry_Unavailable",
+      "sample_number": 50,
+      "hash_name": "d390158db40e3a6e45d0ad5a379995f96fe7cdbb9435ea6f3a044f8851192372",
+      "n_boxes": 0,
+      "image_file": null,
+      "error": "403 Client Error: Forbidden for url: https://publicfiles.fcc.gov/api/manager/download/6261d936-9cae-0cd9-3db2-0f891ef5aab9/347cc4c9-8aaa-4391-bcb2-6a5cf2ce7a7b.pdf"
+    }
+  ]
+}
