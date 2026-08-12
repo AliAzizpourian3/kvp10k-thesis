@@ -46,15 +46,15 @@ are consumed in parallel by the entity-classification head and the linker head.
     \node[block, below=0.8cm of entity, fill=green!12] (spans) {Span Grouper\\(V2 only)};
 
     % Output
-    \node[io, below=2.5cm of encoder] (output) {KVP Pairs\\(key $\rightarrow$ value)};
+    \node[io, below=2.35cm of encoder] (output) {KVP Pairs\\(key $\rightarrow$ value)};
 
     % Arrows
     \draw[arrow] (input) -- (encoder);
     \draw[arrow] (encoder) -| (entity);
     \draw[arrow] (encoder) -| (linker);
     \draw[arrow] (entity) -- (spans);
-    \draw[arrow] (spans) -| node[pos=0.25, above=2pt, fill=white,
-      inner sep=1.5pt, font=\scriptsize\itshape] {contiguous merge} (linker);
+    \draw[arrow] (spans) -| node[pos=0.40, above=3pt, fill=white,
+      inner sep=2.5pt, font=\scriptsize\itshape] {contiguous merge} (linker);
     \draw[arrow] (linker) |- (output);
   \end{tikzpicture}
   \end{adjustbox}
