@@ -367,14 +367,19 @@ was marked positive, providing no discrimination for the linker to learn from
 
 \subsection*{Setup}
 
-All three bugs are fixed and a corrected V4 model is trained from scratch with:
+All three bugs are fixed in V4, which is warm-started from the prior
+\texttt{stage4b\_canary\_B} checkpoint and trained with:
 \begin{itemize}[nosep]
   \item Teacher forcing enabled
   \item Corrected bounding-box filter (only exclude $[0,0,0,0]$)
   \item Corrected link label generation (one positive per GT KVP pair)
   \item $\lambda = 5.0$ (increased to compensate for sparser but correct supervision)
-  \item Early stopping patience = 10, maximum 30 epochs; best model at epoch 13
+  \item Batch size 1 with 8 gradient-accumulation steps (effective batch size 8)
+  \item Early-stopping patience 10 based on validation entity F1
 \end{itemize}
+Training targeted 30 epochs across resumed jobs; the final run history does not
+support reporting a single uninterrupted epoch number for the selected
+checkpoint.
 
 \subsection*{Result 8: Regular-KVP F1 = 0.334 (text-only) / 0.309 (text+location)}
 \label{sec:res8}

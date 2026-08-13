@@ -4,38 +4,15 @@
 \section{System Architecture}
 \label{sec:system-architecture}
 
-\subsection{Modular Design}
-\label{sec:modular-design}
-
-Our implementation follows a modular design with separate components for data
-loading, feature extraction, model training, and evaluation.
-
-\subsection{Configuration Management}
-\label{sec:config-management}
-
-All parameters are centralised in \texttt{config.py} for easy experimentation:
-\begin{itemize}
-  \item Dataset paths and model names
-  \item Hardware settings (CPU/GPU)
-  \item Evaluation thresholds (NED, IoU)
-  \item Training hyperparameters
-  \item Clustering parameters ($k$, random seed)
-\end{itemize}
-
-\subsection{Modular Pipeline Architecture}
-\label{sec:pipeline-architecture}
-
-The implementation follows a staged pipeline design:
-\begin{enumerate}
-  \item Stage~0: Evaluation protocol definition
-  \item Stage~1: Dataset ingestion and preprocessing
-  \item Stage~2: Unique-page annotation-geometry clustering and analysis
-  \item Stage~3: Baseline implementation and evaluation
-  \item Stage~4: Main model (LayoutLMv3\,+\,Linker)
-\end{enumerate}
-Each stage is implemented as an independent function in \texttt{main.py},
-allowing for incremental development, easy debugging, flexible execution, and
-reproducible experiments with consistent interfaces.
+The implementation separates dataset preparation, page-level
+annotation-geometry analysis, model training, prediction export, and benchmark
+evaluation into dedicated scripts under \texttt{code/script}. Shared dataset
+paths, model names, clustering defaults, and evaluation thresholds are defined
+in \texttt{config.py}; run-specific training settings are supplied explicitly
+through command-line arguments in the version-controlled SLURM launch scripts.
+This organization supports the staged workflow used in the thesis: data
+preparation, Stage~2 analysis, Stage~3 baseline evaluation, and Stage~4
+discriminative modeling.
 
 % ---------------------------------------------------------------------------
 \section{Data Preprocessing}
@@ -57,10 +34,12 @@ to PyMuPDF's zero-indexed page access. Page size is preserved and later mapped
 to a quantised $100 \times 100$ coordinate system for prompt and target
 generation.
 
-For Stage~4, pages are additionally rendered at 150\,DPI and resized to
-$224 \times 224$ before being passed to the LayoutLMv3 image encoder.
-The resize preserves the document's aspect ratio up to the nearest 14-pixel
-boundary (matching the $14 \times 14$ patch grid) before centre-cropping.
+Although the Stage~4 data class supports loading rendered page images, the
+reported Stage~4 runs did not provide document-image content. When no image is
+loaded, the data class supplies a blank white $224 \times 224$ placeholder to
+the LayoutLMv3 processor. Final V4 was launched without
+\texttt{--include\_images}; consequently, its document-specific inputs were the
+extracted text tokens and their bounding boxes, not page pixels.
 
 \subsection{Text Processing}
 \label{sec:text-processing}
@@ -118,12 +97,15 @@ above deduplication step.
 \subsection{LayoutLMv3 Integration}
 \label{sec:layoutlmv3-integration}
 
-The Stage~4 model class \texttt{LayoutLMv3KVPModel} wraps the
+Stage~4 uses \texttt{LayoutLMv3KVPModel} for V1 and
+\texttt{LayoutLMv3KVPModelV2} for V2/V4; both wrap the
 \texttt{microsoft/layoutlmv3-base} checkpoint from the HuggingFace Hub.
 The base encoder is loaded in full fp32 precision. No quantisation is applied:
 the 125M-parameter LayoutLMv3-base model fits within the 40\,GB memory
 envelope of the A100 nodes used for Stage~4, unlike the 7B-parameter Mistral
-model that required QLoRA in Stage~3.
+model that required QLoRA in Stage~3. LayoutLMv3 remains a multimodal
+architecture, but the blank visual placeholders used here carry no
+document-specific image information.
 
 All encoder parameters are unfrozen and participate in fine-tuning. A linear
 learning-rate warmup of 500 steps is used to avoid large gradient updates on
@@ -191,35 +173,12 @@ linker matrix to $128 \times 128$ in V1.
 \section{Baseline Evaluation Pipeline}
 \label{sec:baseline-eval-pipeline}
 
-\subsection{Automated Evaluation Workflow}
-\label{sec:eval-workflow}
-
-Stage~3 implements a fully automated 5-step evaluation pipeline:
-\begin{enumerate}
-  \item \textbf{Ground Truth Conversion:} Convert HuggingFace annotations to
-  IBM benchmark format (extract KV pairs from linking attributes, handle ID
-  prefix matching for truncated identifiers, generate individual JSON files
-  per document).
-  \item \textbf{Prediction Generation:} Run baseline on test set (apply spatial
-  pairing algorithm, save predictions in IBM-compatible format).
-  \item \textbf{Benchmark Evaluation:} Automatically execute IBM's official
-  benchmark semantics (type-aware greedy pair matching; evaluate text-only,
-  location-only, and combined metrics; average precision and recall per page,
-  then compute F1 from those macro averages).
-  \item \textbf{Results Analysis:} Generate detailed statistics (type
-  distribution, per-document statistics, sample examples).
-  \item \textbf{Visualisation:} Create publication-ready plots at 300\,DPI.
-\end{enumerate}
-
-\subsection{Scalability}
-\label{sec:scalability}
-
-The pipeline is designed to scale from small validation sets to full datasets:
-\begin{itemize}
-  \item Quick validation: 20 samples ($\sim$25 seconds)
-  \item Medium validation: 1{,}000 samples ($\sim$2--3 minutes)
-  \item Full test set: 5{,}255 samples (scales linearly)
-\end{itemize}
+Stage~3 converts KVP10k annotations and generated predictions into the released
+benchmark format, then applies type-aware greedy matching in text-only,
+location-only, and combined modes. Precision and recall are averaged per page
+before F1 is computed. The evaluation used 581 prepared unique test pages; the
+5{,}255 rows in the raw test split are duplicated annotation copies and are not
+the evaluation sample count.
 
 % ---------------------------------------------------------------------------
 \section{Training Pipeline}
@@ -237,10 +196,10 @@ that optimisation is applied only to the response segment.
 The data loader reads page-level JSON files from the prepared train and test
 directories. Samples without prompt text or without non-empty supervision are
 skipped to avoid training on degenerate examples. For Stage~4, a
-\texttt{KVP10kEntityDataset} class wraps the same JSON files and additionally
-loads the rendered page image from a pre-computed image cache on the cluster
-filesystem. Image loading is performed lazily to minimise CPU-to-GPU transfer
-latency.
+\texttt{LayoutLMv3PreparedDataset} wraps the same JSON files, parses words and
+bounding boxes from the LMDX representation, creates entity and link labels,
+and tokenizes them to a maximum length of 512. The reported runs used the
+loader's blank visual placeholder rather than a page-image cache.
 
 \subsection{Training Loop}
 \label{sec:stage4-training-loop}
@@ -254,19 +213,21 @@ Stage~4a trains the LayoutLMv3 encoder together with the entity classification
 head only, with the linker module disabled ($\lambda = 0$).
 This pre-trains the representation before the more complex
 linking objective is introduced. Training uses fp32 precision
-on A100~80\,GB cluster nodes; no quantisation is required.
-Gradient accumulation over 8 micro-steps gives an
-effective batch size of 32. A SLURM job template with a wall-clock limit of
-24~hours is used for this phase.
+on an A100 node; no quantisation is required. A per-device batch size of 4 with
+8 gradient-accumulation steps gives an effective batch size of 32. The Stage~4a
+run uses early-stopping patience 3 based on validation entity F1.
 
 \paragraph{Stage~4b -- Joint Fine-tuning.}
-Stage~4b resumes from the Stage~4a checkpoint and activates the biaffine
-linker ($\lambda > 0$). The encoder learning rate is reduced by a factor of
-10 relative to Stage~4a to avoid catastrophic forgetting of the entity
-classification capability. Two variants are trained: V1 (token-level linking)
-and V2 (span-level linking). A SLURM job with a 12-hour wall-clock limit
-is used for each variant. Early stopping (patience~$= 3$) on validation
-entity F1 typically terminates training within 10--15 epochs.
+Stage~4b activates the biaffine linker ($\lambda > 0$). Earlier V1 and V2
+development runs were initialized from the Stage~4a entity checkpoint. Final
+V4, which uses the V2 span-linking architecture with the data-pipeline fixes
+below, was instead warm-started from
+\texttt{stage4b\_canary\_B/best\_model/pytorch\_model.bin}. It used a
+per-device batch size of 1, 8 gradient-accumulation steps (effective batch size
+8), a unified learning rate of $2\times10^{-5}$, linker-loss weight
+$\lambda=5$, and early-stopping patience 10 based on validation entity F1.
+Training targeted 30 epochs across resumed jobs rather than one uninterrupted
+30-epoch run.
 
 \paragraph{V4 link label generation.}
 Diagnostic analysis of V2 training revealed that the ground-truth link label
@@ -285,17 +246,19 @@ criterion ($\geq 50\%$ of either the word or the target region), and a relaxed
 span grouping filter that only excludes $[0,0,0,0]$ bounding boxes (previously,
 the filter $x_1 < x_2 \wedge y_1 < y_2$ rejected $\sim$50\% of valid tokens
 whose LayoutLMv3-normalised coordinates had $x_1 = x_2$), the V4 pipeline
-achieves 79\% word-level and 70\% span-level link label recovery on the test
-set (Section~\ref{sec:res567}).
+recovers 141 of 179 word-level links (79\%) and 125 of 179 span-level links
+(70\%) in the first 20 prepared test pages used for the diagnostic in
+Section~\ref{sec:res567}. These are label-pipeline recovery checks, not
+full-test model-performance metrics.
 
 \subsection{Checkpointing}
 \label{sec:checkpointing}
 
 Model checkpoints are stored after each epoch and the best checkpoint (highest
-validation combined F1) is retained. For Stage~4b, checkpoints include both
-the encoder weights and the linker module weights as a single \texttt{.pt}
-file. This enables a clean separation between training, prediction, and
-evaluation, which is important for SLURM-based execution and reproducibility.
+validation entity F1) is retained. For Stage~4b, the serialized
+\texttt{pytorch\_model.bin} state dictionary contains the encoder, entity
+classifier, and linker parameters. Prediction export and benchmark evaluation
+then load this fixed checkpoint independently of training.
 
 % ---------------------------------------------------------------------------
 \section{Evaluation Protocol}
@@ -348,30 +311,25 @@ regular, unkeyed, unvalued, and All categories.
 \section{Code Organisation}
 \label{sec:code-organisation}
 
-Our codebase is organised as a Python package:
+The principal implementation files are:
 \begin{verbatim}
-Script/
-|-- config.py          # Configuration parameters
-|-- data_loader.py     # Dataset loading
-|-- features.py        # Layout feature extraction
-|-- visualization.py   # Plotting utilities
-|-- metrics.py         # NED, IoU, F1 evaluation
-|-- model.py           # LayoutLMv3KVPModel + BiaffineLinker
-|-- train.py           # Stage 4 training loop
-|-- main.py            # Pipeline orchestration
-'-- utils.py           # Helper functions
+code/script/
+|-- prepare_data.py              # PDF text and KVP preparation
+|-- stage4_kvp_dataset.py        # Stage 4 dataset and labels
+|-- layoutlm_model.py            # V1 token linker
+|-- layoutlm_model_v2.py         # V2/V4 span linker
+|-- train_stage4a.py             # Entity-only training
+|-- train_stage4b_v2.py          # V2/V4 joint training
+|-- export_v4_predictions.py     # Fixed-checkpoint inference
+'-- evaluate_kvp10k_benchmark.py # Released benchmark semantics
 \end{verbatim}
 
 % ---------------------------------------------------------------------------
 \section{Reproducibility}
 \label{sec:reproducibility}
 
-To ensure reproducibility:
-\begin{itemize}
-  \item Fixed random seed: \texttt{RANDOM\_SEED = 42}
-  \item Version-controlled dependencies (\texttt{requirements.txt})
-  \item Detailed configuration logging at run start
-  \item Checkpoint saving at each epoch with best-model tracking
-  \item Offline model caching for compute-node execution
-  \item Separate login-node preparation and GPU-node training workflow on TinyGPU
-\end{itemize}
+Reproducibility is supported by seeded data splitting, explicit CLI arguments
+in version-controlled SLURM scripts, per-epoch checkpoints, run logs, and
+offline HuggingFace caches on compute nodes. Data preparation and GPU training
+remain separate steps because source-PDF retrieval is performed before jobs are
+submitted to the offline compute environment.
