@@ -11,20 +11,20 @@ was motivated by the findings of the previous one, forming a chain from a
 generative baseline to a corrected discriminative model and an assessment of
 where it stands relative to the published KVP10k benchmark.
 
-The experiments proceed as follows. We begin with a generative baseline
-(Mistral-7B) to establish a reference point and characterise the failure
-modes of text-only generation on spatial documents. Catastrophic hallucination
-and approximate spatial grounding motivate a shift to a layout-aware discriminative
-model. We then investigate two linking granularities, identify a structural
-imbalance problem, and through diagnostic experiments identify and correct
-three compounding data-pipeline bugs. Under the released KVP10k benchmark, the
-final corrected model reaches regular-KVP F1 of 0.334 (text-only) and 0.309
-(text+location), below the corresponding published values of 0.659 and 0.611;
-diagnostic analyses localise the remaining gap to relation modeling.
+The experiments proceed as follows. We begin with a generative reference
+baseline (Mistral-7B) and then evaluate a layout-aware discriminative approach
+(LayoutLMv3). We then investigate two linking granularities, identify a
+structural imbalance problem, and through diagnostic experiments identify and
+correct three compounding data-pipeline bugs. Under the released KVP10k
+benchmark, the final corrected model reaches regular-KVP F1 of 0.334
+(text-only) and 0.309 (text+location), below the corresponding published values
+of 0.659 and 0.611; diagnostic analyses localise the remaining gap to relation
+modeling.
 
 \subsection*{Evaluation Setup}
 
-All experiments use the same evaluation set: \textbf{581 unique test pages}
+All official benchmark comparisons use the same evaluation set:
+\textbf{581 unique test pages}
 from the KVP10k test split (55\% of 1{,}051 unique pages; limited by PDF
 download failures and scanned pages without text layers). The evaluation
 follows IBM's released KVP10k benchmark implementation. Matching is greedy and
@@ -37,8 +37,9 @@ F1 is the harmonic mean of the two macro averages. Results are reported for
 regular KVPs, unkeyed values, unvalued keys, and their aggregate, under
 text-only, location-only, and combined matching. Pooled regular-link counts
 used during V1--V4 diagnosis are identified separately and are not compared
-directly with the published macro scores. Preprocessing and input-text
-differences are described in Section~\ref{sec:data-preprocessing}.
+directly with the published macro scores; those diagnostics use explicitly
+stated subsets and are not full-test benchmark results. Preprocessing and
+input-text differences are described in Section~\ref{sec:data-preprocessing}.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 1: Generative Baseline (Mistral-7B QLoRA)}
@@ -139,7 +140,7 @@ truth; it does not rerun or retrain Mistral.
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1 regular-KVP macro F1 by corrected page-level
+  \caption{Experiment~1 regular-KVP macro F1 by page-level
   annotation-geometry cluster. ``Scored'' counts pages with non-empty regular
   ground truth, following the released benchmark.}
   \label{tab:exp1-cluster}
@@ -176,11 +177,12 @@ of unsupported text.
 \subsection*{Setup}
 
 We introduce LayoutLMv3-base (125M parameters) as the document encoder.
-LayoutLMv3 jointly models text, layout (bounding boxes), and image patches,
-giving it native spatial grounding. In Stage~4a, only the entity classification
-head is trained (linker disabled): for each token, the model predicts whether
-it is a Key, Value, or Other token. This phase establishes strong entity
-representations before the more complex linking task is introduced.
+The reported runs use extracted text and bounding boxes, with no
+document-specific page image content; the image input is a blank placeholder.
+In Stage~4a, only the entity classification head is trained (linker disabled):
+for each token, the model predicts whether it is a Key, Value, or Other token.
+This phase establishes strong entity representations before the more complex
+linking task is introduced.
 
 \subsection*{Result 2: Strong Entity Classification}
 \label{sec:res2}
@@ -268,8 +270,10 @@ In V2, contiguous same-label tokens are grouped into spans, and the linker
 scores key spans against value spans. This reformulation cuts the number of
 candidate pairs per page from roughly 10{,}000 to about 225 and, correspondingly,
 reduces the negative-to-positive ratio from about 450:1 to about 5:1.
-V2 warm-starts from the best Stage~4a checkpoint with teacher forcing enabled
-(ground-truth entity labels passed to the linker during training).
+The original V2 implementation warm-started from the best Stage~4a checkpoint,
+but span grouping used \texttt{argmax} predicted entity labels rather than
+ground-truth labels; the effect of this choice is examined in
+Experiments~5--7.
 
 \subsection*{Result 4: Imbalance resolved, but link F1 remains near zero}
 \label{sec:res4}
@@ -360,6 +364,13 @@ was marked positive, providing no discrimination for the linker to learn from
   \footnotesize{*Before V4, ``100\% recovery'' is misleading: the cross-product produced all possible positive links, not just correct ones. Effective supervision was a near-uniform positive matrix -- equivalent to no supervision.}
 \end{table}
 
+Table~\ref{tab:diagnostic-verification} is a diagnostic verification summary,
+not an ablation, and therefore cannot attribute effects to any single
+correction. In V4, all three corrections are applied jointly. The reported V4
+results therefore demonstrate pipeline repair as a whole rather than each
+correction's independent numerical contribution; isolating individual effects
+requires dedicated ablations outside the scope of this thesis.
+
 % ---------------------------------------------------------------------------
 \section{Experiment 8: Corrected Model (V4)}
 \label{sec:exp8}
@@ -367,8 +378,8 @@ was marked positive, providing no discrimination for the linker to learn from
 
 \subsection*{Setup}
 
-All three bugs are fixed in V4, which is warm-started from the prior
-\texttt{stage4b\_canary\_B} checkpoint and trained with:
+V4 applies all three corrections jointly, is warm-started from the prior
+\texttt{stage4b\_canary\_B} checkpoint, and is trained with:
 \begin{itemize}[nosep]
   \item Teacher forcing enabled
   \item Corrected bounding-box filter (only exclude $[0,0,0,0]$)
@@ -435,7 +446,7 @@ small amount of entity accuracy for the linking objective.
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~8: V4 regular-KVP macro F1 by corrected page-level
+  \caption{Experiment~8: V4 regular-KVP macro F1 by page-level
   annotation-geometry cluster (same benchmark matching as
   Table~\ref{tab:exp8-results}).}
   \label{tab:exp8-cluster}
@@ -606,12 +617,15 @@ experiments.
 
 This section summarises the experimental progression. The work began with the
 question of whether a layout-aware discriminative model could match a
-generative system that had not been benchmarked against encoder models. The
-generative approach, while competitive overall, fails qualitatively on
-some documents through unsupported text generation, which token-grounded
-discriminative models prevent. Making the discriminative model link key-value pairs proved
-non-trivial: token-level linking is defeated by class imbalance, and span-level
-linking works only after three latent data-pipeline bugs are diagnosed and
-corrected. The final 125M-parameter model reaches regular-KVP macro F1 $=0.334$
-for text and $0.309$ for text+location, below the paper's $0.659$ and $0.611$.
-Internal diagnostics localise the remaining gap primarily to relation modeling.
+generative reference baseline that had not been benchmarked against encoder
+models. The generative approach is competitive overall but can produce
+unsupported text on some documents, whereas token-grounded discriminative
+models cannot generate text absent from the OCR input. Making the
+discriminative model link key-value pairs proved non-trivial: token-level
+linking is hindered by severe class imbalance, span-level linking exposed
+pipeline failures, and non-trivial V4 results emerged after all three
+corrections were applied jointly. The final 125M-parameter model reaches
+regular-KVP macro F1 $=0.334$ for text and $0.309$ for text+location, below the
+paper's $0.659$ and $0.611$. The independent numerical effect of each
+correction was not isolated in this study. Internal diagnostics localise the
+remaining gap primarily to relation modeling.
