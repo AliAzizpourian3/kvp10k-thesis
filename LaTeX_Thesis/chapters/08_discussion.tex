@@ -8,8 +8,8 @@
 
 The LayoutLMv3 V4 entity classifier achieves F1~$= 0.827$, demonstrating that
 the layout-aware encoder effectively distinguishes key, value, and other tokens
-using text and layout representations. This demonstrates the strength
-of the discriminative formulation for entity detection: by
+using text and layout representations. This result indicates strong entity
+classification in the reported setup: by
 constraining predictions to existing OCR tokens, the model prevents the
 generation of text absent from the OCR input. It can still falsely label an
 existing token as a key or value.
@@ -17,8 +17,8 @@ existing token as a key or value.
 \subsection{Token-Level Linking Failure}
 
 The near-zero link F1 ($0.008$) of V1 is the central negative result of this
-thesis. The failure is attributable to the granularity mismatch between the
-linking formulation (token-to-token) and the task structure (span-to-span).
+thesis. The failure is consistent with severe token-level class imbalance and a
+mismatch between token-level candidates and span-level relations.
 With $\sim$450:1 negative-to-positive ratio at the token level, the BCE loss
 is dominated by negative examples even with \texttt{pos\_weight} correction.
 This is consistent with SPADE~\cite{spade} and BROS~\cite{bros}, which both
@@ -37,8 +37,8 @@ pipeline bugs. Once corrected, V4 reaches regular-KVP F1 $=0.334$ for text
 and $0.309$ for text+location, below both reconstructed Mistral and the
 published baseline. Its All score is lower ($0.214/0.199$) because its decoder
 emits only regular pairs. Internal diagnostic analyses
-(Section~\ref{sec:linker-diagnostics}) show the residual regular-pair gap is
-driven by relation modeling rather than entity detection or threshold choice;
+(Section~\ref{sec:linker-diagnostics}) indicate that relation modeling is the
+principal remaining internal bottleneck rather than entity detection or threshold choice;
 a decode-time recovery of unlinked spans (Analysis~C) cheaply extends coverage
 to unkeyed and unvalued at lower accuracy, raising All F1 to $0.257/0.237$
 without retraining.
@@ -46,8 +46,8 @@ without retraining.
 \subsection{Per-Cluster Performance}
 
 Stratifying Stage 3 results by the Stage 2 annotation-geometry
-clusters (Table~\ref{tab:exp1-cluster}) shows an association between polygon
-geometry and performance. The generative baseline reaches regular-pair text
+clusters (Table~\ref{tab:exp1-cluster}) shows an association between
+annotation-box geometry and performance. The generative baseline reaches regular-pair text
 F1 of 0.651 in the higher-count, broad-spread cluster and 0.498 in the
 lower-count, compact cluster; combined F1 is 0.569 and 0.429, respectively.
 A separate pooled error audit gives unsupported-prediction rates of 37.1\%
@@ -58,7 +58,7 @@ input because it only labels tokens that exist on the page.
 
 \begin{table}[ht]
   \centering
-  \caption{Stage~4 regular-KVP macro F1 by corrected page-level annotation-geometry cluster.}
+  \caption{Stage~4 regular-KVP macro F1 by page-level annotation-geometry cluster.}
   \label{tab:stage4-cluster}
   \begin{tabular}{@{}lrrrr@{}}
     \toprule
@@ -76,39 +76,41 @@ the Stage~3 ordering. This is an association over annotation geometry, not
 evidence that a semantic layout class is generally easier. The 49 pages with
 unavailable geometry have empty regular ground truth and are excluded by the
 official macro evaluator. Overall benchmark scores remain unchanged because
-only the test-page grouping was corrected.
+only the test-page grouping was recomputed.
 
 \section{Root-Cause Analysis}
 \label{sec:root-cause-analysis}
 
 The progression from V1 to V4 illustrates a common but underreported pattern
 in structured prediction pipelines: architectural improvements cannot
-compensate for corrupted supervision.  Each bug individually would have been
-sufficient to prevent learning:
+compensate for corrupted supervision.  The diagnostics identified three
+interacting pipeline failures affecting span construction and relation
+supervision.  Because V4 introduced the corrections jointly, their separate
+numerical contributions were not measured; the following mechanisms are
+described without ranking individual effects.
 
-\begin{enumerate}
-  \item \textbf{Missing teacher forcing} (Bug~1): The linker was trained on
-  spans derived from noisy \texttt{argmax} predictions rather than
-  ground-truth labels.  Span boundaries were inconsistent with the
-  ground-truth link labels, creating a train--test mismatch that prevented
-  convergence.
+\paragraph{Missing teacher forcing.}
+The linker was trained on spans derived from noisy \texttt{argmax} predictions
+rather than ground-truth labels.  Span boundaries were inconsistent with the
+ground-truth link labels, which could corrupt span boundaries and create a
+train--test mismatch that impeded convergence.
 
-  \item \textbf{Bounding box filter} (Bug~2): The strict
-  $(x_1 < x_2) \wedge (y_1 < y_2)$ predicate rejected tokens whose
-  normalised coordinates had $x_1 = x_2$ after LayoutLMv3's integer
-  quantisation to $[0, 1000]$.  This removed 49\% of predicted key tokens
-  and 46\% of value tokens --- halfing the number of entity spans available
-  for linking.
+\paragraph{Bounding-box filter.}
+The strict $(x_1 < x_2) \wedge (y_1 < y_2)$ predicate rejected tokens whose
+normalised coordinates had $x_1 = x_2$ after LayoutLMv3's integer
+quantisation to $[0, 1000]$.  This removed many valid tokens---49\% of
+predicted key tokens and 46\% of value tokens---halving the number of entity
+spans available for linking.
 
-  \item \textbf{Cross-product link labels} (Bug~3): The label generator
-  created all-pairs links between key and value words rather than a single
-  representative link per KVP.  Combined with OCR blocks that concatenated
-  multiple words into single ``word'' entries, this produced $\sim$1{,}000
-  positive link entries per document instead of $\sim$8, making the
-  span-level collapse produce near-uniform positive labels.
-\end{enumerate}
+\paragraph{Cross-product link labels.}
+The label generator created all-pairs links between key and value words rather
+than a single representative link per KVP.  Combined with OCR blocks that
+concatenated multiple words into single ``word'' entries, this corrupted the
+relation-supervision signal: the pipeline produced $\sim$1{,}000 positive link
+entries per document instead of $\sim$8, making the span-level collapse
+produce near-uniform positive labels.
 
-\noindent Bug~3 was invisible at the token level
+\noindent The cross-product label issue was invisible at the token level
 (V1), where the dense $n_k \times n_v$ matrix already had many positives.
 It became observable only when the span-level collapse was introduced in V2,
 because the small $K \times V$ matrix should have been sparse but was not.
@@ -147,17 +149,6 @@ link supervision (Bug~3), which trained the linker to associate nearly any
 span pair.  With the V4 corrections, the linker receives correct sparse
 supervision where each KVP produces exactly one positive span link.
 
-A supplementary diagnostic experiment---V3 (linker-only), where the encoder and
-entity classifier were frozen and only the linker was trained---achieved
-83\% link accuracy on the validation set, demonstrating that the
-\texttt{SpanBiaffineLinker} architecture itself is capable of learning
-correct associations when given clean input representations.  This check is
-not listed as a separate row in the main experimental progression
-(Table~\ref{tab:full-progression}), as it isolates the linker for diagnosis
-rather than defining a headline model.  The test-set
-link F1 of V3 (0.018) remained low because it inherited the same sparse
-entity spans from the bbox-filtered entity classifier (Bug~2).
-
 \section{Relation-Modeling Context and Experimental Scope}
 \label{sec:relation_context}
 
@@ -185,12 +176,12 @@ the reported results directly comparable across benchmarks.
 Three limitations of the present work should be noted. First, our training set
 covers only 55.8\% of the unique KVP10k pages, owing to PDF download failures
 and scanned documents lacking a text layer; an OCR-based pipeline (for example
-Tesseract) would increase coverage. Second, hardware constraints (a 40\,GB
-A100) forced the Mistral baseline to use LoRA rank $r = 4$ rather than the
-$r \geq 16$ estimated for the official baseline, which limits the fairness of
-the Stage~3 versus paper comparison. Third, the current pipeline processes a
-single page at a time, so multi-page documents with cross-page key--value pairs
-cannot yet be handled.
+Tesseract) would increase coverage. Second, the reconstructed Mistral baseline
+used LoRA rank $r = 4$; the published work does not disclose enough
+adapter and training detail to reproduce its configuration exactly, which limits
+strict comparability between Stage~3 and the published baseline. Third, the
+current pipeline processes a single page at a time, so multi-page documents
+with cross-page key--value pairs cannot yet be handled.
 
 \subsection{Future Directions}
 
