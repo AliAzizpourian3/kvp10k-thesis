@@ -15,8 +15,8 @@ contributions are:
     exploratory spatial-link audit (Chapter~\ref{ch:dataset}).
 
     \item \textbf{Generative Baseline}: Re-implemented the KVP10k Mistral-7B
-    approach and identified unsupported generation and weak spatial grounding
-    (Chapter~\ref{ch:exresults}).
+    approach and identified cases of unsupported text generation and
+    limitations in spatial grounding (Chapter~\ref{ch:exresults}).
 
     \item \textbf{Discriminative Architecture}: Implemented a LayoutLMv3-based
     entity classifier achieving F1~$= 0.827$. Grounded token classification
@@ -24,18 +24,19 @@ contributions are:
     (Chapter~\ref{ch:methodology}).
 
     \item \textbf{Linking Granularity Analysis}: Demonstrated that token-level
-    linking fails due to extreme class imbalance ($\sim$450:1), yielding link
-    F1~$= 0.008$. Designed and implemented span-level linking (V2) to address
-    this mismatch (Chapter~\ref{ch:methodology}).
+    linking fails decisively, with link F1~$= 0.008$, a result consistent with
+    the extreme class imbalance ($\sim$450:1) in token-to-token scoring.
+    Designed and implemented span-level linking (V2) to address this mismatch
+    (Chapter~\ref{ch:methodology}).
 
-    \item \textbf{Pipeline Debugging and V4 Results}: Diagnosed three
-    compounding data-pipeline bugs (missing teacher forcing, over-strict
-    bounding-box filter, cross-product link label explosion) that masked
-    span-level linking performance. The corrected V4 model achieves regular-KVP
-    macro F1~$=0.334$ (text) / $0.309$ (text+location), below the corresponding
+    \item \textbf{Pipeline Debugging and V4 Results}: Diagnosed and corrected
+    three compounding data-pipeline bugs (missing teacher forcing, over-strict
+    bounding-box filter, cross-product link label explosion), yielding the V4
+    results. The corrected V4 model achieves regular-KVP macro
+    F1~$=0.334$ (text) / $0.309$ (text+location), below the corresponding
     published scores ($0.659/0.611$); diagnostic analyses identify relation
-    modeling within the current biaffine-linker pipeline as the main remaining
-    bottleneck (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
+    modeling within the current biaffine-linker pipeline as the principal
+    remaining bottleneck (Chapters~\ref{ch:exresults}--\ref{ch:discussion}).
 
     \item \textbf{Implementation}: Released a modular, reproducible codebase
     with CONFIG-controlled experiments.
@@ -58,23 +59,25 @@ linking without establishing a causal requirement.
 The discriminative LayoutLMv3 model achieves entity F1~$=0.827$ without
 generating text outside the OCR input. For regular pair extraction, V4 reaches
 combined macro F1 $=0.309$, compared with $0.521$ for reconstructed Mistral;
-the latter nevertheless produces substantial unsupported text.
+the latter can produce unsupported text on some documents.
 These are complementary trade-offs rather than evidence that one formulation
 dominates both entity detection and linking.
 
 \subsection{RQ3: Linking Granularity}
-Token-level linking (V1) fails decisively (F1~$= 0.008$) due to the
-$\sim$450:1 class imbalance inherent in token-to-token scoring. Span-level
-linking (V2) reduces this to $\sim$5:1 by grouping contiguous tokens before
-scoring. However, three data-pipeline bugs initially masked this benefit,
-producing link F1 of only 0.007. After systematic diagnosis and correction,
-the V4 model achieves regular-KVP macro F1~$=0.334$ (text) / $0.309$
-(text+location).
-Span-level linking, paired with correct supervision, is far more effective
-than token-level linking, but still does not reach the
-published regular-KVP scores ($0.659/0.611$); an internal oracle-entity
-diagnostic shows that, within the current pipeline, relation scoring rather
-than entity detection accounts for most of the observed gap.
+Token-level linking (V1) fails decisively (F1~$= 0.008$), a result consistent
+with the $\sim$450:1 class imbalance inherent in token-to-token scoring.
+Span-level linking (V2) reduces this to $\sim$5:1 by grouping contiguous
+tokens before scoring. The V4 result follows from joint diagnosis and
+correction of three data-pipeline issues that initially masked the behaviour
+of the span-level formulation. After these corrections, the V4 model achieves
+regular-KVP macro F1~$=0.334$ (text) / $0.309$ (text+location).
+These results show that non-trivial span-level linking is feasible in the
+corrected pipeline, but they do not isolate the independent effect of
+span-level linking relative to the accompanying corrections. The corrected
+pipeline still does not reach the published regular-KVP scores
+($0.659/0.611$); an internal oracle-entity diagnostic indicates that, within
+the current pipeline, relation modeling is the principal remaining
+bottleneck.
 
 \subsection{RQ4: Success and Failure Factors}
 Performance varies across the exploratory annotation-geometry strata, but the
@@ -100,12 +103,13 @@ the remaining gap.
 \label{sec:closing}
 
 This thesis demonstrates that effective \kvp{} extraction requires both
-layout-aware encoding and appropriate linking granularity. While entity
-classification is largely solved by LayoutLMv3 (F1~$= 0.827$), the linking
-problem demands careful attention to data pipeline correctness, class
-imbalance, and task structure. The progression from V1 through V4 illustrates
-that architectural improvements --- such as span-level linking --- can only
-realise their potential when the supervision signal is correct. The final
+layout-aware encoding and appropriate linking granularity. The reported
+LayoutLMv3 configuration achieves strong entity classification performance
+(F1~$= 0.827$), while linking remains harder and demands careful attention to
+data pipeline correctness, class imbalance, and task structure. Within this
+pipeline, the transition from token-level to span-level linking did not yield
+useful end-to-end performance until the data and supervision issues were
+corrected jointly. The final
 V4 model achieves regular-KVP macro F1~$=0.334$ (text) / $0.309$
 (text+location), below the published $0.659/0.611$. The result establishes
 feasibility for a compact 125M-parameter discriminative model while identifying
