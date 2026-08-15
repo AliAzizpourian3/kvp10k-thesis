@@ -59,6 +59,8 @@ def intersection_over_union(box1, box2):
 \section{Applying Training-Fitted Geometry Clusters}
 \label{app:cluster-assignment}
 
+The following excerpt assumes that the prepared dataset, page groups, and training-fitted Stage~2 artifact (including its scaler and k-means model) have already been loaded.
+
 \begin{lstlisting}[language=Python,
   caption={Assignment of test pages with the frozen Stage~2 scaler and k-means model}]
 feature_names = stage2_artifact["feature_names"]
