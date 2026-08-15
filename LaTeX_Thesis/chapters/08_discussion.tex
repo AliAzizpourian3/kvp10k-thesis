@@ -30,10 +30,9 @@ Under the released pair-level macro benchmark, reconstructed Mistral reaches
 regular-KVP F1 $=0.598$ for text and $0.521$ for text+location. The published
 regular-KVP values are $0.659$ and $0.611$. The initial V2 span-level linker
 fails under the internal pooled diagnostic, remaining near V1's zero score.
-The diagnostic analysis
-(Section~\ref{sec:res567}) revealed that V2's failure was caused
-not by the span-level architecture itself but by three compounding data
-pipeline bugs. Once corrected, V4 reaches regular-KVP F1 $=0.334$ for text
+The diagnostic analysis (Section~\ref{sec:res567}) identified three compounding
+data-pipeline bugs that prevented a clean assessment of the span-level linker
+in V2. Once corrected, V4 reaches regular-KVP F1 $=0.334$ for text
 and $0.309$ for text+location, below both reconstructed Mistral and the
 published baseline. Its All score is lower ($0.214/0.199$) because its decoder
 emits only regular pairs. Internal diagnostic analyses
@@ -162,8 +161,10 @@ KVPFormer~\cite{kvpformer}, and LayoutPointer~\cite{layoutpointer} are therefore
 included as methodological context and future alternatives rather than as
 additional experimental baselines.
 
-SPADE and BROS are evaluated on CORD and FUNSD respectively, not on KVP10k,
-so direct numerical comparison is not possible.
+SPADE is reported on CORD, while BROS is evaluated on several
+document-understanding benchmarks, including FUNSD, CORD, SROIE, and SciTSR;
+neither work is evaluated on KVP10k. Direct numerical comparison is therefore
+not possible.
 Their segment/span-level formulations provide context for the V2 design and
 its reduction of the candidate-space imbalance observed in V1, but do not make
 the reported results directly comparable across benchmarks.
