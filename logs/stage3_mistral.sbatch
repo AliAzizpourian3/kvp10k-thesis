@@ -25,7 +25,7 @@ export TRANSFORMERS_OFFLINE=1
 
 python_bin="$WORK/kvp10k_thesis/env/kvp10k_env/bin/python"
 prepared_dir="$WORK/kvp10k_thesis/data/prepared"
-output_dir="$WORK/kvp10k_thesis/data/outputs/stage3_mistral"
+output_dir="$WORK/kvp10k_thesis/data/outputs/stage3_mistral_clean"
 
 echo "HOST: $(hostname)"
 echo "DATE: $(date)"
@@ -36,7 +36,6 @@ nvidia-smi -L
 
 echo "=== Verify prepared data ==="
 echo "Train samples:" $(ls "$prepared_dir/train/"*.json 2>/dev/null | wc -l)
-echo "Test samples:"  $(ls "$prepared_dir/test/"*.json  2>/dev/null | wc -l)
 
 if [ ! -d "$prepared_dir/train" ]; then
     echo "ERROR: Prepared data not found at $prepared_dir/train"
@@ -44,19 +43,15 @@ if [ ! -d "$prepared_dir/train" ]; then
     exit 1
 fi
 
-echo "=== Phase 2a: Training ==="
-# Auto-detect latest checkpoint for resume
-latest_ckpt=$(ls -d "$output_dir"/checkpoint-* 2>/dev/null | sort -t- -k2 -n | tail -1 || true)
-resume_flag=""
-if [ -n "$latest_ckpt" ] && [ -f "$latest_ckpt/trainer_state.json" ]; then
-    echo "Resuming from $latest_ckpt"
-    resume_flag="--resume_from_checkpoint $latest_ckpt"
+if [ -e "$output_dir" ]; then
+    echo "ERROR: Clean output path already exists: $output_dir"
+    exit 1
 fi
 
+echo "=== Phase 2a: Training ==="
 "$python_bin" mistral_baseline.py train \
-    --data_dir "$prepared_dir" \
-    --output_dir "$output_dir" \
-    $resume_flag
+    --data_dir "$prepared_dir/train" \
+    --output_dir "$output_dir"
 
 echo ""
 echo "=== Phase 2b: Prediction ==="

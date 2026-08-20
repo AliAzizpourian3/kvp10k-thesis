@@ -207,12 +207,6 @@ def train_mistral(data_dir: str, output_dir: str, cfg: Dict = None, resume_from_
     model, tok = _build_model_and_tokenizer(cfg)
 
     train_ds = KVP10kMistralDataset(data_dir, tok, cfg["max_length"], split="train")
-    eval_ds = None
-    if (Path(data_dir) / "test").exists():
-        eval_ds = KVP10kMistralDataset(data_dir, tok, cfg["max_length"], split="test")
-        if len(eval_ds) == 0:
-            eval_ds = None
-
     args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=cfg["epochs"],
@@ -223,7 +217,7 @@ def train_mistral(data_dir: str, output_dir: str, cfg: Dict = None, resume_from_
         bf16=cfg["bf16"],
         logging_steps=50,
         save_strategy="epoch",
-        eval_strategy="epoch" if eval_ds else "no",
+        eval_strategy="no",
         save_total_limit=2,
         seed=cfg["seed"],
         dataloader_num_workers=4,
@@ -234,7 +228,7 @@ def train_mistral(data_dir: str, output_dir: str, cfg: Dict = None, resume_from_
         gradient_checkpointing_kwargs={"use_reentrant": False},
     )
 
-    trainer = Trainer(model=model, args=args, train_dataset=train_ds, eval_dataset=eval_ds)
+    trainer = Trainer(model=model, args=args, train_dataset=train_ds)
     if resume_from_checkpoint:
         logger.info(f"Resuming training from {resume_from_checkpoint}")
     else:
@@ -386,7 +380,7 @@ def main():
     sub = p.add_subparsers(dest="cmd")
 
     tp = sub.add_parser("train")
-    tp.add_argument("--data_dir",   required=True, help="Root of prepared data (with train/ and test/ sub-dirs)")
+    tp.add_argument("--data_dir",   required=True, help="Prepared train directory or root containing train/")
     tp.add_argument("--output_dir", required=True, help="Where to store checkpoints and logs")
     tp.add_argument("--resume_from_checkpoint", default=None, help="Path to checkpoint dir to resume from")
 
