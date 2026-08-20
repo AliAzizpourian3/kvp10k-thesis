@@ -1,0 +1,207 @@
+{
+  "evaluated_at": "2026-08-18T05:26:02.846430+00:00",
+  "selected_by_validation_only": true,
+  "checkpoint_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-10",
+  "checkpoint_sha256": "f4b61bf2db8833aa5b23bf49c9778fb154177b18954e6f8563a59cf80145a27c",
+  "validation_selection": {
+    "selected_at": "2026-08-17T11:11:59.337485+00:00",
+    "selection_metric": "official regular text+location macro pair F1",
+    "score_threshold": 0.5,
+    "validation_score": 0.3417870620845108,
+    "checkpoint_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-10",
+    "weights_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-10/pytorch_model.bin",
+    "weights_sha256": "f4b61bf2db8833aa5b23bf49c9778fb154177b18954e6f8563a59cf80145a27c",
+    "completed_epoch": 10,
+    "global_optimizer_step": 6070,
+    "state_file": "training_state.pt"
+  },
+  "metrics": {
+    "split": "test",
+    "documents": 581,
+    "score_threshold": 0.5,
+    "official_thresholds": {
+      "ned_strict_less_than": 0.2,
+      "iou_inclusive_greater_equal": 0.3
+    },
+    "loss": {
+      "entity": 0.3968692958489349,
+      "link": 0.7053549369405422
+    },
+    "entity_metrics": {
+      "primary": "micro one-vs-rest over KEY and VALUE",
+      "micro": {
+        "precision": 0.7459481850976061,
+        "recall": 0.8443324346500997,
+        "f1": 0.7920969914683431,
+        "tp": 43218,
+        "fp": 14719,
+        "fn": 7968
+      },
+      "macro": {
+        "precision": 0.7241985308846892,
+        "recall": 0.8267421604717727,
+        "f1": 0.7719482277821609
+      },
+      "per_class": {
+        "key": {
+          "precision": 0.6669077958933838,
+          "recall": 0.7829751094270595,
+          "f1": 0.7202956908468058,
+          "tp": 11985,
+          "fp": 5986,
+          "fn": 3322
+        },
+        "value": {
+          "precision": 0.7814892658759945,
+          "recall": 0.870509211516486,
+          "f1": 0.823600764717516,
+          "tp": 31233,
+          "fp": 8733,
+          "fn": 4646
+        }
+      }
+    },
+    "official_pair_metrics": {
+      "all": {
+        "text_only": {
+          "precision": 0.38573071964467837,
+          "recall": 0.19385587567534496,
+          "f1": 0.2580327669252318,
+          "tp": 1434,
+          "fp": 1478,
+          "fn": 6951,
+          "documents_total": 581,
+          "documents_scored": 532,
+          "documents_excluded_empty_gt": 49
+        },
+        "location_only": {
+          "precision": 0.4403077065937571,
+          "recall": 0.23251278384280105,
+          "f1": 0.30432239226580776,
+          "tp": 1623,
+          "fp": 1289,
+          "fn": 6762,
+          "documents_total": 581,
+          "documents_scored": 532,
+          "documents_excluded_empty_gt": 49
+        },
+        "text_location": {
+          "precision": 0.33694404872134615,
+          "recall": 0.17298148608645234,
+          "f1": 0.22860232836848746,
+          "tp": 1216,
+          "fp": 1696,
+          "fn": 7169,
+          "documents_total": 581,
+          "documents_scored": 532,
+          "documents_excluded_empty_gt": 49
+        }
+      },
+      "regular": {
+        "text_only": {
+          "precision": 0.42486282163761674,
+          "recall": 0.36370549632348453,
+          "f1": 0.3919126343108498,
+          "tp": 1434,
+          "fp": 1467,
+          "fn": 2733,
+          "documents_total": 581,
+          "documents_scored": 483,
+          "documents_excluded_empty_gt": 98
+        },
+        "location_only": {
+          "precision": 0.48497660436413825,
+          "recall": 0.4132122456079703,
+          "f1": 0.4462274760210099,
+          "tp": 1623,
+          "fp": 1278,
+          "fn": 2544,
+          "documents_total": 581,
+          "documents_scored": 483,
+          "documents_excluded_empty_gt": 98
+        },
+        "text_location": {
+          "precision": 0.3711267783017726,
+          "recall": 0.32285408430065116,
+          "f1": 0.34531152838637685,
+          "tp": 1216,
+          "fp": 1685,
+          "fn": 2951,
+          "documents_total": 581,
+          "documents_scored": 483,
+          "documents_excluded_empty_gt": 98
+        }
+      },
+      "unkeyed": {
+        "text_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2477,
+          "documents_total": 581,
+          "documents_scored": 472,
+          "documents_excluded_empty_gt": 109
+        },
+        "location_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2477,
+          "documents_total": 581,
+          "documents_scored": 472,
+          "documents_excluded_empty_gt": 109
+        },
+        "text_location": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2477,
+          "documents_total": 581,
+          "documents_scored": 472,
+          "documents_excluded_empty_gt": 109
+        }
+      },
+      "unvalued": {
+        "text_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1741,
+          "documents_total": 581,
+          "documents_scored": 181,
+          "documents_excluded_empty_gt": 400
+        },
+        "location_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1741,
+          "documents_total": 581,
+          "documents_scored": 181,
+          "documents_excluded_empty_gt": 400
+        },
+        "text_location": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1741,
+          "documents_total": 581,
+          "documents_scored": 181,
+          "documents_excluded_empty_gt": 400
+        }
+      }
+    }
+  }
+}

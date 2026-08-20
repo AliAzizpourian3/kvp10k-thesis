@@ -1,0 +1,222 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+\section{Interpretation of Results}
+\label{sec:interpretation}
+
+\subsection{Entity Classification}
+
+The final V4 checkpoint reaches corrected class-aware entity micro F1 of
+$0.792$ and macro F1 of $0.772$. KEY F1 is $0.720$, and VALUE F1 is $0.824$.
+The calculation penalises confusion between the two entity classes: 803 KEY
+targets are predicted as VALUE, and 584 VALUE targets are predicted as KEY.
+The reported micro and macro aggregates include KEY and VALUE and exclude the
+\texttt{O} class.
+The model constrains its textual predictions to tokens in the extracted input
+and therefore cannot emit text that is absent from that input, although it can
+still assign an incorrect label to an observed token.
+
+The token-level entity F1 values are numerically higher than the Regular
+text+location pair F1 of $0.345$. The measures are not
+directly comparable, but the higher token-level entity scores show that correct
+entity recognition alone does not ensure correct relations. Together with the
+observed wrong-link examples, this suggests that relation linking remains a
+major internal limitation of the current pipeline.
+
+\subsection{Token-Level Linking Failure}
+
+V1 uses a dense token-level candidate formulation, producing a substantially
+larger candidate space than the span-level formulation. The failure is
+consistent with token-level class imbalance and a mismatch between token-level
+candidates and span-level relations.
+The illustrative ratio of approximately $500{:}1$ shows the severity of the
+token-level candidate imbalance and why it remains challenging even with
+positive-class weighting. SPADE~\cite{spade} provides a segment-level relation
+formulation, while BROS~\cite{bros} uses sparse linking between entity-initial
+positions. Both provide alternatives to dense token-to-token relation scoring.
+
+\subsection{Comparison to Baselines}
+
+The final corrected V4 reaches Regular F1 of $0.392$ for text, $0.446$
+for location, and $0.345$ for text+location. It combines the corrected data and
+supervision pipeline with correct scheduler accounting, full-state resumption,
+class-aware entity evaluation, validation pair-F1 checkpoint selection, and
+aligned early stopping. Because these corrections are applied together, their
+individual effects are not isolated.
+
+The reconstructed Mistral baseline remains stronger in the official comparable
+Regular modes, with text F1 of $0.598$ and text+location F1 of $0.521$. V4 and
+the reconstructed Mistral baseline were evaluated on the same 581 locally
+available pages with the same evaluator, so these internal results are directly
+comparable. The published Regular values of $0.659$ and $0.611$ are included
+only as contextual information. The generative and discriminative systems have different strengths: Mistral
+achieves higher Regular pair scores in the comparable benchmark modes, while
+the discriminative system cannot emit text that is absent from the extracted
+input. V4 provides the final discriminative result of this study but remains
+below the reconstructed Mistral baseline on complete Regular pair extraction.
+
+The direct V4 decoder predicts Regular pairs only. Its direct All
+text+location F1 is $0.229$. The unchanged recovery method converts unmatched
+VALUE spans into unkeyed outputs and unmatched KEY spans into unvalued outputs.
+This raises All text+location F1 to $0.261$, with $0.162$ for unkeyed and
+$0.276$ for unvalued items. Recovery improves special-category coverage but
+does not change any Regular prediction or the Regular F1 of $0.345$.
+
+\subsection{Per-Cluster Performance}
+
+The frozen Stage~2 assignment divides the prepared test subset into 319 pages
+in Cluster~0, 213 pages in Cluster~1, and 49 pages without usable annotation
+geometry. Of these, 304 and 179 pages, respectively, have scorable Regular
+ground truth. The geometry-unavailable pages do not have scorable Regular
+ground truth and are excluded from the category macro average.
+
+\begin{table}[ht]
+  \centering
+  \caption{Regular text+location macro F1 by page-level annotation-geometry
+  cluster. The clusters are geometry regimes, not document types.}
+  \label{tab:stage4-cluster}
+  \begin{tabular}{@{}lcc@{}}
+    \toprule
+    \textbf{Model} & \textbf{Cluster 0} & \textbf{Cluster 1} \\
+    \midrule
+    Reconstructed Mistral & 0.569 & 0.429 \\
+    V4                    & 0.305 & 0.410 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+V4 performs better in Cluster~1 than in Cluster~0 in text, location, and joint
+evaluation. Mistral has the opposite ordering. Annotation geometry is
+associated with system performance. The observed association differs between
+the two systems: V4 and Mistral show opposite performance ordering across the
+two geometry clusters. It is not evidence of a
+causal effect, and it does not show performance differences between semantic
+document types. The modest training silhouette score also limits strong claims
+about cluster separation.
+
+\section{Root-Cause Analysis}
+\label{sec:root-cause-analysis}
+
+The progression shows that architectural changes are difficult to assess when
+the supervision pipeline contains defects. The diagnostics identified three
+interacting pipeline failures affecting span construction and relation
+supervision.  Because V4 introduced the corrections jointly, their separate
+numerical contributions were not measured; the following mechanisms are
+described without ranking individual effects.
+
+\paragraph{Missing teacher forcing.}
+The original predicted-span variant formed spans from \texttt{argmax} entity
+predictions while relation labels came from ground-truth annotations. This
+created a mismatch between the spans supplied to the linker and the
+ground-truth relation supervision. V4 uses ground-truth spans during training
+and predicted spans during inference. This introduces the usual
+train--inference difference associated with teacher forcing.
+
+\paragraph{Bounding-box filter.}
+The strict $(x_1 < x_2) \wedge (y_1 < y_2)$ predicate could reject valid tokens
+whose quantised LayoutLMv3 boxes had zero width or zero height. On 200 pages
+from the seed-42 validation split, it removed approximately 47.5\% of predicted
+KEY tokens and 48.5\% of predicted VALUE tokens. Only 81 of 200 pages retained
+both strict key and value spans.
+
+\paragraph{Cross-product link labels.}
+The label generator created all-pairs links between key and value words rather
+than a single representative link per KVP. This made the span-level relation
+supervision too dense to represent one relation per annotation.
+
+\noindent The cross-product issue became easier to diagnose after span-level
+collapse, because the resulting span-level target matrix was expected to
+represent sparse annotated relations. The span-level reformulation therefore
+also served as a useful diagnostic change in addition to reducing the candidate
+space.
+
+\section{Error Analysis}
+\label{sec:error_analysis}
+
+\subsection{V4 Qualitative Errors}
+
+The selected examples in Table~\ref{tab:v4-qualitative-errors} illustrate
+several error types. They are consistent with the gap between the entity and
+pair metrics: a model can identify plausible entities but still select the
+wrong relation or miss a relation. The cases are not a statistical sample and
+do not prove their frequency. Some source annotations are also semantically
+ambiguous, so individual cases require cautious interpretation.
+
+\subsection{Validation Diagnostics for V1 and V2}
+
+The fixed seed-42 validation subset is used to inspect link scores, predicted
+entity spans, bounding-box filtering, and relation-label construction. The
+token-level V1 formulation has a dense candidate space. Span-level V2 reduces
+that space, but predicted-span alignment, the strict bounding-box filter, and
+cross-product labels prevent a clean assessment of linking granularity. These
+checks are internal diagnostics and are not official page-macro benchmark
+results.
+
+For the preserved V2 checkpoint, 1{,}481 candidate-pair logits have a median
+of $-6.93$ and a mean of $-7.59$. Only 36 candidate pairs and 20 best-per-key
+predictions have sigmoid probability at least $0.5$.
+
+The corrected label-pipeline audit on the first 20 validation pages contains
+79 regular ground-truth pairs, 53 recovered representative word-level links,
+453 positive token-pair cells after subword expansion, and 44 positive
+span-pair labels after span collapse.
+
+\section{Relation-Modeling Context and Experimental Scope}
+\label{sec:relation_context}
+
+The experimental comparisons in this thesis remain anchored to the KVP10k
+Mistral baseline and the LayoutLMv3 encoder with a projected scaled-dot-product linker with spatial features. As discussed
+in Section~\ref{sec:experimental_scope}, other relation-extraction methods were
+available before the project started, but implementing them would have required
+separate model designs and full experimental pipelines. SPADE~\cite{spade},
+BROS~\cite{bros}, GeoLayoutLM~\cite{geolayoutlm},
+KVPFormer~\cite{kvpformer}, and LayoutPointer~\cite{layoutpointer} are therefore
+included as methodological context and future alternatives rather than as
+additional experimental baselines.
+
+SPADE and BROS are evaluated on document-understanding benchmarks other than
+KVP10k, so their reported numbers are not directly comparable with the results
+in this thesis. SPADE's segment-level dependency formulation and BROS's sparse
+entity-initial linking objective nevertheless provide relevant methodological
+context for reducing dense token-to-token relation scoring.
+
+\section{Limitations and Future Work}
+\label{sec:limitations}
+
+\subsection{Current Limitations}
+
+Several limitations constrain the interpretation of the results. First, the
+prepared development pool contains 5{,}389 usable pages from the 9{,}656 unique
+pages in the official KVP10k training split, or 55.8\%. The fixed seed-42 split
+then uses 4{,}851 pages for model training and 538 for validation. Some PDFs
+were unavailable or broken, and others had no usable text layer. The pipeline uses PyMuPDF native PDF text extraction rather
+than OCR, so scanned pages without a text layer are excluded.
+
+Second, the reconstructed Mistral baseline is a re-implementation rather than
+an exact reproduction. Its LoRA rank, prompt details, input extraction, and
+training coverage are not confirmed to match the published system. Third, V4
+uses constant blank visual input. It evaluates textual and layout features but
+not document-specific image features. Fourth, inputs are limited to 512 tokens
+and one page. Truncation can remove later content, and the current architecture
+would not model cross-page relations when applied to multi-page documents. Finally, the qualitative cases are
+illustrative, and annotation ambiguity can affect their interpretation.
+
+\subsection{Future Directions}
+
+A primary direction for future work is improved relation decoding. Structured
+one-to-one or constrained matching could reduce incompatible local link
+decisions. Hard-negative
+training could focus on plausible neighbouring values, as illustrated by the
+selected V4 examples. Explicit row and column features can add document
+structure that is not captured by pairwise displacement alone. These changes
+can also be compared with segment-graph and relation-focused methods such as
+SPADE~\cite{spade}, BROS~\cite{bros}, GeoLayoutLM~\cite{geolayoutlm},
+KVPFormer~\cite{kvpformer}, and LayoutPointer~\cite{layoutpointer}.
+
+The output design also requires improvement. Learned unkeyed and unvalued
+classes could replace heuristic recovery, while confidence calibration could
+improve the reliability of the fixed decision threshold. Better segmentation and longer
+input handling are needed for short values, long pages, and multi-page
+documents. Finally, a controlled experiment with rendered document images is
+needed to measure the contribution of genuine visual features. All these items
+are future work; they were not implemented in V4.

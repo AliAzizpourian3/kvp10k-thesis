@@ -1,0 +1,13 @@
+{
+  "completed_at": "2026-08-18T05:20:14.274345+00:00",
+  "completed_epoch": 20,
+  "global_optimizer_step": 12140,
+  "best_validation_score": 0.3417870620845108,
+  "stopped_early": true,
+  "maximum_epochs": 30,
+  "test_evaluation": {
+    "result_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/test_evaluation_official.json",
+    "checkpoint_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-10",
+    "checkpoint_sha256": "f4b61bf2db8833aa5b23bf49c9778fb154177b18954e6f8563a59cf80145a27c"
+  }
+}

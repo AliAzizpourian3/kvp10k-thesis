@@ -5,7 +5,30 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{lmedoc/twolang}
          [2000/02/19 v1.01 SUB Package (LME)]
-\RequirePackage{german}
+\IfFileExists{german.sty}{%
+  \RequirePackage{german}%
+}{%
+  % Minimal compatibility fallback for TeX installations without the obsolete
+  % german.sty package. It preserves the template's language switches; German
+  % hyphenation patterns remain unavailable in this fallback.
+  \PackageWarningNoLine{lmedoc/twolang}{german.sty not found; using basic language fallback}%
+  \newlanguage\l@german
+  \providecommand{\captionsenglish}{}
+  \providecommand{\captionsgerman}{}
+  \def\german{german}
+  \def\english{english}
+  \def\selectlanguage##1{%
+    \edef\lme@selectedlanguage{##1}%
+    \def\lme@germanname{german}%
+    \ifx\lme@selectedlanguage\lme@germanname
+      \language=\l@german\relax
+      \captionsgerman
+    \else
+      \language=0\relax
+      \captionsenglish
+    \fi
+  }%
+}
 \DeclareOption{german}{\selectlanguage{\german}}
 \DeclareOption{english}{\selectlanguage{\english}}
 \ProcessOptions

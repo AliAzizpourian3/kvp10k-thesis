@@ -25,7 +25,7 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{\small Progress Report --- June 2026}
+\rhead{\small Progress Report --- August 2026}
 \lhead{\small Ali Azizpourian}
 \cfoot{\thepage}
 
@@ -37,7 +37,7 @@
 A Discriminative Layout-Aware Approach on KVP10k}
 \author{Ali Azizpourian\\[2pt]
 \small Friedrich-Alexander-Universit\"at Erlangen-N\"urnberg}
-\date{June 2026}
+\date{18 August 2026}
 
 \begin{document}
 \maketitle
@@ -50,18 +50,18 @@ A Discriminative Layout-Aware Approach on KVP10k}
 This thesis investigates \textbf{key-value pair (KVP) extraction} from semi-structured documents (invoices, receipts, forms) using IBM's \textbf{KVP10k} benchmark dataset (ICDAR 2024, Naparstek et al.).
 The KVP10k paper argued that encoder-based models such as LayoutLMv3 have limitations for direct KVP linking, and therefore evaluated only a generative LMDX-style baseline rather than empirically benchmarking LayoutLMv3 on KVP10k.
 
-This thesis directly tests that claim by combining \textbf{layout-aware modelling} with \textbf{data-centric analysis}.
-The research goals from the proposal are:
+This thesis evaluates a generative baseline and an adaptation of a pretrained
+LayoutLMv3 encoder with an explicit relation linker. The final research questions are:
 
 \begin{enumerate}[nosep]
-  \item \textbf{Evaluate Layout-Aware Modelling:} The KVP10k paper (Naparstek et al., 2024) argued, without direct empirical evidence, that encoder-based models such as LayoutLMv3 are insufficient for KVP linking, and consequently did not benchmark them on the task. This thesis empirically tests that claim by extending LayoutLMv3 with a lightweight Biaffine Linker module for explicit key--value relationship extraction, and evaluating it directly on the KVP10k benchmark.
-  \item \textbf{Analyze and Categorize Document Layouts:} Apply unsupervised clustering to group documents by structural similarity and explore model performance across layout types.
-  \item \textbf{Assess Robustness and Generalization:} Investigate model behaviour under layout distortions and compare OCR-based with OCR-free approaches in zero-shot and few-shot settings.
-  \item \textbf{Derive Analytical Insights:} Examine learning trends, ablation effects, and error patterns.
+  \item \textbf{RQ1:} How do layout characteristics vary across business documents, and how can this inform model design?
+  \item \textbf{RQ2:} How does a LayoutLMv3-based discriminative linker perform on regular KVP extraction compared with a generative baseline?
+  \item \textbf{RQ3:} What does the experimental progression from token-level to span-level linking reveal about key--value association?
+  \item \textbf{RQ4:} Which factors characterise model successes and failures across page-level annotation-geometry regimes?
 \end{enumerate}
 
 The project is organized into five stages (Figure~\ref{fig:pipeline}).
-\textbf{All stages are now complete.}
+All five stages, including final V5 training and evaluation, are complete.
 
 \begin{figure}[ht]
 \centering
@@ -104,14 +104,14 @@ The project is organized into five stages (Figure~\ref{fig:pipeline}).
 The evaluation protocol is adopted directly from the KVP10k paper (Naparstek et al., ICDAR 2024):
 \begin{itemize}[nosep]
   \item \textbf{Text-only:} Normalized Edit Distance (NED) $< 0.2$ between predicted and ground-truth text.
-  \item \textbf{Text + Location:} NED $< 0.2$ \emph{and} bounding-box IoU $> 0.3$.
+  \item \textbf{Text + Location:} NED $< 0.2$ \emph{and} bounding-box IoU $\ge 0.3$.
 \end{itemize}
 
-\noindent The primary metric is \textbf{F1} (harmonic mean of precision and recall), and all linking results are reported under both metrics above. A key-value pair counts as correct only if \emph{both} its key and its value satisfy the criterion. The \textbf{text-only} F1 is the number directly comparable to the published KVP10k baseline.
+\noindent The primary metric is \textbf{F1} (harmonic mean of precision and recall), and all linking results are reported under both metrics above. A key-value pair counts as correct only if \emph{both} its key and its value satisfy the criterion. The score uses the same metric definition as the published baseline, but the numerical comparison is contextual because the available pages and preprocessing pipelines differ.
 
 \noindent
 The IoU threshold of $0.3$ is adopted directly from Naparstek et al.\ (2024), who chose this value to permit minor spatial imprecision in predicted bounding boxes while still ensuring that the prediction is located in the correct spatial region of the page.
-This is the same threshold used in their published evaluation, so all results in this thesis are directly comparable to the KVP10k paper baseline.
+The paper describes an exceedance criterion, whereas the released IBM evaluator implements the boundary inclusively ($\mathrm{IoU}\ge 0.3$). This report follows the released implementation consistently.
 
 \subsection{Stage 1: Data Ingestion \& Preparation}
 
@@ -142,10 +142,28 @@ Test  & 5{,}255  & 1{,}051 & 581    & 55.3\% \\
 
 \subsection{Stage 2: Layout Clustering \& Analysis}
 
-Training rows were grouped by page hash and the coordinate-richest annotation
-copy was retained. Of 9{,}656 unique training pages, 9{,}124 contain usable
-polygon geometry. K-means on 12 distinct standardized geometry features
-selected $k=2$ from a sweep over $k=2,\ldots,10$ (silhouette 0.222):
+The final Stage~2 analysis operates on unique pages, not duplicated annotator
+rows. Training rows were grouped by page hash and the annotation copy with the
+most usable polygon coordinates was retained. Of 9{,}656 unique training pages,
+9{,}124 contain usable geometry; the remaining 532 are excluded rather than
+encoded as zero vectors. The historical \texttt{density} feature was removed
+because it exactly duplicated \texttt{total\_area}, leaving 12 distinct
+features standardized with \texttt{StandardScaler}.
+
+K-means used seed 42 and 10 initializations. A sweep over
+$k=2,\ldots,10$ selected $k=2$ by the predefined silhouette criterion
+($0.222$); Calinski--Harabasz also favored $k=2$, while Davies--Bouldin
+continued improving at larger $k$. Thus, the groups are exploratory geometry
+strata rather than sharply separated semantic document classes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{figures/optimal_k_analysis.png}
+    \caption{Final Stage~2 cluster-number analysis. The silhouette score is the
+    primary selection criterion; the other diagnostics show that separation is
+    modest and should not be over-interpreted.}
+    \label{fig:pr-optimal-k}
+\end{figure}
 
 \begin{center}
 \begin{tabular}{lccl}
@@ -160,25 +178,51 @@ selected $k=2$ from a sweep over $k=2,\ldots,10$ (silhouette 0.222):
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.60\textwidth]{figures/pca_clusters.png}
-    \caption{Stage~2 page-level geometry clustering ($k=2$), projected with
-    PCA. The first two components explain 52.8\% of standardized-feature
-    variance. Modest overlap is consistent with the silhouette score.}
+    \includegraphics[width=0.72\textwidth]{figures/pca_clusters.png}
+    \caption{Final PCA projection of the $k=2$ unique-page geometry clusters.
+    PC1 and PC2 explain 30.15\% and 22.68\% of standardized-feature variance
+    (52.83\% together). The visible overlap is consistent with the modest
+    silhouette score.}
     \label{fig:pr-clusters-pca}
 \end{figure}
 
-\noindent\textbf{Interpretation.} The clusters describe annotation-box geometry,
-not OCR density, semantic document type, or genre. The secondary t-SNE view is
-computed from the same standardized 12-feature representation on a seeded
-3{,}000-page subsample.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.88\textwidth]{figures/stage2_cluster_examples.png}
+    \caption{Representative test pages with annotation polygons. Cluster~0 is
+    the higher-count, broader-spread regime; Cluster~1 is lower-count and more
+    compact. These are geometry examples, not document-genre labels.}
+    \label{fig:pr-cluster-examples}
+\end{figure}
+
+\noindent\textbf{Interpretation.} Cluster~0 averages
+$31.659\pm22.460$ boxes with vertical/horizontal spread
+$0.714\pm0.261$/$0.739\pm0.122$; Cluster~1 averages
+$14.206\pm10.016$ boxes and spread
+$0.421\pm0.289$/$0.372\pm0.202$. These statistics concern annotation-box
+geometry, not OCR-token density, document genre, or general visual appearance.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.60\textwidth]{figures/tsne_clusters.png}
-    \caption{Secondary t-SNE projection of 3{,}000 unique coordinate-bearing
-    training pages. It is descriptive and does not establish semantic classes.}
+    \includegraphics[width=0.68\textwidth]{figures/tsne_clusters.png}
+    \caption{Final exploratory t-SNE projection of a fixed, seeded sample of
+    3{,}000 unique coordinate-bearing training pages using the same standardized
+    features. It is descriptive only and was not used to select $k$.}
     \label{fig:pr-clusters-manifold}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.84\textwidth]{figures/feature_distributions.png}
+    \caption{Final selected feature distributions for the two unique-page
+    annotation-geometry clusters.}
+    \label{fig:pr-cluster-features}
+\end{figure}
+
+The frozen scaler and K-means model assign all 1{,}051 unique test pages as
+follows: 588 to Cluster~0, 396 to Cluster~1, and 67 as geometry unavailable.
+Within the 581-page prepared evaluation subset, the counts are 319, 213, and
+49, respectively.
 
 \subsection{Stage 3: Generative Baseline (Mistral-7B QLoRA)}
 
@@ -202,22 +246,31 @@ format: left|top|right|bottom.
 \end{quote}
 
 \begin{center}
-\begin{tabular}{lcccc}
+\small
+\begin{tabular}{lccccc}
 \toprule
-\textbf{System} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{TP / Pred / GT} \\
+\textbf{System} & \textbf{Text P} & \textbf{Text R} & \textbf{Text F1} & \textbf{Location F1} & \textbf{Combined F1} \\
 \midrule
-\multicolumn{5}{l}{\textit{Text-only (NED $< 0.2$)}} \\
-KVP10k paper baseline (Naparstek et al., 2024) & --- & --- & 0.643 & --- \\
-\textbf{Mistral-7B (ours)} & \textbf{0.604} & \textbf{0.755} & \textbf{0.671} & 9{,}482 / 15{,}707 / 12{,}552 \\
-\midrule
-\multicolumn{5}{l}{\textit{Text + Location (NED $< 0.2$, IoU $> 0.3$)}} \\
-KVP10k paper baseline (Naparstek et al., 2024) & --- & --- & 0.612 & --- \\
-\textbf{Mistral-7B (ours)} & \textbf{0.539} & \textbf{0.675} & \textbf{0.600} & 8{,}473 / 15{,}707 / 12{,}552 \\
+KVP10k paper baseline & --- & --- & 0.659 & 0.650 & 0.611 \\
+\textbf{Mistral-7B (ours)} & \textbf{0.488} & \textbf{0.774} & \textbf{0.598} & \textbf{0.547} & \textbf{0.521} \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\noindent\textbf{Why our baseline matches the paper with $\sim$55\% of the data.} First, this is measured on \emph{our} 581-page test subset, not the paper's full test set, so it is an approximate rather than identical comparison. Second, the missing pages are lost to random dead PDF links (not adversarial filtering), so the retained sample is representative, and large-model fine-tuning is sample-efficient. Finally, PyMuPDF produces \emph{cleaner} word text than Tesseract OCR (no OCR character errors), which slightly helps text-only NED matching and plausibly explains why our text-only F1 (0.671) is marginally above the paper's (0.643). This ``match'' applies only to the generative text-only baseline; on \emph{linking}, our corrected V4 (0.342) is below the paper's headline 0.659.
+\noindent\textbf{Official evaluation.} These are Regular macro pair metrics
+from the official evaluator (NED $<0.2$; location matching IoU $\geq0.3$) on
+our 581-page prepared test subset; 483 pages contain scorable Regular ground
+truth. Exact Mistral text precision/recall/F1 are
+0.48761/0.77418/0.59835; location F1 is 0.54711 and combined F1 is 0.52057.
+For the broader All category, text/location/combined F1 are
+0.51312/0.47804/0.45508.
+
+The comparison is approximate: this implementation uses fewer prepared pages,
+PyMuPDF text rather than the paper OCR pipeline, and a reconstructed prompt.
+The official results therefore do not support the earlier claim that our
+baseline matches or exceeds the paper. It is a re-implementation and trails the
+published Regular F1 in all three modes. The validation-selected V4 checkpoint
+also remains below the published Regular text F1 (0.363 versus 0.659).
 
 \subsubsection*{Error Analysis by Cluster}
 
@@ -236,59 +289,138 @@ Geometry unavailable & 49 & 0 & --- & --- \\
 These official regular-pair macro scores were recomputed from saved predictions
 and ground truth; no model was retrained. The geometry clusters do not support
 claims about semantic document types. A separate pooled audit finds
-unsupported-prediction rates of 37.1\% and 53.0\% for Clusters 0 and 1.
+unsupported-prediction rates of 37.1\% and 53.0\% for Clusters 0 and 1. In
+this entity-level audit, an unsupported prediction is a predicted key or value
+entity that has no ground-truth match under the audit's text-and-location
+thresholds. The denominator is all predicted entities in the cluster.
 
-\subsection{Stage 4: Discriminative Model (LayoutLMv3 + Biaffine Linker) --- Complete}
+\subsection{Stage 4: Discriminative Model --- Complete}
 
 \subsubsection*{Architecture}
 
-LayoutLMv3-base (125M parameters) with two task heads:
+Stage~4 adapts a pretrained LayoutLMv3-base encoder with two task heads:
 \begin{enumerate}[nosep]
-  \item \textbf{Entity Classifier:} Linear layer classifying each token as Key, Value, or Other.
-  \item \textbf{Biaffine Linker:} Pairs key spans with value spans using semantic (scaled dot-product) and spatial (8-feature MLP) scores. Trained with binary cross-entropy loss on a key\,$\times$\,value adjacency matrix.
+  \item \textbf{Entity classifier:} A two-layer MLP classifies each token as
+  \texttt{KEY}, \texttt{VALUE}, or \texttt{O}.
+  \item \textbf{Relation linker:} A span-level projected scaled-dot-product
+  linker combines semantic representations with spatial features to score
+  key--value pairs.
 \end{enumerate}
+The active V4 and V5 component is not a full bilinear biaffine matrix. Both runs
+use text and bounding boxes with the same constant blank visual input, so they
+do not evaluate document-specific image content.
 
-\subsubsection*{Results}
+\subsubsection*{Experimental and diagnostic progression}
 
-The full story of Stage~4 experiments is as follows:
-
-\paragraph{Stage 4a --- Entity Pre-training.}
-LayoutLMv3 trained with entity classifier only (linker disabled) achieves \textbf{entity F1 = 0.847}, confirming strong token-level key/value classification.
-
-\paragraph{Experiment 1 --- Token-Level Linking (V1).}
-Activating the biaffine linker at the token level: each key token scored against each value token, producing a dense $\sim$10{,}000-candidate matrix with $\sim$450:1 neg:pos ratio. Result: \textbf{link F1 = 0.008} despite entity F1 = 0.841. The $\lambda$ sweep over \{0.5, 1.0, 2.0\} confirms link F1 stays near zero regardless of hyperparameter --- the failure is structural, not a tuning issue.
-
-\paragraph{Experiment 2 --- Span-Level Linking (V2).}
-Grouping contiguous same-label tokens into spans before linking reduces candidates to $\sim$225 per page with $\sim$5:1 neg:pos ratio. Yet initial V2 result: \textbf{link F1 = 0.007} --- still near zero. This prompted a systematic diagnostic investigation.
-
-\paragraph{Experiments D1--D3 --- Diagnostic Analysis.}
-Three root causes were identified and corrected:
+The Stage~4 experiments show the following progression:
 \begin{itemize}[nosep]
-  \item \textbf{Bug 1 (Missing Teacher Forcing):} Linker received predicted entity labels (noisy) instead of ground-truth labels during training, misaligning span boundaries with link labels.
-  \item \textbf{Bug 2 (Bounding Box Filter):} A strict bbox validity filter $(x_1 < x_2) \wedge (y_1 < y_2)$ rejected 49\% of valid key tokens and 46\% of valid value tokens (LayoutLMv3 normalises to a $[0,1000]$ grid, producing many zero-width tokens).
-  \item \textbf{Bug 3 (Link Label Cross-Product Explosion):} Label generation created a positive entry for every key-word $\times$ value-word combination within a KVP (instead of one per KVP pair), inflating the link label matrix to a near-uniform positive signal --- effectively providing no supervision.
+  \item \textbf{V1 token linking:} An illustrative page produces approximately
+  10{,}000 candidate token pairs and a negative-to-positive ratio near
+  $500{:}1$. The preserved run has legacy pooled link F1 $=0.0082$.
+  \item \textbf{V2 span linking:} Grouping tokens into spans reduces the same
+  illustrative case to 225 candidates. With 15 positives, the ratio is
+  approximately $14{:}1$. The preserved V2+TF diagnostic has legacy pooled
+  link F1 $=0.0173$.
+  \item \textbf{V4 pipeline correction:} The data and supervision audit found
+  noisy span alignment, an over-strict bounding-box filter, and cross-product
+  link labels. V4 corrects these faults together. Their separate effects were
+  not isolated.
+  \item \textbf{V5 final training:} V5 keeps the corrected V4 model and data
+  pipeline but corrects optimizer-step scheduling, full-state resumption,
+  class-aware entity metrics, early stopping, and checkpoint selection.
 \end{itemize}
 
-\paragraph{Experiment 3 --- Corrected Model (V4).}
-Applying all three fixes and retraining (30 epochs, $\lambda = 5.0$, early stop at epoch 13):
+V1 and V2 are historical pooled diagnostics and are not directly comparable
+with the official page-macro results below. Stage~4a has no reportable score
+because no reliable checkpoint and class-aware result survive.
 
-\begin{center}
-\begin{tabular}{lcccc}
-\toprule
-\textbf{Model} & \textbf{Entity F1} & \textbf{Link F1} & \textbf{Neg:Pos} & \textbf{Note} \\
-\midrule
-V1 (token-level) & 0.841 & 0.008 & $\sim$450:1 & Token imbalance \\
-V2 (span-level)  & 0.847 & 0.007 & $\sim$5:1   & Pipeline bugs \\
-\textbf{V4 (corrected)} & \textbf{0.827} & \textbf{0.342 / 0.309} & $\sim$5:1 & Bugs fixed \\
-KVP10k paper baseline & ---   & 0.659 & ---         & Published result \\
-\bottomrule
-\end{tabular}
-\end{center}
+\paragraph{Official Regular pair results.}
+The principal comparison uses V4 checkpoint~10, selected after all surviving V4
+checkpoints were rescored on the fixed validation split. V5 checkpoint selection
+uses validation Regular text+location macro F1. Table~\ref{tab:pr-final-regular}
+reports the final test results on the same 581 prepared pages.
 
-The corrected V4 model achieves \textbf{link F1 = 0.342} (text-only, NED\,$<0.2$) / \textbf{0.309} (text+location, NED\,$<0.2$, IoU\,$>0.3$), below the KVP10k published baseline (0.659 text-only); diagnostic analyses localize the remaining gap to relation modeling rather than entity detection.
-Crucially, entity F1 = 0.827 reflects the discriminative model's ability to classify only tokens that actually exist in the document, preventing unsupported text generation by construction.
+\begin{table}[H]
+  \centering
+  \caption{Final Regular macro pair F1 comparison.}
+  \label{tab:pr-final-regular}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{System} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
+    \midrule
+    KVP10k paper baseline & 0.659 & 0.650 & 0.611 \\
+    Mistral-7B re-implementation & 0.598 & 0.547 & 0.521 \\
+    V4 validation-reselected checkpoint & 0.363 & 0.438 & 0.325 \\
+    \textbf{V5 final checkpoint} & \textbf{0.392} & \textbf{0.446} & \textbf{0.345} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
-\noindent\textbf{Entity F1 vs.\ link F1 (two different tasks).} Entity F1 (0.827) measures token classification --- ``finding'' which words are keys and values. Link F1 (0.342) measures the harder pairing of each detected key with its correct value. A strong entity score therefore does \emph{not} imply a strong link score; the two numbers are not directly comparable.
+\noindent\emph{Note:} Internal Mistral, V4, and V5 results use the same 581
+pages. The published result is provided for context.
+
+V5 improves the comparable V4 text+location result by 0.020, but the
+reconstructed Mistral baseline remains stronger. Several training and selection
+procedures change together, so the comparison does not identify the effect of
+one correction.
+
+\paragraph{Completed V5 run.}
+V5 uses batch size 1, gradient accumulation 8, learning rate
+$2\times10^{-5}$, linker-loss weight 5.0, a maximum of 30 epochs, and
+early-stopping patience 10. It is warm-started from Canary~B, not from V4, and
+loads 226 compatible entries: 212 encoder, 2 entity-classifier, and 12 linker
+entries. The scheduler uses 607 optimizer updates per epoch and 500 warm-up
+optimizer steps. Each checkpoint stores the full state required for resumption.
+
+Epoch~10 has the best validation Regular text+location F1 ($0.342$) at optimizer
+step 6{,}070. Training completes 20 epochs and 12{,}140 optimizer updates before
+early stopping. The first job reaches its 24-hour limit after epoch~15; the
+second job restores the complete state and finishes epochs 16--20. Total
+allocated GPU time is approximately 31 hours and 19 minutes.
+
+The corrected class-aware entity micro and macro F1 values are 0.792 and 0.772.
+KEY F1 is 0.720 and VALUE F1 is 0.824. These entity results are substantially
+higher than complete-pair F1, which identifies relation linking as the main
+remaining internal bottleneck.
+
+\paragraph{Post-processing recovery.}
+The direct V5 decoder emits Regular linked pairs. The unchanged recovery method
+adds unmatched predicted value spans as unkeyed outputs and unmatched predicted
+key spans as unvalued outputs. It does not change Regular predictions or
+Regular F1. Table~\ref{tab:pr-v5-recovery} separates direct and recovered
+results.
+
+\begin{table}[H]
+  \centering
+  \caption{V5 direct and recovered test macro F1.}
+  \label{tab:pr-v5-recovery}
+  \begin{tabular}{llccc}
+    \toprule
+    \textbf{Output} & \textbf{Category} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
+    \midrule
+    Direct & Regular & 0.392 & 0.446 & 0.345 \\
+    Direct & All & 0.258 & 0.304 & 0.229 \\
+    \midrule
+    Recovered & Regular & 0.392 & 0.446 & 0.345 \\
+    Recovered & Unkeyed & 0.175 & 0.316 & 0.162 \\
+    Recovered & Unvalued & 0.298 & 0.336 & 0.276 \\
+    Recovered & All & 0.292 & 0.376 & 0.261 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Recovery raises All text+location F1 from 0.229 to 0.261 by adding
+special-category coverage. The special-category scores remain below the Regular
+score, so recovery is a coverage extension rather than a replacement for direct
+relation prediction.
+
+\paragraph{Cluster and qualitative findings.}
+V5 Regular text+location F1 is 0.305 in Cluster~0 and 0.410 in Cluster~1.
+Mistral has the opposite ordering, with 0.569 and 0.429. These results show an
+association with annotation geometry, not semantic document types. Selected
+qualitative cases show correct local links, plausible links to neighbouring
+values, missed short values, KEY--VALUE confusion, and false entity labels on
+ordinary prose. The cases are illustrative and do not establish frequencies.
 
 % ============================================================
 \section{Technical Challenges Encountered}
@@ -306,7 +438,9 @@ Crucially, entity F1 = 0.827 reflects the discriminative model's ability to clas
   Broken/inaccessible source PDFs ($\sim$45\% of pages), conflicting duplicate annotations, and reproducing IBM's workflow with PyMuPDF rather than their internal OCR tooling.
 
 \item \textbf{Stage 4 Training Stability.}
-  Early runs suffered NaN losses from unclamped biaffine logits. Fixed with logit clamping to $[-20, 20]$ and teacher forcing.
+  The original bilinear scorer and a bfloat16 attempt produced non-finite
+  losses. The active runs use projected scaled-dot-product scoring, a valid-label
+  mask before binary cross-entropy, teacher forcing, and fp32 precision.
 
 \item \textbf{Three Compounding Data Pipeline Bugs.}
   The diagnostic work (Experiments D1--D3) required significant engineering to isolate: the bugs interacted in a way that made each individually hard to attribute. Fixing all three at once in V4 was the turning point.
@@ -320,30 +454,78 @@ Crucially, entity F1 = 0.827 reflects the discriminative model's ability to clas
 \begin{itemize}[leftmargin=1.5em]
   \item \textbf{SPADE} (Hwang et al., ACL Findings 2021): spatial dependency parsing, directly inspired the spatial MLP in the Stage~4 linker.
   \item \textbf{BROS} (Hong et al., AAAI 2022): BERT-based with 2D relative position encoding and a token prediction linking head.
-  \item \textbf{LMDX} (Perot et al., 2023): generative LLM approach using LMDX-formatted prompts. The approach evaluated in the KVP10k paper; published F1 = 0.643 is the primary comparison point.
-  \item \textbf{LayoutLMv3} (Huang et al., ACM MM 2022): joint text + layout + image pre-training; entity F1 = 0.91 on FUNSD. Adding a biaffine linker for KVP extraction is the novel contribution of this thesis.
+  \item \textbf{LMDX} (Perot et al., 2023): generative LLM approach using LMDX-formatted prompts. The approach evaluated in the KVP10k paper; published Regular text/location/combined F1 = 0.659/0.650/0.611 provides the primary comparison.
+  \item \textbf{LayoutLMv3} (Huang et al., ACM MM 2022): joint text, layout,
+  and image pre-training. This thesis adapts the pretrained encoder with a token
+  classifier and a projected scaled-dot-product relation linker with spatial features.
 \end{itemize}
 
 % ============================================================
-\section{What Is Left to Do and Questions for the Supervisor}
+\section{Recent Work, Remaining Tasks, and Questions for the Supervisor}
 % ============================================================
 
-All five pipeline stages, the full experimental programme (V1--V4), the
-per-cluster analysis, and the Experiments and Discussion chapters are now
-\textbf{complete}. The remaining writing item is:
+Since the previous progress report, the experimental work and principal thesis
+reporting have been completed.
 
+\subsection*{Work completed since the previous report}
 \begin{enumerate}[leftmargin=1.5em]
-\item \textbf{Final proofreading and formatting.}
-  Full LaTeX compilation, cross-reference checks, bibliography cleanup, and formatting for FAU submission requirements.
+\item \textbf{Evaluation audit and V4 reselection.}
+  The released evaluator was integrated with the correct page-macro protocol,
+  class-aware entity scoring was corrected, and V4 checkpoint~10 was selected
+  on the fixed validation split for the principal V4 comparison.
+\item \textbf{Final V5 training.}
+  The corrected trainer completed 20 epochs across a full-state resume, selected
+  epoch~10 by validation Regular text+location F1, and produced the final
+  official test results.
+\item \textbf{Final analyses.}
+  Direct and recovered outputs were evaluated separately. V5 cluster results,
+  corrected entity metrics, qualitative examples, run provenance, and
+  checkpoint hashes were recorded.
+\item \textbf{Thesis update.}
+  The research questions and contributions were tightened, V5 was made the
+  principal LayoutLMv3 experiment, the experimental progression was clarified,
+  and the final Results, Discussion, and Conclusion chapters were updated.
+\end{enumerate}
+
+\subsection*{Remaining submission tasks}
+\begin{enumerate}[leftmargin=1.5em]
+\item \textbf{Overleaf compilation and bibliography.}
+  Run the complete LaTeX and Biber sequence, then check citations,
+  cross-references, tables, figures, and the final page layout.
+\item \textbf{Final proofreading.}
+  Check terminology, metric names, numerical consistency, grammar, and FAU
+  formatting requirements.
+\item \textbf{Supervisor review and submission.}
+  Incorporate final supervisor comments and prepare the submission package for
+  3 September 2026.
 \end{enumerate}
 
 \noindent\textbf{Questions for the supervisor:}
-\begin{enumerate}[leftmargin=1.5em]
-\item Based on the current results, what would you like the next steps to be?
+\medskip
 
-\item The robustness (rotation, occlusion) and OCR-free comparisons from the
-  original proposal are still open. Keep them in scope, or descope given the
-  timeline?
+\noindent\textbf{Scientific framing:}
+\begin{enumerate}[leftmargin=1.5em]
+\item Is the present text-and-layout scope acceptable without a new experiment
+  using document-specific image content? The current diagnostics identify
+  relation linking, rather than entity detection, as the main internal
+  bottleneck.
+\item Is it acceptable to retain robustness, OCR, image-rendering, and
+  additional retraining experiments as future work within the remaining
+  submission period?
+\item Is it appropriate to present V5 as the final principal experiment and
+  V1--V4 as development and diagnostic stages?
+\item Is the answer to RQ3 sufficiently cautious, given that the independent
+  effect of span-level linking was not isolated?
+\item Are the cluster analysis and selected qualitative examples sufficient
+  for the error analysis?
+\end{enumerate}
+
+\noindent\textbf{Submission procedure:}
+\begin{enumerate}[leftmargin=1.5em]
+\item Is code submission required with the thesis?
+\item What repository access must be provided to the examiners or chair?
+\item Which date must appear in the declaration?
+\item What is the required final submission procedure?
 \end{enumerate}
 
 % ============================================================
@@ -355,21 +537,22 @@ per-cluster analysis, and the Experiments and Discussion chapters are now
 \toprule
 \textbf{Task} & \textbf{Status} & \textbf{Target} \\
 \midrule
-Stages 0--2 (data + layout analysis)         & \textcolor{completed}{\textbf{Complete}} & --- \\
+Stages 0--2 (data and layout analysis)       & \textcolor{completed}{\textbf{Complete}} & --- \\
 Stage 3 (generative baseline)                & \textcolor{completed}{\textbf{Complete}} & --- \\
 Literature review                            & \textcolor{completed}{\textbf{Complete}} & --- \\
-Stage 4 implementation, training, evaluation & \textcolor{completed}{\textbf{Complete}} & --- \\
-Per-cluster V4 analysis                      & \textcolor{completed}{\textbf{Complete}} & --- \\
-Thesis writing (Exp+Results, Discussion)     & \textcolor{completed}{\textbf{Complete}} & --- \\
+Stage 4 implementation and V1--V5 evaluation & \textcolor{completed}{\textbf{Complete}} & --- \\
+Cluster, recovery, and error analyses        & \textcolor{completed}{\textbf{Complete}} & --- \\
+Principal thesis chapters                    & \textcolor{completed}{\textbf{Complete}} & --- \\
 German abstract                              & \textcolor{completed}{\textbf{Complete}} & --- \\
-Robustness \& OCR-free analysis              & Planned & TBD (scope TBC) \\
-Final submission                             & --- & TBD \\
+Overleaf compilation and bibliography        & \textcolor{inprogress}{\textbf{In preparation}} & August 2026 \\
+Robustness, OCR, and real-image experiments  & Descoped; future work & --- \\
+Final submission                             & In preparation & 3 September 2026 \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 % ============================================================
-\section{Proposed Thesis Structure}
+\section{Final Thesis Structure}
 \label{sec:structure}
 % ============================================================
 
@@ -377,9 +560,9 @@ Final submission                             & --- & TBD \\
   \item \textbf{Introduction} --- Motivation, research questions, contributions
   \item \textbf{Literature Review} --- Document understanding, LayoutLM family, generative approaches (LMDX), entity linking (SPADE, BROS)
   \item \textbf{Dataset Analysis} --- KVP10k dataset, data preparation pipeline, layout clustering (before Methodology so readers understand the data first)
-  \item \textbf{Methodology} --- Pipeline overview, evaluation protocol, model architectures (Mistral QLoRA + LayoutLMv3 + Biaffine Linker)
+  \item \textbf{Methodology} --- LayoutLMv3 encoder, entity classifier, projected scaled-dot-product relation linker, training procedure, inference, and post-processing
   \item \textbf{Implementation} --- System architecture, HPC setup, training procedures
-  \item \textbf{Experiments \& Results} --- Story-driven paired blocks: generative baseline $\to$ hallucination problem $\to$ discriminative model motivated $\to$ V1 token linking (imbalance) $\to$ V2 span linking (bugs) $\to$ diagnostic analysis $\to$ V4 corrected model (link F1 = 0.342 text-only / 0.309 text+location). Ends with narrative summary.
+  \item \textbf{Experiments \& Results} --- Generative baseline, V1 and V2 diagnostics, corrected V4 development result, final V5 result, recovery analysis, cluster results, and qualitative errors
   \item \textbf{Discussion} --- Interpretation, generative vs.\ discriminative trade-offs, limitations
   \item \textbf{Conclusion} --- Summary of contributions, future work
 \end{enumerate}

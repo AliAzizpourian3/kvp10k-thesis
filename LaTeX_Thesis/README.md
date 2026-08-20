@@ -13,15 +13,15 @@ LaTeX_Thesis/
 │   ├── 00_acknowledgments.tex
 │   ├── 01_introduction.tex
 │   ├── 02_literature_review.tex
-│   ├── 03_methodology.tex
-│   ├── 04_dataset.tex
+│   ├── 03_dataset.tex
+│   ├── 04_methodology.tex
 │   ├── 05_implementation.tex
 │   ├── 06_experiments.tex
 │   ├── 07_results.tex
-│   ├── 08_discussion.tex
-│   ├── 09_conclusion.tex
+│   ├── 07_discussion.tex
+│   ├── 08_conclusion.tex
 │   └── appendix_a_code.tex
-└── figures/                    # Figures (to be added)
+└── figures/                    # Thesis figures
 ```
 
 ## Compiling
@@ -46,43 +46,16 @@ latexmk -pdf main.tex
 
 ## Current Status
 
-### ✅ Complete Chapters
-- **Abstract** - Template ready
-- **Introduction** - Structure complete, content outlined
-- **Dataset (Chapter 4)** - Fully written with results from Stage 2
+The repository contains a complete supervisor-review draft. V4 is the final
+corrected LayoutLMv3 experiment. The
+verified numerical source is `THESIS_FACTSHEET.md`; older root README files and
+legacy pooled measurements are not authoritative for benchmark results.
 
-### ⏳ In Progress / TODO
-- **Literature Review (Chapter 2)** - Structure only, needs content
-- **Methodology (Chapter 3)** - Structure only, needs implementation details
-- **Implementation (Chapter 5)** - Partial, needs model details
-- **Experiments (Chapter 6)** - Structure only, awaiting Stage 3-5 results
-- **Results (Chapter 7)** - Structure only, awaiting experimental results
-- **Discussion (Chapter 8)** - Structure only, awaiting analysis
-- **Conclusion (Chapter 9)** - Template ready
+The normal local build command is:
 
-### 📊 Figures Needed
-- PCA visualization (from Stage 2)
-- KV distance distribution (from Stage 2)
-- Cluster distribution (from Stage 2)
-- Model architecture diagram
-- Attention visualizations
-- Results tables and plots
-
-## Update Strategy
-
-As experiments progress:
-1. **After Stage 3**: Update Chapter 6 (baselines)
-2. **After Stage 4**: Update Chapter 3 & 5 (methodology & implementation)
-3. **After Stage 5**: Update Chapter 7 (main results)
-4. **After Stage 6**: Update Chapter 7 (robustness results)
-5. **After Stage 7**: Update Chapter 8 (interpretability)
-6. **After Stage 8**: Finalize all chapters
-
-## Current Working Note
-
-For the current operational status of Stage 3 before LaTeX integration, see:
-
-- `STAGE3_STATUS_NOTE.md`
+```bash
+latexmk -pdf main.tex
+```
 
 ## Notes
 

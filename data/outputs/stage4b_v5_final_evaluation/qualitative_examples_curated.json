@@ -1,0 +1,632 @@
+{
+  "metadata": {
+    "created_at": "2026-08-18T11:29:00.988084+00:00",
+    "source_candidates": "data/outputs/stage4b_v5_final_evaluation/qualitative_examples.json",
+    "source_entity_candidates": "data/outputs/stage4b_v5_final_evaluation/entity_error_candidates.json",
+    "selection": "manual readability review of deterministic candidate pools",
+    "matching_mode": "official text_location",
+    "ned_threshold": 0.2,
+    "iou_threshold": 0.3,
+    "caution": "Entity examples are token-level disagreements with KVP10k annotations; context can make individual labels semantically ambiguous."
+  },
+  "correct_pairs": [
+    {
+      "document_id": "efc7468875a54c1becf94cc01fa01ee732adc095a438b6044d7e901ba71b6344",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Instructor:",
+          "bbox": [
+            6,
+            19,
+            17,
+            21
+          ]
+        },
+        "value": {
+          "text": "Professor Bobby Seals (Fela Anikulapo Uhuru), Ph.D. (ABD)",
+          "bbox": [
+            18,
+            19,
+            79,
+            21
+          ]
+        },
+        "link_confidence": 0.9978210926055908
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Instructor:",
+          "bbox": [
+            6,
+            19,
+            14,
+            21
+          ]
+        },
+        "value": {
+          "text": "Professor Bobby Seals (Fela Anikulapo Uhuru), Ph.D. (ABD)",
+          "bbox": [
+            30,
+            19,
+            80,
+            21
+          ]
+        },
+        "center_x": 10,
+        "center_y": 20
+      },
+      "cluster": "Cluster_1",
+      "link_confidence": 0.9978210926055908
+    },
+    {
+      "document_id": "5c9befa2336e89d621efde9dfb845f40cf3537f8ba7411354e50c7102a02b0ad",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Details:",
+          "bbox": [
+            14,
+            18,
+            21,
+            20
+          ]
+        },
+        "value": {
+          "text": "Holy Communion will NOT meet in Mickel Chapel today.",
+          "bbox": [
+            22,
+            18,
+            70,
+            20
+          ]
+        },
+        "link_confidence": 0.9977747797966003
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Details:",
+          "bbox": [
+            13,
+            18,
+            20,
+            19
+          ]
+        },
+        "value": {
+          "text": "Holy Communion will NOT meet in Mickel Chapel today.",
+          "bbox": [
+            21,
+            18,
+            70,
+            20
+          ]
+        },
+        "center_x": 17,
+        "center_y": 19
+      },
+      "cluster": "Cluster_1",
+      "link_confidence": 0.9977747797966003
+    },
+    {
+      "document_id": "035deab0593f06dda63a4966fa30531f2c96f7505eec76e135a8a0592ed5d760",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Special Note:",
+          "bbox": [
+            15,
+            51,
+            24,
+            53
+          ]
+        },
+        "value": {
+          "text": "For support or questions please contact effectvclientcare@comcast.com",
+          "bbox": [
+            24,
+            51,
+            73,
+            53
+          ]
+        },
+        "link_confidence": 0.997714638710022
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Special Note:",
+          "bbox": [
+            15,
+            51,
+            23,
+            53
+          ]
+        },
+        "value": {
+          "text": "For support or questions please contact effectvclientcare@comcast.com",
+          "bbox": [
+            25,
+            51,
+            73,
+            53
+          ]
+        },
+        "center_x": 19,
+        "center_y": 52
+      },
+      "cluster": "Cluster_0",
+      "link_confidence": 0.997714638710022
+    },
+    {
+      "document_id": "1d752623731b1446f58b3ec87f8271b390b3240a0c8410a4a0d6ba1633268982",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Address:",
+          "bbox": [
+            15,
+            25,
+            23,
+            27
+          ]
+        },
+        "value": {
+          "text": "73-4976 Kamanu Street, Hale Kui Plaza, Suite 207 Kailua-Kona, HI 96740",
+          "bbox": [
+            24,
+            25,
+            73,
+            29
+          ]
+        },
+        "link_confidence": 0.997714638710022
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Address:",
+          "bbox": [
+            15,
+            25,
+            23,
+            27
+          ]
+        },
+        "value": {
+          "text": "73-4976 Kamanu Street, Hale Kui Plaza, Suite 207 Kailua-Kona, HI 96740",
+          "bbox": [
+            26,
+            25,
+            73,
+            29
+          ]
+        },
+        "center_x": 19,
+        "center_y": 26
+      },
+      "cluster": "Cluster_1",
+      "link_confidence": 0.997714638710022
+    }
+  ],
+  "wrong_links": [
+    {
+      "document_id": "1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Total Networks",
+          "bbox": [
+            3,
+            51,
+            21,
+            53
+          ]
+        },
+        "value": {
+          "text": "260-422-5614",
+          "bbox": [
+            33,
+            51,
+            50,
+            53
+          ]
+        },
+        "link_confidence": 0.9914857745170593
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Total Networks",
+          "bbox": [
+            3,
+            51,
+            10,
+            53
+          ]
+        },
+        "value": {
+          "text": "3",
+          "bbox": [
+            12,
+            51,
+            13,
+            53
+          ]
+        },
+        "center_x": 6,
+        "center_y": 52
+      },
+      "cluster": "Cluster_0",
+      "link_confidence": 0.9914857745170593,
+      "explanation": "predicted key and value match different ground-truth pairs",
+      "predicted_value_matches_ground_truth_indices": [
+        25
+      ]
+    },
+    {
+      "document_id": "0e3008db1915a75e6badd0d786759540521c72be2640d3a196fd25619f39ba61",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Syscode",
+          "bbox": [
+            5,
+            8,
+            12,
+            10
+          ]
+        },
+        "value": {
+          "text": "GREER, Margolis, Mitchell,",
+          "bbox": [
+            26,
+            8,
+            54,
+            10
+          ]
+        },
+        "link_confidence": 0.9914434552192688
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Syscode",
+          "bbox": [
+            5,
+            9,
+            8,
+            10
+          ]
+        },
+        "value": {
+          "text": "0496",
+          "bbox": [
+            13,
+            9,
+            15,
+            10
+          ]
+        },
+        "center_x": 7,
+        "center_y": 9
+      },
+      "cluster": "Cluster_0",
+      "link_confidence": 0.9914434552192688,
+      "explanation": "predicted key and value match different ground-truth pairs",
+      "predicted_value_matches_ground_truth_indices": [
+        19
+      ]
+    },
+    {
+      "document_id": "07de02d344336182543e7e7592f614d7acce0412ddf034a477195574c98a8aeb",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Zip",
+          "bbox": [
+            31,
+            43,
+            34,
+            45
+          ]
+        },
+        "value": {
+          "text": "SPRINGFIELD, VA",
+          "bbox": [
+            36,
+            43,
+            52,
+            45
+          ]
+        },
+        "link_confidence": 0.9869756698608398
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Zip",
+          "bbox": [
+            33,
+            46,
+            35,
+            48
+          ]
+        },
+        "value": {
+          "text": "22152",
+          "bbox": [
+            43,
+            46,
+            46,
+            47
+          ]
+        },
+        "center_x": 34,
+        "center_y": 47
+      },
+      "cluster": "Cluster_0",
+      "link_confidence": 0.9869756698608398,
+      "explanation": "predicted key and value match different ground-truth pairs",
+      "predicted_value_matches_ground_truth_indices": [
+        10
+      ]
+    },
+    {
+      "document_id": "04d279efe18c2f4c385d8ceaee48a544a9e4f16099ff184b047f09e4578e5643",
+      "prediction": {
+        "type": "kvp",
+        "key": {
+          "text": "Fax:",
+          "bbox": [
+            5,
+            47,
+            8,
+            48
+          ]
+        },
+        "value": {
+          "text": "+44 (0)870 600 6122",
+          "bbox": [
+            10,
+            33,
+            33,
+            34
+          ]
+        },
+        "link_confidence": 0.9568513631820679
+      },
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Fax:",
+          "bbox": [
+            43,
+            35,
+            46,
+            35
+          ]
+        },
+        "value": {
+          "text": "+1 215 674 7183",
+          "bbox": [
+            47,
+            35,
+            57,
+            35
+          ]
+        },
+        "center_x": 45,
+        "center_y": 35
+      },
+      "cluster": "Cluster_1",
+      "link_confidence": 0.9568513631820679,
+      "explanation": "predicted key and value match different ground-truth pairs",
+      "predicted_value_matches_ground_truth_indices": [
+        6
+      ]
+    }
+  ],
+  "missed_pairs": [
+    {
+      "document_id": "9aa0013771206f9b35873bc3c22a8844d31a12f07c1c0eb603a5ddbe0c7518ca",
+      "prediction": null,
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Page",
+          "bbox": [
+            47,
+            88,
+            51,
+            89
+          ]
+        },
+        "value": {
+          "text": "37",
+          "bbox": [
+            51,
+            88,
+            54,
+            89
+          ]
+        },
+        "center_x": 49,
+        "center_y": 88
+      },
+      "cluster": "Cluster_1",
+      "explanation": "no official text+location match"
+    },
+    {
+      "document_id": "5a58456c08ee67739cbfe2e13fe45d740dd86afe4c9bfeb92197ad93caaab7b1",
+      "prediction": null,
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "EDI:",
+          "bbox": [
+            23,
+            13,
+            25,
+            14
+          ]
+        },
+        "value": {
+          "text": "Y",
+          "bbox": [
+            30,
+            13,
+            31,
+            14
+          ]
+        },
+        "center_x": 24,
+        "center_y": 13
+      },
+      "cluster": "Cluster_0",
+      "explanation": "no official text+location match"
+    },
+    {
+      "document_id": "00dbb5450efe3a6cb80ebb0a4f09dafb14606c7731bffaf3f439cc5067929673",
+      "prediction": null,
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "ext.",
+          "bbox": [
+            42,
+            16,
+            45,
+            17
+          ]
+        },
+        "value": {
+          "text": "227",
+          "bbox": [
+            46,
+            16,
+            49,
+            17
+          ]
+        },
+        "center_x": 43,
+        "center_y": 16
+      },
+      "cluster": "Cluster_0",
+      "explanation": "no official text+location match"
+    },
+    {
+      "document_id": "1ab8b1c4f0bbb463686c528269faa1ef5dab2b09d2cb98d4dd6837c21405f940",
+      "prediction": null,
+      "ground_truth": {
+        "type": "kvp",
+        "key": {
+          "text": "Spots",
+          "bbox": [
+            77,
+            38,
+            80,
+            39
+          ]
+        },
+        "value": {
+          "text": "26",
+          "bbox": [
+            77,
+            40,
+            78,
+            40
+          ]
+        },
+        "center_x": 78,
+        "center_y": 39
+      },
+      "cluster": "Cluster_0",
+      "explanation": "no official text+location match"
+    }
+  ],
+  "entity_errors": {
+    "key_predicted_as_value": [
+      {
+        "document_id": "712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb",
+        "source_json": "data/prepared/test/712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb.json",
+        "cluster": "Cluster_0",
+        "word": "COMPANY",
+        "bbox": [
+          35,
+          10,
+          59,
+          11
+        ],
+        "context": "AFFORDED UNDER THE POLICY. PRODUCER COMPANY ALLIANT 100 PINE ST. INSURANCE",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9935694932937622,
+        "token_index": 80,
+        "word_index": 34
+      }
+    ],
+    "value_predicted_as_key": [
+      {
+        "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+        "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+        "cluster": "Cluster_1",
+        "word": "card",
+        "bbox": [
+          55,
+          40,
+          59,
+          42
+        ],
+        "context": "Fee- A yearly fee the card holder is charged for using",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9912063479423523,
+        "token_index": 86,
+        "word_index": 71
+      }
+    ],
+    "missed_entity": [
+      {
+        "document_id": "60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208",
+        "source_json": "data/prepared/test/60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208.json",
+        "cluster": "Cluster_0",
+        "word": "YYYY-MM-DD",
+        "bbox": [
+          85,
+          44,
+          94,
+          46
+        ],
+        "context": "1234567 19 01/01/2009 YYYY-MM-DD 12/31/2009 YYYY-MM-DD 2 Insurance fee and commission",
+        "target": "VALUE",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997285008430481,
+        "token_index": 471,
+        "word_index": 253
+      }
+    ],
+    "spurious_entity": [
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "This",
+        "bbox": [
+          25,
+          90,
+          27,
+          91
+        ],
+        "context": "Latitude 43.747279 Longitude Longitude -85.0505582 This document is available at ScholarWorks",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.999195396900177,
+        "token_index": 132,
+        "word_index": 59
+      }
+    ]
+  }
+}

@@ -19,13 +19,13 @@ Given a business document image, the task is to extract all \kvps{} such that th
 This thesis addresses the following research questions:
 
 \begin{enumerate}
-    \item \textbf{RQ1}: How do layout characteristics vary across business documents, and how can this inform model design?
+    \item \textbf{RQ1}: How does annotation geometry vary across KVP10k pages, and how can this inform model design?
     
-    \item \textbf{RQ2}: To what extent can a LayoutLMv3-based discriminative model with a learned biaffine linker perform regular \kvp{} linking on KVP10k relative to the published generative baseline?
+    \item \textbf{RQ2}: How does a LayoutLMv3-based discriminative linker perform on regular \kvp{} extraction compared with a generative baseline?
     
-    \item \textbf{RQ3}: How does linking granularity (token-level vs.\ span-level) affect key-value association accuracy?
+    \item \textbf{RQ3}: What does the experimental progression from token-level to span-level linking reveal about key--value association?
     
-    \item \textbf{RQ4}: What are the key factors contributing to model success and failure cases, and how do observed outcomes vary across page-level annotation-geometry regimes?
+    \item \textbf{RQ4}: Which factors characterise model successes and failures across page-level annotation-geometry regimes?
 \end{enumerate}
 
 \section{Contributions}
@@ -34,20 +34,16 @@ This thesis addresses the following research questions:
 This thesis makes the following contributions:
 
 \begin{enumerate}
-    \item \textbf{Dataset Analysis}: Page-level clustering of annotation-box geometry on 9{,}124 unique coordinate-bearing KVP10k training pages, together with a separate exploratory spatial-link audit and annotation statistics (Chapter~\ref{ch:dataset})
+    \item \textbf{Dataset Characterisation}: Page-level clustering of annotation-box geometry on 9{,}124 unique coordinate-bearing KVP10k training pages, together with a separate exploratory spatial-link audit and annotation statistics (Chapter~\ref{ch:dataset})
     
-    \item \textbf{Architecture}: Implementation of LayoutLMv3 + Biaffine Linker for discriminative \kvp{} extraction with explicit key-value association, using token-level (V1) and span-level (V2) linking, including the corrected V4 pipeline (Chapter~\ref{ch:methodology})
+    \item \textbf{Discriminative Model}: Adaptation of a pretrained LayoutLMv3 encoder with a token classifier and a span-level projected scaled-dot-product linker with spatial features for discriminative \kvp{} extraction (Chapters~\ref{ch:methodology} and~\ref{ch:implementation})
     
-    \item \textbf{Empirical Evaluation on KVP10k}: Systematic evaluation on the 581 usable pages of the KVP10k test split using the released benchmark evaluator, which applies type-aware one-to-one matching, $\mathrm{NED}<0.2$, $\mathrm{IoU}\geq0.3$, and macro per-page aggregation. This evaluates whether a LayoutLMv3-based discriminative linker can provide a useful alternative to the published generative baseline (Chapter~\ref{ch:exresults})
+    \item \textbf{Controlled KVP10k Evaluation}: Comparison of the final corrected discriminative model with a reconstructed Mistral baseline on the same 581 usable test pages. The final V4 model obtains Regular text+location F1 $=0.345$, compared with $0.521$ for Mistral (Chapter~\ref{ch:exresults})
     
-    \item \textbf{Linking Granularity Analysis}: Detailed investigation of why token-level linking fails ($\sim$450:1 class imbalance) and how span-level linking reduces the candidate-space imbalance (Chapter~\ref{ch:exresults})
-    
-    \item \textbf{Diagnostic Pipeline Analysis}: Systematic identification and correction of three compounding data-pipeline bugs, yielding regular-KVP macro F1\,=\,0.334 (text) / 0.309 (text+location) for corrected V4 (Chapter~\ref{ch:exresults})
-    
-    \item \textbf{Error Analysis}: Per-cluster breakdown showing how performance varies across exploratory annotation-geometry regimes for both generative and discriminative approaches (Chapter~\ref{ch:exresults})
+    \item \textbf{Diagnostic Analysis}: Evidence suggesting that relation linking remains a major limitation, based on the token-to-span experimental progression, corrected entity and pair metrics, page-cluster results, and qualitative errors. Because several corrections were applied together, the study does not claim an isolated causal effect for linking granularity (Chapters~\ref{ch:exresults} and~\ref{ch:discussion})
 \end{enumerate}
 
 \section{Thesis Structure}
 \label{sec:structure}
 
-The remainder of this thesis is organized as follows. Chapter~\ref{ch:literature} reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training. Chapter~\ref{ch:dataset} presents KVP10k together with page-level annotation-geometry clustering and spatial-link characterization. Chapter~\ref{ch:methodology} describes the proposed approach, including the LayoutLMv3 encoder, the biaffine linker architecture, and the evaluation protocol. Chapter~\ref{ch:implementation} details the implementation, covering data preprocessing, model architecture, the training procedure, and the HPC setup. Chapter~\ref{ch:exresults} presents the experiments and results in a story-driven format, moving from the generative baseline through token-level and span-level linking and the diagnostic analysis to the corrected V4 model. Chapter~\ref{ch:discussion} discusses the findings, the generative-versus-discriminative trade-offs, limitations, and future work, and Chapter~\ref{ch:conclusion} summarizes the contributions and conclusions.
+The remainder of this thesis is organized as follows. Chapter~\ref{ch:literature} reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training. Chapter~\ref{ch:dataset} presents KVP10k together with page-level annotation-geometry clustering and spatial-link characterization. Chapter~\ref{ch:methodology} describes the model methodology, architecture, training formulation, and inference. Chapter~\ref{ch:implementation} describes the implementation and evaluation protocol, including data preprocessing and the HPC setup. Chapter~\ref{ch:exresults} presents the experiments and results as a sequential experimental progression, moving from the generative baseline through token-level and span-level linking, the V4 pipeline corrections, and the final corrected V4 configuration. Chapter~\ref{ch:discussion} discusses the findings, the generative-versus-discriminative trade-offs, limitations, and future work, and Chapter~\ref{ch:conclusion} summarizes the contributions and conclusions.

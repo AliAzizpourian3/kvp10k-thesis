@@ -1,0 +1,45 @@
+{
+  "verified_at": "2026-08-18T11:31:17.484990+00:00",
+  "status": "pass",
+  "checks": {
+    "selected_checkpoint_hash_matches_original_test": true,
+    "selected_checkpoint_hash_matches_entity_export": true,
+    "test_was_selected_by_validation_only": true,
+    "link_score_threshold_is_0_5": true,
+    "ned_threshold_is_0_2": true,
+    "iou_threshold_is_0_3": true,
+    "no_document_specific_pixels": true,
+    "direct_regular_matches_original_test": true,
+    "direct_all_matches_original_test": true,
+    "postprocessing_preserves_regular_overall": true,
+    "postprocessing_preserves_regular_per_cluster": true,
+    "confusion_matrix_reconstructs_key_counts": true,
+    "confusion_matrix_reconstructs_value_counts": true,
+    "confusion_matrix_reconstructs_micro_counts": true,
+    "postprocessing_improves_all_f1_in_all_modes": true
+  },
+  "checkpoint_sha256": "f4b61bf2db8833aa5b23bf49c9778fb154177b18954e6f8563a59cf80145a27c",
+  "reconstructed_entity_counts": {
+    "key": {
+      "tp": 11985,
+      "fp": 5986,
+      "fn": 3322
+    },
+    "value": {
+      "tp": 31233,
+      "fp": 8733,
+      "fn": 4646
+    },
+    "micro": {
+      "tp": 43218,
+      "fp": 14719,
+      "fn": 7968
+    }
+  },
+  "postprocessing_all_f1_change": {
+    "text_only": 0.03424408264885492,
+    "location_only": 0.0720380933180983,
+    "text_location": 0.032310553590453345
+  },
+  "regular_unchanged_by_postprocessing": true
+}

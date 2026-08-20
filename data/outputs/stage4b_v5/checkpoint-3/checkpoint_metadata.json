@@ -1,0 +1,8 @@
+{
+  "checkpoint_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-3",
+  "weights_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-3/pytorch_model.bin",
+  "weights_sha256": "2985b01b579a8c79872279e45ff9b51bfb0a145e5dce28a1d7c56f4b699cd217",
+  "completed_epoch": 3,
+  "global_optimizer_step": 1821,
+  "state_file": "training_state.pt"
+}

@@ -8,7 +8,7 @@ pooled scores** and must not be cited.
 Legend: ✅ = verified against a code/data artifact in this repo · ⚠️ = prose-only,
 estimated, or not cleanly recoverable (state cautiously in the thesis).
 
-Verification date: 2026-08-06.
+Verification date: 2026-08-18.
 
 ---
 
@@ -64,112 +64,158 @@ coordinate-bearing rows. The subset contains 3,595 annotations, of which 755
 | Name | Definition | Status |
 |---|---|---|
 | Stage 3 (Mistral) | Re-implemented KVP10k generative baseline, Mistral-7B QLoRA | ✅ |
-| V1 | LayoutLMv3 + **token-level** biaffine linker (`layoutlm_model.py`) | ✅ |
-| V2 | LayoutLMv3 + **span-level** biaffine linker (`layoutlm_model_v2.py`) | ✅ |
-| V3 | Linker-only diagnostic variant (not a headline row) | ⚠️ keep as diagnostic |
-| **V4** | **The corrected V2** run (three data-pipeline bugs fixed); the final/headline discriminative model | ✅ |
-| V4 params | 126,513,684 (~125M) | ✅ |
+| Stage 4a | Methodological entity-pre-training phase; no reliable checkpoint or reportable numerical result survives | ✅ |
+| V1 | LayoutLMv3 + **token-level** projected scaled-dot-product linker with spatial features (`layoutlm_model.py`) | ✅ |
+| V2 | LayoutLMv3 + **span-level** projected scaled-dot-product linker with spatial features (`layoutlm_model_v2.py`) | ✅ |
+| V3 | Linker-only diagnostic variant, not a headline result | ✅ |
+| **V4** | **Final corrected LayoutLMv3 experiment**: corrected V2 data and supervision pipeline with full-state resumption, corrected metrics, and validation pair-F1 checkpoint selection | ✅ |
+| V4 parameters | 126,513,684 (approximately 125M) | ✅ |
 
-V4 is **not** a new architecture — it is V2 with the pipeline fixes. Say so once
-explicitly in the thesis.
+V4 keeps the LayoutLMv3-base encoder, token classifier, and span-level
+projected scaled-dot-product linker with spatial features. It combines several
+data, supervision, training, and evaluation corrections. Do not attribute its
+result to one correction.
 
 ---
 
-## 3. Final official benchmark numbers (headline)
+## 3. Official benchmark and entity results
 
-Evaluator: `kvp10k_official_eval.py` / `evaluate_kvp10k_benchmark.py`.
-Artifacts:
-`data/outputs/stage4b_v4/evaluation_kvp10k_official.json`,
-`data/outputs/stage3_mistral/evaluation_kvp10k_official.json`,
-`data/outputs/stage4b_v4/evaluation_kvp10k_official_alltypes.json`.
-All values are **macro F1** (see §5). `documents_loaded = 581`. ✅
+Official pair evaluator: `kvp10k_official_eval.py` /
+`evaluate_kvp10k_benchmark.py`. Pair values below are macro F1. The evaluation
+set contains 581 prepared pages. ✅
 
-### 3a. V4 (headline = regular-only model)
-| Category | Text F1 | Location F1 | Text+Location F1 | Docs scored |
-|---|---|---|---|---|
-| **Regular** | **0.334** | 0.456 | **0.309** | 483 (98 empty-GT excl.) |
-| Unkeyed | 0.000 | 0.000 | 0.000 | 472 |
-| Unvalued | 0.000 | 0.000 | 0.000 | 181 |
-| All | 0.214 | 0.310 | 0.199 | 532 (49 excl.) |
+### 3a. V4 final principal result
 
-Exact (for tables): Regular text P/R/F1 = 0.38195 / 0.29644 / 0.33380;
-location F1 = 0.45603; combined P/R/F1 = 0.35184 / 0.27473 / 0.30854. ✅
-All: text F1 0.21400, location 0.30996, combined 0.19908. ✅
+Selected checkpoint: epoch 10, chosen only by official validation Regular
+text+location macro F1 at linker score threshold 0.5. Validation combined F1 =
+0.3417870621. The selected checkpoint was evaluated on the test set after
+selection. ✅
 
-Corrected per-cluster Regular results (assigned/scored pages): Cluster 0
-(319/304) text/combined 0.28975 / 0.26365; Cluster 1 (213/179)
-0.40642 / 0.38281. Geometry unavailable (49/0) is not scored. Overall result
-hash is unchanged; only assignment-conditioned results changed. ✅
+| Split/category | Text F1 | Location F1 | Text+location F1 |
+|---|---:|---:|---:|
+| Validation Regular | 0.399 | 0.445 | **0.342** |
+| Test Regular | **0.392** | **0.446** | **0.345** |
+| Test All, direct output | 0.258 | 0.304 | **0.229** |
 
-Threshold sensitivity (Regular, fixed predictions): official combined 0.309;
-relaxed location (IoU≥0.1) 0.321; relaxed text (NED<0.3) 0.321; text-only 0.334. ✅
+Exact test Regular F1: text 0.3919126343; location 0.4462274760; combined
+0.3453115284. The learned decoder directly emits Regular linked pairs. ✅
 
-### 3b. V4 with decode-time recovery (Analysis C ablation, no retraining)
-`...official_alltypes.json`. Regular is **byte-identical** to 3a. ✅
-| Category | Text F1 | Location F1 | Text+Location F1 |
-|---|---|---|---|
-| Regular (unchanged) | 0.334 | 0.456 | 0.309 |
-| Unvalued (recovered) | 0.271 | 0.369 | 0.242 | ✅ |
-| Unkeyed (recovered) | 0.178 | 0.325 | 0.165 | ✅ |
-| **All (with recovery)** | **0.257** | **0.392** | **0.237** | ✅ |
+Corrected class-aware entity results on the test set: ✅
 
-Export counts: kvp = 2,601 (identical to headline), + 1,211 unvalued + 1,747 unkeyed. ✅
+| Aggregation/class | Precision | Recall | F1 |
+|---|---:|---:|---:|
+| Micro | 0.745948 | 0.844332 | **0.792097** |
+| Macro | 0.724199 | 0.826742 | **0.771948** |
+| KEY | 0.666908 | 0.782975 | **0.720296** |
+| VALUE | 0.781489 | 0.870509 | **0.823601** |
 
-### 3c. Mistral baseline (re-implementation)
-| Category | Text F1 | Location F1 | Text+Location F1 | Docs scored |
-|---|---|---|---|---|
-| Regular | 0.598 | 0.547 | 0.521 | 483 |
+Confusion counts: 803 KEY targets predicted as VALUE; 584 VALUE targets
+predicted as KEY. The metric counts each KEY–VALUE confusion as a false
+positive for the predicted class and a false negative for the target class.
+The reported corrected micro and macro aggregates include KEY and VALUE and
+exclude O. ✅
+
+V4 post-processing recovery uses the existing unchanged method. It emits
+unlinked VALUE spans as unkeyed items and unlinked KEY spans as unvalued items.
+It does not change Regular predictions or Regular F1. ✅
+
+| Recovered category | Text F1 | Location F1 | Text+location F1 |
+|---|---:|---:|---:|
+| Regular, unchanged | 0.392 | 0.446 | 0.345 |
+| Unkeyed | 0.175 | 0.316 | **0.162** |
+| Unvalued | 0.298 | 0.336 | **0.276** |
+| All | 0.292 | 0.376 | **0.261** |
+
+V4 Regular results by frozen annotation-geometry cluster: Cluster 0 has
+319 assigned pages and 304 scored pages; text/location/combined F1 =
+0.359/0.430/**0.305**. Cluster 1 has 213 assigned pages and 179 scored pages;
+text/location/combined F1 = 0.444/0.468/**0.410**. The 49 geometry-unavailable
+pages have no scorable Regular ground truth and are excluded. These clusters
+are geometry regimes, not semantic document types. ✅
+
+### 3b. Mistral baseline (re-implementation)
+
+| Category | Text F1 | Location F1 | Text+location F1 | Docs scored |
+|---|---:|---:|---:|---:|
+| Regular | 0.598 | 0.547 | **0.521** | 483 |
 | Unkeyed | 0.000 | 0.000 | 0.000 | 472 |
 | Unvalued | 0.744 | 0.699 | 0.672 | 181 |
 | All | 0.513 | 0.478 | 0.455 | 532 |
 
-Exact: Regular text P/R/F1 = 0.48761 / 0.77418 / 0.59835; location F1 0.54711;
-combined 0.52057. All text F1 0.51312, location 0.47804, combined 0.45508.
-Unvalued text F1 0.74401. Unkeyed = 0 (parser emits no unkeyed predictions). ✅
+Exact Regular combined F1 = 0.52057. Mistral remains stronger than V4 for the
+official comparable Regular combined result. Its corrected cluster combined F1
+is 0.569 for Cluster 0 and 0.429 for Cluster 1. ✅
 
-Corrected per-cluster Regular results (assigned/scored pages): Cluster 0
-(319/304) text/combined 0.65058 / 0.56916; Cluster 1 (213/179)
-0.49777 / 0.42891. Geometry unavailable (49/0) is not scored. Overall result
-hash is unchanged. A separate pooled error audit gives unsupported-prediction
-rates of 37.1% and 53.0% for Clusters 0 and 1, respectively. ✅
+### 3c. Published paper (Naparstek et al., KVP10k): comparison only
 
-### 3d. Published paper (Naparstek et al., KVP10k) — comparison only, **F1 only** ✅
-| Category | Text | Location | Text+Location |
-|---|---|---|---|
+| Category | Text F1 | Location F1 | Text+location F1 |
+|---|---:|---:|---:|
 | Regular | 0.659 | 0.650 | 0.611 |
 | Unkeyed | 0.601 | 0.653 | 0.584 |
 | Unvalued | 0.601 | 0.618 | 0.588 |
 | All | 0.643 | 0.661 | 0.612 |
 
-No per-page P/R available for the paper — compare F1 only. ✅
+The paper supplies F1 but not per-page precision and recall. Compare only F1. ✅
 
-### 3e. Entity (token-classification) F1 — separate task
-V4 full model entity F1 = **0.827**; entity-only Stage 4a = 0.847. ✅
-Linking oracle (GT spans fed to linker; legacy pooled diagnostic, **not** macro):
-text 0.365 / text+bbox 0.345 — perfect entities barely help ⇒ linker is the bottleneck. ✅
+### 3d. Stage 4a and legacy diagnostics
+
+Stage 4a is a methodological entity-pre-training phase. No reliable Stage 4a
+checkpoint survives, so it cannot be rescored with the corrected class-aware
+metric and has no validated or reportable numerical result. The historical
+metric did not correctly penalize KEY–VALUE confusion and is removed. ✅
+
+The corrected label-pipeline audit uses the first 20 pages of the fixed
+seed-42 validation subset. It contains 79 ground-truth regular pairs, 53
+recovered representative word-level links, 453 positive token-pair cells after
+subword expansion, and 44 positive span-pair labels after span collapse. These
+counts are diagnostic pipeline units, not official page-macro benchmark
+results. ✅
+
+The V2 model diagnostic uses 200 pages from the same held-out validation
+split. The historical strict bounding-box predicate removes 1,658 of 3,490
+predicted KEY tokens (47.5%) and 6,135 of 12,649 predicted VALUE tokens
+(48.5%). Only 81 pages retain both strict key and value spans. The 1,481
+candidate-pair logits have median -6.93 and mean -7.59; 36 candidate pairs
+and 20 best-per-key predictions have sigmoid probability at least 0.5. ✅
 
 ---
 
 ## 4. Training settings actually used
 
-### V4 (`slurm/submit_stage4b_v4*.sh` + `train_stage4b_v2.py`) ✅
-- Trainer: `train_stage4b_v2.py`; encoder LayoutLMv3-base + span biaffine linker.
-- **Warm start:** `--pretrained_encoder data/outputs/stage4b_canary_B/best_model/pytorch_model.bin` (**not** from scratch). ⚠️ fix any "trained from scratch" prose.
-- batch_size 1, gradient_accumulation_steps 8 (**effective batch 8**), lr 2e-5,
-  linker_loss_weight 5.0, early_stopping_patience 10, val_fraction 0.1.
-- **No `--include_images`** ⇒ trained **without page-image content** despite the multimodal backbone. The dataset supplied blank white placeholder pixel tensors, not actual page pixels (so `pixel_values` was not `None`). ⚠️ do not claim page-image features were used at train time.
-- Best checkpoint selected by **validation entity F1**, not pair/link F1. ⚠️ state this.
-- GPU: A100 (training); RTX 3080 used for later inference/diagnostics.
-- **Epochs:** target **30** across initial + resume + resume-2 runs. Exact completed
-  count is **not cleanly recoverable** (trainer restarts local epoch numbering on
-  resume; `--resume_from_checkpoint` auto-picks "latest" via **lexicographic** sort,
-  a known ordering caveat). ⚠️ report as "targeted 30 epochs across resumed jobs,"
-  do not assert a single uninterrupted 30-epoch run.
+### V4 final run ✅
+
+- Trainer: `train_stage4b_v5.py`; LayoutLMv3-base + token classifier + span-level projected scaled-dot-product linker with spatial features.
+- Prepared data and seed-42 split: 4,851 train / 538 validation / 581 test.
+- Constant blank visual input; no document-specific image information.
+- Warm start: Canary B, not an intermediate development checkpoint. Loaded 226 compatible entries:
+  212 encoder, 2 classifier, and 12 linker entries.
+- Canary B checkpoint SHA-256:
+  `e86c1c76323b34e2a195d5097f12504f6c2c54a424b3ba0f5af4efb610e9aed1`.
+- Batch size 1; gradient accumulation 8; effective batch size 8; AdamW;
+  learning rate 2e-5; weight decay 0.01; linker-loss weight 5.0.
+- Maximum 30 epochs; early-stopping patience 10; score threshold 0.5.
+- Scheduler steps: `ceil(number_of_batches / 8) × epochs`; 607 optimizer updates
+  per epoch, 18,210 maximum steps, and 500 warm-up optimizer steps.
+- Selection and early stopping: official validation Regular text+location macro
+  pair F1. Best epoch 10 at optimizer step 6,070.
+- Completed 20 epochs and 12,140 optimizer steps; early stopping occurred after
+  10 consecutive epochs without an improvement.
+- The first job reached its 24-hour limit after epoch 15. The second job restored
+  the full state and completed epochs 16–20.
+- Approximate allocated GPU time: 31 h 19 min.
+- Selected checkpoint SHA-256:
+  `f4b61bf2db8833aa5b23bf49c9778fb154177b18954e6f8563a59cf80145a27c`.
+- Each checkpoint saves model, AdamW optimizer, scheduler, gradient scaler,
+  epoch, global optimizer step, best score, early-stopping counter, complete
+  history, run configuration, and Python/NumPy/PyTorch/CUDA random states.
+  `pytorch_model.bin` is also stored for evaluator compatibility.
 
 ### Mistral (`mistral_baseline.py`) ✅
-- Mistral-7B, **QLoRA** (`load_in_4bit=True`).
-- LoRA: r=4, alpha=4, dropout=0.05, bias=none, target_modules = HF attention names.
-- Optimizer AdamW, lr 5e-4, 8 epochs, batch 1, grad_accum 4 (eff. 4), max_len 8192, seed 0.
+
+- Mistral-7B, QLoRA (`load_in_4bit=True`).
+- LoRA: rank 4, alpha 4, dropout 0.05, no bias; Hugging Face attention targets.
+- AdamW, learning rate 5e-4, 8 epochs, batch 1, gradient accumulation 4,
+  effective batch 4, maximum length 8,192, seed 0.
 
 ---
 
@@ -200,7 +246,7 @@ Source: `kvp10k_official_eval.py` (mirrors IBM
 
 Our Mistral is a **re-implementation, not a reproduction** of Naparstek et al. ⚠️
 Confounds that make the 0.598/0.521 vs paper 0.659/0.611 gap only partially comparable:
-- Text source: **PyMuPDF/OCR extraction**, not the paper's exact pipeline.
+- Text source: **PyMuPDF native PDF text extraction**, not OCR and not the paper's exact pipeline.
 - **Coverage**: trained on 55.8% of usable train pages (broken PDFs dropped).
 - LoRA rank **r=4** here; the paper's exact rank/hyperparameters are **not confirmed**
   (thesis previously estimated ≥16). Do not claim identical hyperparameters. ⚠️
@@ -211,13 +257,20 @@ Confounds that make the 0.598/0.521 vs paper 0.659/0.611 gap only partially comp
 
 ---
 
-## 7. Known prose contradictions to fix during polishing
-1. "Trained from scratch" → **warm-started** from `stage4b_canary_B`. ⚠️
-2. Any claim that V4 uses page images → it does **not** (no `--include_images`). ⚠️
-3. "Best model at epoch 13" / single 30-epoch run → say "targeted 30 across resumed
-   jobs; best by val entity F1." ⚠️
-4. V4 described as a 4th architecture → it is the **corrected V2**. ⚠️
-5. Old pooled numbers (0.342/0.309, 0.671/0.600, 0.339/0.306) anywhere except the
-   explicitly-labeled legacy diagnostic → replace with §3 macro numbers. ✅ mostly done
-6. "Follows the KVP10k protocol exactly" → follows the **executable** benchmark;
-   disclose the IoU `>` vs `≥` discrepancy. ✅
+## 7. Final consistency rules
+
+1. V4 is the final corrected LayoutLMv3 experiment.
+2. Stage 4a has no reportable score because no reliable checkpoint survives and
+   its historical entity metric was not class-aware.
+3. V4 uses constant blank visual input and no document-specific images.
+4. V4 is selected by official validation Regular text+location macro F1 at
+   threshold 0.5; epoch 10 is selected and is tested after selection.
+5. Direct model output contains Regular pairs. Unkeyed and unvalued outputs come
+   from unchanged post-processing recovery.
+6. Location-only evaluation is less restrictive than joint text+location
+   evaluation. Do not state that adding text reduces model performance.
+7. V4 combines several corrections. Do not make a single-cause claim.
+8. Legacy pooled metrics are diagnostics. Do not use them as headline benchmark
+   results.
+9. Follow the executable benchmark and disclose the paper-prose IoU > 0.3 versus
+   released-code IoU ≥ 0.3 difference.

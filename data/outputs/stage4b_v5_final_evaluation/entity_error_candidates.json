@@ -1,0 +1,3663 @@
+{
+  "metadata": {
+    "created_at": "2026-08-18T11:01:33.499915+00:00",
+    "checkpoint_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/best_model/pytorch_model.bin",
+    "checkpoint_sha256": "f4b61bf2db8833aa5b23bf49c9778fb154177b18954e6f8563a59cf80145a27c",
+    "documents": 581,
+    "score_threshold": 0.5,
+    "ned_threshold": 0.2,
+    "iou_threshold": 0.3,
+    "recovery_function": "evaluate_stage4b._extract_all_type_predictions",
+    "recovery_function_source_sha256": "8d9a56cfb22571e70ea073d732ea7444a5bef9f17c5458268287746cf2c894db",
+    "visual_input": "constant blank processor tensor",
+    "pixel_min": 1.0,
+    "pixel_max": 1.0
+  },
+  "prediction_counts": {
+    "kvp": 2912,
+    "unkeyed": 1538,
+    "unvalued": 1196
+  },
+  "entity_confusion_matrix": {
+    "labels": [
+      "OTHER",
+      "KEY",
+      "VALUE"
+    ],
+    "rows_target_columns_prediction": [
+      [
+        112902,
+        5402,
+        7930
+      ],
+      [
+        2519,
+        11985,
+        803
+      ],
+      [
+        4062,
+        584,
+        31233
+      ]
+    ],
+    "key_predicted_as_value": 803,
+    "value_predicted_as_key": 584
+  },
+  "candidate_counts": {
+    "key_predicted_as_value": 379,
+    "missed_entity": 3636,
+    "spurious_entity": 6704,
+    "value_predicted_as_key": 375
+  },
+  "top_examples": {
+    "key_predicted_as_value": [
+      {
+        "document_id": "5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222",
+        "source_json": "data/prepared/test/5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222.json",
+        "cluster": "Cluster_1",
+        "word": "MO",
+        "bbox": [
+          50,
+          87,
+          52,
+          89
+        ],
+        "context": "209 South Kingshighway Saint Charles, MO 63301-1695 (636) 949-4933 \u2022 adultadmissions@lindenwood.edu",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9997250437736511,
+        "token_index": 11,
+        "word_index": 6
+      },
+      {
+        "document_id": "d45681d4880c6b2054d35064c74ca7b7649e8c6eecaf26638d30c52f0325b2f4",
+        "source_json": "data/prepared/test/d45681d4880c6b2054d35064c74ca7b7649e8c6eecaf26638d30c52f0325b2f4.json",
+        "cluster": "Cluster_1",
+        "word": "Memphis,",
+        "bbox": [
+          69,
+          7,
+          75,
+          9
+        ],
+        "context": "Review Board 315 Administration Bldg. Memphis, TN 38152-3370 Office: 901.678.2705 Fax:",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.998719334602356,
+        "token_index": 11,
+        "word_index": 6
+      },
+      {
+        "document_id": "5e3dc8f71aa8f1f98bd3ae1d565fb7bdf8831d4d641c204ac1095ca19de08176",
+        "source_json": "data/prepared/test/5e3dc8f71aa8f1f98bd3ae1d565fb7bdf8831d4d641c204ac1095ca19de08176.json",
+        "cluster": "Cluster_0",
+        "word": "P.O.",
+        "bbox": [
+          5,
+          54,
+          7,
+          56
+        ],
+        "context": "ABB Distribution Solutions Distribution Automation P.O. Box 699 FI-65101 VAASA, Finland",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9987173080444336,
+        "token_index": 9,
+        "word_index": 6
+      },
+      {
+        "document_id": "af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477",
+        "source_json": "data/prepared/test/af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477.json",
+        "cluster": "Cluster_1",
+        "word": "http://www.nhq.nrcs.usda.gov/OPA/FB96OPA/WetRule.html",
+        "bbox": [
+          24,
+          79,
+          72,
+          81
+        ],
+        "context": "690-0848 E-mail: RMisso@usda.gov Web Site: http://www.nhq.nrcs.usda.gov/OPA/FB96OPA/WetRule.html or http://www.nhq.nrcs.usda.gov/OPA/FB96OPA/WRPfact.html (fact sheet)",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9970464110374451,
+        "token_index": 140,
+        "word_index": 72
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "St.",
+        "bbox": [
+          78,
+          26,
+          81,
+          27
+        ],
+        "context": "Monroe, Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services Provided: Rock rip-rap,",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9951282739639282,
+        "token_index": 76,
+        "word_index": 30
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Oswego,",
+        "bbox": [
+          62,
+          26,
+          68,
+          27
+        ],
+        "context": "Niagara, Orleans, Monroe, Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services Provided:",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9945483803749084,
+        "token_index": 70,
+        "word_index": 28
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Jefferson,",
+        "bbox": [
+          69,
+          26,
+          77,
+          27
+        ],
+        "context": "Orleans, Monroe, Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services Provided: Rock",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9942686557769775,
+        "token_index": 74,
+        "word_index": 29
+      },
+      {
+        "document_id": "712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb",
+        "source_json": "data/prepared/test/712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb.json",
+        "cluster": "Cluster_0",
+        "word": "COMPANY",
+        "bbox": [
+          35,
+          10,
+          59,
+          11
+        ],
+        "context": "AFFORDED UNDER THE POLICY. PRODUCER COMPANY ALLIANT 100 PINE ST. INSURANCE",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9935694932937622,
+        "token_index": 80,
+        "word_index": 34
+      },
+      {
+        "document_id": "6d20768b63bd4f4d97f647ccebfc606bf618d8bb81917bb8d19e1cf4cca38eb8",
+        "source_json": "data/prepared/test/6d20768b63bd4f4d97f647ccebfc606bf618d8bb81917bb8d19e1cf4cca38eb8.json",
+        "cluster": "Cluster_0",
+        "word": "https://",
+        "bbox": [
+          20,
+          76,
+          25,
+          77
+        ],
+        "context": "MC, DISC & AMEX at: https:// midnorthpayments.spectrumreach.com Payment Terms: Net 30",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9922733902931213,
+        "token_index": 236,
+        "word_index": 116
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Cayuga,",
+        "bbox": [
+          55,
+          26,
+          61,
+          27
+        ],
+        "context": "Served: Niagara, Orleans, Monroe, Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.99131178855896,
+        "token_index": 67,
+        "word_index": 27
+      },
+      {
+        "document_id": "535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa",
+        "source_json": "data/prepared/test/535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa.json",
+        "cluster": "Cluster_1",
+        "word": "they",
+        "bbox": [
+          76,
+          36,
+          79,
+          37
+        ],
+        "context": "currently hiring, so it\u2019s possible they accept interns are part time",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.990812361240387,
+        "token_index": 117,
+        "word_index": 69
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Monroe,",
+        "bbox": [
+          42,
+          26,
+          48,
+          27
+        ],
+        "context": "Yes Locations Served: Niagara, Orleans, Monroe, Wayne, Cayuga, Oswego, Jefferson, St.",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9900084733963013,
+        "token_index": 63,
+        "word_index": 25
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Wayne,",
+        "bbox": [
+          49,
+          26,
+          54,
+          27
+        ],
+        "context": "Locations Served: Niagara, Orleans, Monroe, Wayne, Cayuga, Oswego, Jefferson, St. Lawrence",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9893050193786621,
+        "token_index": 65,
+        "word_index": 26
+      },
+      {
+        "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+        "source_json": "data/prepared/test/2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e.json",
+        "cluster": "Cluster_0",
+        "word": "City,",
+        "bbox": [
+          39,
+          25,
+          44,
+          26
+        ],
+        "context": "21\u201059 44th Dr, Long Island City, NY 11101 Project Type: Residential",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9891459941864014,
+        "token_index": 24,
+        "word_index": 13
+      },
+      {
+        "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+        "source_json": "data/prepared/test/2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e.json",
+        "cluster": "Cluster_0",
+        "word": "44th",
+        "bbox": [
+          22,
+          25,
+          26,
+          26
+        ],
+        "context": "Nest Seekers Development Location: 21\u201059 44th Dr, Long Island City, NY",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.989071249961853,
+        "token_index": 18,
+        "word_index": 9
+      },
+      {
+        "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+        "source_json": "data/prepared/test/2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e.json",
+        "cluster": "Cluster_0",
+        "word": "Long",
+        "bbox": [
+          30,
+          25,
+          33,
+          26
+        ],
+        "context": "Development Location: 21\u201059 44th Dr, Long Island City, NY 11101 Project",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9888990521430969,
+        "token_index": 22,
+        "word_index": 11
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Orleans,",
+        "bbox": [
+          35,
+          26,
+          41,
+          27
+        ],
+        "context": "Work: Yes Locations Served: Niagara, Orleans, Monroe, Wayne, Cayuga, Oswego, Jefferson,",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9871845841407776,
+        "token_index": 61,
+        "word_index": 24
+      },
+      {
+        "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+        "source_json": "data/prepared/test/2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e.json",
+        "cluster": "Cluster_0",
+        "word": "Dr,",
+        "bbox": [
+          27,
+          25,
+          29,
+          26
+        ],
+        "context": "Seekers Development Location: 21\u201059 44th Dr, Long Island City, NY 11101",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.986955463886261,
+        "token_index": 20,
+        "word_index": 10
+      },
+      {
+        "document_id": "deaf2ca878f6480fe5020d077ba37dfc06c640bce564e0258fbc55a518c3fb33",
+        "source_json": "data/prepared/test/deaf2ca878f6480fe5020d077ba37dfc06c640bce564e0258fbc55a518c3fb33.json",
+        "cluster": "Cluster_1",
+        "word": "325-2270",
+        "bbox": [
+          16,
+          34,
+          22,
+          36
+        ],
+        "context": "Offices: 250 McCain Telephone: (662) 325-2270 Mailing Address: Box 9544 Mississippi",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9868242144584656,
+        "token_index": 168,
+        "word_index": 70
+      },
+      {
+        "document_id": "bb9ffc2501a12a526edba68420a5ccbce235c1a49c426553394603bcd30bd01f",
+        "source_json": "data/prepared/test/bb9ffc2501a12a526edba68420a5ccbce235c1a49c426553394603bcd30bd01f.json",
+        "cluster": "Cluster_0",
+        "word": "Doran,",
+        "bbox": [
+          23,
+          18,
+          26,
+          20
+        ],
+        "context": "32143 Well Well Name Name Doran, L 5 County County Ogemaw",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9864802956581116,
+        "token_index": 52,
+        "word_index": 14
+      },
+      {
+        "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+        "source_json": "data/prepared/test/2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e.json",
+        "cluster": "Cluster_0",
+        "word": "Island",
+        "bbox": [
+          34,
+          25,
+          39,
+          26
+        ],
+        "context": "Location: 21\u201059 44th Dr, Long Island City, NY 11101 Project Type:",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9861960411071777,
+        "token_index": 23,
+        "word_index": 12
+      },
+      {
+        "document_id": "794c5190aadd9adc224f42c6bbf098a718efe675b6a0561b8760f0aac005bbee",
+        "source_json": "data/prepared/test/794c5190aadd9adc224f42c6bbf098a718efe675b6a0561b8760f0aac005bbee.json",
+        "cluster": "Cluster_1",
+        "word": "2138,",
+        "bbox": [
+          23,
+          17,
+          27,
+          18
+        ],
+        "context": "Interconnect (Y or N) Zones:_2130, 2138, 2546________________________________________________ 11. Distribution Platform(s): _X___",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9853543043136597,
+        "token_index": 73,
+        "word_index": 35
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Arm",
+        "bbox": [
+          45,
+          25,
+          48,
+          27
+        ],
+        "context": "Bash, Moonlight Ball, Pig Roast, Arm Wrestling Philanthropy: nB<J> Settlement School,",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9852480888366699,
+        "token_index": 74,
+        "word_index": 47
+      },
+      {
+        "document_id": "53b1eac0d2c07caca1e1fd851a39db93f41aeb4ccb92d105c6ad5cc6abe8b6f6",
+        "source_json": "data/prepared/test/53b1eac0d2c07caca1e1fd851a39db93f41aeb4ccb92d105c6ad5cc6abe8b6f6.json",
+        "cluster": "Cluster_0",
+        "word": "1650898",
+        "bbox": [
+          4,
+          13,
+          9,
+          15
+        ],
+        "context": "Copy Information: Order Number: 12055644 1650898 Copy Required 12055644 Tape No.",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9849715828895569,
+        "token_index": 12,
+        "word_index": 7
+      },
+      {
+        "document_id": "535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa",
+        "source_json": "data/prepared/test/535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa.json",
+        "cluster": "Cluster_1",
+        "word": "accept",
+        "bbox": [
+          80,
+          36,
+          85,
+          37
+        ],
+        "context": "hiring, so it\u2019s possible they accept interns are part time workers",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9847662448883057,
+        "token_index": 118,
+        "word_index": 70
+      },
+      {
+        "document_id": "84f6be73e39c64c50bfffc44596a829bcb326879b831f76e4a63c1fbc26dfa1b",
+        "source_json": "data/prepared/test/84f6be73e39c64c50bfffc44596a829bcb326879b831f76e4a63c1fbc26dfa1b.json",
+        "cluster": "Cluster_1",
+        "word": "Main",
+        "bbox": [
+          27,
+          11,
+          31,
+          13
+        ],
+        "context": "Wailuku, HI 96793 (808) 270-\u00ad\u20107285 Main (808) 270-\u00ad\u20107275 Fax WEBSITE: www.mauicounty.gov",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9837136268615723,
+        "token_index": 36,
+        "word_index": 16
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Roast,",
+        "bbox": [
+          40,
+          25,
+          45,
+          27
+        ],
+        "context": "Bedrock Bash, Moonlight Ball, Pig Roast, Arm Wrestling Philanthropy: nB<J> Settlement",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9834012985229492,
+        "token_index": 71,
+        "word_index": 46
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Ball,",
+        "bbox": [
+          33,
+          25,
+          36,
+          27
+        ],
+        "context": "Big Events: Bedrock Bash, Moonlight Ball, Pig Roast, Arm Wrestling Philanthropy:",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9813576340675354,
+        "token_index": 68,
+        "word_index": 44
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Moonlight",
+        "bbox": [
+          25,
+          25,
+          32,
+          27
+        ],
+        "context": "63 Big Events: Bedrock Bash, Moonlight Ball, Pig Roast, Arm Wrestling",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9812001585960388,
+        "token_index": 67,
+        "word_index": 43
+      },
+      {
+        "document_id": "535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa",
+        "source_json": "data/prepared/test/535fe6ca56b85018f5f74d59f5ddf5a18fd3cdcdca75b80b89c9ee2f5fb944aa.json",
+        "cluster": "Cluster_1",
+        "word": "possible",
+        "bbox": [
+          69,
+          36,
+          75,
+          37
+        ],
+        "context": "are currently hiring, so it\u2019s possible they accept interns are part",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9809548854827881,
+        "token_index": 116,
+        "word_index": 68
+      },
+      {
+        "document_id": "294697c3b20e427bc07275ba8dffad2682ca0a8388741554e2d63d8a93ce413f",
+        "source_json": "data/prepared/test/294697c3b20e427bc07275ba8dffad2682ca0a8388741554e2d63d8a93ce413f.json",
+        "cluster": "Cluster_0",
+        "word": "PA",
+        "bbox": [
+          74,
+          8,
+          76,
+          9
+        ],
+        "context": "Manager, 2 Public Square, Wilkes-Barre, PA 18701-1915. Luzerne County Conserve District,",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9775416851043701,
+        "token_index": 24,
+        "word_index": 12
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Guides,",
+        "bbox": [
+          30,
+          35,
+          35,
+          37
+        ],
+        "context": "Size: 25 Involvement: Student Orientation Guides, Public Relations Board Accomplishments: Increased",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9765974879264832,
+        "token_index": 123,
+        "word_index": 71
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Relations",
+        "bbox": [
+          41,
+          35,
+          48,
+          37
+        ],
+        "context": "Involvement: Student Orientation Guides, Public Relations Board Accomplishments: Increased chapter roll",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9765890836715698,
+        "token_index": 126,
+        "word_index": 73
+      },
+      {
+        "document_id": "cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848",
+        "source_json": "data/prepared/test/cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848.json",
+        "cluster": "Cluster_0",
+        "word": "White",
+        "bbox": [
+          46,
+          12,
+          53,
+          14
+        ],
+        "context": "T-Shirt Size: XL Color: Red, White Lettering Material: Cotton Condition: Good",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9761133790016174,
+        "token_index": 30,
+        "word_index": 15
+      },
+      {
+        "document_id": "367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad",
+        "source_json": "data/prepared/test/367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad.json",
+        "cluster": "Cluster_0",
+        "word": "Stray.",
+        "bbox": [
+          59,
+          31,
+          63,
+          33
+        ],
+        "context": "Mid Michigan Gas well in Stray. Stratigraphic and production data. orage",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.975895345211029,
+        "token_index": 106,
+        "word_index": 47
+      },
+      {
+        "document_id": "dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5",
+        "source_json": "data/prepared/test/dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5.json",
+        "cluster": "Cluster_1",
+        "word": "2021",
+        "bbox": [
+          68,
+          61,
+          73,
+          63
+        ],
+        "context": "Response Deadline Date/Time: August 12, 2021 End of Business Response Submission",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9758515357971191,
+        "token_index": 70,
+        "word_index": 41
+      },
+      {
+        "document_id": "367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad",
+        "source_json": "data/prepared/test/367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad.json",
+        "cluster": "Cluster_0",
+        "word": "well",
+        "bbox": [
+          54,
+          31,
+          57,
+          33
+        ],
+        "context": "co_name co_name Mid Michigan Gas well in Stray. Stratigraphic and production",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9757328033447266,
+        "token_index": 104,
+        "word_index": 45
+      },
+      {
+        "document_id": "029a0132f33ba2ce64dc1f5c5614c3d1c3ab5b2ac4546878338f3ab53c17e9f8",
+        "source_json": "data/prepared/test/029a0132f33ba2ce64dc1f5c5614c3d1c3ab5b2ac4546878338f3ab53c17e9f8.json",
+        "cluster": "Cluster_1",
+        "word": "Street,",
+        "bbox": [
+          68,
+          8,
+          74,
+          9
+        ],
+        "context": "Program Manager, 208 West Third Street, Williamsport, PA 17701, 570.327.3636 Facility",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9746789932250977,
+        "token_index": 19,
+        "word_index": 12
+      },
+      {
+        "document_id": "029a0132f33ba2ce64dc1f5c5614c3d1c3ab5b2ac4546878338f3ab53c17e9f8",
+        "source_json": "data/prepared/test/029a0132f33ba2ce64dc1f5c5614c3d1c3ab5b2ac4546878338f3ab53c17e9f8.json",
+        "cluster": "Cluster_1",
+        "word": "Third",
+        "bbox": [
+          63,
+          8,
+          67,
+          9
+        ],
+        "context": "Wetlands Program Manager, 208 West Third Street, Williamsport, PA 17701, 570.327.3636",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9741109609603882,
+        "token_index": 18,
+        "word_index": 11
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Public",
+        "bbox": [
+          36,
+          35,
+          40,
+          37
+        ],
+        "context": "25 Involvement: Student Orientation Guides, Public Relations Board Accomplishments: Increased chapter",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9738124012947083,
+        "token_index": 125,
+        "word_index": 72
+      },
+      {
+        "document_id": "367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad",
+        "source_json": "data/prepared/test/367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad.json",
+        "cluster": "Cluster_0",
+        "word": "Gas",
+        "bbox": [
+          52,
+          31,
+          54,
+          33
+        ],
+        "context": "Pure co_name co_name Mid Michigan Gas well in Stray. Stratigraphic and",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9735314249992371,
+        "token_index": 103,
+        "word_index": 44
+      },
+      {
+        "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+        "source_json": "data/prepared/test/2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e.json",
+        "cluster": "Cluster_0",
+        "word": "(T)",
+        "bbox": [
+          24,
+          92,
+          27,
+          94
+        ],
+        "context": "sites. SKY CONSTRUCTION GROUP 845.598.9845 (T) | 61 ST JAMES PL,",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9726253747940063,
+        "token_index": 194,
+        "word_index": 143
+      },
+      {
+        "document_id": "367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad",
+        "source_json": "data/prepared/test/367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad.json",
+        "cluster": "Cluster_0",
+        "word": "Michigan",
+        "bbox": [
+          46,
+          31,
+          51,
+          33
+        ],
+        "context": "Pure Pure co_name co_name Mid Michigan Gas well in Stray. Stratigraphic",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9724974036216736,
+        "token_index": 102,
+        "word_index": 43
+      },
+      {
+        "document_id": "12591671affcfa14d8bd9ba4dc28a5ae248bcc45c44d771c927cd746b4a257b6",
+        "source_json": "data/prepared/test/12591671affcfa14d8bd9ba4dc28a5ae248bcc45c44d771c927cd746b4a257b6.json",
+        "cluster": "Cluster_1",
+        "word": "Gala",
+        "bbox": [
+          30,
+          66,
+          34,
+          67
+        ],
+        "context": "State Foundation ATTN: 1stGEN Scholarship Gala 9501 S. King Drive ADM",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9724699258804321,
+        "token_index": 269,
+        "word_index": 162
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Bash,",
+        "bbox": [
+          21,
+          25,
+          24,
+          27
+        ],
+        "context": "Size: 63 Big Events: Bedrock Bash, Moonlight Ball, Pig Roast, Arm",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9718334674835205,
+        "token_index": 65,
+        "word_index": 42
+      },
+      {
+        "document_id": "ea9896984f00b3f045190df057c8541f316f13d084652fe5fbea85820edf7329",
+        "source_json": "data/prepared/test/ea9896984f00b3f045190df057c8541f316f13d084652fe5fbea85820edf7329.json",
+        "cluster": "Cluster_0",
+        "word": "Domestic",
+        "bbox": [
+          11,
+          78,
+          20,
+          79
+        ],
+        "context": "Koppling ledningsskyddsbrytare jordfelsbrytare ABB Oy Domestic Sales Bes\u00f6ksadress Telefon Internet FO-nummer",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9715585112571716,
+        "token_index": 169,
+        "word_index": 48
+      },
+      {
+        "document_id": "367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad",
+        "source_json": "data/prepared/test/367cc825af95dd61fee754c8292a243eded258979f60489d11b389e9bff280ad.json",
+        "cluster": "Cluster_0",
+        "word": "Stratigraphic",
+        "bbox": [
+          64,
+          31,
+          72,
+          33
+        ],
+        "context": "Michigan Gas well in Stray. Stratigraphic and production data. orage Company",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9705120325088501,
+        "token_index": 109,
+        "word_index": 48
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Pig",
+        "bbox": [
+          37,
+          25,
+          39,
+          27
+        ],
+        "context": "Events: Bedrock Bash, Moonlight Ball, Pig Roast, Arm Wrestling Philanthropy: nB<J>",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9702423810958862,
+        "token_index": 70,
+        "word_index": 45
+      },
+      {
+        "document_id": "d1f0e00fe54dbf8bb6f9368ac319200b3f1fd7fe88361284d531d4f94920b381",
+        "source_json": "data/prepared/test/d1f0e00fe54dbf8bb6f9368ac319200b3f1fd7fe88361284d531d4f94920b381.json",
+        "cluster": "Cluster_0",
+        "word": "VA",
+        "bbox": [
+          85,
+          20,
+          87,
+          22
+        ],
+        "context": "Address: 817 Slaters Lane Alexandria, VA Contact Name: Steve Syckes 22314",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9698554873466492,
+        "token_index": 73,
+        "word_index": 41
+      },
+      {
+        "document_id": "12591671affcfa14d8bd9ba4dc28a5ae248bcc45c44d771c927cd746b4a257b6",
+        "source_json": "data/prepared/test/12591671affcfa14d8bd9ba4dc28a5ae248bcc45c44d771c927cd746b4a257b6.json",
+        "cluster": "Cluster_1",
+        "word": "Scholarship",
+        "bbox": [
+          21,
+          66,
+          30,
+          67
+        ],
+        "context": "Chicago State Foundation ATTN: 1stGEN Scholarship Gala 9501 S. King Drive",
+        "target": "KEY",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9695897102355957,
+        "token_index": 268,
+        "word_index": 161
+      }
+    ],
+    "missed_entity": [
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Enrl",
+        "bbox": [
+          10,
+          55,
+          14,
+          56
+        ],
+        "context": "----- ----------- 33552 Wrongful Convictions Enrl Bids Acc Wait Max Min",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9998286962509155,
+        "token_index": 358,
+        "word_index": 254
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "900-",
+        "bbox": [
+          44,
+          55,
+          48,
+          56
+        ],
+        "context": "Acc Wait Max Min 1000- 900- 800- 700- 600- 500- 400-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.999819815158844,
+        "token_index": 368,
+        "word_index": 261
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Max",
+        "bbox": [
+          29,
+          31,
+          32,
+          32
+        ],
+        "context": "Resources Enrl Bids Acc Wait Max Min 1000- 900- 800- 700-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9998094439506531,
+        "token_index": 181,
+        "word_index": 121
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "1000-",
+        "bbox": [
+          38,
+          55,
+          43,
+          56
+        ],
+        "context": "Bids Acc Wait Max Min 1000- 900- 800- 700- 600- 500-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9998069405555725,
+        "token_index": 366,
+        "word_index": 260
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Min",
+        "bbox": [
+          33,
+          55,
+          37,
+          56
+        ],
+        "context": "Enrl Bids Acc Wait Max Min 1000- 900- 800- 700- 600-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9998055100440979,
+        "token_index": 365,
+        "word_index": 259
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Min",
+        "bbox": [
+          33,
+          31,
+          37,
+          32
+        ],
+        "context": "Enrl Bids Acc Wait Max Min 1000- 900- 800- 700- 600-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9998019337654114,
+        "token_index": 182,
+        "word_index": 122
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Max",
+        "bbox": [
+          29,
+          55,
+          32,
+          56
+        ],
+        "context": "Convictions Enrl Bids Acc Wait Max Min 1000- 900- 800- 700-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9998010993003845,
+        "token_index": 364,
+        "word_index": 258
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Bids",
+        "bbox": [
+          15,
+          31,
+          19,
+          32
+        ],
+        "context": "----------- 33484 Water Resources Enrl Bids Acc Wait Max Min 1000-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.999800980091095,
+        "token_index": 177,
+        "word_index": 118
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "400-",
+        "bbox": [
+          70,
+          55,
+          74,
+          56
+        ],
+        "context": "900- 800- 700- 600- 500- 400- 300- 200- 100- Cap Bid",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997947812080383,
+        "token_index": 378,
+        "word_index": 266
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Enrl",
+        "bbox": [
+          10,
+          31,
+          14,
+          32
+        ],
+        "context": "----- ----------- 33484 Water Resources Enrl Bids Acc Wait Max Min",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997894167900085,
+        "token_index": 175,
+        "word_index": 117
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "100-",
+        "bbox": [
+          85,
+          55,
+          90,
+          56
+        ],
+        "context": "600- 500- 400- 300- 200- 100- Cap Bid Bid 901 801",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997870326042175,
+        "token_index": 384,
+        "word_index": 269
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "500-",
+        "bbox": [
+          65,
+          55,
+          69,
+          56
+        ],
+        "context": "1000- 900- 800- 700- 600- 500- 400- 300- 200- 100- Cap",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997847676277161,
+        "token_index": 376,
+        "word_index": 265
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "1351",
+        "bbox": [
+          28,
+          44,
+          34,
+          45
+        ],
+        "context": "293- 142- Cap Bid Bid 1351 1200 1049 898 747 596",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997772574424744,
+        "token_index": 300,
+        "word_index": 205
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "300-",
+        "bbox": [
+          75,
+          55,
+          79,
+          56
+        ],
+        "context": "800- 700- 600- 500- 400- 300- 200- 100- Cap Bid Bid",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.999767005443573,
+        "token_index": 380,
+        "word_index": 267
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "200-",
+        "bbox": [
+          80,
+          55,
+          84,
+          56
+        ],
+        "context": "700- 600- 500- 400- 300- 200- 100- Cap Bid Bid 901",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997666478157043,
+        "token_index": 382,
+        "word_index": 268
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "1049",
+        "bbox": [
+          43,
+          44,
+          49,
+          45
+        ],
+        "context": "Cap Bid Bid 1351 1200 1049 898 747 596 445 294",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997650980949402,
+        "token_index": 303,
+        "word_index": 207
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "898",
+        "bbox": [
+          50,
+          44,
+          54,
+          45
+        ],
+        "context": "Bid Bid 1351 1200 1049 898 747 596 445 294 143",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997636675834656,
+        "token_index": 305,
+        "word_index": 208
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "900-",
+        "bbox": [
+          44,
+          31,
+          48,
+          32
+        ],
+        "context": "Acc Wait Max Min 1000- 900- 800- 700- 600- 500- 400-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997605681419373,
+        "token_index": 185,
+        "word_index": 124
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "1000-",
+        "bbox": [
+          38,
+          31,
+          43,
+          32
+        ],
+        "context": "Bids Acc Wait Max Min 1000- 900- 800- 700- 600- 500-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997591376304626,
+        "token_index": 183,
+        "word_index": 123
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "801",
+        "bbox": [
+          35,
+          56,
+          40,
+          57
+        ],
+        "context": "100- Cap Bid Bid 901 801 701 601 501 401 301",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997479319572449,
+        "token_index": 391,
+        "word_index": 274
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "100-",
+        "bbox": [
+          85,
+          31,
+          90,
+          32
+        ],
+        "context": "600- 500- 400- 300- 200- 100- Cap Bid Bid 901 801",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997429251670837,
+        "token_index": 201,
+        "word_index": 132
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "747",
+        "bbox": [
+          56,
+          44,
+          61,
+          45
+        ],
+        "context": "Bid 1351 1200 1049 898 747 596 445 294 143 0",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997416138648987,
+        "token_index": 307,
+        "word_index": 209
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "901",
+        "bbox": [
+          29,
+          56,
+          33,
+          57
+        ],
+        "context": "200- 100- Cap Bid Bid 901 801 701 601 501 401",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.99974125623703,
+        "token_index": 389,
+        "word_index": 273
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "1200",
+        "bbox": [
+          35,
+          44,
+          41,
+          45
+        ],
+        "context": "142- Cap Bid Bid 1351 1200 1049 898 747 596 445",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997370839118958,
+        "token_index": 302,
+        "word_index": 206
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Min",
+        "bbox": [
+          33,
+          43,
+          36,
+          44
+        ],
+        "context": "Enrl Bids Acc Wait Max Min 1501- 1350- 1199- 1048- 897-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997350573539734,
+        "token_index": 269,
+        "word_index": 191
+      },
+      {
+        "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+        "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+        "cluster": "Cluster_0",
+        "word": "mm/dd/yy",
+        "bbox": [
+          37,
+          46,
+          53,
+          49
+        ],
+        "context": "Drdap \u25a1rd 1 mm/dd/yy 1. mm/dd/yy 1. mm/dd/yy 2 mm/dd/yy 2.",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997335076332092,
+        "token_index": 414,
+        "word_index": 234
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "596",
+        "bbox": [
+          62,
+          44,
+          67,
+          45
+        ],
+        "context": "1351 1200 1049 898 747 596 445 294 143 0 ---",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997287392616272,
+        "token_index": 308,
+        "word_index": 210
+      },
+      {
+        "document_id": "5d008d390121815225b91ccb053b8f5e9305cdf16e3229ac938347f113189a7a",
+        "source_json": "data/prepared/test/5d008d390121815225b91ccb053b8f5e9305cdf16e3229ac938347f113189a7a.json",
+        "cluster": "Cluster_0",
+        "word": "38,410.00",
+        "bbox": [
+          59,
+          34,
+          70,
+          35
+        ],
+        "context": "Dec 19 70,095.00 Aug 19 38,410.00 Late Fee: $0.00 Mar 20",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997285008430481,
+        "token_index": 227,
+        "word_index": 104
+      },
+      {
+        "document_id": "60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208",
+        "source_json": "data/prepared/test/60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208.json",
+        "cluster": "Cluster_0",
+        "word": "YYYY-MM-DD",
+        "bbox": [
+          85,
+          44,
+          94,
+          46
+        ],
+        "context": "1234567 19 01/01/2009 YYYY-MM-DD 12/31/2009 YYYY-MM-DD 2 Insurance fee and commission",
+        "target": "VALUE",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997285008430481,
+        "token_index": 471,
+        "word_index": 253
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "400-",
+        "bbox": [
+          70,
+          31,
+          74,
+          32
+        ],
+        "context": "900- 800- 700- 600- 500- 400- 300- 200- 100- Cap Bid",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.999728262424469,
+        "token_index": 195,
+        "word_index": 129
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "500-",
+        "bbox": [
+          65,
+          31,
+          69,
+          32
+        ],
+        "context": "1000- 900- 800- 700- 600- 500- 400- 300- 200- 100- Cap",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997254014015198,
+        "token_index": 193,
+        "word_index": 128
+      },
+      {
+        "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+        "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+        "cluster": "Cluster_0",
+        "word": "mm/dd/yy",
+        "bbox": [
+          13,
+          48,
+          29,
+          51
+        ],
+        "context": "1. mm/dd/yy 1. mm/dd/yy 2 mm/dd/yy 2. mm/dd/yy 2. mm/dd/yy 3",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.999724805355072,
+        "token_index": 427,
+        "word_index": 238
+      },
+      {
+        "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+        "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+        "cluster": "Cluster_0",
+        "word": "mm/dd/yy",
+        "bbox": [
+          37,
+          48,
+          53,
+          51
+        ],
+        "context": "1. mm/dd/yy 2 mm/dd/yy 2. mm/dd/yy 2. mm/dd/yy 3 mm/dd/yy 3.",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997242093086243,
+        "token_index": 434,
+        "word_index": 240
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Max",
+        "bbox": [
+          29,
+          43,
+          32,
+          44
+        ],
+        "context": "Trusts Enrl Bids Acc Wait Max Min 1501- 1350- 1199- 1048-",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.999721109867096,
+        "token_index": 268,
+        "word_index": 190
+      },
+      {
+        "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+        "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+        "cluster": "Cluster_0",
+        "word": "mm/dd/yy",
+        "bbox": [
+          61,
+          46,
+          78,
+          49
+        ],
+        "context": "1 mm/dd/yy 1. mm/dd/yy 1. mm/dd/yy 2 mm/dd/yy 2. mm/dd/yy 2.",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997199177742004,
+        "token_index": 421,
+        "word_index": 236
+      },
+      {
+        "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+        "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+        "cluster": "Cluster_0",
+        "word": "mm/dd/yy",
+        "bbox": [
+          13,
+          46,
+          29,
+          49
+        ],
+        "context": "\u25a1 DTP/DTap Drdap \u25a1rd 1 mm/dd/yy 1. mm/dd/yy 1. mm/dd/yy 2",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997147917747498,
+        "token_index": 407,
+        "word_index": 232
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Cap",
+        "bbox": [
+          10,
+          32,
+          14,
+          33
+        ],
+        "context": "500- 400- 300- 200- 100- Cap Bid Bid 901 801 701",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997110962867737,
+        "token_index": 203,
+        "word_index": 133
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "901",
+        "bbox": [
+          29,
+          32,
+          33,
+          33
+        ],
+        "context": "200- 100- Cap Bid Bid 901 801 701 601 501 401",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997093081474304,
+        "token_index": 206,
+        "word_index": 136
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Cap",
+        "bbox": [
+          10,
+          44,
+          14,
+          45
+        ],
+        "context": "746- 595- 444- 293- 142- Cap Bid Bid 1351 1200 1049",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9997037053108215,
+        "token_index": 297,
+        "word_index": 202
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "300-",
+        "bbox": [
+          75,
+          31,
+          79,
+          32
+        ],
+        "context": "800- 700- 600- 500- 400- 300- 200- 100- Cap Bid Bid",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996986389160156,
+        "token_index": 197,
+        "word_index": 130
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "Cap",
+        "bbox": [
+          10,
+          56,
+          14,
+          57
+        ],
+        "context": "500- 400- 300- 200- 100- Cap Bid Bid 901 801 701",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996962547302246,
+        "token_index": 386,
+        "word_index": 270
+      },
+      {
+        "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+        "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+        "cluster": "Cluster_0",
+        "word": "mm/dd/yy",
+        "bbox": [
+          61,
+          48,
+          78,
+          51
+        ],
+        "context": "2 mm/dd/yy 2. mm/dd/yy 2. mm/dd/yy 3 mm/dd/yy 3. mm/dd/yy 3.",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996933937072754,
+        "token_index": 441,
+        "word_index": 242
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "200-",
+        "bbox": [
+          80,
+          31,
+          84,
+          32
+        ],
+        "context": "700- 600- 500- 400- 300- 200- 100- Cap Bid Bid 901",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996898174285889,
+        "token_index": 199,
+        "word_index": 131
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "143",
+        "bbox": [
+          80,
+          44,
+          85,
+          45
+        ],
+        "context": "898 747 596 445 294 143 0 --- ---- --- ----",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996888637542725,
+        "token_index": 312,
+        "word_index": 213
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "445",
+        "bbox": [
+          68,
+          44,
+          73,
+          45
+        ],
+        "context": "1200 1049 898 747 596 445 294 143 0 --- ----",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996886253356934,
+        "token_index": 310,
+        "word_index": 211
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "801",
+        "bbox": [
+          35,
+          32,
+          40,
+          33
+        ],
+        "context": "100- Cap Bid Bid 901 801 701 601 501 401 301",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996874332427979,
+        "token_index": 208,
+        "word_index": 137
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "101",
+        "bbox": [
+          80,
+          56,
+          84,
+          57
+        ],
+        "context": "601 501 401 301 201 101 1 --- ---- --- ----",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996815919876099,
+        "token_index": 399,
+        "word_index": 281
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "294",
+        "bbox": [
+          74,
+          44,
+          79,
+          45
+        ],
+        "context": "1049 898 747 596 445 294 143 0 --- ---- ---",
+        "target": "KEY",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996803998947144,
+        "token_index": 311,
+        "word_index": 212
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "1501",
+        "bbox": [
+          33,
+          46,
+          41,
+          47
+        ],
+        "context": "------ 95 44 44 0 1501 1 4 1 1 0",
+        "target": "VALUE",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996776580810547,
+        "token_index": 334,
+        "word_index": 235
+      },
+      {
+        "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+        "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+        "cluster": "Cluster_0",
+        "word": "95",
+        "bbox": [
+          10,
+          46,
+          14,
+          47
+        ],
+        "context": "------ ------ ------ ------ ------ 95 44 44 0 1501 1",
+        "target": "VALUE",
+        "prediction": "OTHER",
+        "prediction_confidence": 0.9996750354766846,
+        "token_index": 330,
+        "word_index": 231
+      }
+    ],
+    "spurious_entity": [
+      {
+        "document_id": "b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b",
+        "source_json": "data/prepared/test/b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b.json",
+        "cluster": "Cluster_1",
+        "word": "High-Risk",
+        "bbox": [
+          42,
+          77,
+          48,
+          78
+        ],
+        "context": "High-Risk Pregnancy Program University of Arkansas",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9996920824050903,
+        "token_index": 1,
+        "word_index": 0
+      },
+      {
+        "document_id": "b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b",
+        "source_json": "data/prepared/test/b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b.json",
+        "cluster": "Cluster_1",
+        "word": "Program",
+        "bbox": [
+          56,
+          77,
+          61,
+          78
+        ],
+        "context": "High-Risk Pregnancy Program University of Arkansas for Medical",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9996577501296997,
+        "token_index": 7,
+        "word_index": 2
+      },
+      {
+        "document_id": "b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b",
+        "source_json": "data/prepared/test/b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b.json",
+        "cluster": "Cluster_1",
+        "word": "Pregnancy",
+        "bbox": [
+          49,
+          77,
+          55,
+          78
+        ],
+        "context": "High-Risk Pregnancy Program University of Arkansas for",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9995991587638855,
+        "token_index": 5,
+        "word_index": 1
+      },
+      {
+        "document_id": "af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477",
+        "source_json": "data/prepared/test/af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477.json",
+        "cluster": "Cluster_1",
+        "word": "\u201chttp://www.ncg.nrcs.usda.gov/perdir.html\u201d)",
+        "bbox": [
+          15,
+          37,
+          52,
+          39
+        ],
+        "context": "Resources Conservation Service office (see \u201chttp://www.ncg.nrcs.usda.gov/perdir.html\u201d) Department of Agriculture, National Resources",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9994027614593506,
+        "token_index": 57,
+        "word_index": 47
+      },
+      {
+        "document_id": "0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55",
+        "source_json": "data/prepared/test/0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55.json",
+        "cluster": "Cluster_1",
+        "word": "Lloyd,",
+        "bbox": [
+          18,
+          89,
+          22,
+          90
+        ],
+        "context": "Fax: 215.573.2036 www.archives.upenn.edu Mark Frazier Lloyd, Director",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9992827773094177,
+        "token_index": 48,
+        "word_index": 20
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "This",
+        "bbox": [
+          25,
+          90,
+          27,
+          91
+        ],
+        "context": "Latitude 43.747279 Longitude Longitude -85.0505582 This document is available at ScholarWorks",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.999195396900177,
+        "token_index": 132,
+        "word_index": 59
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "is",
+        "bbox": [
+          34,
+          90,
+          36,
+          91
+        ],
+        "context": "Longitude Longitude -85.0505582 This document is available at ScholarWorks at WMU:",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9991839528083801,
+        "token_index": 134,
+        "word_index": 61
+      },
+      {
+        "document_id": "0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55",
+        "source_json": "data/prepared/test/0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55.json",
+        "cluster": "Cluster_1",
+        "word": "Frazier",
+        "bbox": [
+          12,
+          89,
+          17,
+          90
+        ],
+        "context": "215.898.7024 Fax: 215.573.2036 www.archives.upenn.edu Mark Frazier Lloyd, Director",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9990102052688599,
+        "token_index": 47,
+        "word_index": 19
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "ScholarWorks",
+        "bbox": [
+          45,
+          90,
+          54,
+          91
+        ],
+        "context": "This document is available at ScholarWorks at WMU: https://scholarworks.wmich.edu/pure/3661",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9990092515945435,
+        "token_index": 137,
+        "word_index": 64
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "document",
+        "bbox": [
+          28,
+          90,
+          34,
+          91
+        ],
+        "context": "43.747279 Longitude Longitude -85.0505582 This document is available at ScholarWorks at",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9989219903945923,
+        "token_index": 133,
+        "word_index": 60
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "available",
+        "bbox": [
+          36,
+          90,
+          43,
+          91
+        ],
+        "context": "Longitude -85.0505582 This document is available at ScholarWorks at WMU: https://scholarworks.wmich.edu/pure/3661",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9988874793052673,
+        "token_index": 135,
+        "word_index": 62
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "at",
+        "bbox": [
+          43,
+          90,
+          45,
+          91
+        ],
+        "context": "-85.0505582 This document is available at ScholarWorks at WMU: https://scholarworks.wmich.edu/pure/3661",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9988864064216614,
+        "token_index": 136,
+        "word_index": 63
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "at",
+        "bbox": [
+          54,
+          90,
+          56,
+          91
+        ],
+        "context": "document is available at ScholarWorks at WMU: https://scholarworks.wmich.edu/pure/3661",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9988546371459961,
+        "token_index": 139,
+        "word_index": 65
+      },
+      {
+        "document_id": "0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55",
+        "source_json": "data/prepared/test/0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55.json",
+        "cluster": "Cluster_1",
+        "word": "Director",
+        "bbox": [
+          23,
+          89,
+          29,
+          90
+        ],
+        "context": "215.573.2036 www.archives.upenn.edu Mark Frazier Lloyd, Director",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9988056421279907,
+        "token_index": 50,
+        "word_index": 21
+      },
+      {
+        "document_id": "0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55",
+        "source_json": "data/prepared/test/0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55.json",
+        "cluster": "Cluster_1",
+        "word": "Mark",
+        "bbox": [
+          9,
+          89,
+          11,
+          90
+        ],
+        "context": "19104-3358 215.898.7024 Fax: 215.573.2036 www.archives.upenn.edu Mark Frazier Lloyd, Director",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9987971782684326,
+        "token_index": 46,
+        "word_index": 18
+      },
+      {
+        "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+        "source_json": "data/prepared/test/29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3.json",
+        "cluster": "Cluster_1",
+        "word": "a",
+        "bbox": [
+          48,
+          54,
+          49,
+          56
+        ],
+        "context": "talk to, 24/7. Coalition for a Drug Free Hawaii Phone Numbers:",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9987868666648865,
+        "token_index": 80,
+        "word_index": 37
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "WMU:",
+        "bbox": [
+          56,
+          90,
+          59,
+          91
+        ],
+        "context": "is available at ScholarWorks at WMU: https://scholarworks.wmich.edu/pure/3661",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9987096786499023,
+        "token_index": 140,
+        "word_index": 66
+      },
+      {
+        "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+        "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+        "cluster": "Cluster_1",
+        "word": "https://scholarworks.wmich.edu/pure/3661",
+        "bbox": [
+          60,
+          90,
+          88,
+          91
+        ],
+        "context": "available at ScholarWorks at WMU: https://scholarworks.wmich.edu/pure/3661",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9986242055892944,
+        "token_index": 143,
+        "word_index": 67
+      },
+      {
+        "document_id": "0425109d29b14a711f83e3401d1f8db95a53e2886b0214a3ce42413f6f2ba5ee",
+        "source_json": "data/prepared/test/0425109d29b14a711f83e3401d1f8db95a53e2886b0214a3ce42413f6f2ba5ee.json",
+        "cluster": "Cluster_0",
+        "word": "Full-or-part-time:",
+        "bbox": [
+          9,
+          65,
+          21,
+          66
+        ],
+        "context": "\u00b7 Adsorption with activated carbon Full-or-part-time: 4h 30m Theory classes: 1h",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9984242916107178,
+        "token_index": 274,
+        "word_index": 146
+      },
+      {
+        "document_id": "1811a212568ed883b7f092734383dd81cc975b9f4025e5c276d19139bf88eaac",
+        "source_json": "data/prepared/test/1811a212568ed883b7f092734383dd81cc975b9f4025e5c276d19139bf88eaac.json",
+        "cluster": "Cluster_0",
+        "word": "BRETT",
+        "bbox": [
+          53,
+          52,
+          59,
+          54
+        ],
+        "context": "VERONICA BRETT POLITICAL PLANNER",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9983283877372742,
+        "token_index": 4,
+        "word_index": 1
+      },
+      {
+        "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+        "source_json": "data/prepared/test/29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3.json",
+        "cluster": "Cluster_1",
+        "word": "for",
+        "bbox": [
+          44,
+          54,
+          47,
+          56
+        ],
+        "context": "to talk to, 24/7. Coalition for a Drug Free Hawaii Phone",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9983028173446655,
+        "token_index": 79,
+        "word_index": 36
+      },
+      {
+        "document_id": "cb96d6c0559bad6ac207687ef6a8b2e54d6620eda96ce2786136e203e5617a20",
+        "source_json": "data/prepared/test/cb96d6c0559bad6ac207687ef6a8b2e54d6620eda96ce2786136e203e5617a20.json",
+        "cluster": "Cluster_0",
+        "word": "415-885-3693",
+        "bbox": [
+          5,
+          81,
+          13,
+          83
+        ],
+        "context": "Joseph Friend Cancer Resource Center 415-885-3693 cancer.ucsf.edu/crc Clinical trials 877-827-3222 cancer.ucsf.edu/trials",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9982774257659912,
+        "token_index": 185,
+        "word_index": 89
+      },
+      {
+        "document_id": "53655dd00c33f41681fe671b0b8cceaec8d99e7810a83b764a31952ec5c508cc",
+        "source_json": "data/prepared/test/53655dd00c33f41681fe671b0b8cceaec8d99e7810a83b764a31952ec5c508cc.json",
+        "cluster": "Cluster_0",
+        "word": "924-3100",
+        "bbox": [
+          74,
+          11,
+          81,
+          13
+        ],
+        "context": "San Jose, CA 95192-0058 (408) 924-3100 What is it? A coalition",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9981667995452881,
+        "token_index": 45,
+        "word_index": 30
+      },
+      {
+        "document_id": "04a5ec663fd5f2ad17a8a38d764fb84c1f1b65f1c3377840c81bd06ee3130dbf",
+        "source_json": "data/prepared/test/04a5ec663fd5f2ad17a8a38d764fb84c1f1b65f1c3377840c81bd06ee3130dbf.json",
+        "cluster": "Cluster_1",
+        "word": "www.bber.umt.edu",
+        "bbox": [
+          11,
+          87,
+          23,
+          89
+        ],
+        "context": "Phone: (406) 243-5113 Email: info@business.umt.edu www.bber.umt.edu",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9981619715690613,
+        "token_index": 43,
+        "word_index": 22
+      },
+      {
+        "document_id": "d3126e712afa7afe801f4b71973f24d4232fea25e1db77601c2627347fe1706a",
+        "source_json": "data/prepared/test/d3126e712afa7afe801f4b71973f24d4232fea25e1db77601c2627347fe1706a.json",
+        "cluster": "Cluster_0",
+        "word": "Italy",
+        "bbox": [
+          15,
+          92,
+          18,
+          93
+        ],
+        "context": "of these I-24123 Bergamo - Italy ticulars shall prevail. ABB AG",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9981566071510315,
+        "token_index": 109,
+        "word_index": 76
+      },
+      {
+        "document_id": "d5c289c9db3ecbe57842c03dad5cb3b6d1efe2b16da62e5c1026f95424876398",
+        "source_json": "data/prepared/test/d5c289c9db3ecbe57842c03dad5cb3b6d1efe2b16da62e5c1026f95424876398.json",
+        "cluster": "Cluster_1",
+        "word": "Trip",
+        "bbox": [
+          6,
+          46,
+          9,
+          49
+        ],
+        "context": "of original charge: Amount: SAP: Trip Number: Reason for Deposit: Check",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.998058021068573,
+        "token_index": 68,
+        "word_index": 44
+      },
+      {
+        "document_id": "248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970",
+        "source_json": "data/prepared/test/248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970.json",
+        "cluster": "Cluster_1",
+        "word": "480-965-5965",
+        "bbox": [
+          18,
+          60,
+          30,
+          61
+        ],
+        "context": "questions: ASU Global Education Office 480-965-5965 Email ASU Global Education Office",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.997961163520813,
+        "token_index": 187,
+        "word_index": 120
+      },
+      {
+        "document_id": "eb59301969fccf9951794170a7745e6647dba7e115367c6920421aea07065798",
+        "source_json": "data/prepared/test/eb59301969fccf9951794170a7745e6647dba7e115367c6920421aea07065798.json",
+        "cluster": "Cluster_1",
+        "word": "01852",
+        "bbox": [
+          26,
+          21,
+          33,
+          23
+        ],
+        "context": "17 Kirk Street Lowell, MA 01852 Lowell, MA 01852 Internship: Yes",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9978864789009094,
+        "token_index": 34,
+        "word_index": 16
+      },
+      {
+        "document_id": "79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769",
+        "source_json": "data/prepared/test/79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769.json",
+        "cluster": "Cluster_0",
+        "word": "the",
+        "bbox": [
+          15,
+          29,
+          17,
+          30
+        ],
+        "context": "this form. 3 Name of the bond or certificate issuer State",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9978735446929932,
+        "token_index": 189,
+        "word_index": 149
+      },
+      {
+        "document_id": "5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013",
+        "source_json": "data/prepared/test/5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013.json",
+        "cluster": "Cluster_1",
+        "word": "meals.",
+        "bbox": [
+          27,
+          52,
+          32,
+          54
+        ],
+        "context": "services to housing and hot meals.",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9977372884750366,
+        "token_index": 114,
+        "word_index": 45
+      },
+      {
+        "document_id": "c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777",
+        "source_json": "data/prepared/test/c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777.json",
+        "cluster": "Cluster_1",
+        "word": "104",
+        "bbox": [
+          50,
+          35,
+          54,
+          37
+        ],
+        "context": "______________________________ 3180 Chestnut Street, Suite 104 ______________________________ Philadelphia, PA 19104 ______________________________",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9977275729179382,
+        "token_index": 86,
+        "word_index": 42
+      },
+      {
+        "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+        "source_json": "data/prepared/test/29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3.json",
+        "cluster": "Cluster_1",
+        "word": "Hawaii",
+        "bbox": [
+          60,
+          54,
+          66,
+          56
+        ],
+        "context": "Coalition for a Drug Free Hawaii Phone Numbers: Oahu: (808) 832-3100",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9976992011070251,
+        "token_index": 83,
+        "word_index": 40
+      },
+      {
+        "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+        "source_json": "data/prepared/test/29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3.json",
+        "cluster": "Cluster_1",
+        "word": "Free",
+        "bbox": [
+          55,
+          54,
+          59,
+          56
+        ],
+        "context": "24/7. Coalition for a Drug Free Hawaii Phone Numbers: Oahu: (808)",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9976783394813538,
+        "token_index": 82,
+        "word_index": 39
+      },
+      {
+        "document_id": "cb96d6c0559bad6ac207687ef6a8b2e54d6620eda96ce2786136e203e5617a20",
+        "source_json": "data/prepared/test/cb96d6c0559bad6ac207687ef6a8b2e54d6620eda96ce2786136e203e5617a20.json",
+        "cluster": "Cluster_0",
+        "word": "cancer.ucsf.edu/crc",
+        "bbox": [
+          5,
+          84,
+          16,
+          86
+        ],
+        "context": "Friend Cancer Resource Center 415-885-3693 cancer.ucsf.edu/crc Clinical trials 877-827-3222 cancer.ucsf.edu/trials 11.15-CCC-15-02322",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.997596800327301,
+        "token_index": 191,
+        "word_index": 90
+      },
+      {
+        "document_id": "c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777",
+        "source_json": "data/prepared/test/c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777.json",
+        "cluster": "Cluster_1",
+        "word": "of",
+        "bbox": [
+          28,
+          33,
+          30,
+          35
+        ],
+        "context": "Address: Drexel University ______________________________ Office of Technology Commercialization ______________________________ 3180 Chestnut",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.997531533241272,
+        "token_index": 72,
+        "word_index": 34
+      },
+      {
+        "document_id": "c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777",
+        "source_json": "data/prepared/test/c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777.json",
+        "cluster": "Cluster_1",
+        "word": "Commercialization",
+        "bbox": [
+          41,
+          33,
+          57,
+          35
+        ],
+        "context": "University ______________________________ Office of Technology Commercialization ______________________________ 3180 Chestnut Street, Suite",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9975167512893677,
+        "token_index": 74,
+        "word_index": 36
+      },
+      {
+        "document_id": "79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769",
+        "source_json": "data/prepared/test/79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769.json",
+        "cluster": "Cluster_0",
+        "word": "bond",
+        "bbox": [
+          17,
+          29,
+          20,
+          30
+        ],
+        "context": "form. 3 Name of the bond or certificate issuer State Political",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.997478187084198,
+        "token_index": 190,
+        "word_index": 150
+      },
+      {
+        "document_id": "712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb",
+        "source_json": "data/prepared/test/712c9843c931963bb575073fc138b22f4899f5445b3f39d918fadabbfee388fb.json",
+        "cluster": "Cluster_0",
+        "word": "PRODUCER",
+        "bbox": [
+          6,
+          10,
+          32,
+          11
+        ],
+        "context": "PRIVILEGES AFFORDED UNDER THE POLICY. PRODUCER COMPANY ALLIANT 100 PINE ST.",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9974029660224915,
+        "token_index": 76,
+        "word_index": 33
+      },
+      {
+        "document_id": "79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769",
+        "source_json": "data/prepared/test/79eede87fdb0fb889637e007c19a3c0bca2a73bc9d450da34d835aadb9eae769.json",
+        "cluster": "Cluster_0",
+        "word": "of",
+        "bbox": [
+          12,
+          29,
+          14,
+          30
+        ],
+        "context": "complete this form. 3 Name of the bond or certificate issuer",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.997399091720581,
+        "token_index": 188,
+        "word_index": 148
+      },
+      {
+        "document_id": "5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013",
+        "source_json": "data/prepared/test/5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013.json",
+        "cluster": "Cluster_1",
+        "word": "hot",
+        "bbox": [
+          24,
+          52,
+          26,
+          54
+        ],
+        "context": "counseling services to housing and hot meals.",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9973981380462646,
+        "token_index": 113,
+        "word_index": 44
+      },
+      {
+        "document_id": "5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013",
+        "source_json": "data/prepared/test/5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013.json",
+        "cluster": "Cluster_1",
+        "word": "housing",
+        "bbox": [
+          14,
+          52,
+          20,
+          54
+        ],
+        "context": "need, from counseling services to housing and hot meals.",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9973848462104797,
+        "token_index": 111,
+        "word_index": 42
+      },
+      {
+        "document_id": "04a5ec663fd5f2ad17a8a38d764fb84c1f1b65f1c3377840c81bd06ee3130dbf",
+        "source_json": "data/prepared/test/04a5ec663fd5f2ad17a8a38d764fb84c1f1b65f1c3377840c81bd06ee3130dbf.json",
+        "cluster": "Cluster_1",
+        "word": "Phone:",
+        "bbox": [
+          11,
+          83,
+          15,
+          85
+        ],
+        "context": "Campus Drive Missoula, Montana 59812 Phone: (406) 243-5113 Email: info@business.umt.edu www.bber.umt.edu",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.997379720211029,
+        "token_index": 24,
+        "word_index": 17
+      },
+      {
+        "document_id": "bbef288ad59ece7773ed62c9003fd8afc522dd70c3ae373c19f5a5a37a614802",
+        "source_json": "data/prepared/test/bbef288ad59ece7773ed62c9003fd8afc522dd70c3ae373c19f5a5a37a614802.json",
+        "cluster": "Cluster_1",
+        "word": "No",
+        "bbox": [
+          18,
+          14,
+          19,
+          15
+        ],
+        "context": "rush, and manufacturer orders Samples: No additional cost on items listed",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9973147511482239,
+        "token_index": 68,
+        "word_index": 47
+      },
+      {
+        "document_id": "c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777",
+        "source_json": "data/prepared/test/c0472c5630db87bfe96a25847fce6e248944a1df0cb5a812e7eed7b33db06777.json",
+        "cluster": "Cluster_1",
+        "word": "Office",
+        "bbox": [
+          22,
+          33,
+          27,
+          35
+        ],
+        "context": "Title:__________________________ Address: Drexel University ______________________________ Office of Technology Commercialization ______________________________ 3180",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9972766041755676,
+        "token_index": 71,
+        "word_index": 33
+      },
+      {
+        "document_id": "8ef6248892a15a9b3e6d28ac14b0b72e1062015d12f09109345e84900fbf7c72",
+        "source_json": "data/prepared/test/8ef6248892a15a9b3e6d28ac14b0b72e1062015d12f09109345e84900fbf7c72.json",
+        "cluster": "Cluster_1",
+        "word": "Educational",
+        "bbox": [
+          18,
+          65,
+          30,
+          67
+        ],
+        "context": "Candidate University of New Orleans Educational Administration and Leadership 86",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9972034692764282,
+        "token_index": 116,
+        "word_index": 75
+      },
+      {
+        "document_id": "66927ea34e73ac3b0907eac5ca157d6270554b0146749853d9debf73e928267c",
+        "source_json": "data/prepared/test/66927ea34e73ac3b0907eac5ca157d6270554b0146749853d9debf73e928267c.json",
+        "cluster": "Cluster_1",
+        "word": "utep_honorsprogram",
+        "bbox": [
+          19,
+          45,
+          42,
+          47
+        ],
+        "context": "I UGLC Room 302 Instagram: utep_honorsprogram Application Eligibility \u2013 The students",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9971857666969299,
+        "token_index": 178,
+        "word_index": 69
+      },
+      {
+        "document_id": "4f58333eb67052218d35a78991b27fa3c06f53fa505b279dab6587f96e872ba1",
+        "source_json": "data/prepared/test/4f58333eb67052218d35a78991b27fa3c06f53fa505b279dab6587f96e872ba1.json",
+        "cluster": "Cluster_1",
+        "word": "Office:",
+        "bbox": [
+          14,
+          19,
+          19,
+          20
+        ],
+        "context": "Church St. Spartanburg, SC 29303 Office: 864-597-4180 Cell: 864-809-8963 laura.corbin@wofford.edu FERPA_Faculty_",
+        "target": "OTHER",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9971008896827698,
+        "token_index": 29,
+        "word_index": 18
+      },
+      {
+        "document_id": "c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d",
+        "source_json": "data/prepared/test/c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d.json",
+        "cluster": "Cluster_0",
+        "word": "22203",
+        "bbox": [
+          33,
+          72,
+          42,
+          74
+        ],
+        "context": "Street, Ste. 1204 Arlington, VA 22203 New York, NY 10016 MAIN",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9970999956130981,
+        "token_index": 36,
+        "word_index": 16
+      },
+      {
+        "document_id": "5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013",
+        "source_json": "data/prepared/test/5abad0bc4839831b87f5e88317cee4fd006f97a49440da1d52f8866c1fd00013.json",
+        "cluster": "Cluster_1",
+        "word": "and",
+        "bbox": [
+          20,
+          52,
+          23,
+          54
+        ],
+        "context": "from counseling services to housing and hot meals.",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9970822930335999,
+        "token_index": 112,
+        "word_index": 43
+      },
+      {
+        "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+        "source_json": "data/prepared/test/29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3.json",
+        "cluster": "Cluster_1",
+        "word": "Coalition",
+        "bbox": [
+          34,
+          54,
+          43,
+          56
+        ],
+        "context": "someone to talk to, 24/7. Coalition for a Drug Free Hawaii",
+        "target": "OTHER",
+        "prediction": "VALUE",
+        "prediction_confidence": 0.9969828724861145,
+        "token_index": 78,
+        "word_index": 35
+      }
+    ],
+    "value_predicted_as_key": [
+      {
+        "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+        "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+        "cluster": "Cluster_1",
+        "word": "card",
+        "bbox": [
+          55,
+          40,
+          59,
+          42
+        ],
+        "context": "Fee- A yearly fee the card holder is charged for using",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9912063479423523,
+        "token_index": 86,
+        "word_index": 71
+      },
+      {
+        "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+        "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+        "cluster": "Cluster_1",
+        "word": "is",
+        "bbox": [
+          67,
+          40,
+          69,
+          42
+        ],
+        "context": "yearly fee the card holder is charged for using the card.",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9908629655838013,
+        "token_index": 88,
+        "word_index": 73
+      },
+      {
+        "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+        "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+        "cluster": "Cluster_1",
+        "word": "holder",
+        "bbox": [
+          60,
+          40,
+          66,
+          42
+        ],
+        "context": "A yearly fee the card holder is charged for using the",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9904282093048096,
+        "token_index": 87,
+        "word_index": 72
+      },
+      {
+        "document_id": "81016be0f843d6d313964843c33ecbf8a2bcc04cc360ea03bb7ce0625f3efcee",
+        "source_json": "data/prepared/test/81016be0f843d6d313964843c33ecbf8a2bcc04cc360ea03bb7ce0625f3efcee.json",
+        "cluster": "Cluster_1",
+        "word": "Phone:",
+        "bbox": [
+          12,
+          29,
+          16,
+          31
+        ],
+        "context": "Suite 114 Salem, OR 97301 Phone: (503) 566-2837 Contact Email Address:",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9884776473045349,
+        "token_index": 81,
+        "word_index": 40
+      },
+      {
+        "document_id": "248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970",
+        "source_json": "data/prepared/test/248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970.json",
+        "cluster": "Cluster_1",
+        "word": "Email",
+        "bbox": [
+          18,
+          61,
+          22,
+          63
+        ],
+        "context": "ASU Global Education Office 480-965-5965 Email ASU Global Education Office My",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9880781769752502,
+        "token_index": 194,
+        "word_index": 121
+      },
+      {
+        "document_id": "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c",
+        "source_json": "data/prepared/test/c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c.json",
+        "cluster": "Cluster_1",
+        "word": "to",
+        "bbox": [
+          42,
+          77,
+          44,
+          79
+        ],
+        "context": "How have you stayed connected to Wayland since you graduated? _______________________________________________________",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.987933874130249,
+        "token_index": 113,
+        "word_index": 59
+      },
+      {
+        "document_id": "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c",
+        "source_json": "data/prepared/test/c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c.json",
+        "cluster": "Cluster_1",
+        "word": "since",
+        "bbox": [
+          52,
+          77,
+          57,
+          79
+        ],
+        "context": "you stayed connected to Wayland since you graduated? _______________________________________________________ _______________________________________________________",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9864263534545898,
+        "token_index": 116,
+        "word_index": 61
+      },
+      {
+        "document_id": "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c",
+        "source_json": "data/prepared/test/c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c.json",
+        "cluster": "Cluster_1",
+        "word": "you",
+        "bbox": [
+          58,
+          77,
+          60,
+          79
+        ],
+        "context": "stayed connected to Wayland since you graduated? _______________________________________________________ _______________________________________________________",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9852206707000732,
+        "token_index": 117,
+        "word_index": 62
+      },
+      {
+        "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+        "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+        "cluster": "Cluster_1",
+        "word": "charged",
+        "bbox": [
+          70,
+          40,
+          77,
+          42
+        ],
+        "context": "fee the card holder is charged for using the card. Not",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9842373728752136,
+        "token_index": 89,
+        "word_index": 74
+      },
+      {
+        "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+        "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+        "cluster": "Cluster_1",
+        "word": "Lawrence",
+        "bbox": [
+          12,
+          27,
+          20,
+          29
+        ],
+        "context": "Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services Provided: Rock rip-rap, sheet",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9833300709724426,
+        "token_index": 78,
+        "word_index": 31
+      },
+      {
+        "document_id": "fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8",
+        "source_json": "data/prepared/test/fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8.json",
+        "cluster": "Cluster_1",
+        "word": "Phone:",
+        "bbox": [
+          12,
+          40,
+          16,
+          42
+        ],
+        "context": "Virginia Street Reno, NV 86503 Phone: (775) 682-8751 Contact Email Address:",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9832412004470825,
+        "token_index": 84,
+        "word_index": 39
+      },
+      {
+        "document_id": "842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56",
+        "source_json": "data/prepared/test/842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56.json",
+        "cluster": "Cluster_1",
+        "word": "Internet",
+        "bbox": [
+          9,
+          37,
+          18,
+          39
+        ],
+        "context": "Alcoholics Anonymous (AA) World Services Internet address: www.aa.org Phone: 212\u2013870\u20133400 Makes",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9823262095451355,
+        "token_index": 18,
+        "word_index": 14
+      },
+      {
+        "document_id": "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c",
+        "source_json": "data/prepared/test/c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c.json",
+        "cluster": "Cluster_1",
+        "word": "graduated?",
+        "bbox": [
+          61,
+          77,
+          71,
+          79
+        ],
+        "context": "connected to Wayland since you graduated? _______________________________________________________ _______________________________________________________",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9822589159011841,
+        "token_index": 118,
+        "word_index": 63
+      },
+      {
+        "document_id": "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c",
+        "source_json": "data/prepared/test/c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c.json",
+        "cluster": "Cluster_1",
+        "word": "Wayland",
+        "bbox": [
+          45,
+          77,
+          51,
+          79
+        ],
+        "context": "have you stayed connected to Wayland since you graduated? _______________________________________________________ _______________________________________________________",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9817896485328674,
+        "token_index": 114,
+        "word_index": 60
+      },
+      {
+        "document_id": "396cd2c1d1774cac2ad57ebd00450cba6a61b896a5f3122635d800575b5857b8",
+        "source_json": "data/prepared/test/396cd2c1d1774cac2ad57ebd00450cba6a61b896a5f3122635d800575b5857b8.json",
+        "cluster": "Cluster_1",
+        "word": "Fax:+1",
+        "bbox": [
+          5,
+          30,
+          14,
+          33
+        ],
+        "context": "USA rights Phone:+1 954-752-6700 All Fax:+1 www.abb.com/substationautomation 954 345-5329 ABB. 2015",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9810055494308472,
+        "token_index": 50,
+        "word_index": 23
+      },
+      {
+        "document_id": "f7be244375aa7599f88ff8c30edfcf8b1261571dc64ee9365f8026b314fdf8db",
+        "source_json": "data/prepared/test/f7be244375aa7599f88ff8c30edfcf8b1261571dc64ee9365f8026b314fdf8db.json",
+        "cluster": "Cluster_0",
+        "word": "Phone:",
+        "bbox": [
+          24,
+          9,
+          27,
+          10
+        ],
+        "context": "Box 222000, Seattle WA 98122-1090 Phone: (206) 398-4150 Fax: (206) 398-4058",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9797662496566772,
+        "token_index": 36,
+        "word_index": 24
+      },
+      {
+        "document_id": "c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d",
+        "source_json": "data/prepared/test/c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d.json",
+        "cluster": "Cluster_0",
+        "word": "PHONE:",
+        "bbox": [
+          16,
+          75,
+          24,
+          77
+        ],
+        "context": "New York, NY 10016 MAIN PHONE: 703-524-7600 MAIN PHONE: 212-647 -",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9791547656059265,
+        "token_index": 46,
+        "word_index": 22
+      },
+      {
+        "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+        "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+        "cluster": "Cluster_1",
+        "word": "for",
+        "bbox": [
+          78,
+          40,
+          81,
+          42
+        ],
+        "context": "the card holder is charged for using the card. Not all",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9779834151268005,
+        "token_index": 90,
+        "word_index": 75
+      },
+      {
+        "document_id": "20e99225c119afb7e980df1107e4dc2808aadb39e4d57decfd381bd227cf32a1",
+        "source_json": "data/prepared/test/20e99225c119afb7e980df1107e4dc2808aadb39e4d57decfd381bd227cf32a1.json",
+        "cluster": "Cluster_0",
+        "word": "Longitude",
+        "bbox": [
+          17,
+          37,
+          23,
+          39
+        ],
+        "context": "193 Latitude Latitude 44.2847663 Longitude Longitude -84.2321189 This document is available",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9776990413665771,
+        "token_index": 132,
+        "word_index": 57
+      },
+      {
+        "document_id": "85ac34699ad8f2a81ce79efd00ac145cb5a680d718591f76e15b18766e526323",
+        "source_json": "data/prepared/test/85ac34699ad8f2a81ce79efd00ac145cb5a680d718591f76e15b18766e526323.json",
+        "cluster": "Cluster_0",
+        "word": "Longitude",
+        "bbox": [
+          17,
+          37,
+          23,
+          39
+        ],
+        "context": "992 Latitude Latitude 43.7473131 Longitude Longitude -85.0555192 This document is available",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9767435789108276,
+        "token_index": 133,
+        "word_index": 62
+      },
+      {
+        "document_id": "842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56",
+        "source_json": "data/prepared/test/842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56.json",
+        "cluster": "Cluster_1",
+        "word": "address:",
+        "bbox": [
+          19,
+          37,
+          28,
+          39
+        ],
+        "context": "Anonymous (AA) World Services Internet address: www.aa.org Phone: 212\u2013870\u20133400 Makes referrals",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9745591878890991,
+        "token_index": 19,
+        "word_index": 15
+      },
+      {
+        "document_id": "fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8",
+        "source_json": "data/prepared/test/fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8.json",
+        "cluster": "Cluster_1",
+        "word": "mail",
+        "bbox": [
+          23,
+          70,
+          26,
+          72
+        ],
+        "context": "Assistant Commissioner P.O. Box 420; mail code 401-06 410 East State",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9734290838241577,
+        "token_index": 241,
+        "word_index": 105
+      },
+      {
+        "document_id": "687bf6f49ee421180cfc6f68aba889b932cc36853efaa282eda5b79a3c0f92f9",
+        "source_json": "data/prepared/test/687bf6f49ee421180cfc6f68aba889b932cc36853efaa282eda5b79a3c0f92f9.json",
+        "cluster": "Cluster_0",
+        "word": "Form",
+        "bbox": [
+          19,
+          6,
+          29,
+          13
+        ],
+        "context": "Form 1042-S: Compensation Used for 1040NR-EZ",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9709532856941223,
+        "token_index": 1,
+        "word_index": 0
+      },
+      {
+        "document_id": "f7be244375aa7599f88ff8c30edfcf8b1261571dc64ee9365f8026b314fdf8db",
+        "source_json": "data/prepared/test/f7be244375aa7599f88ff8c30edfcf8b1261571dc64ee9365f8026b314fdf8db.json",
+        "cluster": "Cluster_0",
+        "word": "Fax:",
+        "bbox": [
+          24,
+          10,
+          27,
+          11
+        ],
+        "context": "WA 98122-1090 Phone: (206) 398-4150 Fax: (206) 398-4058 Please note: current",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9698666930198669,
+        "token_index": 45,
+        "word_index": 27
+      },
+      {
+        "document_id": "c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d",
+        "source_json": "data/prepared/test/c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d.json",
+        "cluster": "Cluster_0",
+        "word": "FACEBOOK:",
+        "bbox": [
+          10,
+          80,
+          25,
+          81
+        ],
+        "context": "- 7544 NAMI HELPLINE: 800-950-6264 FACEBOOK: NAMI FACEBOOK: jedfoundation TWITTER: NAMICommunicate",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9669938683509827,
+        "token_index": 79,
+        "word_index": 32
+      },
+      {
+        "document_id": "dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5",
+        "source_json": "data/prepared/test/dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5.json",
+        "cluster": "Cluster_1",
+        "word": "Email",
+        "bbox": [
+          12,
+          73,
+          17,
+          75
+        ],
+        "context": "Information: Submitted electronically to UMSResponses@maine.edu Email Subject Line \u2013 RRW, UM",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9633572101593018,
+        "token_index": 92,
+        "word_index": 52
+      },
+      {
+        "document_id": "248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970",
+        "source_json": "data/prepared/test/248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970.json",
+        "cluster": "Cluster_1",
+        "word": "Email",
+        "bbox": [
+          18,
+          27,
+          22,
+          28
+        ],
+        "context": "questions: Anthony Travel 480-739-9145 1-844-682-5052 Email My ASU Trip Policy, trip",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9556019306182861,
+        "token_index": 89,
+        "word_index": 59
+      },
+      {
+        "document_id": "1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c",
+        "source_json": "data/prepared/test/1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c.json",
+        "cluster": "Cluster_1",
+        "word": "Tel:",
+        "bbox": [
+          12,
+          42,
+          15,
+          43
+        ],
+        "context": "Gap Rd Winchester, TN 37398 Tel: 931-967-9686 Cel: 931-308-2834 Cornus, A-Frame",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.954932451248169,
+        "token_index": 82,
+        "word_index": 41
+      },
+      {
+        "document_id": "cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848",
+        "source_json": "data/prepared/test/cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848.json",
+        "cluster": "Cluster_0",
+        "word": "Material:",
+        "bbox": [
+          18,
+          48,
+          29,
+          49
+        ],
+        "context": "Black w/ Orange/ White Lettering Material: Nylon Condition: Good Date: Unknown",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9534146189689636,
+        "token_index": 104,
+        "word_index": 53
+      },
+      {
+        "document_id": "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d",
+        "source_json": "data/prepared/test/0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d.json",
+        "cluster": "Cluster_0",
+        "word": "of",
+        "bbox": [
+          91,
+          31,
+          93,
+          32
+        ],
+        "context": "Supply, Installation, Testing and Commissioning of 20Nos. of 1.5TR split Air-Conditioning",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9528035521507263,
+        "token_index": 127,
+        "word_index": 53
+      },
+      {
+        "document_id": "cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848",
+        "source_json": "data/prepared/test/cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848.json",
+        "cluster": "Cluster_0",
+        "word": "Material:",
+        "bbox": [
+          18,
+          64,
+          29,
+          65
+        ],
+        "context": "Medium Color: Black, White, Orange Material: Nylon Condition: Good Date: Unknown",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9490389227867126,
+        "token_index": 140,
+        "word_index": 72
+      },
+      {
+        "document_id": "ce1b41a22ea39f67b3f0fe76de5a43d6e2ef37eba4cb16d23f3b6486cce5221d",
+        "source_json": "data/prepared/test/ce1b41a22ea39f67b3f0fe76de5a43d6e2ef37eba4cb16d23f3b6486cce5221d.json",
+        "cluster": "Cluster_1",
+        "word": "Business",
+        "bbox": [
+          15,
+          46,
+          21,
+          48
+        ],
+        "context": "510 Little Rock, AR 72205-7199 Business Email Direct email to IPhone",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9472104907035828,
+        "token_index": 121,
+        "word_index": 64
+      },
+      {
+        "document_id": "92ce22c4d43abefb90d310df410a1aca8e0f2c7a7412582e313895c77dd21460",
+        "source_json": "data/prepared/test/92ce22c4d43abefb90d310df410a1aca8e0f2c7a7412582e313895c77dd21460.json",
+        "cluster": "Cluster_0",
+        "word": "date",
+        "bbox": [
+          26,
+          67,
+          28,
+          69
+        ],
+        "context": "J. Bailey author Licensed content date Feb 2, 2011 Start page",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9462713003158569,
+        "token_index": 183,
+        "word_index": 145
+      },
+      {
+        "document_id": "cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848",
+        "source_json": "data/prepared/test/cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848.json",
+        "cluster": "Cluster_0",
+        "word": "Material:",
+        "bbox": [
+          18,
+          80,
+          29,
+          81
+        ],
+        "context": "x 12\u201d Color: Orange, White Material: Nylon Condition: Worn Date: Unknown",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9459261298179626,
+        "token_index": 178,
+        "word_index": 91
+      },
+      {
+        "document_id": "4775cb7286025d5957ad09cdfa4119aa0019f02366950b9a8cbc6476096a02bb",
+        "source_json": "data/prepared/test/4775cb7286025d5957ad09cdfa4119aa0019f02366950b9a8cbc6476096a02bb.json",
+        "cluster": "Cluster_0",
+        "word": "Beginning:",
+        "bbox": [
+          6,
+          60,
+          20,
+          61
+        ],
+        "context": "ending before October 1, 2018.) Beginning: month/year (MMYYYY) Month: 7 Year:",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9450423717498779,
+        "token_index": 278,
+        "word_index": 190
+      },
+      {
+        "document_id": "fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8",
+        "source_json": "data/prepared/test/fbd607617c7865476f9310e9a74def22ace1b4a2a9d870262a04b2951eb4aaf8.json",
+        "cluster": "Cluster_1",
+        "word": "Contact",
+        "bbox": [
+          12,
+          42,
+          17,
+          44
+        ],
+        "context": "NV 86503 Phone: (775) 682-8751 Contact Email Address: jfaulds@unr.edu Name: James",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9448243379592896,
+        "token_index": 94,
+        "word_index": 42
+      },
+      {
+        "document_id": "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d",
+        "source_json": "data/prepared/test/0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d.json",
+        "cluster": "Cluster_0",
+        "word": "and",
+        "bbox": [
+          75,
+          31,
+          77,
+          32
+        ],
+        "context": "be purchased Supply, Installation, Testing and Commissioning of 20Nos. of 1.5TR",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9440001249313354,
+        "token_index": 124,
+        "word_index": 51
+      },
+      {
+        "document_id": "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d",
+        "source_json": "data/prepared/test/0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d.json",
+        "cluster": "Cluster_0",
+        "word": "Testing",
+        "bbox": [
+          68,
+          31,
+          74,
+          32
+        ],
+        "context": "to be purchased Supply, Installation, Testing and Commissioning of 20Nos. of",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9421877861022949,
+        "token_index": 123,
+        "word_index": 50
+      },
+      {
+        "document_id": "dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5",
+        "source_json": "data/prepared/test/dd6476a65daebecf29669fde4a491e74873442f81c7c7f44ea87ff31a329d2d5.json",
+        "cluster": "Cluster_1",
+        "word": "Subject",
+        "bbox": [
+          18,
+          73,
+          26,
+          75
+        ],
+        "context": "Submitted electronically to UMSResponses@maine.edu Email Subject Line \u2013 RRW, UM FM",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9408076405525208,
+        "token_index": 93,
+        "word_index": 53
+      },
+      {
+        "document_id": "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d",
+        "source_json": "data/prepared/test/0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d.json",
+        "cluster": "Cluster_0",
+        "word": "Supply,",
+        "bbox": [
+          48,
+          31,
+          54,
+          32
+        ],
+        "context": "the item to be purchased Supply, Installation, Testing and Commissioning of",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9404272437095642,
+        "token_index": 119,
+        "word_index": 48
+      },
+      {
+        "document_id": "1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c",
+        "source_json": "data/prepared/test/1f0a08b2dbba286c379b88b96ffd1f35c864cdcf77f6bef6e1e6c1e2ff81fd1c.json",
+        "cluster": "Cluster_1",
+        "word": "Tel:",
+        "bbox": [
+          12,
+          80,
+          15,
+          82
+        ],
+        "context": "Strope Lane Huntland, TN 37345 Tel: 931-469-7435 beanscreeknursery22@yahoo.com Prunus, Cornus, Pears,",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.940240204334259,
+        "token_index": 253,
+        "word_index": 98
+      },
+      {
+        "document_id": "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d",
+        "source_json": "data/prepared/test/0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d.json",
+        "cluster": "Cluster_0",
+        "word": "Installation,",
+        "bbox": [
+          55,
+          31,
+          67,
+          32
+        ],
+        "context": "item to be purchased Supply, Installation, Testing and Commissioning of 20Nos.",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9370083212852478,
+        "token_index": 121,
+        "word_index": 49
+      },
+      {
+        "document_id": "10ff2df4e6e496fe25a2b9d4a718e695409839857e6abb8834faa76fc7986d57",
+        "source_json": "data/prepared/test/10ff2df4e6e496fe25a2b9d4a718e695409839857e6abb8834faa76fc7986d57.json",
+        "cluster": "Cluster_0",
+        "word": "Longitude",
+        "bbox": [
+          17,
+          37,
+          23,
+          39
+        ],
+        "context": "241 Latitude Latitude 43.2429422 Longitude Longitude -83.7845479 This document is available",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9365809559822083,
+        "token_index": 128,
+        "word_index": 57
+      },
+      {
+        "document_id": "deaf2ca878f6480fe5020d077ba37dfc06c640bce564e0258fbc55a518c3fb33",
+        "source_json": "data/prepared/test/deaf2ca878f6480fe5020d077ba37dfc06c640bce564e0258fbc55a518c3fb33.json",
+        "cluster": "Cluster_1",
+        "word": "Office:",
+        "bbox": [
+          6,
+          20,
+          10,
+          21
+        ],
+        "context": "Green, Associate Dean for Academics Office: 160 McCain Telephone: (662) 325-2267",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9364086389541626,
+        "token_index": 73,
+        "word_index": 37
+      },
+      {
+        "document_id": "0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d",
+        "source_json": "data/prepared/test/0cb314c8301bc4508866bc18861ed2a6429a0e2b61e7ec58cd1f554561b3664d.json",
+        "cluster": "Cluster_0",
+        "word": "Commissioning",
+        "bbox": [
+          78,
+          31,
+          90,
+          32
+        ],
+        "context": "purchased Supply, Installation, Testing and Commissioning of 20Nos. of 1.5TR split",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9335840344429016,
+        "token_index": 125,
+        "word_index": 52
+      },
+      {
+        "document_id": "d1f0e00fe54dbf8bb6f9368ac319200b3f1fd7fe88361284d531d4f94920b381",
+        "source_json": "data/prepared/test/d1f0e00fe54dbf8bb6f9368ac319200b3f1fd7fe88361284d531d4f94920b381.json",
+        "cluster": "Cluster_0",
+        "word": "Name:",
+        "bbox": [
+          26,
+          22,
+          33,
+          23
+        ],
+        "context": "Slaters Lane Alexandria, VA Contact Name: Steve Syckes 22314 2. Date",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9319281578063965,
+        "token_index": 75,
+        "word_index": 43
+      },
+      {
+        "document_id": "1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21",
+        "source_json": "data/prepared/test/1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21.json",
+        "cluster": "Cluster_0",
+        "word": "ADVERTISING",
+        "bbox": [
+          12,
+          39,
+          19,
+          40
+        ],
+        "context": "Do Not Submit EDI Invoice ADVERTISING RepFirm 0% Address 2 SUITE",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9317354559898376,
+        "token_index": 214,
+        "word_index": 119
+      },
+      {
+        "document_id": "2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d",
+        "source_json": "data/prepared/test/2d1e7382032c72bb3a4484f3a20d80364fdfa7ee925a7c2031ffa8301097f88d.json",
+        "cluster": "Cluster_0",
+        "word": "Wrestling",
+        "bbox": [
+          41,
+          27,
+          47,
+          28
+        ],
+        "context": "Moonlight Ball, Pig Roast, Arm Wrestling Philanthropy: nB<J> Settlement School, Arrowcraft,",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.9280203580856323,
+        "token_index": 75,
+        "word_index": 48
+      },
+      {
+        "document_id": "adbc8d0b115c06a4b48600373f48df184a763047450e11643b108eab0edde124",
+        "source_json": "data/prepared/test/adbc8d0b115c06a4b48600373f48df184a763047450e11643b108eab0edde124.json",
+        "cluster": "Cluster_0",
+        "word": "Email",
+        "bbox": [
+          28,
+          91,
+          31,
+          92
+        ],
+        "context": "Fax 212 960 0037 | Email studentaid@yu.edu V1- Standard",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.925951361656189,
+        "token_index": 271,
+        "word_index": 178
+      },
+      {
+        "document_id": "222af8d371b854ed5b0ccc792e22f0638c3e1bcf79ff45c10f02944c163b146b",
+        "source_json": "data/prepared/test/222af8d371b854ed5b0ccc792e22f0638c3e1bcf79ff45c10f02944c163b146b.json",
+        "cluster": "Cluster_0",
+        "word": "79",
+        "bbox": [
+          47,
+          85,
+          49,
+          87
+        ],
+        "context": "Contract Data (Traffic) Report Page 79 of 166 Printed On 3/4/2019",
+        "target": "VALUE",
+        "prediction": "KEY",
+        "prediction_confidence": 0.922917366027832,
+        "token_index": 463,
+        "word_index": 256
+      }
+    ]
+  }
+}

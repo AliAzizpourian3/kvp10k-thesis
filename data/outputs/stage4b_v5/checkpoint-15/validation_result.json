@@ -1,0 +1,205 @@
+{
+  "checkpoint": {
+    "checkpoint_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-15",
+    "weights_path": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5/checkpoint-15/pytorch_model.bin",
+    "weights_sha256": "77beffd136596b9d6d6d13bd4ef042d714689f690ae229044f65ae98273a9e80",
+    "completed_epoch": 15,
+    "global_optimizer_step": 9105,
+    "state_file": "training_state.pt"
+  },
+  "selection_metric": {
+    "category": "regular",
+    "mode": "text_location",
+    "score_threshold": 0.5,
+    "value": 0.3197429235894966
+  },
+  "metrics": {
+    "split": "validation",
+    "documents": 538,
+    "score_threshold": 0.5,
+    "official_thresholds": {
+      "ned_strict_less_than": 0.2,
+      "iou_inclusive_greater_equal": 0.3
+    },
+    "loss": {
+      "entity": 0.4017526531717799,
+      "link": 0.7558427140099135
+    },
+    "entity_metrics": {
+      "primary": "micro one-vs-rest over KEY and VALUE",
+      "micro": {
+        "precision": 0.7990978339503809,
+        "recall": 0.767137838058665,
+        "f1": 0.7827917543823081,
+        "tp": 37556,
+        "fp": 9442,
+        "fn": 11400
+      },
+      "macro": {
+        "precision": 0.7818674035629274,
+        "recall": 0.7457718755902819,
+        "f1": 0.7633177696586491
+      },
+      "per_class": {
+        "key": {
+          "precision": 0.7385071675729116,
+          "recall": 0.6896142433234421,
+          "f1": 0.7132237604855759,
+          "tp": 10458,
+          "fp": 3703,
+          "fn": 4707
+        },
+        "value": {
+          "precision": 0.8252276395529433,
+          "recall": 0.8019295078571217,
+          "f1": 0.8134117788317223,
+          "tp": 27098,
+          "fp": 5739,
+          "fn": 6693
+        }
+      }
+    },
+    "official_pair_metrics": {
+      "all": {
+        "text_only": {
+          "precision": 0.3646173602204363,
+          "recall": 0.17356737258231558,
+          "f1": 0.23518198623651942,
+          "tp": 1207,
+          "fp": 1348,
+          "fn": 7050,
+          "documents_total": 538,
+          "documents_scored": 499,
+          "documents_excluded_empty_gt": 39
+        },
+        "location_only": {
+          "precision": 0.44675361395262086,
+          "recall": 0.22403476625791768,
+          "f1": 0.29842002166269177,
+          "tp": 1547,
+          "fp": 1008,
+          "fn": 6710,
+          "documents_total": 538,
+          "documents_scored": 499,
+          "documents_excluded_empty_gt": 39
+        },
+        "text_location": {
+          "precision": 0.3176271649383123,
+          "recall": 0.15650461818669417,
+          "f1": 0.20968903559577004,
+          "tp": 1042,
+          "fp": 1513,
+          "fn": 7215,
+          "documents_total": 538,
+          "documents_scored": 499,
+          "documents_excluded_empty_gt": 39
+        }
+      },
+      "regular": {
+        "text_only": {
+          "precision": 0.4034236424611922,
+          "recall": 0.32450231787458034,
+          "f1": 0.35968467728140013,
+          "tp": 1207,
+          "fp": 1328,
+          "fn": 2947,
+          "documents_total": 538,
+          "documents_scored": 451,
+          "documents_excluded_empty_gt": 87
+        },
+        "location_only": {
+          "precision": 0.494301670426514,
+          "recall": 0.40319109256928765,
+          "f1": 0.4441217551277846,
+          "tp": 1547,
+          "fp": 988,
+          "fn": 2607,
+          "documents_total": 538,
+          "documents_scored": 451,
+          "documents_excluded_empty_gt": 87
+        },
+        "text_location": {
+          "precision": 0.3514322734018134,
+          "recall": 0.2932958510629289,
+          "f1": 0.3197429235894966,
+          "tp": 1042,
+          "fp": 1493,
+          "fn": 3112,
+          "documents_total": 538,
+          "documents_scored": 451,
+          "documents_excluded_empty_gt": 87
+        }
+      },
+      "unkeyed": {
+        "text_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2466,
+          "documents_total": 538,
+          "documents_scored": 436,
+          "documents_excluded_empty_gt": 102
+        },
+        "location_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2466,
+          "documents_total": 538,
+          "documents_scored": 436,
+          "documents_excluded_empty_gt": 102
+        },
+        "text_location": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2466,
+          "documents_total": 538,
+          "documents_scored": 436,
+          "documents_excluded_empty_gt": 102
+        }
+      },
+      "unvalued": {
+        "text_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1637,
+          "documents_total": 538,
+          "documents_scored": 179,
+          "documents_excluded_empty_gt": 359
+        },
+        "location_only": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1637,
+          "documents_total": 538,
+          "documents_scored": 179,
+          "documents_excluded_empty_gt": 359
+        },
+        "text_location": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1637,
+          "documents_total": 538,
+          "documents_scored": 179,
+          "documents_excluded_empty_gt": 359
+        }
+      }
+    }
+  }
+}

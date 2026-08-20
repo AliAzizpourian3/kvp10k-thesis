@@ -9,7 +9,7 @@ The KVP10k dataset \cite{kvp10k} is a large-scale benchmark for \kvp{} extractio
 \subsection{Data Collection and Annotation Format}
 The dataset was collected by IBM Research from real-world business documents, with manual annotation of bounding boxes and key-value relationships. Each raw row contains an annotator copy for a page together with a list of annotations. Fields relevant to this analysis include a \texttt{label}, optional polygon \texttt{coordinates} (a list of $\{x, y\}$ points), and an optional \texttt{attributes.Linking} reference that encodes a key--value relationship. Coordinate availability differs across annotator copies of the same page.
 
-The downstream preparation pipeline operates on unique page hashes and produced 5{,}389 usable training pages and 581 usable test pages. These prepared pages are distinct from the duplicated raw rows used by the Stage~2 analysis below.
+The downstream preparation pipeline operates on unique page hashes and produced 5{,}389 usable pages from the KVP10k training split and 581 usable test pages. These prepared pages are distinct from the duplicated raw rows used by the Stage~2 analysis below.
 
 \section{Page-Level Annotation-Geometry Clustering}
 \label{sec:layout_clustering}
@@ -82,15 +82,22 @@ Principal Component Analysis (PCA) \cite{pca} with two components explains 52.8\
 \end{figure}
 
 To make the interpretation concrete, Figure~\ref{fig:stage2_cluster_examples}
-shows representative test pages from each cluster. The left panel exemplifies
-the higher-count, broader-spread regime (Cluster~0), while the right panel
-shows the lower-count, more compact regime (Cluster~1). Red outlines indicate
-the annotated polygons that define the geometry features used for clustering.
+shows representative test pages assigned to each cluster by the frozen
+training-fitted scaler and K-means model. Panel~(a) shows the higher-count,
+broader-spread regime (Cluster~0), while panel~(b) shows the lower-count,
+more compact regime (Cluster~1). Red outlines indicate the annotated polygons
+that define the geometry features used for clustering.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/stage2/stage2_cluster_examples.png}
-    \caption{Examples of page-level annotation-geometry clusters. Cluster 0 typically contains a larger number of annotation polygons distributed across a broader page area, whereas Cluster 1 contains fewer polygons concentrated in a more compact region. The clusters reflect annotation geometry and should not be interpreted as semantic document genres, OCR density, or visual document types.}
+    \includegraphics[width=0.42\textwidth]{figures/stage2/stage2_cluster_0_example.png}
+    \par\smallskip
+    \textbf{(a)} Cluster 0: higher box count and broader spatial spread
+    \par\medskip
+    \includegraphics[width=0.42\textwidth]{figures/stage2/stage2_cluster_1_example.png}
+    \par\smallskip
+    \textbf{(b)} Cluster 1: lower box count and more compact spatial spread
+    \caption{Representative test pages assigned by the frozen training-fitted clustering model. The clusters describe annotation geometry and should not be interpreted as semantic document types, text density, or visual document types.}
     \label{fig:stage2_cluster_examples}
 \end{figure}
 
@@ -163,7 +170,7 @@ d_{kv} = \sqrt{(x_v - x_k)^2 + (y_v - y_k)^2}
 
 where $(x_k, y_k)$ and $(x_v, y_v)$ are the normalized center coordinates of the key and value boxes.
 
-On a 200-row annotation subset containing 755 links,\footnote{The subset was formed from the first 200 training rows with non-empty annotation lists. It represents 70 unique page hashes, of which 69 contribute coordinate-bearing rows. This exploratory raw-row subset is distinct from the 581-page evaluation set (3{,}776 ground-truth links) reported in Chapter~\ref{ch:exresults}.} linked pairs tend to be proximate: the mean key--value distance is $\mu_d = 0.120$, the median is $\tilde{d} = 0.095$, and the 90th percentile is $d_{90} = 0.239$ (all in normalized coordinate units). The proximity pattern suggests that spatial features may be informative for linking.
+On a 200-row annotation subset containing 755 links,\footnote{The subset was formed from the first 200 training rows with non-empty annotation lists. It represents 70 unique page hashes, of which 69 contribute coordinate-bearing rows. This exploratory raw-row subset is distinct from the 581-page evaluation set used in Chapter~\ref{ch:exresults}.} linked pairs tend to be proximate: the mean key--value distance is $\mu_d = 0.120$, the median is $\tilde{d} = 0.095$, and the 90th percentile is $d_{90} = 0.239$ (all in normalized coordinate units). The proximity pattern suggests that spatial features may be informative for linking.
 
 \section{Annotation Statistics}
 \label{sec:annotation_stats}
@@ -188,4 +195,4 @@ Percentage with linking & 21.0\% \\ \bottomrule
 \section{Summary}
 \label{sec:dataset_summary}
 
-The analysis yields three main observations. First, unique coordinate-bearing pages form two weakly separated annotation-geometry regimes: a higher-count, broad-spread group and a lower-count, compact group. Second, these groups are exploratory geometric strata rather than document types or OCR-density classes. Third, the separate 200-row spatial audit finds that linked \kvps{} tend to be proximate, suggesting that spatial features may aid linking. These findings motivate spatial encoding while keeping the clustering interpretation appropriately limited.
+The clustering indicates two weakly separated annotation-geometry regimes: one with more boxes and broader spatial spread, and another with fewer boxes in a more compact region. These groups are used only as exploratory geometric strata and should not be interpreted as document types or text-density classes. Separately, the 200-row spatial audit shows that linked \kvps{} are often relatively close on the page. This proximity supports the use of spatial features in the linker, while the cluster assignments are retained for descriptive performance analysis.

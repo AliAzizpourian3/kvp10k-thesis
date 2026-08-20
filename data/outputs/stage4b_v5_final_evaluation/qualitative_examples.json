@@ -1,0 +1,6546 @@
+{
+  "metadata": {
+    "created_at": "2026-08-18T11:03:27.795344+00:00",
+    "documents": 581,
+    "ned_threshold": 0.2,
+    "iou_threshold": 0.3,
+    "matching_mode": "official text_location",
+    "selection": "deterministic candidate ranking; inspect selected examples before publication"
+  },
+  "pair_analysis": {
+    "candidate_counts": {
+      "correct_pairs": 1210,
+      "clear_wrong_links": 28,
+      "missed_pairs": 2524
+    },
+    "selected": {
+      "correct_pairs": [
+        {
+          "document_id": "efc7468875a54c1becf94cc01fa01ee732adc095a438b6044d7e901ba71b6344",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Instructor:",
+              "bbox": [
+                6,
+                19,
+                17,
+                21
+              ]
+            },
+            "value": {
+              "text": "Professor Bobby Seals (Fela Anikulapo Uhuru), Ph.D. (ABD)",
+              "bbox": [
+                18,
+                19,
+                79,
+                21
+              ]
+            },
+            "link_confidence": 0.9978210926055908
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Instructor:",
+              "bbox": [
+                6,
+                19,
+                14,
+                21
+              ]
+            },
+            "value": {
+              "text": "Professor Bobby Seals (Fela Anikulapo Uhuru), Ph.D. (ABD)",
+              "bbox": [
+                30,
+                19,
+                80,
+                21
+              ]
+            },
+            "center_x": 10,
+            "center_y": 20
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9978210926055908
+        },
+        {
+          "document_id": "ed5eb89368fd0fd0f8d8d68bda52bbd55ab0d71d6d9b80b648f20f9ba783cb84",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Ship to:",
+              "bbox": [
+                12,
+                38,
+                17,
+                40
+              ]
+            },
+            "value": {
+              "text": "applicable: your institution\u2019s receiving address]",
+              "bbox": [
+                21,
+                38,
+                58,
+                40
+              ]
+            },
+            "link_confidence": 0.9977820515632629
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Ship to:",
+              "bbox": [
+                12,
+                38,
+                18,
+                39
+              ]
+            },
+            "value": {
+              "text": "[if applicable: your institution\u2019s receiving address]",
+              "bbox": [
+                18,
+                38,
+                58,
+                39
+              ]
+            },
+            "center_x": 15,
+            "center_y": 39
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9977820515632629
+        },
+        {
+          "document_id": "5c9befa2336e89d621efde9dfb845f40cf3537f8ba7411354e50c7102a02b0ad",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Details:",
+              "bbox": [
+                14,
+                18,
+                21,
+                20
+              ]
+            },
+            "value": {
+              "text": "Holy Communion will NOT meet in Mickel Chapel today.",
+              "bbox": [
+                22,
+                18,
+                70,
+                20
+              ]
+            },
+            "link_confidence": 0.9977747797966003
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Details:",
+              "bbox": [
+                13,
+                18,
+                20,
+                19
+              ]
+            },
+            "value": {
+              "text": "Holy Communion will NOT meet in Mickel Chapel today.",
+              "bbox": [
+                21,
+                18,
+                70,
+                20
+              ]
+            },
+            "center_x": 17,
+            "center_y": 19
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9977747797966003
+        },
+        {
+          "document_id": "035deab0593f06dda63a4966fa30531f2c96f7505eec76e135a8a0592ed5d760",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                24,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                51,
+                73,
+                53
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                23,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                51,
+                73,
+                53
+              ]
+            },
+            "center_x": 19,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "1d752623731b1446f58b3ec87f8271b390b3240a0c8410a4a0d6ba1633268982",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Address:",
+              "bbox": [
+                15,
+                25,
+                23,
+                27
+              ]
+            },
+            "value": {
+              "text": "73-4976 Kamanu Street, Hale Kui Plaza, Suite 207 Kailua-Kona, HI 96740",
+              "bbox": [
+                24,
+                25,
+                73,
+                29
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Address:",
+              "bbox": [
+                15,
+                25,
+                23,
+                27
+              ]
+            },
+            "value": {
+              "text": "73-4976 Kamanu Street, Hale Kui Plaza, Suite 207 Kailua-Kona, HI 96740",
+              "bbox": [
+                26,
+                25,
+                73,
+                29
+              ]
+            },
+            "center_x": 19,
+            "center_y": 26
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.997714638710022
+        }
+      ],
+      "wrong_links": [
+        {
+          "document_id": "1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Networks",
+              "bbox": [
+                3,
+                51,
+                21,
+                53
+              ]
+            },
+            "value": {
+              "text": "260-422-5614",
+              "bbox": [
+                33,
+                51,
+                50,
+                53
+              ]
+            },
+            "link_confidence": 0.9914857745170593
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Networks",
+              "bbox": [
+                3,
+                51,
+                10,
+                53
+              ]
+            },
+            "value": {
+              "text": "3",
+              "bbox": [
+                12,
+                51,
+                13,
+                53
+              ]
+            },
+            "center_x": 6,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9914857745170593,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            25
+          ]
+        },
+        {
+          "document_id": "0e3008db1915a75e6badd0d786759540521c72be2640d3a196fd25619f39ba61",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                12,
+                10
+              ]
+            },
+            "value": {
+              "text": "GREER, Margolis, Mitchell,",
+              "bbox": [
+                26,
+                8,
+                54,
+                10
+              ]
+            },
+            "link_confidence": 0.9914434552192688
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                9,
+                8,
+                10
+              ]
+            },
+            "value": {
+              "text": "0496",
+              "bbox": [
+                13,
+                9,
+                15,
+                10
+              ]
+            },
+            "center_x": 7,
+            "center_y": 9
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9914434552192688,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            19
+          ]
+        },
+        {
+          "document_id": "810ceb8cb9185cfb874aab43498e7a97b33d8cdefd228206ed54b5a2f43b518a",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                12,
+                10
+              ]
+            },
+            "value": {
+              "text": "Strategic Media Services,",
+              "bbox": [
+                27,
+                8,
+                55,
+                10
+              ]
+            },
+            "link_confidence": 0.9903404116630554
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                9,
+                8,
+                10
+              ]
+            },
+            "value": {
+              "text": "7798",
+              "bbox": [
+                13,
+                8,
+                15,
+                10
+              ]
+            },
+            "center_x": 6,
+            "center_y": 9
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9903404116630554,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            14
+          ]
+        },
+        {
+          "document_id": "3c7ca1e4d38b97a36fb3b23fa7d0109a0d85053d040950e94050eefccc589f07",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                12,
+                10
+              ]
+            },
+            "value": {
+              "text": "GREER, Margolis, Mitchell,",
+              "bbox": [
+                26,
+                8,
+                54,
+                10
+              ]
+            },
+            "link_confidence": 0.9902483820915222
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                8,
+                10
+              ]
+            },
+            "value": {
+              "text": "2385",
+              "bbox": [
+                13,
+                9,
+                15,
+                10
+              ]
+            },
+            "center_x": 6,
+            "center_y": 9
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9902483820915222,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            13
+          ]
+        },
+        {
+          "document_id": "1cddd9805f7ebc53030988543fa1d98ba63f8e3370bc8ee81737c4ad5e377ea6",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Advertiser",
+              "bbox": [
+                39,
+                1,
+                46,
+                3
+              ]
+            },
+            "value": {
+              "text": "None",
+              "bbox": [
+                55,
+                10,
+                59,
+                11
+              ]
+            },
+            "link_confidence": 0.9895673394203186
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Advertiser",
+              "bbox": [
+                37,
+                1,
+                43,
+                3
+              ]
+            },
+            "value": {
+              "text": "Sarah Trone Garriott for Iowa Sena(148648)",
+              "bbox": [
+                49,
+                1,
+                74,
+                3
+              ]
+            },
+            "center_x": 40,
+            "center_y": 2
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9895673394203186,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            13
+          ]
+        }
+      ],
+      "missed_pairs": [
+        {
+          "document_id": "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Y",
+              "bbox": [
+                32,
+                27,
+                34,
+                28
+              ]
+            },
+            "value": {
+              "text": "2",
+              "bbox": [
+                32,
+                29,
+                33,
+                30
+              ]
+            },
+            "center_x": 33,
+            "center_y": 28
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0a050bcc3ace2ed3907d22f8dacc5adf0d960d8c5c5a692afd72a17da13b7ee4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": ". N",
+              "bbox": [
+                10,
+                52,
+                12,
+                54
+              ]
+            },
+            "value": {
+              "text": "T",
+              "bbox": [
+                14,
+                52,
+                20,
+                54
+              ]
+            },
+            "center_x": 11,
+            "center_y": 53
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "a8fadcba35968fab5cf7c42921aa2b80462d07c07b4bb9fd821d8504992a77b4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "20",
+              "bbox": [
+                72,
+                9,
+                74,
+                11
+              ]
+            },
+            "value": {
+              "text": "19",
+              "bbox": [
+                75,
+                9,
+                76,
+                10
+              ]
+            },
+            "center_x": 73,
+            "center_y": 10
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "ac34579dad0840fad1e209c0655ef78b9f09bca2c7d11ec69481ab5c8a5b847c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Cut",
+              "bbox": [
+                21,
+                84,
+                22,
+                85
+              ]
+            },
+            "value": {
+              "text": "1",
+              "bbox": [
+                21,
+                85,
+                22,
+                86
+              ]
+            },
+            "center_x": 22,
+            "center_y": 84
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Acc",
+              "bbox": [
+                18,
+                19,
+                21,
+                20
+              ]
+            },
+            "value": {
+              "text": "13",
+              "bbox": [
+                19,
+                23,
+                20,
+                24
+              ]
+            },
+            "center_x": 20,
+            "center_y": 20
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        }
+      ]
+    },
+    "candidates": {
+      "correct_pairs": [
+        {
+          "document_id": "efc7468875a54c1becf94cc01fa01ee732adc095a438b6044d7e901ba71b6344",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Instructor:",
+              "bbox": [
+                6,
+                19,
+                17,
+                21
+              ]
+            },
+            "value": {
+              "text": "Professor Bobby Seals (Fela Anikulapo Uhuru), Ph.D. (ABD)",
+              "bbox": [
+                18,
+                19,
+                79,
+                21
+              ]
+            },
+            "link_confidence": 0.9978210926055908
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Instructor:",
+              "bbox": [
+                6,
+                19,
+                14,
+                21
+              ]
+            },
+            "value": {
+              "text": "Professor Bobby Seals (Fela Anikulapo Uhuru), Ph.D. (ABD)",
+              "bbox": [
+                30,
+                19,
+                80,
+                21
+              ]
+            },
+            "center_x": 10,
+            "center_y": 20
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9978210926055908
+        },
+        {
+          "document_id": "ed5eb89368fd0fd0f8d8d68bda52bbd55ab0d71d6d9b80b648f20f9ba783cb84",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Ship to:",
+              "bbox": [
+                12,
+                38,
+                17,
+                40
+              ]
+            },
+            "value": {
+              "text": "applicable: your institution\u2019s receiving address]",
+              "bbox": [
+                21,
+                38,
+                58,
+                40
+              ]
+            },
+            "link_confidence": 0.9977820515632629
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Ship to:",
+              "bbox": [
+                12,
+                38,
+                18,
+                39
+              ]
+            },
+            "value": {
+              "text": "[if applicable: your institution\u2019s receiving address]",
+              "bbox": [
+                18,
+                38,
+                58,
+                39
+              ]
+            },
+            "center_x": 15,
+            "center_y": 39
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9977820515632629
+        },
+        {
+          "document_id": "5c9befa2336e89d621efde9dfb845f40cf3537f8ba7411354e50c7102a02b0ad",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Details:",
+              "bbox": [
+                14,
+                18,
+                21,
+                20
+              ]
+            },
+            "value": {
+              "text": "Holy Communion will NOT meet in Mickel Chapel today.",
+              "bbox": [
+                22,
+                18,
+                70,
+                20
+              ]
+            },
+            "link_confidence": 0.9977747797966003
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Details:",
+              "bbox": [
+                13,
+                18,
+                20,
+                19
+              ]
+            },
+            "value": {
+              "text": "Holy Communion will NOT meet in Mickel Chapel today.",
+              "bbox": [
+                21,
+                18,
+                70,
+                20
+              ]
+            },
+            "center_x": 17,
+            "center_y": 19
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9977747797966003
+        },
+        {
+          "document_id": "035deab0593f06dda63a4966fa30531f2c96f7505eec76e135a8a0592ed5d760",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                24,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                51,
+                73,
+                53
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                23,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                51,
+                73,
+                53
+              ]
+            },
+            "center_x": 19,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "1d752623731b1446f58b3ec87f8271b390b3240a0c8410a4a0d6ba1633268982",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Address:",
+              "bbox": [
+                15,
+                25,
+                23,
+                27
+              ]
+            },
+            "value": {
+              "text": "73-4976 Kamanu Street, Hale Kui Plaza, Suite 207 Kailua-Kona, HI 96740",
+              "bbox": [
+                24,
+                25,
+                73,
+                29
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Address:",
+              "bbox": [
+                15,
+                25,
+                23,
+                27
+              ]
+            },
+            "value": {
+              "text": "73-4976 Kamanu Street, Hale Kui Plaza, Suite 207 Kailua-Kona, HI 96740",
+              "bbox": [
+                26,
+                25,
+                73,
+                29
+              ]
+            },
+            "center_x": 19,
+            "center_y": 26
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "28224b713ad7c05eeaa2dc1fb2204aa4509fafb71eaf2dd87f48cd467cc90ff4",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                24,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                51,
+                73,
+                53
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                23,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                51,
+                73,
+                53
+              ]
+            },
+            "center_x": 19,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "ac042c64d57fa72971757dba421d592817ba8ffbaf98bb0c19dbda060636093c",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                24,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                51,
+                73,
+                53
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                23,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                51,
+                74,
+                53
+              ]
+            },
+            "center_x": 19,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "c2849520cc8265c86e1b95883561f0ab0fcc5c4858e18c3c00af11dd83eba5fd",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                24,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                51,
+                73,
+                53
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                51,
+                23,
+                53
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                51,
+                73,
+                53
+              ]
+            },
+            "center_x": 19,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "e072065450d564f2390aca94eecbb9af8c7070c8b9bd89afa746610f432c72f7",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                49,
+                24,
+                50
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                49,
+                73,
+                50
+              ]
+            },
+            "link_confidence": 0.997714638710022
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                49,
+                23,
+                50
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                49,
+                73,
+                50
+              ]
+            },
+            "center_x": 19,
+            "center_y": 49
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.997714638710022
+        },
+        {
+          "document_id": "f3daec05b2c611c58c53be2838f6b9ec7aa522aa9bcf304c9acb9761da33edc6",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "TITLE:",
+              "bbox": [
+                37,
+                16,
+                42,
+                18
+              ]
+            },
+            "value": {
+              "text": "Pharaonic Occultism: The Relationship of Esotericism and Egyptology, 1875-1930",
+              "bbox": [
+                43,
+                16,
+                82,
+                19
+              ]
+            },
+            "link_confidence": 0.9976968169212341
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "TITLE:",
+              "bbox": [
+                37,
+                16,
+                43,
+                18
+              ]
+            },
+            "value": {
+              "text": "Pharaonic Occultism: The Relationship of Esotericism and Egyptology, 1875-1930",
+              "bbox": [
+                49,
+                16,
+                82,
+                20
+              ]
+            },
+            "center_x": 40,
+            "center_y": 17
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9976968169212341
+        },
+        {
+          "document_id": "c0101b0a9b79ae0a1aaa3dbe7f39bb970d580f3d05b967df03aa25700cc7866d",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "TUMBLR:",
+              "bbox": [
+                10,
+                85,
+                17,
+                87
+              ]
+            },
+            "value": {
+              "text": "notalone.nami.org n ok2talk.org",
+              "bbox": [
+                18,
+                85,
+                51,
+                87
+              ]
+            },
+            "link_confidence": 0.9975492358207703
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "TUMBLR:",
+              "bbox": [
+                10,
+                85,
+                15,
+                86
+              ]
+            },
+            "value": {
+              "text": "notalone.nami.org ok2talk.org n",
+              "bbox": [
+                16,
+                85,
+                41,
+                87
+              ]
+            },
+            "center_x": 13,
+            "center_y": 86
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9975492358207703
+        },
+        {
+          "document_id": "7407f44e6736c449d792ab68b90c531dd6a8df5712627137f06b5bb1473a1979",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Institution:",
+              "bbox": [
+                2,
+                3,
+                12,
+                4
+              ]
+            },
+            "value": {
+              "text": "University of Nebraska at Omaha (181394)",
+              "bbox": [
+                13,
+                3,
+                47,
+                4
+              ]
+            },
+            "link_confidence": 0.9974127411842346
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Institution:",
+              "bbox": [
+                2,
+                3,
+                8,
+                4
+              ]
+            },
+            "value": {
+              "text": "University of Nebraska at Omaha (181394)",
+              "bbox": [
+                8,
+                3,
+                32,
+                4
+              ]
+            },
+            "center_x": 5,
+            "center_y": 4
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9974127411842346
+        },
+        {
+          "document_id": "c1e2df9195ef04d5a83687431c09e98ec4d3e8d0b4e7a25a3bfc96863560a887",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Mailing Address:",
+              "bbox": [
+                22,
+                92,
+                34,
+                93
+              ]
+            },
+            "value": {
+              "text": "303 University Drive UOG Station Mangilao, Guam 96913",
+              "bbox": [
+                35,
+                92,
+                78,
+                93
+              ]
+            },
+            "link_confidence": 0.9973611235618591
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Mailing Address:",
+              "bbox": [
+                22,
+                92,
+                34,
+                93
+              ]
+            },
+            "value": {
+              "text": "303 University Drive UOG Station Mangilao, Guam 96913",
+              "bbox": [
+                35,
+                92,
+                78,
+                93
+              ]
+            },
+            "center_x": 28,
+            "center_y": 92
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9973611235618591
+        },
+        {
+          "document_id": "84f6be73e39c64c50bfffc44596a829bcb326879b831f76e4a63c1fbc26dfa1b",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "SERVICES:",
+              "bbox": [
+                14,
+                59,
+                20,
+                61
+              ]
+            },
+            "value": {
+              "text": "Disaster Preparedness, Disaster Relief Services, Traffic Bulletins/Information.",
+              "bbox": [
+                21,
+                59,
+                83,
+                61
+              ]
+            },
+            "link_confidence": 0.9972994923591614
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "SERVICES:",
+              "bbox": [
+                14,
+                60,
+                22,
+                61
+              ]
+            },
+            "value": {
+              "text": "Disaster Preparedness, Disaster Relief Services, Traffic Bulletins/Information.",
+              "bbox": [
+                23,
+                60,
+                84,
+                61
+              ]
+            },
+            "center_x": 18,
+            "center_y": 60
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9972994923591614
+        },
+        {
+          "document_id": "263126d36ee8d7b24b5950781b8129a270bebaf3cacf3e7534a4d450ae124a3e",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Tel:",
+              "bbox": [
+                11,
+                28,
+                16,
+                30
+              ]
+            },
+            "value": {
+              "text": "732.729.4670",
+              "bbox": [
+                18,
+                28,
+                35,
+                30
+              ]
+            },
+            "link_confidence": 0.9972688555717468
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Tel:",
+              "bbox": [
+                11,
+                28,
+                16,
+                30
+              ]
+            },
+            "value": {
+              "text": "732.729.4670",
+              "bbox": [
+                17,
+                28,
+                35,
+                30
+              ]
+            },
+            "center_x": 13,
+            "center_y": 29
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9972688555717468
+        },
+        {
+          "document_id": "47035d746bf7f8364b68028460f9f0cb171e185ce03657408533aa06a8dc79df",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Office hours:",
+              "bbox": [
+                15,
+                28,
+                25,
+                30
+              ]
+            },
+            "value": {
+              "text": "F 10:30AM-1:00 PM or by appointment",
+              "bbox": [
+                26,
+                28,
+                54,
+                30
+              ]
+            },
+            "link_confidence": 0.9972158670425415
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Office hours:",
+              "bbox": [
+                15,
+                28,
+                24,
+                30
+              ]
+            },
+            "value": {
+              "text": "F 10:30AM-1:00 PM or by appointment",
+              "bbox": [
+                25,
+                28,
+                54,
+                30
+              ]
+            },
+            "center_x": 20,
+            "center_y": 29
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9972158670425415
+        },
+        {
+          "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Phone Number:",
+              "bbox": [
+                12,
+                29,
+                24,
+                31
+              ]
+            },
+            "value": {
+              "text": "1-866-4-U-TREVOR (1-866-488-7386)",
+              "bbox": [
+                25,
+                29,
+                57,
+                31
+              ]
+            },
+            "link_confidence": 0.9971895813941956
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Phone Number:",
+              "bbox": [
+                12,
+                29,
+                25,
+                31
+              ]
+            },
+            "value": {
+              "text": "1-866-4-U-TREVOR (1-866-488-7386)",
+              "bbox": [
+                26,
+                30,
+                57,
+                31
+              ]
+            },
+            "center_x": 18,
+            "center_y": 30
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9971895813941956
+        },
+        {
+          "document_id": "52d82fbed86096177a43dfe002e5200c13ccb61afb35e30508f05119240b7c96",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Department Name:",
+              "bbox": [
+                9,
+                28,
+                21,
+                30
+              ]
+            },
+            "value": {
+              "text": "Hawai\u02bbi School of Professional Psychology",
+              "bbox": [
+                22,
+                28,
+                54,
+                30
+              ]
+            },
+            "link_confidence": 0.9971895813941956
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Department Name:",
+              "bbox": [
+                9,
+                29,
+                23,
+                30
+              ]
+            },
+            "value": {
+              "text": "Hawai\u02bbi School of Professional Psychology",
+              "bbox": [
+                24,
+                29,
+                54,
+                30
+              ]
+            },
+            "center_x": 16,
+            "center_y": 29
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9971895813941956
+        },
+        {
+          "document_id": "14e129d3d21b53623ba9ccef8bc862ec3c3c34c71aaac7bd186623cbe466cd2e",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Accepted Payment:",
+              "bbox": [
+                17,
+                26,
+                31,
+                28
+              ]
+            },
+            "value": {
+              "text": "Cash, Check or Money Order (made payable to Canisius College.)",
+              "bbox": [
+                31,
+                26,
+                83,
+                28
+              ]
+            },
+            "link_confidence": 0.9971771240234375
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Accepted Payment:",
+              "bbox": [
+                16,
+                26,
+                32,
+                28
+              ]
+            },
+            "value": {
+              "text": "Cash, Check or Money Order (made payable to Canisius College.)",
+              "bbox": [
+                32,
+                26,
+                83,
+                28
+              ]
+            },
+            "center_x": 24,
+            "center_y": 27
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9971771240234375
+        },
+        {
+          "document_id": "824ab9aebc9e9715f48771a6efb8cbcba9c689926050db2236271a7177a35242",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Hours:",
+              "bbox": [
+                12,
+                26,
+                16,
+                28
+              ]
+            },
+            "value": {
+              "text": "- Fri.: 8:00 a.m. - 4:00 p.m.",
+              "bbox": [
+                21,
+                26,
+                44,
+                28
+              ]
+            },
+            "link_confidence": 0.9971599578857422
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Hours:",
+              "bbox": [
+                12,
+                27,
+                18,
+                28
+              ]
+            },
+            "value": {
+              "text": "Mon. - Fri.: 8:00 a.m. - 4:00 p.m.",
+              "bbox": [
+                18,
+                26,
+                44,
+                28
+              ]
+            },
+            "center_x": 15,
+            "center_y": 27
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9971599578857422
+        },
+        {
+          "document_id": "6d6ab532995689c78267a15668cabc7e629a1886787d07ea786818b0643a7d88",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Outdoor Skills:",
+              "bbox": [
+                12,
+                15,
+                25,
+                17
+              ]
+            },
+            "value": {
+              "text": "Backpacking and outdoor experience, use of compass, hand-held GPS.",
+              "bbox": [
+                26,
+                15,
+                83,
+                17
+              ]
+            },
+            "link_confidence": 0.9970837235450745
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Outdoor Skills:",
+              "bbox": [
+                13,
+                15,
+                28,
+                17
+              ]
+            },
+            "value": {
+              "text": "Backpacking and outdoor experience, use of compass, hand-held GPS.",
+              "bbox": [
+                28,
+                15,
+                84,
+                17
+              ]
+            },
+            "center_x": 21,
+            "center_y": 16
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9970837235450745
+        },
+        {
+          "document_id": "8713cd3e25b2a247710e91f2085c0ce8dcbc770b20656cbe812f0b01411a23b3",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Non -Filers \u2013 4506T",
+              "bbox": [
+                11,
+                18,
+                27,
+                20
+              ]
+            },
+            "value": {
+              "text": "https://www.irs.gov/forms-pubs/about-form-4506-t",
+              "bbox": [
+                28,
+                18,
+                68,
+                20
+              ]
+            },
+            "link_confidence": 0.9970818161964417
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "\uf0d8 Non -Filers \u2013 4506T",
+              "bbox": [
+                10,
+                18,
+                27,
+                20
+              ]
+            },
+            "value": {
+              "text": "https://www.irs.gov/forms-pubs/about-form-4506-t",
+              "bbox": [
+                28,
+                18,
+                69,
+                20
+              ]
+            },
+            "center_x": 19,
+            "center_y": 19
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9970818161964417
+        },
+        {
+          "document_id": "3b7295d97b05954aae101ac70df8f31ee7640994675b0a93a8b7f366adb50b08",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Facebook:",
+              "bbox": [
+                21,
+                84,
+                28,
+                87
+              ]
+            },
+            "value": {
+              "text": "REXSAC - Resource Extraction and Sustainable Arctic Communities",
+              "bbox": [
+                28,
+                84,
+                79,
+                87
+              ]
+            },
+            "link_confidence": 0.9970715045928955
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Facebook:",
+              "bbox": [
+                21,
+                84,
+                28,
+                87
+              ]
+            },
+            "value": {
+              "text": "REXSAC - Resource Extraction and Sustainable Arctic Communities",
+              "bbox": [
+                29,
+                84,
+                79,
+                87
+              ]
+            },
+            "center_x": 24,
+            "center_y": 85
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9970715045928955
+        },
+        {
+          "document_id": "5c390c8494146531feaff1de14e37e5429872f44ea1621bbdc1bc7f58806363f",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Location:",
+              "bbox": [
+                9,
+                23,
+                16,
+                24
+              ]
+            },
+            "value": {
+              "text": "Student Union (Bldg. 31), Room 221",
+              "bbox": [
+                17,
+                23,
+                46,
+                24
+              ]
+            },
+            "link_confidence": 0.9970571994781494
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Location:",
+              "bbox": [
+                9,
+                23,
+                16,
+                24
+              ]
+            },
+            "value": {
+              "text": "Student Union (Bldg. 31), Room 221",
+              "bbox": [
+                17,
+                23,
+                46,
+                24
+              ]
+            },
+            "center_x": 12,
+            "center_y": 23
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9970571994781494
+        },
+        {
+          "document_id": "6d6ab532995689c78267a15668cabc7e629a1886787d07ea786818b0643a7d88",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Field Techniques:",
+              "bbox": [
+                12,
+                13,
+                27,
+                15
+              ]
+            },
+            "value": {
+              "text": "Vegetation sampling; plant identification; stream assessment/inventory; \u2022",
+              "bbox": [
+                11,
+                13,
+                88,
+                17
+              ]
+            },
+            "link_confidence": 0.9970345497131348
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Field Techniques:",
+              "bbox": [
+                13,
+                13,
+                30,
+                15
+              ]
+            },
+            "value": {
+              "text": "Vegetation sampling; plant identification; stream assessment/inventory;",
+              "bbox": [
+                30,
+                13,
+                88,
+                15
+              ]
+            },
+            "center_x": 22,
+            "center_y": 14
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9970345497131348
+        },
+        {
+          "document_id": "003af1c968f071617631afd9c674a94abd9c4028c2c3340ac4f7a00ee3869901",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "the ABC Advisor:",
+              "bbox": [
+                50,
+                92,
+                63,
+                94
+              ]
+            },
+            "value": {
+              "text": "Colson Tester (catester@uark.edu)",
+              "bbox": [
+                64,
+                92,
+                92,
+                94
+              ]
+            },
+            "link_confidence": 0.9970218539237976
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "the ABC Advisor:",
+              "bbox": [
+                50,
+                92,
+                64,
+                93
+              ]
+            },
+            "value": {
+              "text": "Colson Tester (catester@uark.edu)",
+              "bbox": [
+                64,
+                92,
+                92,
+                94
+              ]
+            },
+            "center_x": 57,
+            "center_y": 93
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9970218539237976
+        },
+        {
+          "document_id": "bbef288ad59ece7773ed62c9003fd8afc522dd70c3ae373c19f5a5a37a614802",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Physical Location:",
+              "bbox": [
+                12,
+                84,
+                26,
+                86
+              ]
+            },
+            "value": {
+              "text": "7014 Wellington Road, Manassas, VA 20109",
+              "bbox": [
+                26,
+                84,
+                58,
+                86
+              ]
+            },
+            "link_confidence": 0.9969561100006104
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Physical Location:",
+              "bbox": [
+                12,
+                84,
+                25,
+                86
+              ]
+            },
+            "value": {
+              "text": "7014 Wellington Road, Manassas, VA 20109",
+              "bbox": [
+                25,
+                84,
+                57,
+                86
+              ]
+            },
+            "center_x": 18,
+            "center_y": 85
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9969561100006104
+        },
+        {
+          "document_id": "842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Phone:",
+              "bbox": [
+                9,
+                39,
+                17,
+                42
+              ]
+            },
+            "value": {
+              "text": "212\u2013870\u20133400",
+              "bbox": [
+                18,
+                39,
+                36,
+                42
+              ]
+            },
+            "link_confidence": 0.9968963861465454
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Phone:",
+              "bbox": [
+                8,
+                40,
+                17,
+                42
+              ]
+            },
+            "value": {
+              "text": "212\u2013870\u20133400",
+              "bbox": [
+                17,
+                40,
+                36,
+                42
+              ]
+            },
+            "center_x": 13,
+            "center_y": 41
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9968963861465454
+        },
+        {
+          "document_id": "102e99d9fdd1d0f520d70d47b05aac21e622e4591325ae5afa802bea216955f4",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Date :",
+              "bbox": [
+                15,
+                66,
+                30,
+                68
+              ]
+            },
+            "value": {
+              "text": "02.06.2020",
+              "bbox": [
+                33,
+                66,
+                60,
+                68
+              ]
+            },
+            "link_confidence": 0.9968961477279663
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Date :",
+              "bbox": [
+                15,
+                66,
+                49,
+                68
+              ]
+            },
+            "value": {
+              "text": "02.06.2020",
+              "bbox": [
+                51,
+                66,
+                61,
+                68
+              ]
+            },
+            "center_x": 32,
+            "center_y": 67
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9968961477279663
+        },
+        {
+          "document_id": "ec38e4345979e0881143cc54a740427315668b0390956ddf2d2067e9bb072bb5",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "DESCRIPTION:",
+              "bbox": [
+                6,
+                19,
+                15,
+                21
+              ]
+            },
+            "value": {
+              "text": "Lander University One-time Cleaning of Residence Halls-2022 The",
+              "bbox": [
+                16,
+                19,
+                62,
+                24
+              ]
+            },
+            "link_confidence": 0.9968059062957764
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "DESCRIPTION:",
+              "bbox": [
+                6,
+                20,
+                14,
+                21
+              ]
+            },
+            "value": {
+              "text": "Lander University One-time Cleaning of Residence Halls-2022",
+              "bbox": [
+                15,
+                19,
+                62,
+                21
+              ]
+            },
+            "center_x": 10,
+            "center_y": 20
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9968059062957764
+        },
+        {
+          "document_id": "e69cd262bba386288fe1b785422c52b3f7788b3f04d2d52e6247cbb775ed0ab7",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Subject:",
+              "bbox": [
+                22,
+                39,
+                27,
+                40
+              ]
+            },
+            "value": {
+              "text": "Institutional Review Board Exemption Determination - Limited Review",
+              "bbox": [
+                28,
+                39,
+                77,
+                40
+              ]
+            },
+            "link_confidence": 0.9967982172966003
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Subject:",
+              "bbox": [
+                22,
+                39,
+                27,
+                40
+              ]
+            },
+            "value": {
+              "text": "Institutional Review Board Exemption Determination - Limited Review",
+              "bbox": [
+                39,
+                39,
+                77,
+                40
+              ]
+            },
+            "center_x": 25,
+            "center_y": 40
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9967982172966003
+        },
+        {
+          "document_id": "2bb5953e322a2d4ec2df77cc332c9d87ab828266943e94cf009e8cfc36afb22e",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Project Type:",
+              "bbox": [
+                10,
+                28,
+                20,
+                30
+              ]
+            },
+            "value": {
+              "text": "Residential Multifamily/Commercial",
+              "bbox": [
+                20,
+                28,
+                47,
+                30
+              ]
+            },
+            "link_confidence": 0.9967532753944397
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Project Type:",
+              "bbox": [
+                9,
+                28,
+                20,
+                30
+              ]
+            },
+            "value": {
+              "text": "Residential Multifamily/Commercial",
+              "bbox": [
+                21,
+                28,
+                48,
+                30
+              ]
+            },
+            "center_x": 15,
+            "center_y": 29
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9967532753944397
+        },
+        {
+          "document_id": "7ba3555882aa848966c6a4be26208f36f2bb5c2e638225f7601f7a0d12d3133c",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "To:",
+              "bbox": [
+                12,
+                23,
+                15,
+                25
+              ]
+            },
+            "value": {
+              "text": "Potential Participant",
+              "bbox": [
+                16,
+                23,
+                39,
+                25
+              ]
+            },
+            "link_confidence": 0.9967395663261414
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "To:",
+              "bbox": [
+                12,
+                23,
+                15,
+                25
+              ]
+            },
+            "value": {
+              "text": "Potential Participant",
+              "bbox": [
+                23,
+                23,
+                40,
+                25
+              ]
+            },
+            "center_x": 13,
+            "center_y": 24
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9967395663261414
+        },
+        {
+          "document_id": "b7d016f1fad0b8dbf66eced3f23aee5c95d3cb0f001dacc7e3420001eb8e42f5",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Fax:",
+              "bbox": [
+                12,
+                16,
+                16,
+                17
+              ]
+            },
+            "value": {
+              "text": "573-882-1953",
+              "bbox": [
+                17,
+                16,
+                32,
+                17
+              ]
+            },
+            "link_confidence": 0.9965751767158508
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Fax:",
+              "bbox": [
+                12,
+                16,
+                17,
+                17
+              ]
+            },
+            "value": {
+              "text": "573-882-1953",
+              "bbox": [
+                17,
+                16,
+                32,
+                17
+              ]
+            },
+            "center_x": 14,
+            "center_y": 16
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9965751767158508
+        },
+        {
+          "document_id": "5af0cca4c8b6dffcae50e077a4e472b059001ffe006813c5e9d8d75df4376927",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Website:",
+              "bbox": [
+                8,
+                30,
+                22,
+                37
+              ]
+            },
+            "value": {
+              "text": "https://libsense.ren.africa",
+              "bbox": [
+                23,
+                30,
+                71,
+                37
+              ]
+            },
+            "link_confidence": 0.9965296387672424
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Website:",
+              "bbox": [
+                8,
+                30,
+                24,
+                36
+              ]
+            },
+            "value": {
+              "text": "https://libsense.ren.africa",
+              "bbox": [
+                24,
+                30,
+                71,
+                38
+              ]
+            },
+            "center_x": 16,
+            "center_y": 33
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9965296387672424
+        },
+        {
+          "document_id": "842bec8fbe2631ae88cfd3c58261f4c852f7c40c52383e86489674123f214e56",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Phone:",
+              "bbox": [
+                9,
+                82,
+                17,
+                84
+              ]
+            },
+            "value": {
+              "text": "888\u2013554\u2013COAS or 301\u2013468\u20130985",
+              "bbox": [
+                19,
+                82,
+                59,
+                84
+              ]
+            },
+            "link_confidence": 0.9965285658836365
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Phone:",
+              "bbox": [
+                8,
+                83,
+                17,
+                84
+              ]
+            },
+            "value": {
+              "text": "888\u2013554\u2013COAS or 301\u2013468\u20130985",
+              "bbox": [
+                18,
+                83,
+                60,
+                85
+              ]
+            },
+            "center_x": 13,
+            "center_y": 83
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9965285658836365
+        },
+        {
+          "document_id": "f4e51230f6b8e42c874118fa692f28dc3490e5bf343a032a4c09da52325afd95",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Email:",
+              "bbox": [
+                17,
+                44,
+                23,
+                46
+              ]
+            },
+            "value": {
+              "text": "jrngen@law.columbia.edu",
+              "bbox": [
+                24,
+                44,
+                47,
+                46
+              ]
+            },
+            "link_confidence": 0.9964446425437927
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Email:",
+              "bbox": [
+                17,
+                44,
+                23,
+                45
+              ]
+            },
+            "value": {
+              "text": "jrngen@law.columbia.edu",
+              "bbox": [
+                23,
+                44,
+                47,
+                46
+              ]
+            },
+            "center_x": 20,
+            "center_y": 45
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9964446425437927
+        },
+        {
+          "document_id": "dc81c5baef9ae239be99ac577ae7411ca5d1762d34d54349f4fbbe4cf90fc660",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Describe of the Content of the Ad:",
+              "bbox": [
+                14,
+                56,
+                39,
+                57
+              ]
+            },
+            "value": {
+              "text": "Biden will protect healthcare and prescription coverage",
+              "bbox": [
+                40,
+                56,
+                81,
+                57
+              ]
+            },
+            "link_confidence": 0.9964130520820618
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Describe of the Content of the Ad:",
+              "bbox": [
+                14,
+                56,
+                41,
+                57
+              ]
+            },
+            "value": {
+              "text": "Biden will protect healthcare and prescription coverage",
+              "bbox": [
+                41,
+                55,
+                81,
+                57
+              ]
+            },
+            "center_x": 28,
+            "center_y": 56
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9964130520820618
+        },
+        {
+          "document_id": "9ac16cef4aebc48e38478d0781e26645d6bf326f5fb864e4e8e9eef1743812f7",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Email Address and Extension:",
+              "bbox": [
+                6,
+                48,
+                30,
+                50
+              ]
+            },
+            "value": {
+              "text": "lindfelt@csusb.edu & 909-537-3310",
+              "bbox": [
+                31,
+                48,
+                60,
+                50
+              ]
+            },
+            "link_confidence": 0.9964040517807007
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Email Address and Extension:",
+              "bbox": [
+                6,
+                48,
+                30,
+                49
+              ]
+            },
+            "value": {
+              "text": "lindfelt@csusb.edu & 909-537-3310",
+              "bbox": [
+                30,
+                48,
+                60,
+                50
+              ]
+            },
+            "center_x": 18,
+            "center_y": 49
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9964040517807007
+        },
+        {
+          "document_id": "bbef288ad59ece7773ed62c9003fd8afc522dd70c3ae373c19f5a5a37a614802",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Freight:",
+              "bbox": [
+                12,
+                56,
+                17,
+                57
+              ]
+            },
+            "value": {
+              "text": "Exact freight cost for shipment \u2013 no upcharge on all standard, rush, and manufacturer orders",
+              "bbox": [
+                18,
+                56,
+                86,
+                57
+              ]
+            },
+            "link_confidence": 0.9963879585266113
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Freight:",
+              "bbox": [
+                12,
+                56,
+                17,
+                57
+              ]
+            },
+            "value": {
+              "text": "Exact freight cost for shipment \u2013 no upcharge on all standard, rush, and manufacturer orders",
+              "bbox": [
+                18,
+                56,
+                86,
+                57
+              ]
+            },
+            "center_x": 15,
+            "center_y": 57
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9963879585266113
+        },
+        {
+          "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Late Payment Fee- The",
+              "bbox": [
+                24,
+                48,
+                45,
+                50
+              ]
+            },
+            "value": {
+              "text": "fee charged for making a payment past the due date.",
+              "bbox": [
+                46,
+                48,
+                91,
+                51
+              ]
+            },
+            "link_confidence": 0.9962930083274841
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Late Payment Fee-",
+              "bbox": [
+                24,
+                48,
+                41,
+                50
+              ]
+            },
+            "value": {
+              "text": "The fee charged for making a payment past the due date.",
+              "bbox": [
+                54,
+                48,
+                92,
+                51
+              ]
+            },
+            "center_x": 32,
+            "center_y": 49
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9962930083274841
+        },
+        {
+          "document_id": "f3daec05b2c611c58c53be2838f6b9ec7aa522aa9bcf304c9acb9761da33edc6",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "COMMITTEE MEMBER:",
+              "bbox": [
+                23,
+                61,
+                41,
+                63
+              ]
+            },
+            "value": {
+              "text": "Paul Hiltpold, Ph.D. Professor of History",
+              "bbox": [
+                42,
+                61,
+                65,
+                65
+              ]
+            },
+            "link_confidence": 0.9962888956069946
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "COMMITTEE MEMBER:",
+              "bbox": [
+                23,
+                61,
+                44,
+                63
+              ]
+            },
+            "value": {
+              "text": "Paul Hiltpold, Ph.D. Professor of History",
+              "bbox": [
+                49,
+                61,
+                66,
+                65
+              ]
+            },
+            "center_x": 34,
+            "center_y": 62
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9962888956069946
+        },
+        {
+          "document_id": "1e0177fa726eaa47738bd5ad09657b0c2db9ded98bd1b288e118ca7b32e833f0",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                53,
+                24,
+                54
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                53,
+                73,
+                54
+              ]
+            },
+            "link_confidence": 0.9962788224220276
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                53,
+                23,
+                54
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                53,
+                73,
+                54
+              ]
+            },
+            "center_x": 19,
+            "center_y": 53
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9962788224220276
+        },
+        {
+          "document_id": "3d903a525328f3aaa000581a93f811e4f43a8eb7574cec491af56869b3bbaea9",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                50,
+                24,
+                51
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                50,
+                73,
+                51
+              ]
+            },
+            "link_confidence": 0.9962788224220276
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                50,
+                23,
+                51
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                50,
+                74,
+                51
+              ]
+            },
+            "center_x": 19,
+            "center_y": 51
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9962788224220276
+        },
+        {
+          "document_id": "91ad1cf615acd3ac9831836bb4a5ca0acde9df49b08aa1413f9e4c3a5bbbab52",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                50,
+                24,
+                51
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                24,
+                50,
+                73,
+                51
+              ]
+            },
+            "link_confidence": 0.9962788224220276
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Note:",
+              "bbox": [
+                15,
+                50,
+                23,
+                51
+              ]
+            },
+            "value": {
+              "text": "For support or questions please contact effectvclientcare@comcast.com",
+              "bbox": [
+                25,
+                50,
+                73,
+                52
+              ]
+            },
+            "center_x": 19,
+            "center_y": 51
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9962788224220276
+        },
+        {
+          "document_id": "7ba3555882aa848966c6a4be26208f36f2bb5c2e638225f7601f7a0d12d3133c",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Subject:",
+              "bbox": [
+                12,
+                30,
+                18,
+                32
+              ]
+            },
+            "value": {
+              "text": "Invitation to Participate in Research Study on Faculty Collegiality",
+              "bbox": [
+                19,
+                30,
+                75,
+                32
+              ]
+            },
+            "link_confidence": 0.9962719678878784
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Subject:",
+              "bbox": [
+                11,
+                30,
+                18,
+                32
+              ]
+            },
+            "value": {
+              "text": "Invitation to Participate in Research Study on Faculty Collegiality",
+              "bbox": [
+                23,
+                30,
+                76,
+                32
+              ]
+            },
+            "center_x": 15,
+            "center_y": 31
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9962719678878784
+        },
+        {
+          "document_id": "52d82fbed86096177a43dfe002e5200c13ccb61afb35e30508f05119240b7c96",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Instructor Name:",
+              "bbox": [
+                9,
+                42,
+                20,
+                44
+              ]
+            },
+            "value": {
+              "text": "Dennis P. Itoga, Psy.D., M.Ed.; Assistant Professor of Psychology",
+              "bbox": [
+                21,
+                42,
+                69,
+                44
+              ]
+            },
+            "link_confidence": 0.9962652325630188
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Instructor Name:",
+              "bbox": [
+                9,
+                42,
+                22,
+                44
+              ]
+            },
+            "value": {
+              "text": "Dennis P. Itoga, Psy.D., M.Ed.; Assistant Professor of Psychology",
+              "bbox": [
+                22,
+                42,
+                69,
+                44
+              ]
+            },
+            "center_x": 15,
+            "center_y": 43
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9962652325630188
+        },
+        {
+          "document_id": "553c9eb9dbe4ce7f31255d439320b76ad33801e802acadd3f82743b65ed3ad24",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "SKILLS",
+              "bbox": [
+                13,
+                32,
+                20,
+                33
+              ]
+            },
+            "value": {
+              "text": "Mathcad, Simulink",
+              "bbox": [
+                21,
+                32,
+                41,
+                33
+              ]
+            },
+            "link_confidence": 0.9961373209953308
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "SKILLS",
+              "bbox": [
+                13,
+                32,
+                19,
+                33
+              ]
+            },
+            "value": {
+              "text": "Mathcad, Simulink",
+              "bbox": [
+                27,
+                32,
+                41,
+                33
+              ]
+            },
+            "center_x": 16,
+            "center_y": 32
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9961373209953308
+        },
+        {
+          "document_id": "86fd6bbf3e855e383462622eda4851966cd45984d47d539cf6511f816a398512",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Email:",
+              "bbox": [
+                12,
+                72,
+                17,
+                74
+              ]
+            },
+            "value": {
+              "text": "andreaerinbass@gmail.com",
+              "bbox": [
+                18,
+                72,
+                39,
+                74
+              ]
+            },
+            "link_confidence": 0.9961373209953308
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Email:",
+              "bbox": [
+                12,
+                72,
+                17,
+                74
+              ]
+            },
+            "value": {
+              "text": "andreaerinbass@gmail.com",
+              "bbox": [
+                17,
+                72,
+                39,
+                74
+              ]
+            },
+            "center_x": 14,
+            "center_y": 73
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9961373209953308
+        },
+        {
+          "document_id": "dc0682dd4f2030ec4247fa13484981ddbedab4d3253c8df38ad92bae47e7f2f1",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Institutional Address:",
+              "bbox": [
+                12,
+                31,
+                30,
+                33
+              ]
+            },
+            "value": {
+              "text": "P.G. Department of Home Science, S.P. University, V.V. Nagar",
+              "bbox": [
+                31,
+                31,
+                81,
+                33
+              ]
+            },
+            "link_confidence": 0.996134877204895
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Institutional Address:",
+              "bbox": [
+                12,
+                31,
+                30,
+                33
+              ]
+            },
+            "value": {
+              "text": "P.G. Department of Home Science, S.P. University, V.V. Nagar",
+              "bbox": [
+                30,
+                31,
+                81,
+                33
+              ]
+            },
+            "center_x": 21,
+            "center_y": 32
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.996134877204895
+        }
+      ],
+      "wrong_links": [
+        {
+          "document_id": "1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Networks",
+              "bbox": [
+                3,
+                51,
+                21,
+                53
+              ]
+            },
+            "value": {
+              "text": "260-422-5614",
+              "bbox": [
+                33,
+                51,
+                50,
+                53
+              ]
+            },
+            "link_confidence": 0.9914857745170593
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Networks",
+              "bbox": [
+                3,
+                51,
+                10,
+                53
+              ]
+            },
+            "value": {
+              "text": "3",
+              "bbox": [
+                12,
+                51,
+                13,
+                53
+              ]
+            },
+            "center_x": 6,
+            "center_y": 52
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9914857745170593,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            25
+          ]
+        },
+        {
+          "document_id": "0e3008db1915a75e6badd0d786759540521c72be2640d3a196fd25619f39ba61",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                12,
+                10
+              ]
+            },
+            "value": {
+              "text": "GREER, Margolis, Mitchell,",
+              "bbox": [
+                26,
+                8,
+                54,
+                10
+              ]
+            },
+            "link_confidence": 0.9914434552192688
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                9,
+                8,
+                10
+              ]
+            },
+            "value": {
+              "text": "0496",
+              "bbox": [
+                13,
+                9,
+                15,
+                10
+              ]
+            },
+            "center_x": 7,
+            "center_y": 9
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9914434552192688,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            19
+          ]
+        },
+        {
+          "document_id": "810ceb8cb9185cfb874aab43498e7a97b33d8cdefd228206ed54b5a2f43b518a",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                12,
+                10
+              ]
+            },
+            "value": {
+              "text": "Strategic Media Services,",
+              "bbox": [
+                27,
+                8,
+                55,
+                10
+              ]
+            },
+            "link_confidence": 0.9903404116630554
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                9,
+                8,
+                10
+              ]
+            },
+            "value": {
+              "text": "7798",
+              "bbox": [
+                13,
+                8,
+                15,
+                10
+              ]
+            },
+            "center_x": 6,
+            "center_y": 9
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9903404116630554,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            14
+          ]
+        },
+        {
+          "document_id": "3c7ca1e4d38b97a36fb3b23fa7d0109a0d85053d040950e94050eefccc589f07",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                12,
+                10
+              ]
+            },
+            "value": {
+              "text": "GREER, Margolis, Mitchell,",
+              "bbox": [
+                26,
+                8,
+                54,
+                10
+              ]
+            },
+            "link_confidence": 0.9902483820915222
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Syscode",
+              "bbox": [
+                5,
+                8,
+                8,
+                10
+              ]
+            },
+            "value": {
+              "text": "2385",
+              "bbox": [
+                13,
+                9,
+                15,
+                10
+              ]
+            },
+            "center_x": 6,
+            "center_y": 9
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9902483820915222,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            13
+          ]
+        },
+        {
+          "document_id": "1cddd9805f7ebc53030988543fa1d98ba63f8e3370bc8ee81737c4ad5e377ea6",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Advertiser",
+              "bbox": [
+                39,
+                1,
+                46,
+                3
+              ]
+            },
+            "value": {
+              "text": "None",
+              "bbox": [
+                55,
+                10,
+                59,
+                11
+              ]
+            },
+            "link_confidence": 0.9895673394203186
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Advertiser",
+              "bbox": [
+                37,
+                1,
+                43,
+                3
+              ]
+            },
+            "value": {
+              "text": "Sarah Trone Garriott for Iowa Sena(148648)",
+              "bbox": [
+                49,
+                1,
+                74,
+                3
+              ]
+            },
+            "center_x": 40,
+            "center_y": 2
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9895673394203186,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            13
+          ]
+        },
+        {
+          "document_id": "07de02d344336182543e7e7592f614d7acce0412ddf034a477195574c98a8aeb",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Zip",
+              "bbox": [
+                31,
+                43,
+                34,
+                45
+              ]
+            },
+            "value": {
+              "text": "SPRINGFIELD, VA",
+              "bbox": [
+                36,
+                43,
+                52,
+                45
+              ]
+            },
+            "link_confidence": 0.9869756698608398
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Zip",
+              "bbox": [
+                33,
+                46,
+                35,
+                48
+              ]
+            },
+            "value": {
+              "text": "22152",
+              "bbox": [
+                43,
+                46,
+                46,
+                47
+              ]
+            },
+            "center_x": 34,
+            "center_y": 47
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9869756698608398,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            10
+          ]
+        },
+        {
+          "document_id": "4b599a0402029499fa990e994df630e94e7de8fd02356e6a6340bdb8ebfd9adc",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Overall Record:",
+              "bbox": [
+                50,
+                54,
+                65,
+                56
+              ]
+            },
+            "value": {
+              "text": "7-11-1",
+              "bbox": [
+                66,
+                54,
+                72,
+                56
+              ]
+            },
+            "link_confidence": 0.9868157505989075
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Overall Record:",
+              "bbox": [
+                56,
+                41,
+                66,
+                42
+              ]
+            },
+            "value": {
+              "text": "214-112-18, 18 yrs",
+              "bbox": [
+                68,
+                41,
+                80,
+                43
+              ]
+            },
+            "center_x": 61,
+            "center_y": 42
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9868157505989075,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            17
+          ]
+        },
+        {
+          "document_id": "b7085ca3d724ea06acfb3d80e0f2ebfabce33df95b3a7f197843cf544ed4f8db",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Well Well Number Number",
+              "bbox": [
+                12,
+                20,
+                22,
+                22
+              ]
+            },
+            "value": {
+              "text": "1",
+              "bbox": [
+                22,
+                20,
+                23,
+                22
+              ]
+            },
+            "link_confidence": 0.9860801100730896
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Well Well Number Number",
+              "bbox": [
+                12,
+                21,
+                22,
+                22
+              ]
+            },
+            "value": {
+              "text": "",
+              "bbox": [
+                23,
+                21,
+                23,
+                22
+              ]
+            },
+            "center_x": 17,
+            "center_y": 21
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9860801100730896,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            7
+          ]
+        },
+        {
+          "document_id": "810ceb8cb9185cfb874aab43498e7a97b33d8cdefd228206ed54b5a2f43b518a",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Total",
+              "bbox": [
+                71,
+                18,
+                78,
+                20
+              ]
+            },
+            "value": {
+              "text": "$234.81",
+              "bbox": [
+                80,
+                18,
+                90,
+                20
+              ]
+            },
+            "link_confidence": 0.9830386638641357
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Total",
+              "bbox": [
+                63,
+                14,
+                65,
+                15
+              ]
+            },
+            "value": {
+              "text": "$276.25",
+              "bbox": [
+                87,
+                14,
+                90,
+                15
+              ]
+            },
+            "center_x": 64,
+            "center_y": 15
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9830386638641357,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            26
+          ]
+        },
+        {
+          "document_id": "ac34579dad0840fad1e209c0655ef78b9f09bca2c7d11ec69481ab5c8a5b847c",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Remarks",
+              "bbox": [
+                27,
+                21,
+                33,
+                22
+              ]
+            },
+            "value": {
+              "text": "Thank you for using Cox Media.",
+              "bbox": [
+                35,
+                21,
+                58,
+                22
+              ]
+            },
+            "link_confidence": 0.9796914458274841
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Remarks",
+              "bbox": [
+                6,
+                18,
+                9,
+                19
+              ]
+            },
+            "value": {
+              "text": "62955625 - est 1489 - 6900 Phoen",
+              "bbox": [
+                15,
+                18,
+                30,
+                19
+              ]
+            },
+            "center_x": 7,
+            "center_y": 19
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9796914458274841,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            22
+          ]
+        },
+        {
+          "document_id": "07de02d344336182543e7e7592f614d7acce0412ddf034a477195574c98a8aeb",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "RepFirm",
+              "bbox": [
+                3,
+                41,
+                11,
+                43
+              ]
+            },
+            "value": {
+              "text": "2 STE A-300",
+              "bbox": [
+                26,
+                41,
+                39,
+                43
+              ]
+            },
+            "link_confidence": 0.9785265922546387
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "RepFirm",
+              "bbox": [
+                2,
+                41,
+                8,
+                43
+              ]
+            },
+            "value": {
+              "text": "0%",
+              "bbox": [
+                26,
+                41,
+                28,
+                43
+              ]
+            },
+            "center_x": 5,
+            "center_y": 42
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9785265922546387,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            9
+          ]
+        },
+        {
+          "document_id": "07de02d344336182543e7e7592f614d7acce0412ddf034a477195574c98a8aeb",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Zones",
+              "bbox": [
+                3,
+                46,
+                23,
+                48
+              ]
+            },
+            "value": {
+              "text": "22152",
+              "bbox": [
+                36,
+                46,
+                46,
+                48
+              ]
+            },
+            "link_confidence": 0.9782739281654358
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Zones",
+              "bbox": [
+                2,
+                46,
+                8,
+                47
+              ]
+            },
+            "value": {
+              "text": "1",
+              "bbox": [
+                12,
+                46,
+                13,
+                48
+              ]
+            },
+            "center_x": 5,
+            "center_y": 47
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9782739281654358,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            11
+          ]
+        },
+        {
+          "document_id": "e3735c641c30e5e3d0d936398abc188b6a50da22bc86eb5581e81de0f6e4b86b",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Zip",
+              "bbox": [
+                32,
+                44,
+                35,
+                46
+              ]
+            },
+            "value": {
+              "text": "BLOOMFIELD, NJ",
+              "bbox": [
+                36,
+                44,
+                52,
+                46
+              ]
+            },
+            "link_confidence": 0.9750306606292725
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Zip",
+              "bbox": [
+                33,
+                47,
+                35,
+                49
+              ]
+            },
+            "value": {
+              "text": "07003",
+              "bbox": [
+                43,
+                47,
+                46,
+                48
+              ]
+            },
+            "center_x": 34,
+            "center_y": 48
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9750306606292725,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            13
+          ]
+        },
+        {
+          "document_id": "aef5308e99863645b06aa0cff9767002681664bc62987a4e40fcab35ae558d05",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Order #",
+              "bbox": [
+                62,
+                7,
+                74,
+                8
+              ]
+            },
+            "value": {
+              "text": "Cheyenne House",
+              "bbox": [
+                74,
+                18,
+                85,
+                19
+              ]
+            },
+            "link_confidence": 0.9743474125862122
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Order #",
+              "bbox": [
+                75,
+                7,
+                80,
+                8
+              ]
+            },
+            "value": {
+              "text": "2401035",
+              "bbox": [
+                83,
+                7,
+                88,
+                8
+              ]
+            },
+            "center_x": 77,
+            "center_y": 7
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9743474125862122,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            15
+          ]
+        },
+        {
+          "document_id": "ac9efddb67f5a672ea6204172fb5ac65c9ec057af34937aa954e73cc3a6f37b4",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "F",
+              "bbox": [
+                50,
+                34,
+                51,
+                36
+              ]
+            },
+            "value": {
+              "text": "+852 3166 7001,",
+              "bbox": [
+                36,
+                34,
+                50,
+                36
+              ]
+            },
+            "link_confidence": 0.9719017148017883
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "F",
+              "bbox": [
+                21,
+                62,
+                22,
+                62
+              ]
+            },
+            "value": {
+              "text": "+91 22 4085 1554",
+              "bbox": [
+                23,
+                62,
+                33,
+                63
+              ]
+            },
+            "center_x": 22,
+            "center_y": 62
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9719017148017883,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            15
+          ]
+        },
+        {
+          "document_id": "05cd680bfc7793d5af051b09d5ed66fee13ea2a2052ae73566be2c191fee94e9",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "ATTN:",
+              "bbox": [
+                6,
+                17,
+                9,
+                18
+              ]
+            },
+            "value": {
+              "text": "To make a secure credit card payment, log into www.comcastinvoices.com to register for an account.",
+              "bbox": [
+                24,
+                54,
+                84,
+                56
+              ]
+            },
+            "link_confidence": 0.9613550305366516
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "ATTN:",
+              "bbox": [
+                6,
+                17,
+                10,
+                18
+              ]
+            },
+            "value": {
+              "text": "NCC",
+              "bbox": [
+                10,
+                17,
+                14,
+                18
+              ]
+            },
+            "center_x": 8,
+            "center_y": 18
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9613550305366516,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            12
+          ]
+        },
+        {
+          "document_id": "cab4f90cf44b4ca5f806ad00e549dd6e93fa12b348d5e2fc76e71d5181da8848",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Size:",
+              "bbox": [
+                18,
+                28,
+                24,
+                30
+              ]
+            },
+            "value": {
+              "text": "Orange, Black Lettering",
+              "bbox": [
+                41,
+                28,
+                70,
+                30
+              ]
+            },
+            "link_confidence": 0.9582442045211792
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Size:",
+              "bbox": [
+                18,
+                12,
+                21,
+                14
+              ]
+            },
+            "value": {
+              "text": "XL",
+              "bbox": [
+                22,
+                12,
+                24,
+                14
+              ]
+            },
+            "center_x": 19,
+            "center_y": 13
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9582442045211792,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            6
+          ]
+        },
+        {
+          "document_id": "04d279efe18c2f4c385d8ceaee48a544a9e4f16099ff184b047f09e4578e5643",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Fax:",
+              "bbox": [
+                5,
+                47,
+                8,
+                48
+              ]
+            },
+            "value": {
+              "text": "+44 (0)870 600 6122",
+              "bbox": [
+                10,
+                33,
+                33,
+                34
+              ]
+            },
+            "link_confidence": 0.9568513631820679
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Fax:",
+              "bbox": [
+                43,
+                35,
+                46,
+                35
+              ]
+            },
+            "value": {
+              "text": "+1 215 674 7183",
+              "bbox": [
+                47,
+                35,
+                57,
+                35
+              ]
+            },
+            "center_x": 45,
+            "center_y": 35
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9568513631820679,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            6
+          ]
+        },
+        {
+          "document_id": "d81ef66940dceb3383e01915fd272f305e1ed11d5889a1714193c1dbe67d4c3b",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Service email:",
+              "bbox": [
+                5,
+                72,
+                14,
+                73
+              ]
+            },
+            "value": {
+              "text": "+1 215 674 6000",
+              "bbox": [
+                8,
+                57,
+                18,
+                59
+              ]
+            },
+            "link_confidence": 0.9399703145027161
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Service email:",
+              "bbox": [
+                5,
+                72,
+                14,
+                73
+              ]
+            },
+            "value": {
+              "text": "instrumentservice.abbchina@cn.abb.com",
+              "bbox": [
+                14,
+                72,
+                42,
+                73
+              ]
+            },
+            "center_x": 9,
+            "center_y": 72
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.9399703145027161,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            0
+          ]
+        },
+        {
+          "document_id": "e3735c641c30e5e3d0d936398abc188b6a50da22bc86eb5581e81de0f6e4b86b",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Zones",
+              "bbox": [
+                3,
+                47,
+                23,
+                49
+              ]
+            },
+            "value": {
+              "text": "07003",
+              "bbox": [
+                36,
+                47,
+                46,
+                49
+              ]
+            },
+            "link_confidence": 0.9053021669387817
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Zones",
+              "bbox": [
+                3,
+                47,
+                8,
+                48
+              ]
+            },
+            "value": {
+              "text": "2",
+              "bbox": [
+                12,
+                47,
+                13,
+                48
+              ]
+            },
+            "center_x": 6,
+            "center_y": 48
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.9053021669387817,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            14
+          ]
+        },
+        {
+          "document_id": "81016be0f843d6d313964843c33ecbf8a2bcc04cc360ea03bb7ce0625f3efcee",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "URL:",
+              "bbox": [
+                12,
+                33,
+                15,
+                35
+              ]
+            },
+            "value": {
+              "text": "(401) 874-2265",
+              "bbox": [
+                17,
+                66,
+                29,
+                68
+              ]
+            },
+            "link_confidence": 0.8846896886825562
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "URL:",
+              "bbox": [
+                11,
+                21,
+                16,
+                22
+              ]
+            },
+            "value": {
+              "text": "http://www.ou.edu/ogs",
+              "bbox": [
+                17,
+                21,
+                35,
+                22
+              ]
+            },
+            "center_x": 14,
+            "center_y": 22
+          },
+          "cluster": "Cluster_1",
+          "link_confidence": 0.8846896886825562,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            8
+          ]
+        },
+        {
+          "document_id": "afe94c7ed1f89cbb7fed696b1a234396922cc0ea31888aa4bbadded5f92ac0ad",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Handling",
+              "bbox": [
+                37,
+                10,
+                54,
+                11
+              ]
+            },
+            "value": {
+              "text": "10/31/2022 - 11/6/2022",
+              "bbox": [
+                68,
+                10,
+                93,
+                11
+              ]
+            },
+            "link_confidence": 0.880791962146759
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Special Handling",
+              "bbox": [
+                37,
+                10,
+                46,
+                11
+              ]
+            },
+            "value": {
+              "text": "None",
+              "bbox": [
+                49,
+                10,
+                52,
+                11
+              ]
+            },
+            "center_x": 41,
+            "center_y": 10
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.880791962146759,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            19
+          ]
+        },
+        {
+          "document_id": "64a54bc2801c2efa57dc713e037d7ba40e83e77644010ef53622d8c925624a47",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Number of Hours/Week:",
+              "bbox": [
+                33,
+                38,
+                52,
+                40
+              ]
+            },
+            "value": {
+              "text": "54-600-1756",
+              "bbox": [
+                25,
+                45,
+                35,
+                47
+              ]
+            },
+            "link_confidence": 0.8562121391296387
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Number of Hours/Week:",
+              "bbox": [
+                34,
+                39,
+                54,
+                40
+              ]
+            },
+            "value": {
+              "text": "than 20",
+              "bbox": [
+                55,
+                39,
+                70,
+                40
+              ]
+            },
+            "center_x": 44,
+            "center_y": 39
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.8562121391296387,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            1
+          ]
+        },
+        {
+          "document_id": "268f35fb2fb90442f0062ff1163a52243e53c6a79afa7d1cf6b77b6eb2ddb483",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "ISB No.",
+              "bbox": [
+                28,
+                13,
+                34,
+                16
+              ]
+            },
+            "value": {
+              "text": "CV-01-17-8091",
+              "bbox": [
+                50,
+                38,
+                73,
+                40
+              ]
+            },
+            "link_confidence": 0.8048200011253357
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "ISB No.",
+              "bbox": [
+                28,
+                14,
+                35,
+                15
+              ]
+            },
+            "value": {
+              "text": "5374",
+              "bbox": [
+                35,
+                14,
+                39,
+                15
+              ]
+            },
+            "center_x": 31,
+            "center_y": 15
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.8048200011253357,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            4
+          ]
+        },
+        {
+          "document_id": "aef5308e99863645b06aa0cff9767002681664bc62987a4e40fcab35ae558d05",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Invoice Period",
+              "bbox": [
+                46,
+                11,
+                56,
+                13
+              ]
+            },
+            "value": {
+              "text": "www.gray.tv/advertising",
+              "bbox": [
+                29,
+                11,
+                45,
+                13
+              ]
+            },
+            "link_confidence": 0.7649376392364502
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Invoice Period",
+              "bbox": [
+                51,
+                12,
+                60,
+                13
+              ]
+            },
+            "value": {
+              "text": "01/31/22 - 02/27/22",
+              "bbox": [
+                62,
+                11,
+                74,
+                13
+              ]
+            },
+            "center_x": 56,
+            "center_y": 12
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.7649376392364502,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            1
+          ]
+        },
+        {
+          "document_id": "4b599a0402029499fa990e994df630e94e7de8fd02356e6a6340bdb8ebfd9adc",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Assoc. Dir. of Athletics:",
+              "bbox": [
+                11,
+                47,
+                36,
+                48
+              ]
+            },
+            "value": {
+              "text": "(503) 554-3864",
+              "bbox": [
+                26,
+                58,
+                40,
+                60
+              ]
+            },
+            "link_confidence": 0.7139678001403809
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Assoc. Dir. of Athletics:",
+              "bbox": [
+                11,
+                47,
+                27,
+                48
+              ]
+            },
+            "value": {
+              "text": "Pat Bailey",
+              "bbox": [
+                29,
+                47,
+                36,
+                48
+              ]
+            },
+            "center_x": 19,
+            "center_y": 48
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.7139678001403809,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            37
+          ]
+        },
+        {
+          "document_id": "1d38adadf89e9ba2c03f3f6cc89cfac24dc9cff59de825d8ea9969e96dd98e21",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Zones",
+              "bbox": [
+                3,
+                46,
+                23,
+                48
+              ]
+            },
+            "value": {
+              "text": "46802",
+              "bbox": [
+                36,
+                46,
+                46,
+                48
+              ]
+            },
+            "link_confidence": 0.6973124742507935
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Total Zones",
+              "bbox": [
+                3,
+                46,
+                9,
+                47
+              ]
+            },
+            "value": {
+              "text": "2",
+              "bbox": [
+                12,
+                46,
+                12,
+                47
+              ]
+            },
+            "center_x": 6,
+            "center_y": 47
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.6973124742507935,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            24
+          ]
+        },
+        {
+          "document_id": "ec38e4345979e0881143cc54a740427315668b0390956ddf2d2067e9bb072bb5",
+          "prediction": {
+            "type": "kvp",
+            "key": {
+              "text": "CONFERENCE TYPE:",
+              "bbox": [
+                11,
+                43,
+                27,
+                44
+              ]
+            },
+            "value": {
+              "text": "ONE ORIGINAL and ONE COPY",
+              "bbox": [
+                30,
+                28,
+                48,
+                30
+              ]
+            },
+            "link_confidence": 0.5812117457389832
+          },
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "CONFERENCE TYPE:",
+              "bbox": [
+                11,
+                43,
+                23,
+                44
+              ]
+            },
+            "value": {
+              "text": "Site Visit",
+              "bbox": [
+                24,
+                43,
+                29,
+                44
+              ]
+            },
+            "center_x": 17,
+            "center_y": 44
+          },
+          "cluster": "Cluster_0",
+          "link_confidence": 0.5812117457389832,
+          "explanation": "predicted key and value match different ground-truth pairs",
+          "predicted_value_matches_ground_truth_indices": [
+            8
+          ]
+        }
+      ],
+      "missed_pairs": [
+        {
+          "document_id": "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Y",
+              "bbox": [
+                32,
+                27,
+                34,
+                28
+              ]
+            },
+            "value": {
+              "text": "2",
+              "bbox": [
+                32,
+                29,
+                33,
+                30
+              ]
+            },
+            "center_x": 33,
+            "center_y": 28
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "S",
+              "bbox": [
+                44,
+                27,
+                45,
+                28
+              ]
+            },
+            "value": {
+              "text": "3",
+              "bbox": [
+                44,
+                29,
+                45,
+                30
+              ]
+            },
+            "center_x": 45,
+            "center_y": 28
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "N",
+              "bbox": [
+                56,
+                27,
+                57,
+                28
+              ]
+            },
+            "value": {
+              "text": "4",
+              "bbox": [
+                56,
+                29,
+                57,
+                30
+              ]
+            },
+            "center_x": 57,
+            "center_y": 28
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "YD",
+              "bbox": [
+                20,
+                27,
+                23,
+                28
+              ]
+            },
+            "value": {
+              "text": "1",
+              "bbox": [
+                20,
+                29,
+                22,
+                30
+              ]
+            },
+            "center_x": 22,
+            "center_y": 28
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "49a5e4ab52c69bbf2805a71838227041e4d95009f32a0c31cfd62ff204fb701c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "DN",
+              "bbox": [
+                68,
+                27,
+                70,
+                28
+              ]
+            },
+            "value": {
+              "text": "5",
+              "bbox": [
+                68,
+                29,
+                69,
+                30
+              ]
+            },
+            "center_x": 69,
+            "center_y": 28
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0a050bcc3ace2ed3907d22f8dacc5adf0d960d8c5c5a692afd72a17da13b7ee4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": ". N",
+              "bbox": [
+                10,
+                52,
+                12,
+                54
+              ]
+            },
+            "value": {
+              "text": "T",
+              "bbox": [
+                14,
+                52,
+                20,
+                54
+              ]
+            },
+            "center_x": 11,
+            "center_y": 53
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "a8fadcba35968fab5cf7c42921aa2b80462d07c07b4bb9fd821d8504992a77b4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "20",
+              "bbox": [
+                72,
+                9,
+                74,
+                11
+              ]
+            },
+            "value": {
+              "text": "19",
+              "bbox": [
+                75,
+                9,
+                76,
+                10
+              ]
+            },
+            "center_x": 73,
+            "center_y": 10
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "ac34579dad0840fad1e209c0655ef78b9f09bca2c7d11ec69481ab5c8a5b847c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Cut",
+              "bbox": [
+                21,
+                84,
+                22,
+                85
+              ]
+            },
+            "value": {
+              "text": "1",
+              "bbox": [
+                21,
+                85,
+                22,
+                86
+              ]
+            },
+            "center_x": 22,
+            "center_y": 84
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0a050bcc3ace2ed3907d22f8dacc5adf0d960d8c5c5a692afd72a17da13b7ee4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "F",
+              "bbox": [
+                9,
+                60,
+                13,
+                61
+              ]
+            },
+            "value": {
+              "text": "Rev.",
+              "bbox": [
+                18,
+                59,
+                28,
+                61
+              ]
+            },
+            "center_x": 11,
+            "center_y": 60
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Acc",
+              "bbox": [
+                18,
+                19,
+                21,
+                20
+              ]
+            },
+            "value": {
+              "text": "13",
+              "bbox": [
+                19,
+                23,
+                20,
+                24
+              ]
+            },
+            "center_x": 20,
+            "center_y": 20
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Wait",
+              "bbox": [
+                22,
+                19,
+                25,
+                20
+              ]
+            },
+            "value": {
+              "text": "5",
+              "bbox": [
+                22,
+                22,
+                23,
+                24
+              ]
+            },
+            "center_x": 24,
+            "center_y": 19
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Acc",
+              "bbox": [
+                18,
+                31,
+                21,
+                32
+              ]
+            },
+            "value": {
+              "text": "22",
+              "bbox": [
+                18,
+                34,
+                20,
+                36
+              ]
+            },
+            "center_x": 19,
+            "center_y": 31
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Wait",
+              "bbox": [
+                22,
+                31,
+                25,
+                32
+              ]
+            },
+            "value": {
+              "text": "0",
+              "bbox": [
+                22,
+                34,
+                23,
+                35
+              ]
+            },
+            "center_x": 24,
+            "center_y": 31
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Acc",
+              "bbox": [
+                18,
+                43,
+                21,
+                44
+              ]
+            },
+            "value": {
+              "text": "44",
+              "bbox": [
+                18,
+                46,
+                20,
+                47
+              ]
+            },
+            "center_x": 20,
+            "center_y": 43
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Wait",
+              "bbox": [
+                22,
+                42,
+                25,
+                44
+              ]
+            },
+            "value": {
+              "text": "0",
+              "bbox": [
+                22,
+                46,
+                23,
+                47
+              ]
+            },
+            "center_x": 24,
+            "center_y": 43
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Acc",
+              "bbox": [
+                18,
+                54,
+                21,
+                55
+              ]
+            },
+            "value": {
+              "text": "26",
+              "bbox": [
+                19,
+                58,
+                20,
+                59
+              ]
+            },
+            "center_x": 20,
+            "center_y": 55
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Wait",
+              "bbox": [
+                22,
+                54,
+                25,
+                55
+              ]
+            },
+            "value": {
+              "text": "0",
+              "bbox": [
+                22,
+                58,
+                23,
+                59
+              ]
+            },
+            "center_x": 24,
+            "center_y": 55
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "326198826eccb1c969f99625f1db4a1062d232c01e1d2fa185dce2bacd222969",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "LO:",
+              "bbox": [
+                15,
+                85,
+                17,
+                86
+              ]
+            },
+            "value": {
+              "text": "3,",
+              "bbox": [
+                17,
+                85,
+                18,
+                86
+              ]
+            },
+            "center_x": 16,
+            "center_y": 85
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "3c96142dbf883d55fd870cb3e424985bd229f0480939b78e69af8fe4ebc2bef4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page",
+              "bbox": [
+                8,
+                92,
+                12,
+                93
+              ]
+            },
+            "value": {
+              "text": "4",
+              "bbox": [
+                12,
+                92,
+                13,
+                93
+              ]
+            },
+            "center_x": 10,
+            "center_y": 93
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "47c84067ad3e4153781c644281fb5b565bf05b0021d4a40a7cd85182d8858619",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Len",
+              "bbox": [
+                85,
+                19,
+                88,
+                20
+              ]
+            },
+            "value": {
+              "text": "30",
+              "bbox": [
+                85,
+                21,
+                87,
+                22
+              ]
+            },
+            "center_x": 87,
+            "center_y": 19
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "47c84067ad3e4153781c644281fb5b565bf05b0021d4a40a7cd85182d8858619",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Line",
+              "bbox": [
+                4,
+                19,
+                6,
+                20
+              ]
+            },
+            "value": {
+              "text": "8",
+              "bbox": [
+                3,
+                21,
+                4,
+                22
+              ]
+            },
+            "center_x": 5,
+            "center_y": 19
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "5a58456c08ee67739cbfe2e13fe45d740dd86afe4c9bfeb92197ad93caaab7b1",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "EDI:",
+              "bbox": [
+                23,
+                13,
+                25,
+                14
+              ]
+            },
+            "value": {
+              "text": "Y",
+              "bbox": [
+                30,
+                13,
+                31,
+                14
+              ]
+            },
+            "center_x": 24,
+            "center_y": 13
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "aa35720ba3611f946c372cc99d8cd1d78e81265b8ceb51dcdb4672d196944c2b",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "EDI:",
+              "bbox": [
+                23,
+                13,
+                25,
+                14
+              ]
+            },
+            "value": {
+              "text": "Y",
+              "bbox": [
+                31,
+                13,
+                31,
+                14
+              ]
+            },
+            "center_x": 24,
+            "center_y": 13
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "c56413c43be7b785b1c78927e16bbd6c79d768de242ff2b3ac893cad77bb013d",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page",
+              "bbox": [
+                60,
+                75,
+                63,
+                76
+              ]
+            },
+            "value": {
+              "text": "3",
+              "bbox": [
+                63,
+                75,
+                64,
+                76
+              ]
+            },
+            "center_x": 61,
+            "center_y": 75
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "cb5c44dade786717a133e52da5929436849f3a00f4ac93ef9d47ec306072908c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "page",
+              "bbox": [
+                34,
+                6,
+                37,
+                7
+              ]
+            },
+            "value": {
+              "text": "1",
+              "bbox": [
+                37,
+                6,
+                38,
+                6
+              ]
+            },
+            "center_x": 36,
+            "center_y": 6
+          },
+          "cluster": "Cluster_1",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "e71cd69fe9f1b230bc43b09f7ddf9f483e3ca4e88886801b5f722dfc24d82602",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Rev.",
+              "bbox": [
+                97,
+                88,
+                98,
+                89
+              ]
+            },
+            "value": {
+              "text": "B",
+              "bbox": [
+                97,
+                87,
+                98,
+                88
+              ]
+            },
+            "center_x": 98,
+            "center_y": 89
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "fa627b73abc31f216ace64b14d941598d06a97f0e1df2cf80f468fbb8c7028ce",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "EDI:",
+              "bbox": [
+                24,
+                21,
+                25,
+                22
+              ]
+            },
+            "value": {
+              "text": "Y",
+              "bbox": [
+                31,
+                21,
+                31,
+                22
+              ]
+            },
+            "center_x": 25,
+            "center_y": 21
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0a050bcc3ace2ed3907d22f8dacc5adf0d960d8c5c5a692afd72a17da13b7ee4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "A .",
+              "bbox": [
+                9,
+                56,
+                15,
+                57
+              ]
+            },
+            "value": {
+              "text": "DPP",
+              "bbox": [
+                18,
+                56,
+                33,
+                58
+              ]
+            },
+            "center_x": 12,
+            "center_y": 57
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Bids",
+              "bbox": [
+                14,
+                19,
+                17,
+                20
+              ]
+            },
+            "value": {
+              "text": "18",
+              "bbox": [
+                14,
+                23,
+                16,
+                24
+              ]
+            },
+            "center_x": 16,
+            "center_y": 19
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Bids",
+              "bbox": [
+                14,
+                31,
+                17,
+                32
+              ]
+            },
+            "value": {
+              "text": "22",
+              "bbox": [
+                14,
+                34,
+                16,
+                35
+              ]
+            },
+            "center_x": 16,
+            "center_y": 31
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Bids",
+              "bbox": [
+                14,
+                43,
+                17,
+                44
+              ]
+            },
+            "value": {
+              "text": "44",
+              "bbox": [
+                14,
+                46,
+                16,
+                47
+              ]
+            },
+            "center_x": 16,
+            "center_y": 43
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Bids",
+              "bbox": [
+                14,
+                54,
+                17,
+                55
+              ]
+            },
+            "value": {
+              "text": "26",
+              "bbox": [
+                14,
+                58,
+                16,
+                59
+              ]
+            },
+            "center_x": 16,
+            "center_y": 55
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "1cddd9805f7ebc53030988543fa1d98ba63f8e3370bc8ee81737c4ad5e377ea6",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page:",
+              "bbox": [
+                84,
+                95,
+                87,
+                96
+              ]
+            },
+            "value": {
+              "text": "2",
+              "bbox": [
+                87,
+                95,
+                88,
+                96
+              ]
+            },
+            "center_x": 86,
+            "center_y": 95
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "294697c3b20e427bc07275ba8dffad2682ca0a8388741554e2d63d8a93ce413f",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "NO.",
+              "bbox": [
+                54,
+                94,
+                56,
+                95
+              ]
+            },
+            "value": {
+              "text": "32,",
+              "bbox": [
+                57,
+                94,
+                59,
+                95
+              ]
+            },
+            "center_x": 55,
+            "center_y": 94
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "3ab365b3a53e7f5026ec5999b4b55068e0e817e0ef90e6288f9c635b4aafa7a9",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Spots",
+              "bbox": [
+                77,
+                38,
+                80,
+                39
+              ]
+            },
+            "value": {
+              "text": "6",
+              "bbox": [
+                77,
+                40,
+                78,
+                40
+              ]
+            },
+            "center_x": 78,
+            "center_y": 39
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "602acf32d0beabcb8162b0f9b0a582547deb76f5196e4bd0be281a3781301bdc",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "NO.",
+              "bbox": [
+                55,
+                94,
+                58,
+                95
+              ]
+            },
+            "value": {
+              "text": "19,",
+              "bbox": [
+                59,
+                94,
+                60,
+                95
+              ]
+            },
+            "center_x": 57,
+            "center_y": 94
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "6615585b199ecaa92e92b3382effec4bd1c773187fa0d249fda2c039b67e4599",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page",
+              "bbox": [
+                88,
+                95,
+                91,
+                96
+              ]
+            },
+            "value": {
+              "text": "17",
+              "bbox": [
+                92,
+                95,
+                93,
+                96
+              ]
+            },
+            "center_x": 90,
+            "center_y": 96
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "878723d28417bc3aead25ea06543f55cdfec049c9f82b5987596f7ba70d82314",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page",
+              "bbox": [
+                93,
+                99,
+                97,
+                100
+              ]
+            },
+            "value": {
+              "text": "39",
+              "bbox": [
+                97,
+                99,
+                100,
+                100
+              ]
+            },
+            "center_x": 95,
+            "center_y": 99
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "94c8fe3ace1071ab2f2a34dae52192ede7dcacdeaaef40c2b93672ceddca983a",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "SI",
+              "bbox": [
+                6,
+                97,
+                7,
+                98
+              ]
+            },
+            "value": {
+              "text": "3379",
+              "bbox": [
+                7,
+                97,
+                10,
+                98
+              ]
+            },
+            "center_x": 6,
+            "center_y": 97
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "9aa0013771206f9b35873bc3c22a8844d31a12f07c1c0eb603a5ddbe0c7518ca",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page",
+              "bbox": [
+                47,
+                88,
+                51,
+                89
+              ]
+            },
+            "value": {
+              "text": "37",
+              "bbox": [
+                51,
+                88,
+                54,
+                89
+              ]
+            },
+            "center_x": 49,
+            "center_y": 88
+          },
+          "cluster": "Cluster_1",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "ac34579dad0840fad1e209c0655ef78b9f09bca2c7d11ec69481ab5c8a5b847c",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Aired",
+              "bbox": [
+                74,
+                69,
+                77,
+                70
+              ]
+            },
+            "value": {
+              "text": "0",
+              "bbox": [
+                75,
+                71,
+                76,
+                71
+              ]
+            },
+            "center_x": 75,
+            "center_y": 70
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "afe94c7ed1f89cbb7fed696b1a234396922cc0ea31888aa4bbadded5f92ac0ad",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Page:",
+              "bbox": [
+                84,
+                95,
+                87,
+                96
+              ]
+            },
+            "value": {
+              "text": "2",
+              "bbox": [
+                87,
+                95,
+                88,
+                96
+              ]
+            },
+            "center_x": 86,
+            "center_y": 95
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "c27b5ba6bcf38954bd3b45e22bb694c48bab20bd9587bb210c380494806f8020",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "NO.",
+              "bbox": [
+                55,
+                94,
+                58,
+                95
+              ]
+            },
+            "value": {
+              "text": "20,",
+              "bbox": [
+                59,
+                94,
+                60,
+                95
+              ]
+            },
+            "center_x": 57,
+            "center_y": 94
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "f956a0cc3e42495b4b2cd99fce71cec0c118c0bd8ab585dbc075b7e7b5a2f251",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "NO.",
+              "bbox": [
+                56,
+                94,
+                58,
+                95
+              ]
+            },
+            "value": {
+              "text": "18,",
+              "bbox": [
+                59,
+                94,
+                61,
+                95
+              ]
+            },
+            "center_x": 57,
+            "center_y": 94
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "00dbb5450efe3a6cb80ebb0a4f09dafb14606c7731bffaf3f439cc5067929673",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "ext.",
+              "bbox": [
+                42,
+                16,
+                45,
+                17
+              ]
+            },
+            "value": {
+              "text": "227",
+              "bbox": [
+                46,
+                16,
+                49,
+                17
+              ]
+            },
+            "center_x": 43,
+            "center_y": 16
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "07de02d344336182543e7e7592f614d7acce0412ddf034a477195574c98a8aeb",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Units",
+              "bbox": [
+                65,
+                18,
+                68,
+                20
+              ]
+            },
+            "value": {
+              "text": "68",
+              "bbox": [
+                76,
+                18,
+                78,
+                20
+              ]
+            },
+            "center_x": 66,
+            "center_y": 19
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "100- 1",
+              "bbox": [
+                87,
+                31,
+                91,
+                33
+              ]
+            },
+            "value": {
+              "text": "9",
+              "bbox": [
+                89,
+                34,
+                90,
+                36
+              ]
+            },
+            "center_x": 89,
+            "center_y": 32
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "100- 1",
+              "bbox": [
+                87,
+                54,
+                90,
+                57
+              ]
+            },
+            "value": {
+              "text": "5",
+              "bbox": [
+                89,
+                58,
+                90,
+                59
+              ]
+            },
+            "center_x": 89,
+            "center_y": 55
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "1196e42c1d34cb8e01f1464df33795fb0f880c56f515e5ffa0518b922ba739b4",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Rev. 1",
+              "bbox": [
+                89,
+                81,
+                90,
+                82
+              ]
+            },
+            "value": {
+              "text": "B",
+              "bbox": [
+                89,
+                80,
+                90,
+                80
+              ]
+            },
+            "center_x": 89,
+            "center_y": 81
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        },
+        {
+          "document_id": "1ab8b1c4f0bbb463686c528269faa1ef5dab2b09d2cb98d4dd6837c21405f940",
+          "prediction": null,
+          "ground_truth": {
+            "type": "kvp",
+            "key": {
+              "text": "Spots",
+              "bbox": [
+                77,
+                38,
+                80,
+                39
+              ]
+            },
+            "value": {
+              "text": "26",
+              "bbox": [
+                77,
+                40,
+                78,
+                40
+              ]
+            },
+            "center_x": 78,
+            "center_y": 39
+          },
+          "cluster": "Cluster_0",
+          "explanation": "no official text+location match"
+        }
+      ]
+    }
+  },
+  "entity_errors": {
+    "confusion_matrix": {
+      "labels": [
+        "OTHER",
+        "KEY",
+        "VALUE"
+      ],
+      "rows_target_columns_prediction": [
+        [
+          112902,
+          5402,
+          7930
+        ],
+        [
+          2519,
+          11985,
+          803
+        ],
+        [
+          4062,
+          584,
+          31233
+        ]
+      ],
+      "key_predicted_as_value": 803,
+      "value_predicted_as_key": 584
+    },
+    "candidate_counts": {
+      "key_predicted_as_value": 379,
+      "missed_entity": 3636,
+      "spurious_entity": 6704,
+      "value_predicted_as_key": 375
+    },
+    "selected": {
+      "key_predicted_as_value": [
+        {
+          "document_id": "5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222",
+          "source_json": "data/prepared/test/5813675ca0b9abe9a0bf09266ee8cc781dacbfc91bb66a43c51d9e267b6c5222.json",
+          "cluster": "Cluster_1",
+          "word": "MO",
+          "bbox": [
+            50,
+            87,
+            52,
+            89
+          ],
+          "context": "209 South Kingshighway Saint Charles, MO 63301-1695 (636) 949-4933 \u2022 adultadmissions@lindenwood.edu",
+          "target": "KEY",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9997250437736511,
+          "token_index": 11,
+          "word_index": 6
+        },
+        {
+          "document_id": "d45681d4880c6b2054d35064c74ca7b7649e8c6eecaf26638d30c52f0325b2f4",
+          "source_json": "data/prepared/test/d45681d4880c6b2054d35064c74ca7b7649e8c6eecaf26638d30c52f0325b2f4.json",
+          "cluster": "Cluster_1",
+          "word": "Memphis,",
+          "bbox": [
+            69,
+            7,
+            75,
+            9
+          ],
+          "context": "Review Board 315 Administration Bldg. Memphis, TN 38152-3370 Office: 901.678.2705 Fax:",
+          "target": "KEY",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.998719334602356,
+          "token_index": 11,
+          "word_index": 6
+        },
+        {
+          "document_id": "5e3dc8f71aa8f1f98bd3ae1d565fb7bdf8831d4d641c204ac1095ca19de08176",
+          "source_json": "data/prepared/test/5e3dc8f71aa8f1f98bd3ae1d565fb7bdf8831d4d641c204ac1095ca19de08176.json",
+          "cluster": "Cluster_0",
+          "word": "P.O.",
+          "bbox": [
+            5,
+            54,
+            7,
+            56
+          ],
+          "context": "ABB Distribution Solutions Distribution Automation P.O. Box 699 FI-65101 VAASA, Finland",
+          "target": "KEY",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9987173080444336,
+          "token_index": 9,
+          "word_index": 6
+        },
+        {
+          "document_id": "af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477",
+          "source_json": "data/prepared/test/af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477.json",
+          "cluster": "Cluster_1",
+          "word": "http://www.nhq.nrcs.usda.gov/OPA/FB96OPA/WetRule.html",
+          "bbox": [
+            24,
+            79,
+            72,
+            81
+          ],
+          "context": "690-0848 E-mail: RMisso@usda.gov Web Site: http://www.nhq.nrcs.usda.gov/OPA/FB96OPA/WetRule.html or http://www.nhq.nrcs.usda.gov/OPA/FB96OPA/WRPfact.html (fact sheet)",
+          "target": "KEY",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9970464110374451,
+          "token_index": 140,
+          "word_index": 72
+        },
+        {
+          "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+          "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+          "cluster": "Cluster_1",
+          "word": "St.",
+          "bbox": [
+            78,
+            26,
+            81,
+            27
+          ],
+          "context": "Monroe, Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services Provided: Rock rip-rap,",
+          "target": "KEY",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9951282739639282,
+          "token_index": 76,
+          "word_index": 30
+        }
+      ],
+      "missed_entity": [
+        {
+          "document_id": "0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481",
+          "source_json": "data/prepared/test/0fd6c8a1470fd394544a68cd289e812009e59cefe0513157b423dec427481481.json",
+          "cluster": "Cluster_0",
+          "word": "Enrl",
+          "bbox": [
+            10,
+            55,
+            14,
+            56
+          ],
+          "context": "----- ----------- 33552 Wrongful Convictions Enrl Bids Acc Wait Max Min",
+          "target": "KEY",
+          "prediction": "OTHER",
+          "prediction_confidence": 0.9998286962509155,
+          "token_index": 358,
+          "word_index": 254
+        },
+        {
+          "document_id": "ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813",
+          "source_json": "data/prepared/test/ccf588b1112664b055f9bade9b47026d686d7f1690cfdd69458d29eea3101813.json",
+          "cluster": "Cluster_0",
+          "word": "mm/dd/yy",
+          "bbox": [
+            37,
+            46,
+            53,
+            49
+          ],
+          "context": "Drdap \u25a1rd 1 mm/dd/yy 1. mm/dd/yy 1. mm/dd/yy 2 mm/dd/yy 2.",
+          "target": "KEY",
+          "prediction": "OTHER",
+          "prediction_confidence": 0.9997335076332092,
+          "token_index": 414,
+          "word_index": 234
+        },
+        {
+          "document_id": "5d008d390121815225b91ccb053b8f5e9305cdf16e3229ac938347f113189a7a",
+          "source_json": "data/prepared/test/5d008d390121815225b91ccb053b8f5e9305cdf16e3229ac938347f113189a7a.json",
+          "cluster": "Cluster_0",
+          "word": "38,410.00",
+          "bbox": [
+            59,
+            34,
+            70,
+            35
+          ],
+          "context": "Dec 19 70,095.00 Aug 19 38,410.00 Late Fee: $0.00 Mar 20",
+          "target": "KEY",
+          "prediction": "OTHER",
+          "prediction_confidence": 0.9997285008430481,
+          "token_index": 227,
+          "word_index": 104
+        },
+        {
+          "document_id": "60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208",
+          "source_json": "data/prepared/test/60986c99f78d1f41459dd07c49dc726caa251aae5092bf46d66250d3f9272208.json",
+          "cluster": "Cluster_0",
+          "word": "YYYY-MM-DD",
+          "bbox": [
+            85,
+            44,
+            94,
+            46
+          ],
+          "context": "1234567 19 01/01/2009 YYYY-MM-DD 12/31/2009 YYYY-MM-DD 2 Insurance fee and commission",
+          "target": "VALUE",
+          "prediction": "OTHER",
+          "prediction_confidence": 0.9997285008430481,
+          "token_index": 471,
+          "word_index": 253
+        }
+      ],
+      "spurious_entity": [
+        {
+          "document_id": "b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b",
+          "source_json": "data/prepared/test/b1040ca6331c30a5077a5fe7443f06df8560d0fcbb29501f28e74e0758837d3b.json",
+          "cluster": "Cluster_1",
+          "word": "High-Risk",
+          "bbox": [
+            42,
+            77,
+            48,
+            78
+          ],
+          "context": "High-Risk Pregnancy Program University of Arkansas",
+          "target": "OTHER",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9996920824050903,
+          "token_index": 1,
+          "word_index": 0
+        },
+        {
+          "document_id": "af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477",
+          "source_json": "data/prepared/test/af12cbfa90d4a608143855dcc12da18ca038f33057e9d4b6c2f2515746a64477.json",
+          "cluster": "Cluster_1",
+          "word": "\u201chttp://www.ncg.nrcs.usda.gov/perdir.html\u201d)",
+          "bbox": [
+            15,
+            37,
+            52,
+            39
+          ],
+          "context": "Resources Conservation Service office (see \u201chttp://www.ncg.nrcs.usda.gov/perdir.html\u201d) Department of Agriculture, National Resources",
+          "target": "OTHER",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9994027614593506,
+          "token_index": 57,
+          "word_index": 47
+        },
+        {
+          "document_id": "0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55",
+          "source_json": "data/prepared/test/0d56c8367caaccd2ecf7e080f5a75ae10343a0412a7b3830d1743dc6295afa55.json",
+          "cluster": "Cluster_1",
+          "word": "Lloyd,",
+          "bbox": [
+            18,
+            89,
+            22,
+            90
+          ],
+          "context": "Fax: 215.573.2036 www.archives.upenn.edu Mark Frazier Lloyd, Director",
+          "target": "OTHER",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9992827773094177,
+          "token_index": 48,
+          "word_index": 20
+        },
+        {
+          "document_id": "b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11",
+          "source_json": "data/prepared/test/b33f2b9454c5e808dcd6236936a16621b85b2e5e6397ae82d5b2ca7ebae2ba11.json",
+          "cluster": "Cluster_1",
+          "word": "This",
+          "bbox": [
+            25,
+            90,
+            27,
+            91
+          ],
+          "context": "Latitude 43.747279 Longitude Longitude -85.0505582 This document is available at ScholarWorks",
+          "target": "OTHER",
+          "prediction": "KEY",
+          "prediction_confidence": 0.999195396900177,
+          "token_index": 132,
+          "word_index": 59
+        },
+        {
+          "document_id": "29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3",
+          "source_json": "data/prepared/test/29a869c411e7dca6761900cdc4029983b6a9c2f05f4e8bfc5afa01d4d3243ae3.json",
+          "cluster": "Cluster_1",
+          "word": "a",
+          "bbox": [
+            48,
+            54,
+            49,
+            56
+          ],
+          "context": "talk to, 24/7. Coalition for a Drug Free Hawaii Phone Numbers:",
+          "target": "OTHER",
+          "prediction": "VALUE",
+          "prediction_confidence": 0.9987868666648865,
+          "token_index": 80,
+          "word_index": 37
+        }
+      ],
+      "value_predicted_as_key": [
+        {
+          "document_id": "27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc",
+          "source_json": "data/prepared/test/27df4f83b95e73cc77a2030e35321a71345229fdbc428ad3c3561e6e4122c7cc.json",
+          "cluster": "Cluster_1",
+          "word": "card",
+          "bbox": [
+            55,
+            40,
+            59,
+            42
+          ],
+          "context": "Fee- A yearly fee the card holder is charged for using",
+          "target": "VALUE",
+          "prediction": "KEY",
+          "prediction_confidence": 0.9912063479423523,
+          "token_index": 86,
+          "word_index": 71
+        },
+        {
+          "document_id": "81016be0f843d6d313964843c33ecbf8a2bcc04cc360ea03bb7ce0625f3efcee",
+          "source_json": "data/prepared/test/81016be0f843d6d313964843c33ecbf8a2bcc04cc360ea03bb7ce0625f3efcee.json",
+          "cluster": "Cluster_1",
+          "word": "Phone:",
+          "bbox": [
+            12,
+            29,
+            16,
+            31
+          ],
+          "context": "Suite 114 Salem, OR 97301 Phone: (503) 566-2837 Contact Email Address:",
+          "target": "VALUE",
+          "prediction": "KEY",
+          "prediction_confidence": 0.9884776473045349,
+          "token_index": 81,
+          "word_index": 40
+        },
+        {
+          "document_id": "248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970",
+          "source_json": "data/prepared/test/248237e3d1494d2a98f72832c38211c53ba2d80a0d434f604b234a4f75541970.json",
+          "cluster": "Cluster_1",
+          "word": "Email",
+          "bbox": [
+            18,
+            61,
+            22,
+            63
+          ],
+          "context": "ASU Global Education Office 480-965-5965 Email ASU Global Education Office My",
+          "target": "VALUE",
+          "prediction": "KEY",
+          "prediction_confidence": 0.9880781769752502,
+          "token_index": 194,
+          "word_index": 121
+        },
+        {
+          "document_id": "c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c",
+          "source_json": "data/prepared/test/c4d0d20dbe690462ae62ecd793f7cbefdddf870baa388662a3afcbbffdef749c.json",
+          "cluster": "Cluster_1",
+          "word": "to",
+          "bbox": [
+            42,
+            77,
+            44,
+            79
+          ],
+          "context": "How have you stayed connected to Wayland since you graduated? _______________________________________________________",
+          "target": "VALUE",
+          "prediction": "KEY",
+          "prediction_confidence": 0.987933874130249,
+          "token_index": 113,
+          "word_index": 59
+        },
+        {
+          "document_id": "4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586",
+          "source_json": "data/prepared/test/4fefbaaeac5e2d9809c0ebcbbbda2878705bcaa71abc0023e97958b2447a5586.json",
+          "cluster": "Cluster_1",
+          "word": "Lawrence",
+          "bbox": [
+            12,
+            27,
+            20,
+            29
+          ],
+          "context": "Wayne, Cayuga, Oswego, Jefferson, St. Lawrence Services Provided: Rock rip-rap, sheet",
+          "target": "VALUE",
+          "prediction": "KEY",
+          "prediction_confidence": 0.9833300709724426,
+          "token_index": 78,
+          "word_index": 31
+        }
+      ]
+    }
+  }
+}

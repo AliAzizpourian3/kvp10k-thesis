@@ -14,9 +14,10 @@ fine-tuned for both tasks on the KVP10k dataset.
 We investigate two linking granularities: \textbf{V1 (token-level)}, where
 every key token is scored against every value token, and \textbf{V2
 (span-level)}, where contiguous same-label tokens are first grouped into
-spans before pairwise scoring. The span-level approach is motivated by
-SPADE~\cite{spade} and BROS~\cite{bros}, which demonstrate that entity
-linking operates naturally at the segment level (Section~\ref{subsec:entity_linking}).
+spans before pairwise scoring. The span-level approach draws its segment-level motivation from
+SPADE~\cite{spade}. BROS~\cite{bros} provides complementary motivation through
+sparse linking over entity-initial positions and spatially informed
+representations (Section~\ref{subsec:entity_linking}).
 
 Figure~\ref{fig:architecture-overview} provides a schematic overview.
 The encoder receives token sequences together with 2D bounding-box coordinates
@@ -33,14 +34,14 @@ are consumed in parallel by the entity-classification head and the linker head.
     node distance=0.8cm and 1.2cm
   ]
     % Input
-    \node[io] (input) {OCR Words +\\Bounding Boxes\\{\scriptsize Page image optional; not used in V4}};
+    \node[io] (input) {Extracted Words +\\Bounding Boxes\\{\scriptsize Page image optional; not used in V4}};
 
     % Encoder
     \node[block, below=of input, fill=blue!10] (encoder) {LayoutLMv3\\Encoder};
 
     % Two heads
     \node[block, below left=1.2cm and 1.5cm of encoder, fill=orange!15] (entity) {Entity Classifier\\(Key / Value / Other)};
-    \node[block, below right=1.2cm and 1.5cm of encoder, fill=red!12] (linker) {Biaffine Linker\\(Key--Value Scoring)};
+    \node[block, below right=1.2cm and 1.5cm of encoder, fill=red!12] (linker) {Projected Scaled\\Dot-Product Linker\\with Spatial Features};
 
     % Span grouper (V2 only)
     \node[block, below=0.8cm of entity, fill=green!12] (spans) {Span Grouper\\(V2 only)};
@@ -58,9 +59,9 @@ are consumed in parallel by the entity-classification head and the linker head.
     \draw[arrow] (linker) |- (output);
   \end{tikzpicture}
   \end{adjustbox}
-  \caption{Overview of the proposed LayoutLMv3 + Biaffine Linker architecture.
+  \caption{Overview of the proposed LayoutLMv3 architecture with a projected scaled-dot-product linker.
     Token representations produced by the encoder are fed to two heads:
-    an entity classifier (token-level labelling) and a biaffine linker
+    an entity classifier (token-level labelling) and a projected scaled-dot-product linker with spatial features
     (pairwise key--value scoring). In V2, a span grouper merges contiguous
     same-label tokens into spans before linking.}
   \label{fig:architecture-overview}
@@ -73,14 +74,14 @@ are consumed in parallel by the entity-classification head and the linker head.
 \subsection{Input Representation}
 \label{sec:input-representation}
 
-LayoutLMv3~\cite{huang2022layoutlmv3} accepts three parallel input streams that
+LayoutLMv3~\cite{layoutlmv3} accepts three parallel input streams that
 are fused inside the transformer backbone.
 
 \paragraph{Text tokens.}
-The OCR word sequence is tokenised with the LayoutLMv3 tokenizer (a byte-pair
+The extracted word sequence is tokenised with the LayoutLMv3 tokenizer (a byte-pair
 encoding vocabulary of 50{,}265 entries). A \texttt{[CLS]} token is prepended
 and a \texttt{[SEP]} token appended. Each subword inherits the bounding box of
-its parent OCR word. Multi-word entity and span boxes are formed later as the
+its parent extracted word. Multi-word entity and span boxes are formed later as the
 union of their constituent word boxes.
 
 \paragraph{Layout embeddings.}
@@ -90,32 +91,40 @@ derived per token:
 \[
   \mathbf{b}_i = (x_{\min},\, y_{\min},\, x_{\max},\, y_{\max},\, w,\, h)
 \]
-where $w = x_{\max} - x_{\min}$ and $h = y_{\max} - y_{\min}$. Each scalar
-is embedded independently with a learnable embedding table and the six
-embeddings are summed with the text token embedding before the first
-transformer layer.
+where $w = x_{\max} - x_{\min}$ and $h = y_{\max} - y_{\min}$. The x/y coordinate embeddings and width/height embeddings are combined into
+the LayoutLMv3 spatial representation. The coordinate-derived components are
+concatenated to form this spatial embedding, which is then combined with the
+textual and sequence-position representation before the first transformer
+layer.
 
 \paragraph{Optional image patch embeddings.}
-The document image is resized to $224 \times 224$ pixels and split into
-$16 \times 16 = 196$ non-overlapping patches of size $14 \times 14$.
-Each patch is projected to the model hidden dimension $d = 768$ via a
-learnable linear layer. A 2D sine-cosine positional encoding is added to
-preserve patch location. The resulting 196 patch tokens are concatenated with
-the text tokens when document-image input is enabled.
+The document image is resized to $224 \times 224$ pixels and split into a
+$14 \times 14$ grid of 196 non-overlapping patches. Each patch is
+$16 \times 16$ pixels and is projected to the model hidden dimension
+$d = 768$. Learned patch-position embeddings preserve the patch order.
+The resulting 196 visual tokens are concatenated with the text tokens when
+document-image input is enabled.
 
-Although LayoutLMv3 supports document-image inputs, the final V4 launch did not
-enable page-image loading. The data pipeline supplied blank white placeholder
-pixel tensors rather than actual page pixels. The reported V4 results therefore
-use text and layout information only, with no page-image content.
+Although LayoutLMv3 supports document-image inputs, the reported Stage~4 runs
+did not enable page-image loading. Instead, the data pipeline passed a generated
+solid-white placeholder through the LayoutLMv3 processor. This produces a
+constant tensor with value $1.0$ at every pixel position, so every page receives
+the same visual input. The model therefore uses text and layout information but
+no document-specific visual content. This project did not repeat LayoutLMv3
+pre-training. V4 fine-tuned the pre-trained checkpoint with this constant blank
+visual input and the task-specific entity and relation losses.
 
 \subsection{Self-Attention Mechanism}
 \label{sec:self-attention}
 
 LayoutLMv3 uses a standard multi-head self-attention with $H = 12$ heads and
-hidden dimension $d = 768$. The spatial-aware bias introduced in
-LayoutLMv2~\cite{xu2021layoutlmv2} is \emph{not} re-applied; instead, layout
-information is injected through the embedding summing described above, allowing
-the standard dot-product attention to propagate spatial signals across layers.
+hidden dimension $d = 768$. In addition to the absolute input embeddings, the
+attention scores use semantic 1D relative-position biases and spatial 2D
+relative-position biases~\cite{layoutlmv3}. The corresponding
+Transformers implementation exposes both bias mechanisms and the visual patch
+configuration.\footnote{\url{https://github.com/huggingface/transformers/tree/main/src/transformers/models/layoutlmv3}}
+These biases let the attention mechanism represent token order and relative
+document geometry.
 When image patches are supplied, cross-modal attention between text tokens and
 image patch tokens is unrestricted, enabling the architecture to ground textual
 entities in specific image regions.
@@ -125,22 +134,22 @@ entities in specific image regions.
 
 The LayoutLMv3 checkpoint used in this work
 (\texttt{microsoft/layoutlmv3-base}) was pre-trained on IIT-CDIP with three
-objectives~\cite{huang2022layoutlmv3}:
+objectives~\cite{layoutlmv3}:
 
 \begin{enumerate}
-  \item \textbf{Masked Language Modelling (MLM):} 15\% of text tokens are masked
-  and the model predicts the missing tokens, encouraging semantic text understanding.
-  \item \textbf{Masked Image Modelling (MIM):} 40\% of image patches are masked
-  and the model reconstructs the discrete token index of each patch (using a
-  pre-trained image tokenizer), encouraging visual-spatial grounding.
-  \item \textbf{Word-Patch Alignment (WPA):} The model predicts whether a text
-  token and an image patch originate from the same document region, creating
-  explicit cross-modal alignment supervision.
+  \item \textbf{Masked Language Modelling (MLM):} 30\% of text tokens are
+  selected with span masking, and the model predicts the masked tokens.
+  \item \textbf{Masked Image Modelling (MIM):} Approximately 40\% of image
+  tokens are masked, and the model reconstructs the discrete token index of
+  each patch with a pre-trained image tokenizer.
+  \item \textbf{Word-Patch Alignment (WPA):} For each unmasked word, the model
+  predicts whether its associated image patches are masked. This objective
+  supports alignment between text and image representations.
 \end{enumerate}
 
-These pre-training objectives give the encoder strong initialisation for both
-textual and layout-spatial understanding, reducing the amount of task-specific
-fine-tuning data required.
+These objectives define the pretrained textual, spatial, and visual
+representations used to initialise the LayoutLMv3 encoder before task-specific
+fine-tuning.
 
 % ---------------------------------------------------------------------------
 \section{Task Head: Entity Classifier}
@@ -152,29 +161,26 @@ three classes: \texttt{O} (other), \texttt{KEY}, \texttt{VALUE}.
 
 \paragraph{Architecture.}
 Let $\mathbf{H} \in \mathbb{R}^{N \times d}$ denote the encoder output for
-$N$ text tokens. A two-layer MLP with GELU activations projects each token to
-logits:
+$N$ text tokens. After dropout with $p=0.1$, one linear layer projects each
+token to three raw logits:
 \[
-  \hat{y}_i = \operatorname{softmax}\!\bigl(\mathbf{W}_2\,
-    \operatorname{GELU}(\mathbf{W}_1\,\mathbf{h}_i + \mathbf{b}_1) +
-    \mathbf{b}_2\bigr)
+  \mathbf{z}_i = \mathbf{W}\,\mathbf{h}_i + \mathbf{b}
 \]
-where $\mathbf{W}_1 \in \mathbb{R}^{d \times d}$,
-$\mathbf{W}_2 \in \mathbb{R}^{d \times 3}$. Dropout with $p = 0.1$ is applied
-after the first projection.
+where $\mathbf{W} \in \mathbb{R}^{3 \times d}$. Softmax converts
+$\mathbf{z}_i$ to class probabilities for prediction, while the training
+cross-entropy is applied to the raw logits.
 
 \paragraph{Why token classification instead of generation?}
-Generative baselines (Stage~3 Mistral) demonstrated strong text recall but
-poor spatial grounding and systematic unsupported generation
-(Section~\ref{sec:stage3-per-cluster}). Token classification is grounded by
-construction: predictions are tied to OCR tokens with known bounding boxes.
-This prevents the model from generating text absent from the OCR input,
-although it can still assign an incorrect entity label to an existing token.
+The reconstructed Mistral baseline achieves stronger pair extraction
+performance, but its generated output is not constrained to tokens observed in
+the extracted input. Token classification predicts labels only for observed
+input tokens and therefore cannot generate new text, although it can assign an
+incorrect label to an existing token.
 
 % ---------------------------------------------------------------------------
 \needspace{8\baselineskip}
-\section{Biaffine Linker (V1: Token-Level)}
-\label{sec:biaffine-linker}
+\section{Projected Scaled-Dot-Product Linker (V1: Token-Level)}
+\label{sec:projected-linker}
 
 \subsection{Scoring Function}
 \label{sec:kv-attention}
@@ -192,23 +198,22 @@ representations:
 \]
 where $\mathbf{h}_i, \mathbf{h}_j \in \mathbb{R}^{d}$ are encoder hidden
 states ($d = 768$), and $\mathbf{W}_k, \mathbf{W}_v \in \mathbb{R}^{d \times d}$
-are learnable projections. This formulation follows the attention mechanism
-of Vaswani et al.~\cite{vaswani2017attention} and is numerically stable
-because no learned weight matrix couples the key and value streams in the
-scoring step.
+are learnable projections. This formulation follows the attention mechanism of Vaswani et
+al.~\cite{vaswani2017attention}. Compared with the earlier biaffine
+formulation, this scorer uses separate key and value projections and does not
+contain a full learned bilinear interaction matrix.
 
 \paragraph{Design evolution.}
-An earlier implementation used a full biaffine formulation
+An earlier full biaffine implementation
 ($s = \mathbf{k}^\top \mathbf{W}_{\text{bil}} \mathbf{v}$, following
-Dozat and Manning~\cite{dozat2017biaffine}), but this caused
-\texttt{link\_loss~=~NaN} at approximately step~1400 due to exploding
-gradients through the $768 \times 768$ bilinear weight matrix. The scaled
-dot-product formulation avoided this failure in subsequent runs.
+Dozat and Manning~\cite{dozat2017biaffine}) produced
+\texttt{link\_loss~=~NaN} at approximately step~1400. Replacing it with the
+projected scaled-dot-product formulation avoided the observed failure in
+subsequent runs.
 
-The module is referred to as the Biaffine Linker for continuity with the
-implementation and early design. However, the final V4 scorer uses projected
-scaled dot-product similarity combined with spatial features, rather than a
-full bilinear biaffine matrix.
+The active V4 component is therefore a span-level projected
+scaled-dot-product linker with spatial features. The Python class keeps its
+historical name only for checkpoint compatibility.
 
 \subsection{Spatial Encoding}
 \label{sec:spatial-encoding}
@@ -225,29 +230,25 @@ a final MLP produces the link score $s_{i,j}$.
 \label{sec:v1-imbalance}
 
 In V1, every key token is scored against every value token, producing a dense
-$n_k \times n_v$ matrix. On a typical KVP10k page with $\sim$100 key tokens
-and $\sim$100 value tokens, this yields $\sim$10{,}000 candidate pairs of
-which only $\sim$20 are positive (true links), giving a negative-to-positive
-ratio of approximately \textbf{450:1}. Despite applying
-\texttt{pos\_weight}~$= \min(n_{\text{neg}}/n_{\text{pos}},\, 50)$ to the
-BCE loss, the extreme imbalance in V1 was associated with failure to learn
-reliable associations. The resulting legacy pooled diagnostic link F1 was
-approximately $0.008$ (see
-Section~\ref{sec:res3}).
+$n_k \times n_v$ matrix. For illustration, a page with 100 key tokens and 100
+value tokens produces 10{,}000 candidate pairs. If 20 pairs are positive, the
+negative-to-positive ratio is approximately \textbf{500:1}. Despite applying \texttt{pos\_weight}
+to the BCE loss, the extreme imbalance in V1 was associated with poor relation
+learning in the validation diagnostics.
 
-This observation motivates V2: by grouping tokens into spans before linking,
-the candidate matrix shrinks from $\sim$10{,}000 to $\sim$225 entries with
-a manageable $\sim$5:1 imbalance ratio.
+This observation motivates V2: grouping tokens into spans reduces the candidate
+matrix. At span level, an illustrative case with 15 key spans and 15 value
+spans produces 225 candidates. With 15 positive links, it has 210 negatives and
+a negative-to-positive ratio of approximately $14{:}1$.
 
 % ---------------------------------------------------------------------------
 \section{Span-Level Linker (V2)}
 \label{sec:v2-span-linking}
 
 V2 addresses the granularity mismatch identified in V1 by performing linking
-at the \emph{span} level rather than the token level. This design is directly
-motivated by SPADE~\cite{spade}, which operates on text segments, and
-BROS~\cite{bros}, which links entity-initial tokens to reduce the prediction
-space.
+at the \emph{span} level rather than the token level. SPADE~\cite{spade}
+provides the segment-level motivation, while BROS~\cite{bros} motivates sparse
+entity-initial linking and spatially informed representations.
 
 \subsection{Span Grouping}
 \label{sec:span-grouping}
@@ -255,9 +256,12 @@ space.
 After entity classification, contiguous tokens sharing the same non-\texttt{O}
 label are merged into spans. For example, if tokens 5--7 are labelled
 \texttt{KEY} and tokens 8--12 are labelled \texttt{VALUE}, they form one key
-span and one value span respectively. During linker training, spans are formed
-from ground-truth entity labels through teacher forcing. At inference, spans
-are formed from the entity classifier's predicted labels.
+span and one value span respectively. The original predicted-span training
+formed these spans from the entity classifier output and suffered from noisy
+alignment with the ground-truth relation labels. The later teacher-forced
+variant, including V4, forms spans from ground-truth entity labels during
+training and from predicted labels during inference. This creates a span-source
+difference between training and inference.
 
 Figure~\ref{fig:span-grouping} illustrates the span grouping process.
 
@@ -337,10 +341,10 @@ applied at the span level.
 The span-level projected dot-product scorer operates identically to V1
 (Section~\ref{sec:kv-attention}) but over span representations instead of
 token representations. For $K$ key spans and $V$ value spans, the linker
-produces a $K \times V$ score matrix. On typical KVP10k pages, $K \approx 15$
-and $V \approx 15$, yielding $\sim$225 candidate pairs with
-$\sim$15 positives --- a \textbf{$\sim$5:1} neg:pos ratio compared to V1's
-$\sim$450:1.
+produces a $K \times V$ score matrix. For illustration, 15 key spans and 15
+value spans produce 225 candidate pairs. With 15 positives and 210 negatives,
+this gives a negative-to-positive ratio of approximately \textbf{$14{:}1$},
+compared with approximately $500{:}1$ in the illustrative V1 example.
 
 \subsection{Training Objective}
 \label{sec:v2-training}
@@ -351,10 +355,16 @@ V2 uses the same joint loss as V1:
   \mathcal{L} = \mathcal{L}_{\text{entity}} + \lambda\,\mathcal{L}_{\text{link}}
 \end{equation}
 The entity loss is unchanged. The link loss is binary cross-entropy over the
-$K \times V$ span-level score matrix. Because the class imbalance is
-manageable at this granularity, \texttt{pos\_weight} is computed dynamically
-per batch as $n_{\text{neg}}/n_{\text{pos}}$ without the cap of~50 required
-in V1.
+$K \times V$ span-level score matrix. The implementation computes
+\texttt{pos\_weight} dynamically per batch as
+$\min(n_{\text{neg}}/n_{\text{pos}},50)$.
+
+For V4 relation supervision, each recovered ground-truth KVP contributes one
+representative word-level key$\rightarrow$value relation. V4 does not use the
+earlier key-word $\times$ value-word cross-product. Tokenisation can expand
+the representative relation into multiple positive subword-level cells before
+these labels are collapsed to the span level. Chapter~\ref{ch:implementation}
+describes the implementation details.
 
 % ---------------------------------------------------------------------------
 \section{Training Procedure}
@@ -370,41 +380,45 @@ linking (Equation~\ref{eq:joint-loss}, repeated here for convenience):
 \]
 where:
 \begin{itemize}
-  \item $\mathcal{L}_{\text{entity}}$ is the cross-entropy loss over
-  \{\texttt{O, KEY, VALUE}\} for each text token, with inverse-frequency
-  class weights to address the dominance of the \texttt{O} class.
+  \item $\mathcal{L}_{\text{entity}}$ is unweighted cross-entropy over
+  \{\texttt{O, KEY, VALUE}\} for the text-token portion of the encoder output.
+  Padding positions are excluded by the attention mask.
   \item $\mathcal{L}_{\text{link}}$ is the binary cross-entropy loss over
   predicted link scores, with \texttt{pos\_weight} to address class imbalance
-  (capped at 50 for V1; uncapped for V2).
+  (capped at 50 for V1, V2, and V4).
   \item $\lambda$ is the linker-loss weight. Earlier development experiments
-  swept $\{0.5, 1.0, 2.0\}$ (see Section~\ref{sec:exp2}); final V4 used
+  swept $\{0.5, 1.0, 2.0\}$ (see Section~\ref{sec:exp3}); V4 uses
   $\lambda=5.0$.
 \end{itemize}
 
 \paragraph{Training stability.}
-Achieving stable Stage~4b training required addressing two sources of
-numerical instability: (i)~the switch from a bilinear weight matrix to
-scaled dot-product scoring (Section~\ref{sec:kv-attention}), and
-(ii)~a valid-label mask applied before the BCE call to exclude positions
-with uninitialised link labels. After these fixes, training proceeds
-without \texttt{NaN} across all runs. Full details of the diagnostic
-process are documented in Section~\ref{sec:linker-impl}.
+The reported Stage~4b implementation uses scaled dot-product scoring
+(Section~\ref{sec:kv-attention}), applies a valid-label mask before the BCE
+call, and clamps valid link logits to $[-10,10]$ before calculating the loss.
+The reported fp32 runs proceed without \texttt{NaN}. Implementation details are given in
+Section~\ref{sec:linker-impl}, while the validation-based diagnostic analysis
+is reported in Section~\ref{sec:exp567}.
 
 \subsection{Optimisation}
 \label{sec:optimisation}
 
-We use AdamW~\cite{loshchilov2019decoupled} with weight decay $0.01$ and a
-linear warmup of 500 steps followed by linear decay to zero. For the final V4
-run, training used batch size 1 with gradient accumulation over 8 steps
-(effective batch size 8), a unified learning rate of $2\times10^{-5}$, and
-early stopping with patience 10 based on validation entity F1. The best
-checkpoint was selected by validation entity F1, not linker F1. Training
-targeted 30 epochs across resumed jobs; the final run history does not support
-interpreting this as a single uninterrupted 30-epoch run.
+We use AdamW~\cite{loshchilov2019decoupled} with weight decay $0.01$.
+The final V4 uses batch size 1, gradient accumulation over 8 batches, a unified
+learning rate of $2\times10^{-5}$, a maximum of 30 epochs, and early-stopping
+patience 10. The scheduler is defined over actual optimizer updates:
+with 4{,}851 training batches, one epoch contains
+$\lceil 4851/8 \rceil=607$ updates. The linear schedule therefore has at most
+18{,}210 optimizer steps, with the first 500 used for warm-up; early stopping
+may reduce the completed total. The V4 decoder uses a fixed linker-confidence
+threshold of $0.5$ when producing key--value pairs. These predictions are
+evaluated with the released KVP10k benchmark criteria, namely NED $<0.2$ and
+IoU $\geq0.3$. Official validation Regular text+location macro pair F1 is used
+for both checkpoint selection and early stopping. Test scores do not enter
+either decision. V4 selects epoch 10 at optimizer step 6{,}070. Training
+completes 20 epochs and 12{,}140 optimizer steps before early stopping.
 
-All Stage~4 training uses fp32 precision. An earlier attempt with bfloat16
-caused \texttt{loss~=~NaN} due to underflow in the spatial feature encoder;
-reverting to fp32 resolved the issue.
+An earlier bfloat16 development attempt produced \texttt{loss~=~NaN}. All
+reported Stage~4 runs therefore use fp32 precision.
 
 \subsection{Two-Phase Training}
 \label{sec:two-phase}
@@ -413,14 +427,18 @@ Training proceeds in two phases:
 \begin{enumerate}
   \item \textbf{Stage~4a (entity pre-training):} The encoder and entity
   classification head are trained with $\lambda = 0$ (linker disabled).
-  This establishes strong entity representations before the linking
-  objective is introduced.
+  This provides entity-oriented representations before the linking
+  objective is introduced. No reliable Stage~4a checkpoint survives, and its
+  historical metric did not penalise KEY--VALUE confusion correctly. Stage~4a
+  is therefore a methodological phase without a reportable numerical result.
   \item \textbf{Stage~4b (joint fine-tuning):} The linker is activated
   ($\lambda > 0$) and the full model is jointly optimised. Earlier V2
-  development runs followed the Stage~4a entity checkpoint; final V4 is the
-  corrected V2 pipeline and was warm-started from the prior
-  \texttt{stage4b\_canary\_B} checkpoint rather than trained from scratch.
-  Its trainable parameters used the unified $2\times10^{-5}$ learning rate.
+  development runs followed the Stage~4a entity checkpoint. The final V4 uses
+  the corrected V2 pipeline and is warm-started from the prior
+  \texttt{stage4b\_canary\_B} checkpoint rather than trained from scratch. It
+  includes corrected scheduler accounting, full-state resumption, class-aware
+  entity metrics, and validation pair-F1 checkpoint selection. Its trainable
+  parameters use the unified $2\times10^{-5}$ learning rate.
 \end{enumerate}
 
 % ---------------------------------------------------------------------------
@@ -447,18 +465,18 @@ highest-scoring valid pair).
 
 In V2, spans are first formed by the grouping step
 (Section~\ref{sec:span-grouping}), then span representations are computed via
-mean-pooling. The span-level projected dot-product scorer produces a $K \times V$ score
-matrix and the highest-scoring match for each key span is selected.
+mean-pooling. The span-level projected dot-product scorer produces a $K \times V$
+score matrix. For each key span, the highest-scoring value span above the fixed
+sigmoid threshold of $0.5$ is selected. If no candidate reaches the threshold,
+the key remains unmatched.
 
 \subsection{Post-processing}
 \label{sec:post-processing}
 
-The implemented decoder emits linked key--value span pairs above the fixed
-link-score threshold. Unmatched key and value spans are not converted into
-\emph{unvalued} or \emph{unkeyed} predictions; consequently, the discriminative
-experiments directly cover the regular-KVP category of the KVP10k benchmark,
-not its two singleton categories. No beam search or constrained decoding is
-applied. Bounding boxes are inherited directly from the OCR input. A separate
-decode-time recovery ablation emits unmatched predicted spans as unkeyed or
-unvalued outputs; it is reported separately and is not part of the primary
-regular-KVP result.
+The learned direct decoder emits Regular linked key--value span pairs above the
+fixed link-score threshold. Unmatched spans are not singleton predictions in
+the direct output. The separate unchanged recovery method can emit unmatched
+VALUE spans as unkeyed outputs and unmatched KEY spans as unvalued outputs.
+Recovery is reported separately and does not modify the Regular predictions.
+No beam search or constrained decoding is applied, and bounding boxes are
+inherited directly from the extracted input.

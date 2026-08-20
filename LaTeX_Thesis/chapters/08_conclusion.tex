@@ -1,0 +1,115 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\section{Summary of Contributions}
+\label{sec:summary}
+
+This thesis studied key--value pair extraction from business documents with a
+generative baseline and a layout-aware discriminative system. Its main
+contributions are:
+
+\begin{enumerate}
+  \item \textbf{Dataset characterisation:} The study characterises 9{,}124 unique
+  coordinate-bearing KVP10k training pages with two weakly separated
+  annotation-geometry clusters and a separate spatial-link audit.
+
+  \item \textbf{Discriminative model:} The study adapts a pretrained
+  LayoutLMv3-base encoder with a token classifier and a span-level relation
+  linker. The final V4 model uses text and bounding boxes with constant blank
+  visual input, so it does not use document-specific image information.
+
+  \item \textbf{Controlled KVP10k evaluation:} The study compares the final corrected V4 with a reconstructed Mistral-7B
+  baseline on the same 581 usable test pages. V4 reaches Regular text+location
+  F1 of $0.345$, compared with $0.521$ for Mistral.
+
+  \item \textbf{Diagnostic analysis:} The token-to-span progression, corrected
+  entity and pair metrics, cluster evaluation, and qualitative examples suggest
+  that relation linking remains a major limitation of the current pipeline.
+  Because several corrections were applied together, the study does not assign
+  an independent causal effect to linking granularity.
+\end{enumerate}
+
+Stage~4a remains a methodological entity-pre-training phase. No reliable
+checkpoint survives, and its historical metric did not penalise KEY--VALUE
+confusion correctly. It therefore has no reportable numerical result.
+
+\section{Research Questions Revisited}
+\label{sec:rq_revisited}
+
+\subsection{RQ1: Layout Characteristics}
+
+Page-level clustering identifies two weakly separated annotation-geometry
+regimes. Cluster~0 has a higher box count and broader spatial spread, while
+Cluster~1 has fewer, larger boxes in a more compact region. Two principal
+components explain 52.8\% of the standardised feature variance, and the
+silhouette score is 0.222. These groups should not be interpreted as document genres or text-density
+classes because the clustering is based on annotation geometry. In a separate exploratory audit, linked pairs have a mean normalised
+centre distance of 0.120. This result suggests that spatial relations can be
+useful, but it does not establish a causal requirement.
+
+\subsection{RQ2: Discriminative vs.\ Generative}
+
+The final corrected V4 system reaches Regular text+location F1 of $0.345$.
+The reconstructed Mistral baseline remains stronger at $0.521$. The
+discriminative system has a different constraint: its output text comes from
+observed input tokens and cannot contain generated text that is absent from the
+extracted input. V4 does not solve complete pair extraction and does not
+outperform the generative baseline.
+
+\subsection{RQ3: Linking Granularity}
+
+V1 uses dense token-level relation candidates, which creates a substantially
+larger candidate space than the later span-level formulation. For illustration,
+100 candidate key tokens and 100 candidate value tokens with about 20 positive
+relations would produce about 10{,}000 candidate pairs and an imbalance of
+roughly $500{:}1$. In the illustrative span-level case, 15 positive links among
+225 candidates give 210 negatives, or approximately $14{:}1$. The V2 results are difficult to interpret because the implementation contained
+a mismatch between predicted spans and ground-truth relation supervision, an
+over-strict bounding-box filter, and cross-product link labels. Final V4 uses
+ground-truth entity spans during training and predicted spans during inference,
+and corrects the bounding-box and link-label pipeline issues. It reaches
+official Regular combined F1 of $0.345$. Because several procedures change together, the
+experiment does not identify the independent effect of one correction or of
+span-level linking alone.
+
+\subsection{RQ4: Success and Failure Factors}
+
+V4 reaches Regular combined F1 of $0.305$ in Cluster~0 and $0.410$ in
+Cluster~1. Mistral has the opposite order, with $0.569$ and $0.429$. This is an
+association with annotation geometry, not evidence about semantic document
+types. Qualitative cases show correct local links, plausible links to
+neighbouring values, missed short or abbreviated values, and KEY--VALUE
+confusion. These examples are illustrative and are not statistical proof.
+
+The corrected V4 token-level entity scores are numerically higher than the
+complete-pair score, although these metrics are not directly comparable.
+Together with the observed wrong-link examples, this suggests that relation
+linking remains a major internal limitation of the current pipeline. Location-only evaluation is less
+restrictive than joint text+location evaluation, so its higher score does not
+mean that text reduces model performance.
+
+\section{Practical Implications}
+\label{sec:implications}
+
+The direct V4 model emits Regular pairs. The unchanged recovery method adds
+unkeyed and unvalued outputs and raises All text+location F1 from $0.229$ to
+$0.261$. It does not change Regular F1. This provides a low-cost coverage
+extension, but its special-category accuracy remains limited.
+
+The results suggest that relation modeling is an important priority for further
+development. Useful future directions include constrained
+one-to-one matching, hard-negative relation training, explicit row and column
+features, learned unkeyed and unvalued classes, confidence calibration, better
+handling of short values and long documents, and a controlled experiment with
+real document images.
+
+\section{Closing Remarks}
+\label{sec:closing}
+
+V4 is the final corrected LayoutLMv3 experiment in this thesis. It provides
+a controlled, reproducible result for text-and-layout processing without
+genuine image content. Its official Regular combined F1 of $0.345$ remains
+below the reconstructed Mistral result. The principal finding is therefore diagnostic: comparatively stronger entity
+recognition does not by itself translate into equally strong complete
+key--value relation extraction. Future work could investigate stronger relation
+structure and evaluate genuine visual input under controlled conditions.

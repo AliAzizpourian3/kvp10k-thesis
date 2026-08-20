@@ -18,7 +18,7 @@
 
 **How to use it:**
 1. Copy the content
-2. Insert into `LaTeX_Thesis/chapters/03_methodology.tex` after line 20 (after "Overview" section)
+2. Insert into `LaTeX_Thesis/chapters/04_methodology.tex` after line 20 (after "Overview" section)
 3. LaTeX will auto-generate \ref{} and citation links
 
 **Estimated integration time:** 15 minutes
@@ -66,7 +66,7 @@
 ### **HIGH PRIORITY** — Do This Now (Next 2 hours)
 
 #### Task 1: Integrate Stage 4 Methodology Section (30 min)
-**Action**: Add `STAGE4_METHODOLOGY_DRAFT.tex` to `LaTeX_Thesis/chapters/03_methodology.tex`
+**Action**: Add `STAGE4_METHODOLOGY_DRAFT.tex` to `LaTeX_Thesis/chapters/04_methodology.tex`
 
 **Why now**: 
 - Completely writeable (architecture, not results)
@@ -160,7 +160,7 @@ Already present but could expand with Stage 4-specific gaps
 
 ### Ready to Use
 ```
-✅ STAGE4_METHODOLOGY_DRAFT.tex       → Insert into 03_methodology.tex
+✅ STAGE4_METHODOLOGY_DRAFT.tex       → Insert into 04_methodology.tex
 ✅ CHAPTER7_RESULTS_TEMPLATE.tex      → Insert into 07_results.tex (update later)
 ✅ IMPLEMENTATION_SUMMARY.md          → Complete, reference as needed
 ✅ STAGE4_DATASET_FIX.md             → Already created
@@ -236,7 +236,7 @@ If you follow this plan and training completes in 24 hours:
 | Document | Purpose | Location |
 |----------|---------|----------|
 | Literature Review (complete) | Citation style, thesis voice | `LaTeX_Thesis/chapters/02_literature_review.tex` |
-| Methodology (existing) | Structure, formatting | `LaTeX_Thesis/chapters/03_methodology.tex` |
+| Methodology (existing) | Structure, formatting | `LaTeX_Thesis/chapters/04_methodology.tex` |
 | BibTeX | All available citations | `LaTeX_Thesis/references.bib` |
 | Implementation details | Stage 4 technical facts | `code/script/IMPLEMENTATION_SUMMARY.md` |
 | KVP10k paper | Baseline metrics, dataset details | `KVP10k.pdf` |

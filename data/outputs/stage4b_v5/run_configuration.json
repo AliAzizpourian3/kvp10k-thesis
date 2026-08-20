@@ -1,0 +1,48 @@
+{
+  "model": "microsoft/layoutlmv3-base + existing span-level biaffine linker",
+  "data_dir": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/prepared",
+  "output_dir": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_v5",
+  "batch_size": 1,
+  "gradient_accumulation_steps": 8,
+  "learning_rate": 2e-05,
+  "num_epochs": 30,
+  "early_stopping_patience": 10,
+  "linker_loss_weight": 5.0,
+  "seed": 42,
+  "validation_fraction": 0.1,
+  "include_images": false,
+  "visual_input": "generated solid-white placeholder",
+  "score_threshold": 0.5,
+  "selection_metric": "official regular text+location macro pair F1",
+  "ned_threshold": 0.2,
+  "iou_threshold": 0.3,
+  "warmup_optimizer_steps": 500,
+  "number_of_training_batches": 4851,
+  "optimizer_steps_per_epoch": 607,
+  "total_optimizer_steps": 18210,
+  "max_train_batches": null,
+  "max_validation_documents": null,
+  "max_test_documents": null,
+  "skip_final_test": false,
+  "warm_start_provenance": {
+    "source": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage4b_canary_B/best_model/pytorch_model.bin",
+    "sha256": "e86c1c76323b34e2a195d5097f12504f6c2c54a424b3ba0f5af4efb610e9aed1",
+    "compatible_keys_loaded": 226,
+    "compatible_parameters_loaded": 126513684,
+    "skipped_keys": 0,
+    "groups": {
+      "encoder": {
+        "transferred_keys": 212,
+        "transferred_parameters": 125326976
+      },
+      "entity_classifier": {
+        "transferred_keys": 2,
+        "transferred_parameters": 2307
+      },
+      "linker": {
+        "transferred_keys": 12,
+        "transferred_parameters": 1184401
+      }
+    }
+  }
+}

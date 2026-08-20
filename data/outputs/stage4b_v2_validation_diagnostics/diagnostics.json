@@ -1,0 +1,268 @@
+{
+  "created_at": "2026-08-19T22:58:31.895660+00:00",
+  "split": "validation",
+  "split_source": "data/prepared/train",
+  "split_seed": 42,
+  "validation_fraction": 0.1,
+  "train_pages_total": 5389,
+  "validation_pages_total": 538,
+  "model_samples": 200,
+  "label_audit_samples": 20,
+  "real_images_loaded": false,
+  "checkpoint_dir": "data/outputs/stage4b_v2_tf_p7",
+  "weights_path": "data/outputs/stage4b_v2_tf_p7/best_model/pytorch_model.bin",
+  "weights_sha256": "f14e505107c4392bf76dc88cc58480baafb5209ad0d5dd1bd458e9b3ac31102a",
+  "historical_bbox_filter_reproduced": "x1 < x2 and y1 < y2",
+  "model_diagnostics": {
+    "counts": {
+      "documents": 200,
+      "documents_with_strict_key_and_value_spans": 81,
+      "documents_without_strict_key_and_value_spans": 119,
+      "predicted_key_tokens_raw": 3490,
+      "predicted_value_tokens_raw": 12649,
+      "predicted_key_tokens_strict": 1832,
+      "predicted_value_tokens_strict": 6514,
+      "predicted_key_tokens_relaxed": 3490,
+      "predicted_value_tokens_relaxed": 12649,
+      "predicted_key_spans_strict": 309,
+      "predicted_value_spans_strict": 811,
+      "predicted_key_spans_relaxed": 505,
+      "predicted_value_spans_relaxed": 858,
+      "strict_filter_key_removed": 1658,
+      "strict_filter_value_removed": 6135,
+      "strict_filter_key_removed_fraction": 0.47507163323782237,
+      "strict_filter_value_removed_fraction": 0.4850185785437584
+    },
+    "all_pair_logits": {
+      "count": 1481,
+      "min": -21.508588790893555,
+      "max": 2.165557861328125,
+      "mean": -7.594637946081697,
+      "std": 4.275926820906411,
+      "percentiles": {
+        "1": -18.933832550048827,
+        "25": -10.476812362670898,
+        "50": -6.926754474639893,
+        "75": -4.4948015213012695,
+        "99": 0.9565288305282595
+      }
+    },
+    "best_logit_per_key_span": {
+      "count": 282,
+      "min": -19.62283706665039,
+      "max": 2.165557861328125,
+      "mean": -6.125578539049688,
+      "std": 4.784136902615696,
+      "percentiles": {
+        "1": -18.707456703186036,
+        "25": -8.792839288711548,
+        "50": -5.169883728027344,
+        "75": -2.623223900794983,
+        "99": 2.0395126581192016
+      }
+    },
+    "threshold_counts": {
+      "all_pairs": {
+        "0.1": 115,
+        "0.3": 50,
+        "0.5": 36
+      },
+      "best_per_key": {
+        "0.1": 58,
+        "0.3": 25,
+        "0.5": 20
+      }
+    }
+  },
+  "label_pipeline_audit": {
+    "totals": {
+      "documents": 20,
+      "ground_truth_regular_pairs": 79,
+      "recovered_representative_word_links": 53,
+      "positive_token_pair_cells": 453,
+      "positive_span_pair_labels": 44
+    },
+    "documents": [
+      {
+        "validation_subset_index": 0,
+        "base_train_index": 2181,
+        "hash_name": "6687738a251d1e0fef8f7ff77b26c01b2ca6fdf57461fafd6cb5e147f096f6df",
+        "ground_truth_regular_pairs": 7,
+        "recovered_representative_word_links": 4,
+        "positive_token_pair_cells": 33,
+        "positive_span_pair_labels": 3
+      },
+      {
+        "validation_subset_index": 1,
+        "base_train_index": 2613,
+        "hash_name": "7a3ac66945eb8256ecc31670de8a86cbb2e3abe2ec05501c09b0cc62d122e8f7",
+        "ground_truth_regular_pairs": 14,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 2,
+        "base_train_index": 3853,
+        "hash_name": "b70a962511335d2f98d93b322e08cbf718213a2d30466764b927d4f81d8cb658",
+        "ground_truth_regular_pairs": 1,
+        "recovered_representative_word_links": 1,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 3,
+        "base_train_index": 4050,
+        "hash_name": "c0b31a5295d41e678560dd27ba40bc318af71b2fd2c15e3d8593a46b15de571d",
+        "ground_truth_regular_pairs": 22,
+        "recovered_representative_word_links": 20,
+        "positive_token_pair_cells": 199,
+        "positive_span_pair_labels": 15
+      },
+      {
+        "validation_subset_index": 4,
+        "base_train_index": 4277,
+        "hash_name": "cb641e26d0fc1907bf70e8dada48d0c200a77c503177b95df8b3dd1bc713a957",
+        "ground_truth_regular_pairs": 1,
+        "recovered_representative_word_links": 1,
+        "positive_token_pair_cells": 3,
+        "positive_span_pair_labels": 1
+      },
+      {
+        "validation_subset_index": 5,
+        "base_train_index": 3217,
+        "hash_name": "968a5708a5704c2bb321e466e12e98ddba6901b28365386c6b95b10dcbed022d",
+        "ground_truth_regular_pairs": 2,
+        "recovered_representative_word_links": 2,
+        "positive_token_pair_cells": 19,
+        "positive_span_pair_labels": 2
+      },
+      {
+        "validation_subset_index": 6,
+        "base_train_index": 2211,
+        "hash_name": "67bcd011f6d67e9f054acc1b2cbd79d413e3e85913d9bd52f40070d3b2307a11",
+        "ground_truth_regular_pairs": 5,
+        "recovered_representative_word_links": 4,
+        "positive_token_pair_cells": 8,
+        "positive_span_pair_labels": 4
+      },
+      {
+        "validation_subset_index": 7,
+        "base_train_index": 1091,
+        "hash_name": "325d7737458e725f2baeff9c9127e075975318b5493cf7465f6c256d1576956d",
+        "ground_truth_regular_pairs": 4,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 8,
+        "base_train_index": 2899,
+        "hash_name": "8800aa1b010dd8d09c617340342bf32b7a71b7f83015dc59b49a9d2dbd6051c3",
+        "ground_truth_regular_pairs": 14,
+        "recovered_representative_word_links": 13,
+        "positive_token_pair_cells": 127,
+        "positive_span_pair_labels": 11
+      },
+      {
+        "validation_subset_index": 9,
+        "base_train_index": 3008,
+        "hash_name": "8d09a198fc5b323264014ae77a847a6cd08d78d82505ee01bbb81b91e4d100d5",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 10,
+        "base_train_index": 1048,
+        "hash_name": "30398b7524e0e7f801ab6de02f797e9873264e4bab45d5a470f076f5979c5769",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 11,
+        "base_train_index": 3180,
+        "hash_name": "94f462650cfc4672b5f939a91037863984686092b09d54aa62ccc29bb90ed8de",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 12,
+        "base_train_index": 1062,
+        "hash_name": "30e191663466d98c6adf10a1b023c6dd579c6f667fd856ae5ec7da1afbcf1ab5",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 13,
+        "base_train_index": 4800,
+        "hash_name": "e3b20280a7baccfee08725f18dcd14de1fe5d6749c96e8dac123651ddef5997a",
+        "ground_truth_regular_pairs": 3,
+        "recovered_representative_word_links": 3,
+        "positive_token_pair_cells": 20,
+        "positive_span_pair_labels": 3
+      },
+      {
+        "validation_subset_index": 14,
+        "base_train_index": 1438,
+        "hash_name": "4204d7908a14fa3953d494e5bc2abce3c5ced094840dd3ba136b8e1bcd69de05",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 15,
+        "base_train_index": 4007,
+        "hash_name": "bef04a94695187bfd05e6c546e6a01d0e7bef4e9530c24028bb1381d458221fa",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 16,
+        "base_train_index": 320,
+        "hash_name": "0f6a6aae43530ed188f17842cba2e2e1db086cde77a2d226e23388e92ad1f224",
+        "ground_truth_regular_pairs": 1,
+        "recovered_representative_word_links": 1,
+        "positive_token_pair_cells": 21,
+        "positive_span_pair_labels": 1
+      },
+      {
+        "validation_subset_index": 17,
+        "base_train_index": 4388,
+        "hash_name": "d0e29a1bb786b7eae462bf4be9f0f75601938628c7107bc06f75ca423af75f5a",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      },
+      {
+        "validation_subset_index": 18,
+        "base_train_index": 3431,
+        "hash_name": "a15955dea52d94c44b38a62ffffd81498f5bf98c71a8c829929b4e805e3788d2",
+        "ground_truth_regular_pairs": 5,
+        "recovered_representative_word_links": 4,
+        "positive_token_pair_cells": 23,
+        "positive_span_pair_labels": 4
+      },
+      {
+        "validation_subset_index": 19,
+        "base_train_index": 2407,
+        "hash_name": "7081e3e3f68fd51671b7827008614b1117a02cdad7e0ff6230340403d5024e28",
+        "ground_truth_regular_pairs": 0,
+        "recovered_representative_word_links": 0,
+        "positive_token_pair_cells": 0,
+        "positive_span_pair_labels": 0
+      }
+    ]
+  }
+}
