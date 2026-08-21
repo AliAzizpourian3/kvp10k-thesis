@@ -54,7 +54,10 @@ Mistral-7B-Instruct-v0.2 is fine-tuned with 4-bit QLoRA (NF4 quantisation,
 LoRA rank $r=4$, $\alpha=4$) on LMDX-formatted document prompts, where each
 line-like text block is represented as \texttt{text x1|y1|x2|y2} in normalised
 coordinates. The model generates KVP predictions as structured text
-output and is trained for 8 epochs with learning rate $5 \times 10^{-4}$.
+output. It is trained for a fixed eight epochs with learning rate
+$5 \times 10^{-4}$ using only the prepared training data. After training is
+complete, the final model generates predictions for the 581 prepared held-out
+test pages, which are then scored with the released KVP10k evaluator.
 
 The exact prompt template is shown in Figure~\ref{fig:stage3-prompt}. It follows
 the LMDX paradigm~\cite{lmdx} used by the KVP10k baseline --- a document

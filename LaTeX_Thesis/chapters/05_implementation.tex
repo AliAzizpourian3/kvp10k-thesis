@@ -187,18 +187,24 @@ the evaluation sample count.
 \section{Training Pipeline}
 \label{sec:training-pipeline}
 
-The training pipeline for the Mistral baseline (Stage~3) operates on the
-prepared JSON files generated during preprocessing. Each sample contains the
-prompt text, the expected target response, and the aligned ground-truth
-key-value pairs. During tokenisation, prompt tokens are masked in the loss so
-that optimisation is applied only to the response segment.
+The training pipeline for the Mistral baseline (Stage~3) operates only on the
+prepared JSON files in the training split. Each sample contains the prompt
+text, the expected target response, and the aligned ground-truth key-value
+pairs. During tokenisation, prompt tokens are masked in the loss so that
+optimisation is applied only to the response segment. No validation-based early
+stopping or checkpoint selection is used. The model is trained for the fixed
+eight epochs, after which the resulting final model is applied to the held-out
+test pages.
 
 \subsection{Data Loader}
 \label{sec:data-loader}
 
-The data loader reads page-level JSON files from the prepared train and test
-directories. Samples without prompt text or without non-empty supervision are
-skipped to avoid training on degenerate examples. For Stage~4, a
+For Stage~3 training, the data loader reads page-level JSON files only from the
+prepared training directory. After the fixed eight-epoch training run is
+complete, the prediction path separately reads the prepared test directory to
+generate outputs for final benchmark evaluation. Training samples without
+prompt text or without non-empty supervision are skipped to avoid training on
+degenerate examples. For Stage~4, a
 \texttt{LayoutLMv3PreparedDataset} wraps the same JSON files, parses words and
 bounding boxes from the LMDX representation, creates entity and link labels,
 and tokenizes them to a maximum length of 512. With seed 42 and a validation

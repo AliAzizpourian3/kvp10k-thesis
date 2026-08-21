@@ -216,6 +216,9 @@ and 20 best-per-key predictions have sigmoid probability at least 0.5. ✅
 - LoRA: rank 4, alpha 4, dropout 0.05, no bias; Hugging Face attention targets.
 - AdamW, learning rate 5e-4, 8 epochs, batch 1, gradient accumulation 4,
   effective batch 4, maximum length 8,192, seed 0.
+- Stage 3 training uses only the prepared training split for the fixed eight
+  epochs; the held-out test split is accessed only afterward for final
+  prediction and benchmark evaluation.
 
 ---
 
