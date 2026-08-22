@@ -8,6 +8,13 @@ Business document processing is an important task in enterprise automation, affe
 
 Traditional approaches rely on template matching or rule-based systems, which lack generalization to diverse document layouts and formats. Recent advances in deep learning, particularly multimodal pre-trained models like LayoutLMv3 \cite{layoutlmv3}, offer promising solutions by jointly modeling text, layout, and visual features.
 
+KVP10k provides the benchmark and published Mistral baseline used as the main
+comparison point in this thesis~\cite{kvp10k}, while LayoutLMv3 supplies the
+pretrained document encoder adapted here~\cite{layoutlmv3}. The relation
+component is situated within prior segment- and entity-linking work such as
+SPADE and BROS~\cite{spade,bros}; detailed comparison is provided in
+Chapter~\ref{ch:literature}.
+
 \section{Problem Statement}
 \label{sec:problem}
 

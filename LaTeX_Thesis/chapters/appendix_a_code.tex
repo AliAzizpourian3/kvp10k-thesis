@@ -8,6 +8,9 @@ when the thesis is compiled without the repository's Python source tree.
 \section{Evaluation Metrics}
 \label{app:metrics}
 
+These listings supplement the evaluation protocol in
+Section~\ref{sec:evaluation-protocol}.
+
 \begin{lstlisting}[language=Python,
   caption={Normalized Edit Distance implementation from \texttt{metrics.py}}]
 def normalized_edit_distance(pred: str, target: str) -> float:
@@ -59,7 +62,10 @@ def intersection_over_union(box1, box2):
 \section{Applying Training-Fitted Geometry Clusters}
 \label{app:cluster-assignment}
 
-The following excerpt assumes that the prepared dataset, page groups, and training-fitted Stage~2 artifact (including its scaler and k-means model) have already been loaded.
+This listing supplements the cluster-assignment procedure in
+Section~\ref{subsec:cluster_use}. The following excerpt assumes that the
+prepared dataset, page groups, and training-fitted Stage~2 artifact (including
+its scaler and k-means model) have already been loaded.
 
 \begin{lstlisting}[language=Python,
   caption={Assignment of test pages with the frozen Stage~2 scaler and k-means model}]

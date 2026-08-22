@@ -307,16 +307,19 @@ cannot silently continue with incompatible settings.
 We implement a dual-threshold evaluation protocol. V4 checkpoint selection
 uses validation data only. After selection, the chosen checkpoint is evaluated
 on the test set. The test result does not choose the V4 checkpoint.
+Implementation excerpts for both metrics are provided in
+Appendix~\ref{app:metrics}.
 
 \subsection{Text Matching: NED}
 \label{sec:ned}
 
 Normalised Edit Distance (NED) measures text accuracy:
 \[
-  \text{NED}(p, t) = \frac{\text{Levenshtein}(p, t)}{\max(|p|, |t|)}
+  \text{NED}(\hat{t}, t) = \frac{\text{Levenshtein}(\hat{t}, t)}{\max(|\hat{t}|, |t|)}
   \tag{5.1}
 \]
-where $p$ is predicted text, $t$ is target text. Threshold: $\text{NED} < 0.2$.
+where $\hat{t}$ is predicted text and $t$ is target text. Threshold:
+$\text{NED} < 0.2$.
 
 \subsection{Location Matching: IoU}
 \label{sec:iou}
