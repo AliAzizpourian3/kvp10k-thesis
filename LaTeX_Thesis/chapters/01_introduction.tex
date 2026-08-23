@@ -45,7 +45,7 @@ This thesis makes the following contributions:
     
     \item \textbf{Discriminative Model}: Adaptation of a pretrained LayoutLMv3 encoder with a token classifier and a span-level projected scaled-dot-product linker with spatial features for discriminative \kvp{} extraction (Chapters~\ref{ch:methodology} and~\ref{ch:implementation})
     
-    \item \textbf{Controlled KVP10k Evaluation}: Comparison of the final corrected discriminative model with a reconstructed Mistral baseline on the same 581 usable test pages. The final V4 model obtains Regular text+location F1 $=0.345$, compared with $0.521$ for Mistral (Chapter~\ref{ch:exresults})
+    \item \textbf{Controlled KVP10k Evaluation}: Comparison of the final corrected discriminative model with a reconstructed Mistral baseline on the same 581 usable test pages. The final V4 model obtains Regular text+location F1 $=0.345$, compared with $0.662$ for the reconstructed Mistral baseline on the same prepared 581-page test subset (Chapter~\ref{ch:exresults})
     
     \item \textbf{Diagnostic Analysis}: Evidence suggesting that relation linking remains a major limitation, based on the token-to-span experimental progression, corrected entity and pair metrics, page-cluster results, and qualitative errors. Because several corrections were applied together, the study does not claim an isolated causal effect for linking granularity (Chapters~\ref{ch:exresults} and~\ref{ch:discussion})
 \end{enumerate}

@@ -44,16 +44,23 @@ class-aware entity evaluation, validation pair-F1 checkpoint selection, and
 aligned early stopping. Because these corrections are applied together, their
 individual effects are not isolated.
 
-The reconstructed Mistral baseline remains stronger in the official comparable
-Regular modes, with text F1 of $0.598$ and text+location F1 of $0.521$. V4 and
-the reconstructed Mistral baseline were evaluated on the same 581 locally
-available pages with the same evaluator, so these internal results are directly
-comparable. The published Regular values of $0.659$ and $0.611$ are included
-only as contextual information. The generative and discriminative systems have different strengths: Mistral
-achieves higher Regular pair scores in the comparable benchmark modes, while
-the discriminative system cannot emit text that is absent from the extracted
-input. V4 provides the final discriminative result of this study but remains
-below the reconstructed Mistral baseline on complete Regular pair extraction.
+The reconstructed Mistral baseline is stronger than V4 in the official
+comparable Regular modes, reaching text F1 of $0.769$ and text+location F1 of
+$0.662$, compared with $0.392$ and $0.345$ for V4. Both internal systems are
+evaluated on the same 581 prepared pages with the same benchmark evaluator.
+On this subset, the reconstructed Mistral scores are also numerically above the
+published Regular values of $0.659$ and $0.611$. This must not be interpreted
+as evidence that the reconstructed system outperforms the published baseline
+under equivalent conditions. The local evaluation covers only pages that
+survive PDF retrieval and native-text preparation, PyMuPDF text replaces the
+paper's OCR-based input, and the prompt, preprocessing, and fine-tuning
+implementation are not identical to the published system.
+
+For Regular text+location matching, Mistral has macro precision $0.661$ and
+recall $0.663$, whereas V4 has precision $0.371$ and recall $0.323$. V4's lower
+recall is consistent with the qualitative missed-link examples, while its
+moderate precision indicates that incorrect predicted links are also an
+important source of error.
 
 The direct V4 decoder predicts Regular pairs only. Its direct All
 text+location F1 is $0.229$. The unchanged recovery method converts unmatched
@@ -79,7 +86,7 @@ ground truth and are excluded from the category macro average.
     \toprule
     \textbf{Model} & \textbf{Cluster 0} & \textbf{Cluster 1} \\
     \midrule
-    Reconstructed Mistral & 0.569 & 0.429 \\
+    Reconstructed Mistral & 0.679 & 0.633 \\
     V4                    & 0.305 & 0.410 \\
     \bottomrule
   \end{tabular}

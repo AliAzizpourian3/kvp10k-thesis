@@ -58,6 +58,12 @@ embedded into the prompt given to the Mistral model. For the Stage~3
 reconstruction, ground-truth targets are serialised as Python list-of-lists
 strings.
 
+The generated list-of-lists representation encodes regular pairs as
+key--value entries, unvalued items as single-element entries, and unkeyed items
+as a canonical category label without a bounding box followed by the located
+value. The prediction parser converts these representations into the
+corresponding KVP10k types before benchmark evaluation.
+
 \paragraph{V4: Word-level splitting.}
 Diagnostic analysis (Section~\ref{sec:exp567}) revealed that one line of
 the prepared LMDX-style representation can contain a multi-word text block ---

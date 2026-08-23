@@ -8,7 +8,7 @@ pooled scores** and must not be cited.
 Legend: ✅ = verified against a code/data artifact in this repo · ⚠️ = prose-only,
 estimated, or not cleanly recoverable (state cautiously in the thesis).
 
-Verification date: 2026-08-18.
+Verification date: 2026-08-23.
 
 ---
 
@@ -81,8 +81,9 @@ result to one correction.
 ## 3. Official benchmark and entity results
 
 Official pair evaluator: `kvp10k_official_eval.py` /
-`evaluate_kvp10k_benchmark.py`. Pair values below are macro F1. The evaluation
-set contains 581 prepared pages. ✅
+`evaluate_kvp10k_benchmark.py`. Pair precision and recall are page-macro values;
+F1 is their harmonic mean. TP/FP/FN columns are raw totals and do not reconstruct
+the macro values. The evaluation set contains 581 prepared pages. ✅
 
 ### 3a. V4 final principal result
 
@@ -99,6 +100,20 @@ selection. ✅
 
 Exact test Regular F1: text 0.3919126343; location 0.4462274760; combined
 0.3453115284. The learned decoder directly emits Regular linked pairs. ✅
+
+Complete selected-checkpoint direct-output test metrics: ✅
+
+| Category | Mode | Precision | Recall | F1 | TP | FP | FN | Docs scored |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Regular | Text | 0.424863 | 0.363705 | **0.391913** | 1,434 | 1,467 | 2,733 | 483 |
+| Regular | Location | 0.484977 | 0.413212 | **0.446227** | 1,623 | 1,278 | 2,544 | 483 |
+| Regular | Text+location | 0.371127 | 0.322854 | **0.345312** | 1,216 | 1,685 | 2,951 | 483 |
+| All, direct | Text | 0.385731 | 0.193856 | **0.258033** | 1,434 | 1,478 | 6,951 | 532 |
+| All, direct | Location | 0.440308 | 0.232513 | **0.304322** | 1,623 | 1,289 | 6,762 | 532 |
+| All, direct | Text+location | 0.336944 | 0.172981 | **0.228602** | 1,216 | 1,696 | 7,169 | 532 |
+
+Direct Unkeyed and Unvalued P/R/F1 are 0 because the learned decoder emits only
+Regular pairs. They are supplied only by the unchanged recovery step below. ✅
 
 Corrected class-aware entity results on the test set: ✅
 
@@ -119,12 +134,20 @@ V4 post-processing recovery uses the existing unchanged method. It emits
 unlinked VALUE spans as unkeyed items and unlinked KEY spans as unvalued items.
 It does not change Regular predictions or Regular F1. ✅
 
-| Recovered category | Text F1 | Location F1 | Text+location F1 |
-|---|---:|---:|---:|
-| Regular, unchanged | 0.392 | 0.446 | 0.345 |
-| Unkeyed | 0.175 | 0.316 | **0.162** |
-| Unvalued | 0.298 | 0.336 | **0.276** |
-| All | 0.292 | 0.376 | **0.261** |
+| Category | Mode | Precision | Recall | F1 | TP | FP | FN | Docs scored |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Regular, unchanged | Text | 0.424863 | 0.363705 | **0.391913** | 1,434 | 1,467 | 2,733 | 483 |
+| Regular, unchanged | Location | 0.484977 | 0.413212 | **0.446227** | 1,623 | 1,278 | 2,544 | 483 |
+| Regular, unchanged | Text+location | 0.371127 | 0.322854 | **0.345312** | 1,216 | 1,685 | 2,951 | 483 |
+| Unkeyed | Text | 0.189219 | 0.163551 | **0.175451** | 240 | 1,212 | 2,237 | 472 |
+| Unkeyed | Location | 0.348060 | 0.290085 | **0.316439** | 409 | 1,043 | 2,068 | 472 |
+| Unkeyed | Text+location | 0.172947 | 0.152761 | **0.162229** | 214 | 1,238 | 2,263 | 472 |
+| Unvalued | Text | 0.298976 | 0.297524 | **0.298248** | 360 | 636 | 1,381 | 181 |
+| Unvalued | Location | 0.351799 | 0.321433 | **0.335931** | 399 | 597 | 1,342 | 181 |
+| Unvalued | Text+location | 0.278177 | 0.273611 | **0.275875** | 319 | 677 | 1,422 | 181 |
+| All | Text | 0.323127 | 0.266804 | **0.292277** | 2,034 | 3,612 | 6,351 | 532 |
+| All | Location | 0.416247 | 0.343449 | **0.376360** | 2,431 | 3,215 | 5,954 | 532 |
+| All | Text+location | 0.286822 | 0.239297 | **0.260913** | 1,749 | 3,897 | 6,636 | 532 |
 
 V4 Regular results by frozen annotation-geometry cluster: Cluster 0 has
 319 assigned pages and 304 scored pages; text/location/combined F1 =
@@ -135,27 +158,74 @@ are geometry regimes, not semantic document types. ✅
 
 ### 3b. Mistral baseline (re-implementation)
 
-| Category | Text F1 | Location F1 | Text+location F1 | Docs scored |
-|---|---:|---:|---:|---:|
-| Regular | 0.598 | 0.547 | **0.521** | 483 |
-| Unkeyed | 0.000 | 0.000 | 0.000 | 472 |
-| Unvalued | 0.744 | 0.699 | 0.672 | 181 |
-| All | 0.513 | 0.478 | 0.455 | 532 |
+Final inference uses `data/outputs/stage3_mistral/checkpoint` and completed all
+581 prepared test pages with greedy decoding (`do_sample=false`), maximum input
+length 8,192, and maximum 2,048 new tokens. It preserves 581 raw responses and
+581 parsed prediction files. Official result artifact:
+`data/outputs/stage3_mistral_final_inference/evaluation_kvp10k_official.json`. ✅
 
-Exact Regular combined F1 = 0.52057. Mistral remains stronger than V4 for the
-official comparable Regular combined result. Its corrected cluster combined F1
-is 0.569 for Cluster 0 and 0.429 for Cluster 1. ✅
+| Category | Mode | Precision | Recall | F1 | TP | FP | FN | Docs scored |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Regular | Text | 0.763149 | 0.775018 | **0.769038** | 3,116 | 850 | 1,051 | 483 |
+| Regular | Location | 0.698525 | 0.700213 | **0.699368** | 2,851 | 1,115 | 1,316 | 483 |
+| Regular | Text+location | 0.660577 | 0.663004 | **0.661788** | 2,727 | 1,239 | 1,440 | 483 |
+| Unkeyed | Text | 0.705257 | 0.693157 | **0.699155** | 1,535 | 814 | 942 | 472 |
+| Unkeyed | Location | 0.708039 | 0.692368 | **0.700116** | 1,559 | 790 | 918 | 472 |
+| Unkeyed | Text+location | 0.652894 | 0.639909 | **0.646336** | 1,395 | 954 | 1,082 | 472 |
+| Unvalued | Text | 0.739973 | 0.761732 | **0.750695** | 1,232 | 484 | 509 | 181 |
+| Unvalued | Location | 0.694542 | 0.705239 | **0.699850** | 1,141 | 575 | 600 | 181 |
+| Unvalued | Text+location | 0.663828 | 0.674710 | **0.669225** | 1,060 | 656 | 681 | 181 |
+| All | Text | 0.747052 | 0.756358 | **0.751676** | 5,883 | 2,261 | 2,502 | 532 |
+| All | Location | 0.715336 | 0.719899 | **0.717610** | 5,551 | 2,593 | 2,834 | 532 |
+| All | Text+location | 0.670584 | 0.674865 | **0.672718** | 5,182 | 2,962 | 3,203 | 532 |
+
+Final headline F1 rounded to three decimals: Regular 0.769/0.699/0.662;
+Unkeyed 0.699/0.700/0.646; Unvalued 0.751/0.700/0.669; All
+0.752/0.718/0.673 (text/location/text+location). The earlier parser pass and
+its cluster results are superseded and must not be mixed with the final pass. ✅
+
+Final official Regular results by frozen annotation-geometry cluster use
+`data/outputs/stage3_mistral_final_inference/evaluation_kvp10k_official_per_cluster.json`. ✅
+
+| Cluster | Mode | Precision | Recall | F1 | TP | FP | FN | Assigned | Scored |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Cluster 0 | Text | 0.791479 | 0.780953 | **0.786181** | 2,483 | 519 | 869 | 319 | 304 |
+| Cluster 0 | Location | 0.716654 | 0.708182 | **0.712393** | 2,261 | 741 | 1,091 | 319 | 304 |
+| Cluster 0 | Text+location | 0.682427 | 0.674887 | **0.678636** | 2,177 | 825 | 1,175 | 319 | 304 |
+| Cluster 1 | Text | 0.715034 | 0.764939 | **0.739145** | 633 | 331 | 182 | 213 | 179 |
+| Cluster 1 | Location | 0.667735 | 0.686680 | **0.677075** | 590 | 374 | 225 | 213 | 179 |
+| Cluster 1 | Text+location | 0.623468 | 0.642822 | **0.632997** | 550 | 414 | 265 | 213 | 179 |
+
+Geometry unavailable has 49 assigned pages and no scorable Regular ground
+truth. It is excluded from the Regular cluster averages. ✅
+
+The legacy pooled unmatched-entity diagnostic on the final predictions gives
+39.7% for Cluster 0 (3,505/8,834) and 52.5% for Cluster 1 (1,730/3,297).
+It uses NED < 0.5, strict IoU > 0.5, no key–value role equality, and all
+predicted entities as the denominator. It is not an official benchmark
+metric. ✅
 
 ### 3c. Published paper (Naparstek et al., KVP10k): comparison only
 
-| Category | Text F1 | Location F1 | Text+location F1 |
-|---|---:|---:|---:|
-| Regular | 0.659 | 0.650 | 0.611 |
-| Unkeyed | 0.601 | 0.653 | 0.584 |
-| Unvalued | 0.601 | 0.618 | 0.588 |
-| All | 0.643 | 0.661 | 0.612 |
+| Category | Mode | Precision | Recall | F1 |
+|---|---|---:|---:|---:|
+| Regular | Text | 0.678 | 0.641 | 0.659 |
+| Regular | Location | 0.670 | 0.631 | 0.650 |
+| Regular | Text+location | 0.627 | 0.595 | 0.611 |
+| Unkeyed | Text | 0.584 | 0.620 | 0.601 |
+| Unkeyed | Location | 0.635 | 0.672 | 0.653 |
+| Unkeyed | Text+location | 0.568 | 0.601 | 0.584 |
+| Unvalued | Text | 0.617 | 0.586 | 0.601 |
+| Unvalued | Location | 0.634 | 0.604 | 0.618 |
+| Unvalued | Text+location | 0.603 | 0.573 | 0.588 |
+| All | Text | 0.645 | 0.640 | 0.643 |
+| All | Location | 0.665 | 0.657 | 0.661 |
+| All | Text+location | 0.615 | 0.608 | 0.612 |
 
-The paper supplies F1 but not per-page precision and recall. Compare only F1. ✅
+The paper's Table 1 reports page-macro precision, recall, and F1 for Text,
+Location, and Text+location in all four categories. It does not publish
+individual per-page scores. Direct comparison remains limited by the different
+local data and implementation conditions described below. ✅
 
 ### 3d. Stage 4a and legacy diagnostics
 
@@ -248,13 +318,14 @@ Source: `kvp10k_official_eval.py` (mirrors IBM
 ## 6. Baseline-comparison limitations (state explicitly)
 
 Our Mistral is a **re-implementation, not a reproduction** of Naparstek et al. ⚠️
-Confounds that make the 0.598/0.521 vs paper 0.659/0.611 gap only partially comparable:
+Confounds that make our Regular text/combined F1 of 0.769/0.662 versus the
+paper's 0.659/0.611 only partially comparable:
 - Text source: **PyMuPDF native PDF text extraction**, not OCR and not the paper's exact pipeline.
 - **Coverage**: trained on 55.8% of usable train pages (broken PDFs dropped).
 - LoRA rank **r=4** here; the paper's exact rank/hyperparameters are **not confirmed**
   (thesis previously estimated ≥16). Do not claim identical hyperparameters. ⚠️
 - Prompt formatting, seed, max_len, and epoch budget are our choices, not the paper's.
-- Paper provides **F1 only** (no P/R) ⇒ compare F1, and only at the category level.
+- Paper provides category-level macro **precision, recall, and F1**, but not individual per-page scores.
 - V4 vs Mistral: V4 is a 125M discriminative model trained without page images;
   Mistral is a 7B generative model — different paradigm and capacity.
 
@@ -277,3 +348,6 @@ Confounds that make the 0.598/0.521 vs paper 0.659/0.611 gap only partially comp
    results.
 9. Follow the executable benchmark and disclose the paper-prose IoU > 0.3 versus
    released-code IoU ≥ 0.3 difference.
+10. Use the final Mistral inference/evaluation artifact for every Mistral result.
+    Do not mix its values with the superseded parser pass or its old cluster
+    evaluation.

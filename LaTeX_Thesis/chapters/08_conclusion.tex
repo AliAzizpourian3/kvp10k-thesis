@@ -20,7 +20,7 @@ contributions are:
 
   \item \textbf{Controlled KVP10k evaluation:} The study compares the final corrected V4 with a reconstructed Mistral-7B
   baseline on the same 581 usable test pages. V4 reaches Regular text+location
-  F1 of $0.345$, compared with $0.521$ for Mistral.
+  F1 of $0.345$, compared with $0.662$ for the reconstructed Mistral baseline on the same prepared 581-page test subset.
 
   \item \textbf{Diagnostic analysis:} The token-to-span progression, corrected
   entity and pair metrics, cluster evaluation, and qualitative examples suggest
@@ -55,12 +55,13 @@ useful, but it does not establish a causal requirement.
 
 \subsection{RQ2: Discriminative vs.\ Generative}
 
-The final corrected V4 system reaches Regular text+location F1 of $0.345$.
-The reconstructed Mistral baseline remains stronger at $0.521$. The
-discriminative system has a different constraint: its output text comes from
-observed input tokens and cannot contain generated text that is absent from the
-extracted input. V4 does not solve complete pair extraction and does not
-outperform the generative baseline.
+The final V4 system reaches Regular text+location F1 of $0.345$, while the
+reconstructed Mistral baseline reaches $0.662$ on the same prepared 581-page
+test subset. The reconstructed value is also numerically above the published
+Mistral result of $0.611$, but differences in test coverage, native-text
+extraction, preprocessing, and implementation prevent a direct superiority
+claim. V4 therefore remains below the generative baseline in the controlled
+internal comparison.
 
 \subsection{RQ3: Linking Granularity}
 
@@ -81,7 +82,7 @@ span-level linking alone.
 \subsection{RQ4: Success and Failure Factors}
 
 V4 reaches Regular combined F1 of $0.305$ in Cluster~0 and $0.410$ in
-Cluster~1. Mistral has the opposite order, with $0.569$ and $0.429$. This is an
+Cluster~1. Mistral has the opposite order, with $0.679$ and $0.633$. This is an
 association with annotation geometry, not evidence about semantic document
 types. Qualitative cases show correct local links, plausible links to
 neighbouring values, missed short or abbreviated values, and KEY--VALUE

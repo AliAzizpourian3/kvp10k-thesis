@@ -109,16 +109,16 @@ text-block-and-coordinate representation of the page.}
     \textbf{Category} & \textbf{System} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
     Regular  & KVP10k paper & 0.659 & 0.650 & 0.611 \\
-             & Mistral (ours) & 0.598 & 0.547 & 0.521 \\
+             & Mistral (ours) & 0.769 & 0.699 & 0.662 \\
     \midrule
     Unkeyed  & KVP10k paper & 0.601 & 0.653 & 0.584 \\
-             & Mistral (ours) & 0.000 & 0.000 & 0.000 \\
+             & Mistral (ours) & 0.699 & 0.700 & 0.646 \\
     \midrule
     Unvalued & KVP10k paper & 0.601 & 0.618 & 0.588 \\
-             & Mistral (ours) & 0.744 & 0.699 & 0.672 \\
+             & Mistral (ours) & 0.751 & 0.700 & 0.669 \\
     \midrule
     All      & KVP10k paper & 0.643 & 0.661 & 0.612 \\
-             & Mistral (ours) & 0.513 & 0.478 & 0.455 \\
+             & Mistral (ours) & 0.752 & 0.718 & 0.673 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -126,16 +126,26 @@ text-block-and-coordinate representation of the page.}
 \noindent\emph{Note:} Internal Mistral and V4 results use the same 581
 pages. The published result is provided for context.
 
-For regular KVPs, the reconstructed Mistral baseline reaches text-only
-F1 $=0.598$, compared with $0.659$ in the paper, and combined F1 $=0.521$,
-compared with $0.611$. Its unvalued-key score is strong, but the reconstructed
-output parser emits no unkeyed-value predictions, giving zero for that category
-and reducing the All score to $0.513$ text-only and $0.455$ combined. These
-results are substantially different from the earlier pooled entity-level
-calculation and replace it as the benchmark comparison. Given the data,
-text-source, prompt, adapter-rank, and training-detail differences above, they
-show that the reconstruction is competitive on regular pairs but do not
-constitute a reproduction of the paper's baseline.
+On the prepared 581-page test subset, the reconstructed Mistral baseline
+reaches Regular F1 values of $0.769$ for text, $0.699$ for location, and
+$0.662$ for text+location. Unkeyed and Unvalued text+location F1 are $0.646$
+and $0.669$, respectively, yielding an All text+location F1 of $0.673$. These
+values are numerically higher than the published baseline values on the
+corresponding categories. They do not, however, establish superiority over the
+published system under equivalent conditions. The local pipeline evaluates
+only the 581 test pages that survive PDF retrieval and native-text preparation,
+uses PyMuPDF text rather than the paper's OCR-based input, and reconstructs the
+prompt and fine-tuning implementation rather than reproducing them exactly.
+
+Final evaluation uses the type-aware output parser, which distinguishes
+regular, unkeyed, and unvalued generated entries before benchmark scoring.
+
+For Regular text+location matching, the reconstructed Mistral baseline has
+macro precision $0.661$ and recall $0.663$, indicating a nearly balanced result.
+V4 has precision $0.371$ and recall $0.323$ under the same Regular
+text+location criterion. The lower V4 recall is consistent with the observed
+missed-link cases, while its moderate precision also shows that incorrect links
+remain substantial.
 
 \paragraph{Per-cluster breakdown.}
 \label{sec:stage3-per-cluster}
@@ -154,8 +164,8 @@ truth; it does not rerun or retrain Mistral.
     \toprule
     \textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text F1} & \textbf{Text+location F1} \\
     \midrule
-    Cluster 0 (higher count, broad spread) & 319 & 304 & 0.651 & 0.569 \\
-    Cluster 1 (lower count, compact)       & 213 & 179 & 0.498 & 0.429 \\
+    Cluster 0 (higher count, broad spread) & 319 & 304 & 0.786 & 0.679 \\
+    Cluster 1 (lower count, compact)       & 213 & 179 & 0.739 & 0.633 \\
     Geometry unavailable                    &  49 &   0 & ---   & ---   \\
     \bottomrule
   \end{tabular}
@@ -163,15 +173,16 @@ truth; it does not rerun or retrain Mistral.
 
 Regular-pair performance is higher in Cluster~0 than Cluster~1, but the groups
 describe annotation-box geometry rather than text density or document genre. A
-separate pooled error audit shows unsupported-prediction rates of 37.1\% in
-Cluster~0 and 53.0\% in Cluster~1. In this entity-level audit, an unsupported
-prediction is a predicted key or value entity that has no ground-truth match
-under the audit's text-and-location thresholds; the denominator is all
-predicted entities in the cluster. The 49 geometry-unavailable prepared pages
-contain no regular ground truth and are therefore excluded from the official
-per-cluster F1 calculation. These pages must not be interpreted as a third
-performance regime. The overall benchmark values in Table~\ref{tab:exp1-overall}
-are unchanged because only the grouping was recomputed.
+separate pooled unmatched-entity audit gives rates of 39.7\% in Cluster~0 and
+52.5\% in Cluster~1. In this diagnostic, an unmatched prediction is a predicted
+entity with no ground-truth match under NED $<0.5$ and strict IoU $>0.5$.
+Matching does not enforce key--value role equality, and the denominator is all
+predicted entities in the cluster. This diagnostic is not an official
+benchmark metric. The 49 geometry-unavailable prepared pages contain no
+regular ground truth and are therefore excluded from the official per-cluster
+F1 calculation. These pages must not be interpreted as a third performance
+regime. The overall benchmark values in Table~\ref{tab:exp1-overall} are
+unchanged because only the grouping was recomputed.
 
 \textbf{Motivation for Experiment 2:} A discriminative model that classifies
 extracted tokens while using their spatial positions can constrain its textual
@@ -413,7 +424,7 @@ F1~=\VFourTestTextFOne{} for text, \VFourTestLocationFOne{} for location, and
 \end{table}
 
 Reconstructed Mistral remains stronger, with Regular text+location
-F1~=0.521. The final V4 combines several pipeline, training, and selection
+F1~=0.662. The final V4 combines several pipeline, training, and selection
 corrections, so the result does not identify the effect of one correction.
 
 \paragraph{Corrected entity metrics.}
@@ -560,7 +571,7 @@ locally available pages and are directly comparable to each other.
     \textbf{Model} & \textbf{Corrected entity micro F1} & \textbf{Regular pair F1 (Text / Text+location)} & \textbf{Key Finding} \\
     \midrule
     KVP10k paper baseline     & ---   & 0.659 / 0.611 & Published generative system \\
-    Exp 1: Mistral-7B        & ---   & 0.598 / 0.521 & Re-implementation; no unkeyed outputs \\
+    Exp 1: Mistral-7B        & ---   & 0.769 / 0.662 & Re-implementation; final type-aware parser \\
     Exp 2: Stage~4a (entity pre-training) & \multicolumn{2}{c}{No reportable score} & Checkpoint unavailable; legacy score omitted \\
     Exp 3: V1 token linking & \multicolumn{2}{c}{Validation diagnostic} & Dense token candidate space \\
     Exp 4: V2 span linking & \multicolumn{2}{c}{Validation diagnostic} & Span and supervision defects remain \\
