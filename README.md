@@ -1,31 +1,33 @@
 # KVP10k: Key-Value Pair Extraction Pipeline
 
-![Stages](https://img.shields.io/badge/Stages-0--4-blue) ![Dataset](https://img.shields.io/badge/Dataset-KVP10k%20ICDAR%202024-orange) ![Status](https://img.shields.io/badge/Stage%204b-In%20Progress-yellow)
+![Stages](https://img.shields.io/badge/Stages-0--4-blue) ![Dataset](https://img.shields.io/badge/Dataset-KVP10k%20ICDAR%202024-orange) ![Status](https://img.shields.io/badge/Thesis%20Results-Final-green)
 
-Thesis project implementing a full key-value pair (KVP) extraction pipeline on the [KVP10k dataset](https://huggingface.co/datasets/ibm/KVP10k) (ICDAR 2024). The pipeline progresses through five stages: evaluation protocol → dataset ingestion → layout analysis → baselines → LayoutLMv3 fine-tuning with biaffine linking.
+Thesis project for key-value pair (KVP) extraction on the [KVP10k dataset](https://huggingface.co/datasets/ibm/KVP10k) (ICDAR 2024). The final internal comparison covers a reconstructed Mistral baseline and the corrected LayoutLMv3 V4 model. [LaTeX_Thesis/THESIS_FACTSHEET.md](LaTeX_Thesis/THESIS_FACTSHEET.md) is the authoritative source for all reported values and settings.
 
 
 ## Pipeline Overview
 
 | Stage | Script | Description |
 |-------|--------|-------------|
-| 0 | `config.py` + `main.py` | Evaluation protocol (NED, IoU thresholds) |
+| 0 | `kvp10k_official_eval.py` + `evaluate_kvp10k_benchmark.py` | Released-benchmark-compatible evaluation |
 | 1 | `data_loader.py` | Dataset ingestion from HuggingFace |
-| 2 | `features.py` + `visualization.py` | Layout clustering & data audit |
-| 3 | `prepare_data.py` + `baselines.py` + `mistral_baseline.py` | Data preparation + baselines |
-| 4a | `train_stage4a.py` | LayoutLMv3 entity classifier (ablation) |
-| 4b | `train_stage4b.py` | LayoutLMv3 + biaffine linker, λ sweep |
+| 2 | `features.py` + `visualization.py` | Annotation-geometry clustering and audit |
+| 3 | `prepare_data.py` + `mistral_baseline.py` + `stage3_mistral_final_inference.py` | Data preparation and reconstructed Mistral baseline |
+| 4a | `train_stage4a.py` | Methodological entity-pre-training phase; no reportable result |
+| V4 | `train_stage4b_v5.py` | Final corrected LayoutLMv3 and span-level relation linker |
 
 ---
 
 ## Stage 0: Evaluation Protocol
 
-Defined in `config.py`, validated via `main.py`.
+Implemented in `kvp10k_official_eval.py` and exposed by
+`evaluate_kvp10k_benchmark.py`.
 
 - **Text matching**: NED (Normalised Edit Distance) < 0.2
-- **Location matching**: IoU > 0.3
-- **Overall metric**: F1 score (balanced precision + recall)
-- **Protocol**: IBM-compatible pair-level matching — a predicted KVP is a true positive if both its key text/bbox and value text/bbox match a ground-truth pair
+- **Location matching**: IoU >= 0.3, as implemented by the released IBM code
+- **Matching**: prediction-order greedy, one-to-one, with equal KVP type
+- **Aggregation**: page-macro precision and recall over pages with non-empty filtered ground truth
+- **F1**: harmonic mean of macro precision and macro recall
 
 ---
 
@@ -33,7 +35,8 @@ Defined in `config.py`, validated via `main.py`.
 
 `data_loader.py` loads KVP10k from HuggingFace (`ibm/KVP10k`, cached locally at `hf_cache/`):
 
-- 10,000 document pages — 9,405 train / 595 test (after filtering annotated pages)
+- 10,707 unique pages: 9,656 train and 1,051 test
+- Prepared pages: 5,389 train and 581 test
 - Each page: PDF URL + word annotations + KVP ground truth
 - Annotation format: bounding polygon coordinates per word, structured KVP pairs
 
@@ -41,7 +44,7 @@ Defined in `config.py`, validated via `main.py`.
 
 ## Stage 2: Layout Clustering & Data Audit
 
-`features.py` extracts 13 layout features per document page:
+`features.py` extracts 12 annotation-geometry features per document page:
 
 | Feature | Description |
 |---------|-------------|
@@ -51,11 +54,13 @@ Defined in `config.py`, validated via `main.py`.
 | `mean_width`, `mean_height` | Average box dimensions |
 | `mean_aspect_ratio` | Mean width/height ratio |
 | `mean_cx`, `mean_cy` | Centroid of layout |
-| `density` | Area coverage fraction |
 | `v_spread`, `h_spread` | Vertical/horizontal extent |
 | `mean_spacing` | Average inter-box spacing |
 
-K-means clustering with optimal k selected by silhouette score. Results saved to `data/outputs/stage2/`.
+The historical `density` feature was removed because it duplicated
+`total_area`. The frozen seed-42 K-means model selects k=2. On the prepared
+581-page test subset, Cluster 0 has 319 assigned pages, Cluster 1 has 213, and
+49 have unavailable geometry.
 
 ---
 
@@ -70,21 +75,10 @@ Converts raw KVP10k pages into prepared JSON files for Stage 4 training:
 3. Fuse extracted words with annotation bounding boxes (word-match threshold = 0.6)
 4. Produce LMDX-format text and ground-truth KVP labels
 
-Output format (`data/prepared/{train,test}/{hash_name}.json`):
-```json
-{
-  "hash_name": "abc123...",
-  "lmdx_text": "Company Name 100|200|150|220\nACME Corp 100|300|180|320\n...",
-  "image_width": 2000,
-  "image_height": 2800,
-  "gt_kvps": {
-    "kvps_list": [
-      {"key": "Company Name", "key_bbox": [100, 200, 150, 220],
-       "value": "ACME Corp",  "value_bbox": [100, 300, 180, 320]}
-    ]
-  }
-}
-```
+Each `data/prepared/{train,test}/{hash_name}.json` record contains the
+quantised LMDX text, the complete training prompt, the list-of-lists target,
+and typed `gt_kvps` entries. Ground-truth entries use the official `kvp`,
+`unkeyed`, or `unvalued` type and nested text and bounding-box fields.
 
 Dataset sizes after preparation: **5,389 train** / **581 test**.
 
@@ -92,114 +86,97 @@ Dataset sizes after preparation: **5,389 train** / **581 test**.
 
 Rule-based: pair each key with the spatially closest value (Euclidean centroid distance, max 0.3 normalised units). No learning required.
 
-### Mistral-7B LoRA Baseline (`mistral_baseline.py`)
+### Reconstructed Mistral-7B Baseline
 
-Faithful reproduction of the IBM ICDAR 2024 baseline:
+Stage 3 is a re-implementation, not an exact reproduction. The local and
+released IBM configurations share the model, rank 4, alpha 4, dropout 0.05,
+learning rate 5e-4, seed 0, maximum length 8192, eight epochs, batch size 1,
+and gradient accumulation 4.
 
-| Parameter | Value |
-|-----------|-------|
-| Model | `mistralai/Mistral-7B-Instruct-v0.2` |
-| Quantisation | 4-bit QLoRA (NF4) |
-| LoRA rank | r=4, α=4, dropout=0.05 |
-| Learning rate | 5×10⁻⁴ (AdamW) |
-| Epochs | 8 |
-| Batch / accum | 1 / 4 (effective 4) |
-| Max length | 8192 tokens |
-| Prompt format | LMDX (`<Document>…</Document><Task>…`) |
+The local implementation uses PyMuPDF native text, reduced prepared coverage,
+an adapted prompt/output contract, Hugging Face LoRA target names, 4-bit NF4
+QLoRA, Hugging Face Trainer, paged 8-bit AdamW, and response-only loss. The
+released IBM implementation uses Tesseract OCR, bfloat16 LoRA, PyTorch
+Lightning, non-8-bit AdamW, and loss on all non-padding tokens.
 
-**Results on 581 test documents:**
+`stage3_mistral_final_inference.py` is the canonical final inference and
+type-aware parser path. `mistral_baseline.py` delegates prediction parsing to
+the same implementation. The parser maps Regular, Unkeyed, and Unvalued
+list-of-lists entries to their benchmark types before evaluation.
 
-| Metric | Text-only | Text + BBox |
-|--------|-----------|-------------|
-| Precision | 0.627 | 0.497 |
-| Recall | 0.785 | 0.622 |
-| **F1** | **0.697** | **0.552** |
+Final page-macro F1 on the prepared 581-page test subset:
+
+| Category | Text | Location | Text+location |
+|----------|-----:|---------:|--------------:|
+| Regular | 0.769 | 0.699 | 0.662 |
+| Unkeyed | 0.699 | 0.700 | 0.646 |
+| Unvalued | 0.751 | 0.700 | 0.669 |
+| All | 0.752 | 0.718 | 0.673 |
+
+Final Regular text+location F1 by frozen annotation-geometry cluster is 0.679
+for Cluster 0 and 0.633 for Cluster 1.
+
+Authoritative result files:
+
+- `data/outputs/stage3_mistral_final_inference/evaluation_kvp10k_official.json`
+- `data/outputs/stage3_mistral_final_inference/evaluation_kvp10k_official_per_cluster.json`
+- `data/outputs/stage3_mistral_final_inference/unmatched_entity_audit/cluster_error_summary.json`
 
 ---
 
 ## Stage 4: LayoutLMv3 Fine-tuning
 
-### Architecture
+V4 is the final corrected LayoutLMv3 experiment. It uses:
 
-```
-Input: (input_ids, attention_mask, bbox, pixel_values)
-  ↓
-LayoutLMv3Encoder (microsoft/layoutlmv3-base, 125M params)
-  ├─ Text + layout + visual features  
-  └─ Output: [batch, 709, hidden] → truncate to [batch, 512, hidden]
-  ↓
-EntityClassifier
-  └─ Output: [batch, 512, 3]  (0=Other, 1=Key, 2=Value)
-  ↓
-BiaffineLinker  ← Stage 4b only
-  ├─ Filter tokens: key_mask & value_mask (bbox_valid applied)
-  ├─ Spatial encoder: 9-dim spatial features → 64-dim MLP
-  ├─ Dot-product scorer: key_proj · val_proj + spatial_bias
-  └─ Output: [num_keys, num_values] logits
-  ↓
-Loss = CrossEntropy(entity) + λ × BCE(link, pos_weight=n_neg/n_pos)
-```
+- LayoutLMv3-base with a token classifier
+- span-level projected scaled-dot-product linking with spatial features
+- extracted text and bounding boxes
+- a constant blank visual input, with no document-specific image information
+- batch size 1, gradient accumulation 8, and learning rate 2e-5
+- official validation Regular text+location macro F1 for checkpoint selection
+- score threshold 0.5
 
-The `pos_weight` in the link BCE loss corrects a ~450:1 negative-to-positive class imbalance in link labels (capped at 50 to prevent collapse).
+The selected epoch-10 checkpoint produces these direct Regular test results:
 
-### Stage 4a: Entity-Only Baseline
+| Mode | Precision | Recall | F1 |
+|------|----------:|-------:|---:|
+| Text | 0.425 | 0.364 | 0.392 |
+| Location | 0.485 | 0.413 | 0.446 |
+| Text+location | 0.371 | 0.323 | 0.345 |
 
-LayoutLMv3 encoder + entity classifier, no linker. Serves as an ablation.
+Corrected class-aware entity F1 is 0.792 micro and 0.772 macro. The unchanged
+post-processing recovery adds Unkeyed and Unvalued outputs and gives All
+text+location F1 of 0.261. It does not change Regular predictions.
 
-```bash
-sbatch logs/stage4a.sbatch
-```
+Regular text+location F1 by frozen cluster is 0.305 for Cluster 0 and 0.410 for
+Cluster 1. The 49 geometry-unavailable pages have no scorable Regular ground
+truth.
 
-**Best validation entity F1: 0.8436**
-
-### Stage 4b: Entity + Linker (λ Sweep)
-
-Adds the BiaffineLinker with a configurable loss weight λ ∈ {0.5, 1.0, 2.0}.
-
-```bash
-sbatch logs/stage4b_lambda05.sbatch   # λ=0.5
-sbatch logs/stage4b_lambda10.sbatch   # λ=1.0
-sbatch logs/stage4b_lambda20.sbatch   # λ=2.0
-```
-
-**Hyperparameters (all Stage 4b runs):**
-
-| Parameter | Value |
-|-----------|-------|
-| Encoder | `microsoft/layoutlmv3-base` |
-| Precision | fp32 (bf16 disabled) |
-| Learning rate | 2×10⁻⁵ |
-| Batch size | 1 |
-| Gradient accumulation | 8 (effective batch 8) |
-| Epochs (max) | 20 |
-| Early stopping patience | 3 epochs |
-| GPU | A100 40GB |
-
-**Stage 4b entity F1 results (λ sweep, best epoch):**
-
-| Run | λ | Best Entity F1 | Best Epoch | Stopped |
-|-----|---|----------------|------------|---------|
-| Canary B | 1.0 | 0.8463 | 6 | 9 |
-| λ=0.5 | 0.5 | **0.8488** | 6 | 9 |
-| λ=1.0 | 1.0 | 0.8447 | 6 | 9 |
-| λ=2.0 | 2.0 | 0.8480 | 9 | 9 |
-
-**Link F1 evaluation (Canary B best_model, pos_weight pending):**
-
-| Metric | Value |
-|--------|-------|
-| Entity F1 | 0.835 |
-| Entity Precision | 0.816 |
-| Entity Recall | 0.856 |
-| Link F1 | 0.0 (linker predicted 0/3776 GT pairs — pos_weight fix in testing) |
+Stage 4a remains a methodological entity-pre-training phase. No reliable
+checkpoint or class-aware numerical result survives, so it has no reportable
+score.
 
 ### Evaluation
 
-```bash
-# Internal checkpoint diagnostic (entity F1 + pooled regular-link F1)
-sbatch slurm/submit_eval.sh data/outputs/stage4b_canary_B
+Re-evaluate saved predictions without training or inference:
 
-# Official KVP10k pair-level macro evaluation of saved predictions
+```bash
+# Final Stage 3
+PYTHONPATH=code/script env/kvp10k_env/bin/python \
+  code/script/evaluate_kvp10k_benchmark.py \
+  --prediction_dir data/outputs/stage3_mistral_final_inference/predictions \
+  --ground_truth_dir data/prepared/test \
+  --output data/outputs/stage3_mistral_final_inference/evaluation_kvp10k_official.json
+
+# Final Stage 3 by frozen annotation-geometry cluster
+PYTHONPATH=code/script env/kvp10k_env/bin/python \
+  code/script/evaluate_kvp10k_benchmark.py \
+  --prediction_dir data/outputs/stage3_mistral_final_inference/predictions \
+  --ground_truth_dir data/prepared/test \
+  --cluster_map data/outputs/stage2/test_cluster_map.json \
+  --output data/outputs/stage3_mistral_final_inference/evaluation_kvp10k_official_per_cluster.json
+
+# Final V4
 PYTHONPATH=code/script env/kvp10k_env/bin/python \
   code/script/evaluate_kvp10k_benchmark.py \
   --prediction_dir data/outputs/stage4b_v4/predictions \
@@ -208,80 +185,48 @@ PYTHONPATH=code/script env/kvp10k_env/bin/python \
   --output data/outputs/stage4b_v4/evaluation_kvp10k_official.json
 ```
 
-`evaluate_stage4b.py` retains pooled regular-link metrics for checkpoint
-diagnosis. Reported benchmark comparisons use `evaluate_kvp10k_benchmark.py`,
-which implements IBM's type-aware, per-document macro evaluation.
+`evaluate_stage4b.py` retains legacy pooled diagnostic metrics. Headline
+benchmark comparisons use `evaluate_kvp10k_benchmark.py`, which implements
+type-aware page-macro evaluation. Do not use `measurements.json` or legacy
+pooled scores as headline results.
 
 ---
 
-## Project Structure
+## Key Files
 
-```
-kvp10k_thesis/
-├── code/script/
-│   ├── config.py                   # Stage 0: evaluation protocol constants
-│   ├── main.py                     # Pipeline orchestration (stages 0–2)
-│   ├── data_loader.py              # Stage 1: HuggingFace dataset loading
-│   ├── features.py                 # Stage 2: layout feature extraction
-│   ├── visualization.py            # Stage 2: cluster plots
-│   ├── prepare_data.py             # Stage 3: PDF → prepared JSON
-│   ├── baselines.py                # Stage 3: nearest-neighbour baseline
-│   ├── mistral_baseline.py         # Stage 3: Mistral-7B LoRA baseline
-│   ├── evaluate_mistral.py         # Stage 3: legacy pooled entity diagnostic
-│   ├── evaluate_kvp10k_benchmark.py # Official pair-level macro evaluation
-│   ├── kvp10k_official_eval.py     # IBM-compatible metric implementation
-│   ├── analyze_results.py          # Stage 3: results analysis vs ground truth
-│   ├── analyze_stage3_errors.py    # Stage 3: per-cluster error breakdown
-│   ├── visualize_baseline.py       # Stage 3: baseline result visualisation
-│   ├── kvp_dataset.py              # Stage 4 (prototype): original dataset class
-│   ├── train_kvp.py                # Stage 4 (prototype): original training script
-│   ├── layoutlm_model.py           # Stage 4: LayoutLMv3 + BiaffineLinker
-│   ├── stage4_kvp_dataset.py       # Stage 4: data loading + label alignment
-│   ├── train_stage4a.py            # Stage 4a: entity-only trainer
-│   ├── train_stage4b.py            # Stage 4b: entity + linker trainer
-│   ├── evaluate_stage4b.py         # Stage 4b: entity + link F1 evaluation
-│   ├── metrics.py                  # F1 computation utilities
-│   ├── utils.py                    # Shared utilities
-│   └── KVP10k_poc.ipynb            # Exploratory notebook (proof of concept)
-├── logs/
-│   ├── gpu_check.sbatch            # SLURM: GPU availability check
-│   ├── stage3_prepare_data.sbatch  # SLURM: Stage 3 data preparation
-│   ├── stage3_mistral.sbatch       # SLURM: Stage 3 Mistral-7B fine-tuning
-│   ├── stage4a.sbatch              # SLURM: Stage 4a train
-│   ├── stage4b_lambda05.sbatch     # SLURM: Stage 4b λ=0.5
-│   ├── stage4b_lambda10.sbatch     # SLURM: Stage 4b λ=1.0
-│   └── stage4b_lambda20.sbatch     # SLURM: Stage 4b λ=2.0
-├── slurm/
-│   ├── submit_stage4b_canary_A.sh  # SLURM: canary A run (lr=5e-5)
-│   ├── submit_stage4b_canary_B.sh  # SLURM: canary B run (lr=2e-5)
-│   └── submit_eval.sh              # SLURM: evaluation job
-├── data/
-│   ├── prepared/{train,test}/      # 5389 train + 581 test prepared JSONs
-│   └── outputs/                    # Training checkpoints + eval results
-├── hf_cache/                       # Offline HuggingFace model/dataset cache
-├── COMMANDS_CHEATSHEET.md          # Quick reference for common commands
-└── env/kvp10k_env/                 # Python virtualenv
-```
+| Component | File | Purpose |
+|-----------|------|---------|
+| Facts | `LaTeX_Thesis/THESIS_FACTSHEET.md` | Authoritative values and settings |
+| Preparation | `code/script/prepare_data.py` | PDF text and annotations to prepared JSON |
+| Stage 2 | `code/script/features.py` | Annotation-geometry features and clustering |
+| Stage 3 training | `code/script/mistral_baseline.py` | Local Mistral QLoRA training |
+| Stage 3 final inference | `code/script/stage3_mistral_final_inference.py` | Final inference, saved raw output, and type-aware parsing |
+| Stage 3 parser tests | `code/script/test_stage3_mistral_final_inference.py` | CPU-only parser and entry-point parity tests |
+| Official evaluation | `code/script/kvp10k_official_eval.py` | Benchmark-compatible matching and aggregation |
+| Evaluation CLI | `code/script/evaluate_kvp10k_benchmark.py` | Evaluation of saved predictions |
+| V1 model | `code/script/layoutlm_model.py` | Token-level projected relation scorer |
+| V2/V4 model | `code/script/layoutlm_model_v2.py` | Span-level projected relation scorer |
+| V4 training | `code/script/train_stage4b_v5.py` | Final corrected training and full-state resumption |
 
 ---
 
-## Key Implementation Notes
+## Reproducibility Notes
 
-**LayoutLMv3 visual patch truncation**: The encoder appends 197 ViT patch tokens; sequence output is truncated to `input_ids.shape[1]` (512) before the entity classifier and linker.
-
-**BiaffineLinker NaN fixes**: Three patches were required to eliminate `link_loss=NaN`:
-1. `bbox_valid` filter — excludes CLS/SEP/PAD tokens (zero bboxes) from key/value candidate sets
-2. Aspect-ratio denominator guard — `+1e-8` to prevent divide-by-zero for zero-height boxes
-3. Dot-score clamp ±20 — prevents MLP explosion in early training
-
-**Link label quality**: 56.8% of raw link labels were junk (non-KVP annotation types). Fixed in `stage4_kvp_dataset.py` — link labels only generated for `type=="kvp"` entries with non-empty key/value text and valid bboxes.
-
-**Class imbalance**: Link label matrices are ~450:1 negative-to-positive. `pos_weight = n_neg/n_pos` (capped at 50) passed to `F.binary_cross_entropy_with_logits` to prevent trivial all-zero predictions.
+- `data/outputs/`, prepared data, model checkpoints, raw responses, and full
+  prediction directories are normally ignored because they are generated or
+  environment-specific.
+- The small authoritative final Stage 3 evaluation summaries are tracked even
+  though their parent output directory is ignored.
+- Exact GPU inference requires the corresponding local checkpoint. Saved
+  evaluation summaries can be inspected without the checkpoint.
+- Stage 4a and legacy pooled metrics are diagnostic only. Do not report them as
+  final benchmark results.
 
 ---
 
 ## References
 
 - **KVP10k / IBM baseline**: [ICDAR 2024](https://huggingface.co/datasets/ibm/KVP10k)
+- **KVP10k released code and configuration**: [IBM/KVP10k](https://github.com/IBM/KVP10k)
 - **LayoutLMv3**: Huang et al., 2022 — [microsoft/layoutlmv3-base](https://huggingface.co/microsoft/layoutlmv3-base)
 - **Biaffine relation extraction**: Dozat & Manning, 2017

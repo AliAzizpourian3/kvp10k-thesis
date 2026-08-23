@@ -62,16 +62,25 @@ test pages, which are then scored with the released KVP10k evaluator.
 The exact prompt template is shown in Figure~\ref{fig:stage3-prompt}. It follows
 the LMDX paradigm~\cite{lmdx} used by the KVP10k baseline --- a document
 representation with text-block coordinates followed by a task instruction
-requesting a Python list-of-lists output. Because Naparstek et al.\ do not
-publish their prompt, we reproduce its format and output contract rather than a
-verbatim string. The reconstruction differs from the published system in
-several respects. Word text and coordinates come from PyMuPDF's native text
-layer rather than Tesseract OCR; pages without a usable text layer are
-excluded; the resulting train and test subsets differ; the unpublished prompt
-is reconstructed; LoRA rank is limited to $r=4$; and the paper does not report
-enough training detail to reproduce its setup exactly. Numerical proximity
-must therefore be read as an indicative comparison, not evidence of strict
-reproduction.
+requesting a Python list-of-lists output. The released KVP10k repository
+contains the original prompt implementation. The local template retains its
+document and task structure but modifies the detailed output instruction to
+require two strings with quantised bounding boxes.
+
+Several local settings match the released configuration: LoRA rank $r=4$,
+$\alpha=4$, dropout $0.05$, learning rate $5\times10^{-4}$, seed 0, maximum
+length 8{,}192, eight epochs, batch size 1, and gradient accumulation 4. The
+reconstruction still differs in important ways. Word text and coordinates come
+from PyMuPDF's native text layer rather than Tesseract OCR; pages without a
+usable text layer are excluded; and the resulting train and test subsets
+differ. The released implementation loads the base model in bfloat16 and uses
+PyTorch Lightning with non-8-bit AdamW, whereas the local implementation uses
+4-bit NF4 QLoRA, Hugging Face Trainer, and paged 8-bit AdamW. The LoRA target
+module names and the prompt/output implementation also differ. Finally, the
+local training loss masks prompt tokens and learns only from response tokens,
+whereas the released implementation masks only padding tokens. Numerical
+proximity must therefore be read as an indicative comparison, not evidence of
+strict reproduction.
 
 \begin{figure}[ht]
 \centering

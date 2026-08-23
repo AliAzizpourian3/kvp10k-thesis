@@ -1,0 +1,14 @@
+{
+  "checkpoint": "/home/woody/iwi5/iwi5413h/kvp10k_thesis/data/outputs/stage3_mistral/checkpoint",
+  "documents_considered": 581,
+  "prediction_files": 581,
+  "raw_response_files": 581,
+  "generated": 581,
+  "reparsed_from_saved_raw": 0,
+  "skipped_complete": 0,
+  "peak_cuda_memory_bytes": 5622417920,
+  "max_length": 8192,
+  "max_new_tokens": 2048,
+  "do_sample": false,
+  "complete": true
+}

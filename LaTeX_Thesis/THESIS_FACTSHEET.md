@@ -8,7 +8,7 @@ pooled scores** and must not be cited.
 Legend: ✅ = verified against a code/data artifact in this repo · ⚠️ = prose-only,
 estimated, or not cleanly recoverable (state cautiously in the thesis).
 
-Verification date: 2026-08-23.
+Verification date: 2026-08-24.
 
 ---
 
@@ -282,10 +282,24 @@ and 20 best-per-key predictions have sigmoid probability at least 0.5. ✅
 
 ### Mistral (`mistral_baseline.py`) ✅
 
-- Mistral-7B, QLoRA (`load_in_4bit=True`).
-- LoRA: rank 4, alpha 4, dropout 0.05, no bias; Hugging Face attention targets.
-- AdamW, learning rate 5e-4, 8 epochs, batch 1, gradient accumulation 4,
-  effective batch 4, maximum length 8,192, seed 0.
+- Local model: Mistral-7B with 4-bit NF4 QLoRA (`load_in_4bit=True`).
+- Settings shared with IBM's released configuration: LoRA rank 4, alpha 4,
+  dropout 0.05, no bias; learning rate 5e-4; 8 epochs; batch 1; gradient
+  accumulation 4; maximum length 8,192; seed 0.
+- The released KVP10k repository contains the baseline prompt in
+  `utils/prompt_utils.py` and these settings in `config/base.yaml` and
+  `config/kvp.yaml`.
+- Local differences: PyMuPDF native text instead of Tesseract OCR; reduced
+  prepared data coverage; an adapted prompt/output contract; Hugging Face LoRA
+  target names; 4-bit NF4 QLoRA instead of the released bfloat16 LoRA load;
+  Hugging Face Trainer and paged 8-bit AdamW instead of PyTorch Lightning and
+  non-8-bit AdamW.
+- The local loss masks prompt tokens and learns only from response tokens.
+  IBM's released code masks only padding tokens, so its loss also covers the
+  prompt.
+- Final type-aware inference and parsing use
+  `stage3_mistral_final_inference.py`; `mistral_baseline.py` delegates to
+  the same parser.
 - Stage 3 training uses only the prepared training split for the fixed eight
   epochs; the held-out test split is accessed only afterward for final
   prediction and benchmark evaluation.
@@ -322,9 +336,16 @@ Confounds that make our Regular text/combined F1 of 0.769/0.662 versus the
 paper's 0.659/0.611 only partially comparable:
 - Text source: **PyMuPDF native PDF text extraction**, not OCR and not the paper's exact pipeline.
 - **Coverage**: trained on 55.8% of usable train pages (broken PDFs dropped).
-- LoRA rank **r=4** here; the paper's exact rank/hyperparameters are **not confirmed**
-  (thesis previously estimated ≥16). Do not claim identical hyperparameters. ⚠️
-- Prompt formatting, seed, max_len, and epoch budget are our choices, not the paper's.
+- The local and released configurations share rank 4, alpha 4, dropout 0.05,
+  learning rate 5e-4, seed 0, maximum length 8,192, eight epochs, batch 1, and
+  gradient accumulation 4.
+- The released prompt is public. The local prompt retains its structure but
+  changes the detailed bounding-box output instruction and target
+  serialization.
+- The released code loads the base model in bfloat16. The local model uses
+  4-bit NF4 QLoRA, different LoRA target-module names, Hugging Face Trainer,
+  paged 8-bit AdamW, and response-only loss instead of loss on all non-padding
+  tokens.
 - Paper provides category-level macro **precision, recall, and F1**, but not individual per-page scores.
 - V4 vs Mistral: V4 is a 125M discriminative model trained without page images;
   Mistral is a 7B generative model — different paradigm and capacity.

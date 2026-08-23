@@ -1,11 +1,11 @@
 """
 IBM Mistral-7B LoRA Baseline for KVP10k
 
-Faithful reproduction of IBM's training pipeline using their exact
-hyper-parameters from config/base.yaml + config/kvp.yaml.
+Stage 3 re-implementation based on IBM's released model, prompt, and
+configuration. It is not an exact reproduction.
 
-IBM configuration:
-  Model:    mistralai/Mistral-7B-Instruct-v0.2, 4-bit QLoRA (NF4)
+Released IBM configuration:
+  Model:    mistralai/Mistral-7B-Instruct-v0.2, bf16 LoRA
   LoRA:     r=4, alpha=4, dropout=0.05, bias=none
             targets (IBM):  ["out_proj", "up_proj", "down_proj", "Wqkv"]
             targets (HF):   ["q_proj","k_proj","v_proj","o_proj","up_proj","down_proj"]
@@ -20,6 +20,8 @@ Differences from IBM:
   3. LoRA target_modules use HF names (see above)
   4. 4-bit QLoRA quantization (IBM uses bf16) — needed for A100 40GB
   5. paged_adamw_8bit optimizer + gradient checkpointing for memory
+  6. Prompt tokens are masked from the local training loss; IBM masks only
+     padding tokens.
 
 Prerequisites:
   Run prepare_data.py first to create data/prepared/{train,test}/*.json
@@ -31,13 +33,12 @@ Usage:
 
 import os
 import sys
-import ast
 import json
 import glob
 import argparse
 import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any
 
 import torch
 from torch.utils.data import Dataset as TorchDataset
@@ -49,12 +50,13 @@ from transformers import (
     Trainer,
 )
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, AutoPeftModelForCausalLM
+from stage3_mistral_final_inference import parse_response as parse_stage3_response
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 # ============================================================================
-# IBM Configuration (exact values from config/base.yaml + config/kvp.yaml)
+# Local configuration: shared IBM values plus documented local choices
 # ============================================================================
 IBM_CONFIG = {
     "model_name": "mistralai/Mistral-7B-Instruct-v0.2",
@@ -81,7 +83,8 @@ class KVP10kMistralDataset(TorchDataset):
     """
     Reads per-sample JSONs (from prepare_data.py) and tokenises them.
     Labels mask the prompt tokens with -100 so the loss is computed only
-    on the model's response (matching IBM's training loop).
+    on the model's response. IBM's released loop masks only padding tokens,
+    so its loss also covers prompt tokens.
     """
 
     def __init__(self, data_dir: str, tokenizer, max_length: int, split: str = "train"):
@@ -307,52 +310,9 @@ def predict_mistral(checkpoint_dir: str, data_dir: str, output_dir: str, cfg: Di
     logger.info(f"Wrote {len(json_files)} prediction files → {output_dir}")
 
 
-def _parse_entity(s: str) -> Tuple[str, Optional[List[int]]]:
-    """Parse 'text left|top|right|bottom' → (text, [l,t,r,b]) or (text, None)."""
-    parts = s.rsplit(" ", 1)
-    if len(parts) == 2:
-        try:
-            bbox = [int(x) for x in parts[1].split("|")]
-            if len(bbox) == 4:
-                return parts[0], bbox
-        except ValueError:
-            pass
-    return s, None
-
-
 def _parse_response(text: str) -> List[Dict]:
-    """Parse model output (Python list-of-lists) into IBM KVP format."""
-    text = text.strip()
-    try:
-        parsed = ast.literal_eval(text)
-    except Exception:
-        return []
-
-    if not isinstance(parsed, list):
-        return []
-
-    kvps = []
-    for item in parsed:
-        if not isinstance(item, list) or not item:
-            continue
-        k_text, k_bbox = _parse_entity(str(item[0]))
-        if len(item) >= 2:
-            v_text, v_bbox = _parse_entity(str(item[1]))
-            kvp: Dict[str, Any] = {
-                "type": "kvp",
-                "key":   {"text": k_text},
-                "value": {"text": v_text},
-            }
-            if k_bbox:
-                kvp["key"]["bbox"] = k_bbox
-            if v_bbox:
-                kvp["value"]["bbox"] = v_bbox
-        else:
-            kvp = {"type": "unvalued", "key": {"text": k_text}}
-            if k_bbox:
-                kvp["key"]["bbox"] = k_bbox
-        kvps.append(kvp)
-    return kvps
+    """Parse model output with the canonical final Stage 3 parser."""
+    return parse_stage3_response(text)
 
 
 # ============================================================================

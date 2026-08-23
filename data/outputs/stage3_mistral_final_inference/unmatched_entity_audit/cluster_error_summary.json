@@ -1,0 +1,38 @@
+{
+  "Cluster_0": {
+    "n_docs": 319,
+    "n_pred_kvps": 8834,
+    "n_gt_kvps": 9671,
+    "correct_kvps": 5329,
+    "hallucinated_kvps": 3505,
+    "missed_kvps": 4342,
+    "correct_rate": 0.6032,
+    "hallucinate_rate_of_preds": 0.3968,
+    "hallucinate_rate_of_gt": 0.3624,
+    "missed_rate": 0.449
+  },
+  "Cluster_1": {
+    "n_docs": 213,
+    "n_pred_kvps": 3297,
+    "n_gt_kvps": 2881,
+    "correct_kvps": 1567,
+    "hallucinated_kvps": 1730,
+    "missed_kvps": 1314,
+    "correct_rate": 0.4753,
+    "hallucinate_rate_of_preds": 0.5247,
+    "hallucinate_rate_of_gt": 0.6005,
+    "missed_rate": 0.4561
+  },
+  "Geometry_Unavailable": {
+    "n_docs": 49,
+    "n_pred_kvps": 988,
+    "n_gt_kvps": 0,
+    "correct_kvps": 0,
+    "hallucinated_kvps": 988,
+    "missed_kvps": 0,
+    "correct_rate": 0.0,
+    "hallucinate_rate_of_preds": 1.0,
+    "hallucinate_rate_of_gt": null,
+    "missed_rate": null
+  }
+}
