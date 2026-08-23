@@ -77,10 +77,13 @@ differ. The released implementation loads the base model in bfloat16 and uses
 PyTorch Lightning with non-8-bit AdamW, whereas the local implementation uses
 4-bit NF4 QLoRA, Hugging Face Trainer, and paged 8-bit AdamW. The LoRA target
 module names and the prompt/output implementation also differ. Finally, the
-local training loss masks prompt tokens and learns only from response tokens,
-whereas the released implementation masks only padding tokens. Numerical
-proximity must therefore be read as an indicative comparison, not evidence of
-strict reproduction.
+local training loss deliberately masks prompt tokens and learns only from
+response tokens. This task-aligned choice treats the document and instruction
+as conditioning input and focuses optimisation on the structured KVP output.
+The released implementation masks only padding tokens, so its loss also covers
+the prompt. No controlled ablation isolates the effect of this difference;
+numerical proximity must therefore be read as an indicative comparison, not
+evidence of strict reproduction.
 
 \begin{figure}[ht]
 \centering

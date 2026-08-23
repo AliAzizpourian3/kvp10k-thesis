@@ -294,9 +294,11 @@ and 20 best-per-key predictions have sigmoid probability at least 0.5. ✅
   target names; 4-bit NF4 QLoRA instead of the released bfloat16 LoRA load;
   Hugging Face Trainer and paged 8-bit AdamW instead of PyTorch Lightning and
   non-8-bit AdamW.
-- The local loss masks prompt tokens and learns only from response tokens.
-  IBM's released code masks only padding tokens, so its loss also covers the
-  prompt.
+- The local loss deliberately masks prompt tokens and learns only from response
+  tokens. This task-aligned choice treats the document and instruction as
+  conditioning input and focuses training on the structured KVP output. IBM's
+  released code masks only padding tokens, so its loss also covers the prompt.
+  No controlled ablation isolates the effect of this difference.
 - Final type-aware inference and parsing use
   `stage3_mistral_final_inference.py`; `mistral_baseline.py` delegates to
   the same parser.
