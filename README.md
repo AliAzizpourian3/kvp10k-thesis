@@ -99,10 +99,11 @@ QLoRA, Hugging Face Trainer, paged 8-bit AdamW, and response-only loss. The
 released IBM implementation uses Tesseract OCR, bfloat16 LoRA, PyTorch
 Lightning, non-8-bit AdamW, and loss on all non-padding tokens.
 
-Response-only supervision is a deliberate task-aligned choice: the document
-and instruction are conditioning input, while the structured KVP response is
-the prediction target. No controlled ablation isolates its effect on the final
-score.
+The local objective uses response-only supervision: document and instruction
+tokens remain as conditioning context but are masked from the loss, while the
+structured KVP response is supervised. This concentrates the training signal
+on the evaluated output instead of reproducing input tokens. No controlled
+ablation isolates its effect on the final score.
 
 `stage3_mistral_final_inference.py` is the canonical final inference and
 type-aware parser path. `mistral_baseline.py` delegates prediction parsing to

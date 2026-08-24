@@ -77,12 +77,17 @@ differ. The released implementation loads the base model in bfloat16 and uses
 PyTorch Lightning with non-8-bit AdamW, whereas the local implementation uses
 4-bit NF4 QLoRA, Hugging Face Trainer, and paged 8-bit AdamW. The LoRA target
 module names and the prompt/output implementation also differ. Finally, the
-local training loss deliberately masks prompt tokens and learns only from
-response tokens. This task-aligned choice treats the document and instruction
-as conditioning input and focuses optimisation on the structured KVP output.
-The released implementation masks only padding tokens, so its loss also covers
-the prompt. No controlled ablation isolates the effect of this difference;
-numerical proximity must therefore be read as an indicative comparison, not
+local training objective masks prompt tokens and applies the language-model
+loss only to the generated response. This choice reflects the structure of the
+task: the document and instruction serve as conditioning context, whereas the
+structured KVP representation is the prediction target. Applying loss to the
+prompt would also optimise the model to reproduce input tokens that are not
+part of the extraction objective. Response-only supervision therefore
+concentrates the training signal on the output that is evaluated at inference
+time. The released KVP10k implementation instead masks only padding tokens and
+computes loss over both prompt and response tokens. No controlled ablation was
+performed, so the effect of this difference on the final score is not isolated.
+Numerical proximity must therefore be read as an indicative comparison, not
 evidence of strict reproduction.
 
 \begin{figure}[ht]
