@@ -57,6 +57,8 @@ Figure~\ref{fig:stage2_optimal_k} summarizes the selection outcome. The prespeci
     \label{fig:stage2_optimal_k}
 \end{figure}
 
+Table~\ref{tab:clusters} reports the size and geometry profile of each cluster.
+
 \begin{table}[H]
 \centering
 \caption{Page-level geometry-cluster distribution for $k=2$}
@@ -113,14 +115,14 @@ descriptive only and is not used to select $k$.
     \label{fig:stage2_tsne}
 \end{figure}
 
+To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Table~\ref{tab:stage2_cluster_stats} summarize how key geometry statistics differ across clusters.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.90\textwidth]{figures/stage2/feature_distributions.png}
     \caption{Selected geometry-feature distributions for the unique-page clusters.}
     \label{fig:stage2_feature_distributions}
 \end{figure}
-
-To interpret the clusters, Figure~\ref{fig:stage2_feature_distributions} and Table~\ref{tab:stage2_cluster_stats} summarize how key geometry statistics differ across clusters.
 
 \begin{table}[H]
     \centering
@@ -172,10 +174,12 @@ d_{kv} = \sqrt{(x_v - x_k)^2 + (y_v - y_k)^2}
 
 where $(x_k, y_k)$ and $(x_v, y_v)$ are the normalized center coordinates of the key and value boxes.
 
-On a 200-row annotation subset containing 755 links,\footnote{The subset was formed from the first 200 training rows with non-empty annotation lists. It represents 70 unique page hashes, of which 69 contribute coordinate-bearing rows. This exploratory raw-row subset is distinct from the 581-page evaluation set used in Chapter~\ref{ch:exresults}.} linked pairs tend to be proximate: the mean key--value distance is $\mu_d = 0.120$, the median is $\tilde{d} = 0.095$, and the 90th percentile is $d_{90} = 0.239$ (all in normalized coordinate units). The proximity pattern suggests that spatial features may be informative for linking.
+On a 200-row annotation subset containing 755 links,\footnote{The subset was formed from the first 200 training rows with non-empty annotation lists. These rows represent 70 unique page hashes; 69 rows contain usable coordinate information. This exploratory raw-row subset is distinct from the 581-page evaluation set used in Chapter~\ref{ch:exresults}.} linked pairs tend to be proximate: the mean key--value distance is $\mu_d = 0.120$, the median is $\tilde{d} = 0.095$, and the 90th percentile is $d_{90} = 0.239$ (all in normalized coordinate units). The proximity pattern suggests that spatial features may be informative for linking.
 
 \section{Annotation Statistics}
 \label{sec:annotation_stats}
+
+Table~\ref{tab:ann_stats} summarizes the annotation subset.
 
 \begin{table}[h]
 \centering

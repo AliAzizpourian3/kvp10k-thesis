@@ -44,8 +44,8 @@ are consumed in parallel by the entity-classification head and the linker head.
     \node[block, below left=1.2cm and 1.5cm of encoder, fill=orange!15] (entity) {Entity Classifier\\(Key / Value / Other)};
     \node[block, below right=1.2cm and 1.5cm of encoder, fill=red!12] (linker) {Projected Scaled\\Dot-Product Linker\\with Spatial Features};
 
-    % Span grouper (V2 only)
-    \node[block, below=0.8cm of entity, fill=green!12] (spans) {Span Grouper\\(V2 only)};
+    % Span grouper (V2 and V4)
+    \node[block, below=0.8cm of entity, fill=green!12] (spans) {Span Grouper\\(V2 and V4)};
 
     % Output
     \node[io, below=2.35cm of encoder] (output) {KVP Pairs\\(key $\rightarrow$ value)};
@@ -63,7 +63,7 @@ are consumed in parallel by the entity-classification head and the linker head.
   \caption{Overview of the proposed LayoutLMv3 architecture with a projected scaled-dot-product linker.
     Token representations produced by the encoder are fed to two heads:
     an entity classifier (token-level labelling) and a projected scaled-dot-product linker with spatial features
-    (pairwise key--value scoring). In V2, a span grouper merges contiguous
+    (pairwise key--value scoring). In V2 and V4, a span grouper merges contiguous
     same-label tokens into spans before linking.}
   \label{fig:architecture-overview}
 \end{figure}
@@ -243,7 +243,7 @@ spans produces 225 candidates. With 15 positive links, it has 210 negatives and
 a negative-to-positive ratio of approximately $14{:}1$.
 
 % ---------------------------------------------------------------------------
-\section{Span-Level Linker (V2)}
+\section{Span-Level Linker (V2/V4)}
 \label{sec:v2-span-linking}
 
 V2 addresses the granularity mismatch identified in V1 by performing linking
@@ -294,18 +294,18 @@ Figure~\ref{fig:span-grouping} illustrates the span grouping process.
     \node[font=\tiny, above=0.15cm of t1] {O};
     \node[font=\tiny, above=0.15cm of t2] {KEY};
     \node[font=\tiny, above=0.15cm of t3] {KEY};
-    \node[font=\tiny, above=0.15cm of t4] {VAL};
-    \node[font=\tiny, above=0.15cm of t5] {VAL};
-    \node[font=\tiny, above=0.15cm of t6] {VAL};
+    \node[font=\tiny, above=0.15cm of t4] {VALUE};
+    \node[font=\tiny, above=0.15cm of t5] {VALUE};
+    \node[font=\tiny, above=0.15cm of t6] {VALUE};
     \node[font=\tiny, above=0.15cm of t7] {KEY};
     \node[font=\tiny, above=0.15cm of t8] {KEY};
-    \node[font=\tiny, above=0.15cm of t9] {VAL};
+    \node[font=\tiny, above=0.15cm of t9] {VALUE};
 
     % Span row
     \node[span, fill=red!30, below=1.2cm of $(t2)!0.5!(t3)$] (s1) {Key 1:\\``Date :''};
-    \node[span, fill=blue!30, below=1.2cm of t5] (s2) {Val 1:\\``01/15/2024''};
+    \node[span, fill=blue!30, below=1.2cm of t5] (s2) {Value 1:\\``01/15/2024''};
     \node[span, fill=red!30, below=1.2cm of $(t7)!0.5!(t8)$] (s3) {Key 2:\\``Total Amt''};
-    \node[span, fill=blue!30, below=1.2cm of t9] (s4) {Val 2:\\``\$1500''};
+    \node[span, fill=blue!30, below=1.2cm of t9] (s4) {Value 2:\\``\$1500''};
 
     % Arrows
     \draw[arrow] (t2.south) -- (s1.north);
@@ -341,7 +341,7 @@ applied at the span level.
 \subsection{Span-Level Scoring}
 \label{sec:span-scoring}
 
-The span-level projected dot-product scorer operates identically to V1
+The span-level projected scaled-dot-product scorer operates identically to V1
 (Section~\ref{sec:kv-attention}) but over span representations instead of
 token representations. For $K$ key spans and $V$ value spans, the linker
 produces a $K \times V$ score matrix. For illustration, 15 key spans and 15
@@ -463,12 +463,12 @@ In V1, the linker scores all key--value token pairs. A sigmoid threshold of
 0.5 determines valid links; each key is matched to at most one value (the
 highest-scoring valid pair).
 
-\subsection{Linking (V2)}
+\subsection{Linking (V2/V4)}
 \label{sec:v2-linking-inference}
 
-In V2, spans are first formed by the grouping step
+In V2 and V4, spans are first formed by the grouping step
 (Section~\ref{sec:span-grouping}), then span representations are computed via
-mean-pooling. The span-level projected dot-product scorer produces a $K \times V$
+mean-pooling. The span-level projected scaled-dot-product scorer produces a $K \times V$
 score matrix. For each key span, the highest-scoring value span above the fixed
 sigmoid threshold of $0.5$ is selected. If no candidate reaches the threshold,
 the key remains unmatched.

@@ -86,13 +86,13 @@ alternatives rather than additional experimental baselines.
 The review motivates the following research gaps and thesis objectives:
 
 \begin{enumerate}
-    \item \textbf{Controlled evaluation and diagnosis on KVP10k}: This thesis evaluates a LayoutLMv3-based discriminative linker on KVP10k using the released benchmark evaluator, compares token-level and span-level linking, and diagnoses data-pipeline limitations and relation-modeling limitations within the current projected scaled-dot-product linker pipeline.
+    \item \textbf{Controlled evaluation and diagnosis on KVP10k}: This thesis evaluates a LayoutLMv3-based discriminative linker on KVP10k using the released benchmark evaluator, examines token-level and span-level candidate formation through validation diagnostics, and diagnoses data-pipeline limitations and relation-modelling limitations within the current projected scaled-dot-product linker pipeline.
     
-    \item \textbf{Spatial localization vs.\ text accuracy trade-offs}: Generative baselines can achieve strong text extraction, while spatial localisation may be less accurate and generated outputs are not constrained to observed input tokens. Understanding and addressing this trade-off is central to this thesis.
+    \item \textbf{Spatial localisation and text accuracy}: The benchmark reports text-only, location-only, and text+location metrics. This thesis uses these metrics to describe the corresponding performance differences for the reconstructed Mistral baseline and V4.
     
     \item \textbf{Systematic error analysis by annotation geometry}: This thesis further examines how performance varies across exploratory page-level clusters based on annotation-box count, size, and spatial spread.
     
-    \item \textbf{Learned linking for key-value association}: SPADE~\cite{spade} provides token-relation graph modelling, while BROS~\cite{bros} combines relative spatial representations and area-masked pre-training with a SPADE-based relation decoder; neither approach has been evaluated on the larger and more diverse KVP10k benchmark. This thesis examines how token-level and span-level linking affect candidate-space imbalance and linking behaviour within the present KVP10k pipeline.
+    \item \textbf{Learned linking for key-value association}: SPADE~\cite{spade} provides token-relation graph modelling, while BROS~\cite{bros} combines relative spatial representations and area-masked pre-training with a SPADE-based relation decoder; neither approach has been evaluated on the larger and more diverse KVP10k benchmark. This thesis examines how token-level and span-level candidate construction changes the candidate-space imbalance and diagnoses linking behaviour within the present KVP10k pipeline.
 \end{enumerate}
 
 In this thesis, we adopt LayoutLMv3 as the encoder backbone combined with a learned span-level projected scaled-dot-product linker with spatial features. We investigate both token-level (V1) and span-level (V2) linking granularities. SPADE and BROS provide context for relation-based extraction and spatial representations, while contiguous span grouping and its candidate reduction are design choices of the present KVP10k pipeline.

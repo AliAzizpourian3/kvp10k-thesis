@@ -21,9 +21,13 @@ corrected V4 combines those pipeline fixes with correct scheduler accounting,
 full-state resumption, class-aware entity metrics, validation pair-F1 checkpoint
 selection, and aligned early stopping.
 
+V3 was an intermediate diagnostic configuration and has no separate headline
+result; V4 is the final corrected model.
+
 \subsection*{Evaluation Setup}
 
-All official benchmark comparisons use the same evaluation set:
+All direct internal benchmark comparisons between the reconstructed Mistral
+baseline and V4 use the same evaluation set:
 \textbf{581 unique test pages}
 from the KVP10k test split (55\% of 1{,}051 unique pages; limited by PDF
 download failures and scanned pages without text layers). The evaluation
@@ -119,28 +123,28 @@ single-string entry for Unvalued items.}
 \label{fig:stage3-prompt}
 \end{figure}
 
-\subsection*{Result 1: Regular-pair performance and unsupported-prediction audit}
+\subsection*{Result 1: Regular-pair and per-cluster performance}
 \label{sec:res1}
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1: pair-level macro F1 under the released KVP10k benchmark. The reconstructed result uses $n=581$ prepared test pages. Published values are from Naparstek et al.\ (2024), Table~1, and use the evaluation coverage reported in the paper.}
+  \caption{Experiment~1: pair-level macro F1 under the released KVP10k benchmark. The reconstructed result uses $n=581$ prepared test pages. Published values are from Naparstek et al.\ (2024)~\cite{kvp10k}, Table~1, and use the evaluation coverage reported in the paper.}
   \label{tab:exp1-overall}
   \begin{tabular}{@{}llccc@{}}
     \toprule
     \textbf{Category} & \textbf{System} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
-    Regular  & KVP10k paper & 0.659 & 0.650 & 0.611 \\
-             & Mistral (ours) & 0.769 & 0.699 & 0.662 \\
+    Regular  & Published KVP10k baseline & 0.659 & 0.650 & 0.611 \\
+             & Reconstructed Mistral & 0.769 & 0.699 & 0.662 \\
     \midrule
-    Unkeyed  & KVP10k paper & 0.601 & 0.653 & 0.584 \\
-             & Mistral (ours) & 0.699 & 0.700 & 0.646 \\
+    Unkeyed  & Published KVP10k baseline & 0.601 & 0.653 & 0.584 \\
+             & Reconstructed Mistral & 0.699 & 0.700 & 0.646 \\
     \midrule
-    Unvalued & KVP10k paper & 0.601 & 0.618 & 0.588 \\
-             & Mistral (ours) & 0.751 & 0.700 & 0.669 \\
+    Unvalued & Published KVP10k baseline & 0.601 & 0.618 & 0.588 \\
+             & Reconstructed Mistral & 0.751 & 0.700 & 0.669 \\
     \midrule
-    All      & KVP10k paper & 0.643 & 0.661 & 0.612 \\
-             & Mistral (ours) & 0.752 & 0.718 & 0.673 \\
+    All      & Published KVP10k baseline & 0.643 & 0.661 & 0.612 \\
+             & Reconstructed Mistral & 0.752 & 0.718 & 0.673 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -163,13 +167,6 @@ reproducing them exactly.
 
 Final evaluation uses the type-aware output parser, which distinguishes
 regular, unkeyed, and unvalued generated entries before benchmark scoring.
-
-For Regular text+location matching, the reconstructed Mistral baseline has
-macro precision $0.661$ and recall $0.663$, indicating a nearly balanced result.
-V4 has precision $0.371$ and recall $0.323$ under the same Regular
-text+location criterion. The lower V4 recall is consistent with the observed
-missed-link cases, while its moderate precision also shows that incorrect links
-remain substantial.
 
 \paragraph{Per-cluster breakdown.}
 \label{sec:stage3-per-cluster}
@@ -208,9 +205,7 @@ F1 calculation. These pages must not be interpreted as a third performance
 regime. The overall benchmark values in Table~\ref{tab:exp1-overall} are
 unchanged because only the grouping was recomputed.
 
-\textbf{Motivation for Experiment 2:} A discriminative model that classifies
-extracted tokens while using their spatial positions can constrain its textual
-predictions to observed input tokens rather than generating free-form text.
+This output constraint motivates the discriminative model in Experiment~2.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 2: Layout-Aware Entity Classification (Stage 4a)}
@@ -245,9 +240,7 @@ that appear in the document; it has no mechanism for generating text absent
 from the extracted input. It can, however, still assign the wrong label to an
 observed token.
 
-\textbf{Motivation for Experiment 3:} Stage~4a provides the entity-pretraining
-phase; Experiment~3 then introduces the relation-linking task of pairing
-predicted keys with their corresponding values.
+Experiment~3 introduces relation linking after the entity-classification stage.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 3: Token-Level Linking (V1)}
@@ -275,12 +268,8 @@ availability. These are internal diagnostics, not official benchmark results.
 The token-level formulation produces a dense candidate matrix with very few
 positive relations, which motivates span-level linking.
 
-\textbf{Motivation for Experiment 4:} One motivation for V2 is to reduce the
-candidate space by grouping contiguous key and value tokens into spans before
-relation scoring. In this illustrative example, the candidate space decreases
-from $\sim$10{,}000 to $\sim$225 entries. With 15 positive links, the
-illustrative 225-candidate case has
-210 negatives, or approximately $14{:}1$.
+Experiment~4 groups contiguous key and value tokens into spans to reduce the
+candidate space.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 4: Span-Level Linking (V2)}
@@ -392,9 +381,8 @@ ability to distinguish the annotated relation from other candidate span pairs.
 Table~\ref{tab:diagnostic-verification} is a diagnostic verification summary,
 not an ablation, and therefore cannot attribute effects to any single
 correction. In V4, all three corrections are applied jointly. The reported V4
-results therefore demonstrate pipeline repair as a whole rather than each
-correction's independent numerical contribution; isolating individual effects
-requires dedicated ablations outside the scope of this thesis.
+result therefore reflects the jointly corrected pipeline and does not measure
+the independent effect of any one correction.
 
 % ---------------------------------------------------------------------------
 \section{Experiment 8: Final Corrected Model (V4)}
@@ -446,6 +434,13 @@ F1~=\VFourTestTextFOne{} for text, \VFourTestLocationFOne{} for location, and
     \bottomrule
   \end{tabular}
 \end{table}
+
+For Regular text+location matching, the reconstructed Mistral baseline has
+macro precision $0.661$ and recall $0.663$, indicating a nearly balanced result.
+V4 has precision $0.371$ and recall $0.323$ under the same Regular
+text+location criterion. The lower V4 recall is consistent with the observed
+missed-link cases, while its moderate precision also shows that incorrect links
+remain substantial.
 
 Reconstructed Mistral remains stronger, with Regular text+location
 F1~=0.662. The final V4 combines several pipeline, training, and selection
@@ -594,7 +589,7 @@ locally available pages and are directly comparable to each other.
     \toprule
     \textbf{Model} & \textbf{Corrected entity micro F1} & \textbf{Regular pair F1 (Text / Text+location)} & \textbf{Key Finding} \\
     \midrule
-    KVP10k paper baseline     & ---   & 0.659 / 0.611 & Published generative system \\
+    Published KVP10k baseline     & ---   & 0.659 / 0.611 & Published generative system \\
     Exp 1: Mistral-7B        & ---   & 0.769 / 0.662 & Re-implementation; final type-aware parser \\
     Exp 2: Stage~4a (entity pre-training) & \multicolumn{2}{c}{No reportable score} & Checkpoint unavailable; legacy score omitted \\
     Exp 3: V1 token linking & \multicolumn{2}{c}{Validation diagnostic} & Dense token candidate space \\
