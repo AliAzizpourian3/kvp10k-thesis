@@ -71,7 +71,7 @@ The historical `density` feature was removed because it duplicated
 Converts raw KVP10k pages into prepared JSON files for Stage 4 training:
 
 1. Download PDF from HuggingFace image URL
-2. Render page at 300 DPI with PyMuPDF (native text extraction, no Tesseract dependency)
+2. Extract words and word-level boxes from the native PDF text layer with PyMuPDF (no Tesseract dependency)
 3. Fuse extracted words with annotation bounding boxes (word-match threshold = 0.6)
 4. Produce LMDX-format text and ground-truth KVP labels
 
@@ -81,6 +81,9 @@ and typed `gt_kvps` entries. Ground-truth entries use the official `kvp`,
 `unkeyed`, or `unvalued` type and nested text and bounding-box fields.
 
 Dataset sizes after preparation: **5,389 train** / **581 test**.
+The Stage 3 loader skips 404 prepared training pages with empty targets, so
+Mistral training uses **4,985 pages**, or **51.6%** of the 9,656-page official
+training split.
 
 ### Nearest-Neighbour Baseline (`baselines.py`)
 
