@@ -14,10 +14,11 @@ fine-tuned for both tasks on the KVP10k dataset.
 We investigate two linking granularities: \textbf{V1 (token-level)}, where
 every key token is scored against every value token, and \textbf{V2
 (span-level)}, where contiguous same-label tokens are first grouped into
-spans before pairwise scoring. The span-level approach draws its segment-level motivation from
-SPADE~\cite{spade}. BROS~\cite{bros} provides complementary motivation through
-sparse linking over entity-initial positions and spatially informed
-representations (Section~\ref{subsec:entity_linking}).
+spans before pairwise scoring. SPADE~\cite{spade} provides context through its
+directed token-relation graph, while BROS~\cite{bros} combines relative spatial
+representations and area-masked pre-training with a SPADE-based relation
+decoder (Section~\ref{subsec:entity_linking}). Grouping contiguous KEY/VALUE
+tokens before scoring is a design decision of the present pipeline.
 
 Figure~\ref{fig:architecture-overview} provides a schematic overview.
 The encoder receives token sequences together with 2D bounding-box coordinates
@@ -246,9 +247,11 @@ a negative-to-positive ratio of approximately $14{:}1$.
 \label{sec:v2-span-linking}
 
 V2 addresses the granularity mismatch identified in V1 by performing linking
-at the \emph{span} level rather than the token level. SPADE~\cite{spade}
-provides the segment-level motivation, while BROS~\cite{bros} motivates sparse
-entity-initial linking and spatially informed representations.
+at the \emph{span} level rather than the token level. This contiguous-span
+construction reduces the candidate matrix and is specific to the present
+implementation. SPADE~\cite{spade} and BROS~\cite{bros} provide broader
+methodological context for learned token relations and spatially informed
+representations, respectively.
 
 \subsection{Span Grouping}
 \label{sec:span-grouping}

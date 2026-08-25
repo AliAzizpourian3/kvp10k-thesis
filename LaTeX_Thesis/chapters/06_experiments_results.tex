@@ -55,17 +55,20 @@ LoRA rank $r=4$, $\alpha=4$) on LMDX-formatted document prompts, where each
 line-like text block is represented as \texttt{text x1|y1|x2|y2} in normalised
 coordinates. The model generates KVP predictions as structured text
 output. It is trained for a fixed eight epochs with learning rate
-$5 \times 10^{-4}$ using only the prepared training data. After training is
-complete, the final model generates predictions for the 581 prepared held-out
-test pages, which are then scored with the released KVP10k evaluator.
+$5 \times 10^{-4}$ using 4{,}985 prepared pages with non-empty targets. The
+loader skips 404 other prepared pages whose targets are empty. After training
+is complete, the final model generates predictions for the 581 prepared
+held-out test pages, which are then scored with the released KVP10k evaluator.
 
 The exact prompt template is shown in Figure~\ref{fig:stage3-prompt}. It follows
 the LMDX paradigm~\cite{lmdx} used by the KVP10k baseline --- a document
 representation with text-block coordinates followed by a task instruction
 requesting a Python list-of-lists output. The released KVP10k repository
 contains the original prompt implementation. The local template retains its
-document and task structure but modifies the detailed output instruction to
-require two strings with quantised bounding boxes.
+document and task structure but adapts the detailed output contract. Regular
+entries contain located key and value strings, Unkeyed entries contain a
+category label and a located value, and Unvalued entries contain one located
+key because no value is present.
 
 Several local settings match the released configuration: LoRA rank $r=4$,
 $\alpha=4$, dropout $0.05$, learning rate $5\times10^{-4}$, seed 0, maximum
@@ -110,7 +113,9 @@ format: left|top|right|bottom.
 \end{verbatim}
 \end{minipage}
 \caption{Stage~3 LMDX prompt template. \texttt{\{lmdx\_text\}} is replaced by the
-text-block-and-coordinate representation of the page.}
+text-block-and-coordinate representation of the page. The literal two-string
+instruction describes paired outputs; the training serializer uses a
+single-string entry for Unvalued items.}
 \label{fig:stage3-prompt}
 \end{figure}
 
@@ -119,7 +124,7 @@ text-block-and-coordinate representation of the page.}
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1: pair-level macro F1 under the released KVP10k benchmark ($n=581$ available test pages). Published values are from Naparstek et al.\ (2024), Table~1.}
+  \caption{Experiment~1: pair-level macro F1 under the released KVP10k benchmark. The reconstructed result uses $n=581$ prepared test pages. Published values are from Naparstek et al.\ (2024), Table~1, and use the evaluation coverage reported in the paper.}
   \label{tab:exp1-overall}
   \begin{tabular}{@{}llccc@{}}
     \toprule
@@ -140,8 +145,9 @@ text-block-and-coordinate representation of the page.}
   \end{tabular}
 \end{table}
 
-\noindent\emph{Note:} Internal Mistral and V4 results use the same 581
-pages. The published result is provided for context.
+\noindent\emph{Note:} The $n=581$ subset applies only to the internal Mistral
+and V4 results. The published result is provided for context and does not use
+this internal prepared subset.
 
 On the prepared 581-page test subset, the reconstructed Mistral baseline
 reaches Regular F1 values of $0.769$ for text, $0.699$ for location, and
@@ -151,8 +157,9 @@ values are numerically higher than the published baseline values on the
 corresponding categories. They do not, however, establish superiority over the
 published system under equivalent conditions. The local pipeline evaluates
 only the 581 test pages that survive PDF retrieval and native-text preparation,
-uses PyMuPDF text rather than the paper's OCR-based input, and reconstructs the
-prompt and fine-tuning implementation rather than reproducing them exactly.
+uses PyMuPDF text rather than the OCR-based input used in the paper, and uses an
+adapted prompt/output contract and fine-tuning implementation rather than
+reproducing them exactly.
 
 Final evaluation uses the type-aware output parser, which distinguishes
 regular, unkeyed, and unvalued generated entries before benchmark scoring.

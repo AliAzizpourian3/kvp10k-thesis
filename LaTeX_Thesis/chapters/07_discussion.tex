@@ -31,9 +31,11 @@ consistent with token-level class imbalance and a mismatch between token-level
 candidates and span-level relations.
 The illustrative ratio of approximately $500{:}1$ shows the severity of the
 token-level candidate imbalance and why it remains challenging even with
-positive-class weighting. SPADE~\cite{spade} provides a segment-level relation
-formulation, while BROS~\cite{bros} uses sparse linking between entity-initial
-positions. Both provide alternatives to dense token-to-token relation scoring.
+positive-class weighting. SPADE~\cite{spade} provides a relation formulation
+operating over document tokens, while BROS~\cite{bros} combines relative
+spatial representations with a SPADE-based relation decoder. Both provide
+relation-based context, but neither defines the contiguous-span candidate
+reduction used in this thesis.
 
 \subsection{Comparison to Baselines}
 
@@ -183,9 +185,9 @@ additional experimental baselines.
 
 SPADE and BROS are evaluated on document-understanding benchmarks other than
 KVP10k, so their reported numbers are not directly comparable with the results
-in this thesis. SPADE's segment-level dependency formulation and BROS's sparse
-entity-initial linking objective nevertheless provide relevant methodological
-context for reducing dense token-to-token relation scoring.
+in this thesis. The SPADE token-level dependency graph and the BROS relative
+spatial encoding, area-masked pre-training, and SPADE-based decoder nevertheless
+provide relevant methodological context for relation-based document extraction.
 
 \section{Limitations and Future Work}
 \label{sec:limitations}
@@ -195,13 +197,17 @@ context for reducing dense token-to-token relation scoring.
 Several limitations constrain the interpretation of the results. First, the
 prepared development pool contains 5{,}389 usable pages from the 9{,}656 unique
 pages in the official KVP10k training split, or 55.8\%. The fixed seed-42 split
-then uses 4{,}851 pages for model training and 538 for validation. Some PDFs
-were unavailable or broken, and others had no usable text layer. The pipeline uses PyMuPDF native PDF text extraction rather
-than OCR, so scanned pages without a text layer are excluded.
+then uses 4{,}851 pages for model training and 538 for validation. The Stage~3
+loader separately skips 404 prepared pages with empty targets, so Mistral
+training uses 4{,}985 pages, or 51.6\% of the official training split. Some
+PDFs were unavailable or broken, and others had no usable text layer. The
+pipeline uses PyMuPDF native PDF text extraction rather than OCR, so scanned
+pages without a text layer are excluded.
 
 Second, the reconstructed Mistral baseline is a re-implementation rather than
-an exact reproduction. Its LoRA rank, prompt details, input extraction, and
-training coverage are not confirmed to match the published system. Third, V4
+an exact reproduction. Its verified LoRA rank $r=4$ matches the released
+configuration, while its prompt/output details, input extraction, and training
+coverage differ. Third, V4
 uses constant blank visual input. It evaluates textual and layout features but
 not document-specific image features. Fourth, inputs are limited to 512 tokens
 and one page. Truncation can remove later content, and the current architecture

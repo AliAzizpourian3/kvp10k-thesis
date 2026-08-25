@@ -304,7 +304,8 @@ and 20 best-per-key predictions have sigmoid probability at least 0.5. âœ…
 - Final type-aware inference and parsing use
   `stage3_mistral_final_inference.py`; `mistral_baseline.py` delegates to
   the same parser.
-- Stage 3 training uses only the prepared training split for the fixed eight
+- The Stage 3 loader scans 5,389 prepared training pages and skips 404 pages
+  with empty targets. Training therefore uses 4,985 pages for the fixed eight
   epochs; the held-out test split is accessed only afterward for final
   prediction and benchmark evaluation.
 
@@ -339,7 +340,9 @@ Our Mistral is a **re-implementation, not a reproduction** of Naparstek et al. â
 Confounds that make our Regular text/combined F1 of 0.769/0.662 versus the
 paper's 0.659/0.611 only partially comparable:
 - Text source: **PyMuPDF native PDF text extraction**, not OCR and not the paper's exact pipeline.
-- **Coverage**: trained on 55.8% of usable train pages (broken PDFs dropped).
+- **Coverage**: preparation retained 5,389 of 9,656 training pages (55.8%). The
+  Stage 3 loader then skipped 404 empty-target pages, so Mistral training used
+  4,985 pages, or 51.6% of the official training split.
 - The local and released configurations share rank 4, alpha 4, dropout 0.05,
   learning rate 5e-4, seed 0, maximum length 8,192, eight epochs, batch 1, and
   gradient accumulation 4.
