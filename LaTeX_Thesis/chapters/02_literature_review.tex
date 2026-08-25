@@ -4,9 +4,14 @@
 \section{Document Understanding}
 \label{sec:doc_understanding}
 
-Document understanding — the task of extracting structured information from unstructured document images — is a foundational problem in information extraction and enterprise automation. Early systems relied on hand-crafted rules; modern approaches leverage deep learning and pre-training to achieve better generalization.
-
-Early document understanding systems relied on hand-crafted rules and template matching, where documents were processed using predefined spatial zones or keyword dictionaries. OCR engines such as Tesseract provided raw text extraction, but structural understanding — identifying which text belongs to which field — required manual layout rules per document type. These systems generalize poorly: a rule designed for one invoice format breaks on a different vendor's layout. Heuristic approaches such as regular expressions or nearest-neighbor text pairing remain useful lower bounds but cannot handle layout diversity at scale.
+Document understanding—the task of extracting structured information from
+unstructured document images—is a foundational problem in information
+extraction and enterprise automation. Early systems combined OCR with
+hand-crafted rules, template matching, predefined spatial zones, and keyword
+dictionaries. Because these rules were specific to document types or layouts,
+they generalized poorly when formats changed. Regular expressions and
+nearest-neighbor text pairing remain useful lower bounds but do not handle
+layout diversity at scale.
 
 Convolutional neural networks were first applied to document images for classification tasks, treating the document as a visual object. Recurrent models such as LSTMs were later used to model sequential token dependencies in OCR output. A major shift came with the Transformer architecture, which replaced recurrence with self-attention for sequence modelling~\cite{vaswani2017attention}. Later document models extended this architecture to combine textual information with layout and visual features.
 
