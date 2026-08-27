@@ -222,8 +222,8 @@ historical name only for checkpoint compatibility.
 Eight geometric features are computed per (key, value) token pair: horizontal
 and vertical centre displacement $(\Delta x, \Delta y)$, Euclidean distance,
 angle $\theta = \text{atan2}(\Delta y, \Delta x)$, horizontal and vertical
-bounding-box overlap ratios, relative area ratio, and relative aspect-ratio
-ratio. These are encoded by a two-layer MLP with ReLU activations into a
+bounding-box overlap ratios, relative area ratio, and the ratio of aspect
+ratios. These are encoded by a two-layer MLP with ReLU activations into a
 32-dimensional vector, which is concatenated with the semantic scalar before
 a final MLP produces the link score $s_{i,j}$.
 
