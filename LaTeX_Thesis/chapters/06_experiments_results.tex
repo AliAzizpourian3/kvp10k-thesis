@@ -55,7 +55,11 @@ separation. They do not represent verified document genres.
 
 The reconstructed reference system and its fixed eight-epoch training,
 inference, parser, and output format are defined in
-Section~\ref{sec:mistral-implementation}. The final clean inference run produces
+Section~\ref{sec:mistral-implementation}.
+In the local reconstruction, prompt and padding tokens are masked from the
+causal language-model loss, so only the serialised response contributes to
+training; Section~5.3.3 gives the complete training setup.
+The final clean inference run produces
 predictions for all 581 prepared test pages. No validation or test metric was
 used to select its final training checkpoint.
 
