@@ -118,7 +118,7 @@ parser errors.
 \label{sec:mistral-training}
 
 The reconstructed reference system fine-tunes
-\texttt{mistralai/Mistral-7B-Instruct-v0.2}~\cite{mistral}. QLoRA loads the
+\texttt{mistralai/}\linebreak[4]\texttt{Mistral-7B-Instruct-v0.2}~\cite{mistral}. QLoRA loads the
 base model with 4-bit NormalFloat4 quantisation, double quantisation, and
 bfloat16 computation~\cite{qlora}. LoRA adapters use rank $r=4$, scaling
 parameter $\alpha=4$, dropout $0.05$, and no bias~\cite{lora}. They target the
@@ -290,7 +290,7 @@ relation parameters and does not reuse the linker from an earlier joint
 checkpoint.
 
 V4 uses fp32 precision, batch size 1, gradient accumulation over 8 batches,
-AdamW~\cite{loshchilov2019decoupled}, learning rate $2\times10^{-5}$, weight
+AdamW \cite{loshchilov2019decoupled}, learning rate $2\times10^{-5}$, weight
 decay $0.01$, and relation-loss weight 5.0. The maximum is 30 epochs. The
 scheduler advances once per optimiser update. With 4{,}851 training
 microbatches, each epoch contains

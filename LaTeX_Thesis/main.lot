@@ -9,7 +9,7 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Pair-level macro F1 under the released KVP10k benchmark. The reconstructed Mistral result uses 581 prepared test pages. Published values are from Naparstek et al.~\blx@tocontentsinit {0}\cite {kvp10k}, Table~1, and use the evaluation coverage reported in that paper.}}{48}{table.caption.24}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Pair-level macro F1 under the released KVP10k benchmark. The reconstructed Mistral result uses 581 prepared test pages. Published values are from Naparstek et al.~\blx@tocontentsinit {0}\cite {kvp10k}, Table~1, and use the evaluation coverage reported in that paper.}}{49}{table.caption.24}%
 \contentsline {table}{\numberline {6.2}{\ignorespaces Relation-label units in the 20-document validation audit.}}{52}{table.caption.25}%
 \contentsline {table}{\numberline {6.3}{\ignorespaces Final V4 Regular macro F1 for validation-selected checkpoint~15.}}{52}{table.caption.26}%
 \contentsline {table}{\numberline {6.4}{\ignorespaces Direct Regular comparison on the same 581 prepared test pages. Text+location columns report macro precision, recall, and F1.}}{53}{table.caption.27}%

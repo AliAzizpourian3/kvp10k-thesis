@@ -88,8 +88,8 @@
 \contentsline {chapter}{\numberline {6}Experiments and Results}{47}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Evaluation Scope and Evidence}{47}{section.6.1}%
 \contentsline {section}{\numberline {6.2}Reconstructed Mistral-7B Reference Results}{48}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Discriminative-Model Development}{49}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Entity-Classification Initialisation}{49}{subsection.6.3.1}%
+\contentsline {section}{\numberline {6.3}Discriminative-Model Development}{48}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Entity-Classification Initialisation}{48}{subsection.6.3.1}%
 \contentsline {subsection}{\numberline {6.3.2}Token-Level Candidate Construction (V1)}{49}{subsection.6.3.2}%
 \contentsline {subsection}{\numberline {6.3.3}Span-Level Candidate Construction (V2) and Predicted-Span Diagnostic (V3)}{50}{subsection.6.3.3}%
 \contentsline {section}{\numberline {6.4}Diagnostic Pipeline Analysis}{50}{section.6.4}%
@@ -109,9 +109,9 @@
 \contentsline {subsection}{\numberline {7.1.1}Entity Classification and Pair Extraction}{57}{subsection.7.1.1}%
 \contentsline {subsection}{\numberline {7.1.2}Candidate Granularity and Development Evidence}{58}{subsection.7.1.2}%
 \contentsline {subsection}{\numberline {7.1.3}System-Level Comparison and Output Coverage}{58}{subsection.7.1.3}%
-\contentsline {subsection}{\numberline {7.1.4}Annotation-Geometry Strata}{58}{subsection.7.1.4}%
+\contentsline {subsection}{\numberline {7.1.4}Annotation-Geometry Strata}{59}{subsection.7.1.4}%
 \contentsline {section}{\numberline {7.2}Interpretation of Development Diagnostics}{59}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Qualitative Error Analysis}{59}{section.7.3}%
+\contentsline {section}{\numberline {7.3}Qualitative Error Analysis}{60}{section.7.3}%
 \contentsline {section}{\numberline {7.4}Relation-Modeling Context and Experimental Scope}{60}{section.7.4}%
 \contentsline {section}{\numberline {7.5}Limitations and Future Work}{60}{section.7.5}%
 \contentsline {subsection}{\numberline {7.5.1}Current Limitations}{60}{subsection.7.5.1}%

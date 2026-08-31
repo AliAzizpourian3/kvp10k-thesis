@@ -19,9 +19,8 @@ entity F1 measures whether individual tokens are classified correctly as
 span construction and correct relation linking. The two values therefore
 cannot be compared directly as a measure of linker quality. Nevertheless, the
 substantially lower pair-level result, together with the verified checkpoint-15
-examples in Table~\ref{tab:v4-qualitative-errors}, is consistent with errors
-arising after entity classification during span construction and relation
-decoding. The available evidence cannot
+examples, is consistent with errors arising after entity classification during
+span construction and relation decoding. The available evidence cannot
 determine how much of this loss is caused by the linker itself versus upstream
 entity-label or span-boundary errors.
 
@@ -61,14 +60,6 @@ output representation.
 The local Mistral result is also not directly comparable with the published
 KVP10k Mistral-7B baseline because the page coverage, extracted input text,
 prompt, and fine-tuning implementation differ.
-The numerically higher local score may reflect differences in page coverage,
-input-text extraction, prompting, fine-tuning, or output handling. The prepared
-subset is non-random (Section~\ref{sec:kvp10k}), and the reconstruction uses
-native PDF text rather than the published OCR input
-(Section~\ref{sec:text-processing}), but the present experiments do not
-establish the direction or magnitude of these potential effects. A controlled
-comparison using identical pages, input text, and training conditions would be
-required to explain the numerical difference.
 
 V4's direct decoder supports Regular pairs only. This output restriction
 contributes to its All text+location F1 of $0.214$ because it emits no Unkeyed
@@ -128,7 +119,7 @@ the difference between entity and pair metrics cannot be assigned to the
 linker alone. The selected cases are illustrative rather than a statistical
 sample, and annotation ambiguity limits conclusions from individual examples.
 
-\section[Relation-Modeling Context and Experimental Scope]{Relation-Modeling Context\\and Experimental Scope}
+\section{Relation-Modeling Context and Experimental Scope}
 \label{sec:relation_context}
 
 The dense V1 candidate space and the verified V4 case involving a competing
