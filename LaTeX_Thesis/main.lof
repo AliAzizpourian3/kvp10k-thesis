@@ -1,19 +1,16 @@
-\babel@toc {english}{}\relax 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Overview of the proposed LayoutLMv3 + Biaffine Linker architecture. Token representations produced by the encoder are fed to two heads: an entity classifier (token-level labelling) and a biaffine linker (pairwise key--value scoring). In V2, a span grouper merges contiguous same-label tokens into spans before linking.}}{12}{figure.caption.8}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Span grouping: contiguous tokens with the same entity label are merged into spans. The span representation is the mean pool of constituent token hidden states; the span bounding box is the union of constituent token boxes.}}{15}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Two illustrative KVP10k test pages with polygon annotation overlays. Red outlines mark annotated regions. The pages are used later to illustrate the fitted annotation-geometry groups.}}{15}{figure.caption.4}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Cluster-count diagnostics for the annotation-geometry analysis: silhouette score, Davies--Bouldin index, Calinski--Harabasz score, and inertia.}}{17}{figure.caption.6}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces PCA visualization of the $k=2$ unique-page geometry clusters.}}{18}{figure.caption.8}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Exploratory t-SNE projection of 3{,}000 unique coordinate-bearing training pages.}}{19}{figure.caption.9}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Selected geometry-feature distributions for the unique-page clusters.}}{20}{figure.caption.10}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Stage 2 layout clustering. We select the number of clusters using multiple criteria and report the final cluster size distribution.}}{21}{figure.caption.20}%
-\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Optimal $k$ selection across metrics.}}}{21}{subfigure.1.1}%
-\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Cluster size distribution for the chosen $k=2$.}}}{21}{subfigure.1.2}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces PCA visualization of the $k=2$ layout clusters based on standardized layout features.}}{22}{figure.caption.22}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Feature distributions by cluster for selected layout features (Stage 2).}}{22}{figure.caption.23}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Summary statistics of selected layout features per cluster (mean and standard deviation).}}{23}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Architecture overview and variant paths. The LayoutLMv3-base encoder is a pretrained component from prior work. The entity classifier, projected scaled-dot-product linker with spatial features, and span grouper are task-specific implementations developed for this thesis; the general scaled-dot-product principle is prior work. V1 routes token candidates directly to the linker. V2 and V4 use span candidates. V3 reuses the span path with predicted spans while keeping the encoder and classifier frozen and updating only the linker. During V4 training, ground-truth labels supply the spans; during inference, predicted labels supply them.}}{24}{figure.caption.13}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Span grouping: contiguous tokens with the same entity label are merged into spans. The span representation is the mean pool of constituent token hidden states; the span bounding box is the union of constituent token boxes.}}{31}{figure.caption.21}%
 \addvspace {10\p@ }
-\addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Prompt template used by the reconstructed Mistral-7B reference system. \texttt {\{lmdx\_text\}} is replaced by the page representation. The literal two-string instruction describes paired outputs. The target serializer and final parser also support a single located key for an Unvalued item.}}{39}{figure.caption.23}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

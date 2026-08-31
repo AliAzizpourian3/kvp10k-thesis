@@ -3,7 +3,7 @@
 
 \begin{center}
   \bfseries
-  {\selectlanguage{german}\"Ubersicht}
+  {\selectlanguage{german}Zusammenfassung}
 \end{center}
 \normalfont
 
@@ -11,7 +11,33 @@
 
 {\selectlanguage{german}
 
-Diese Arbeit untersucht die automatische Extraktion von Schlüssel-Wert-Paaren aus Geschäftsdokumenten mit generativen und layoutbewussten diskriminativen Ansätzen. Das diskriminative System kombiniert einen LayoutLMv3-Base-Encoder, Token-Klassifikation und eine Span-basierte Schlüssel-Wert-Verknüpfung. Es verwendet extrahierten Text und Begrenzungsrahmen mit einer konstanten leeren visuellen Eingabe und nutzt daher keine dokumentspezifischen Bildinformationen. Das finale V4-Modell wird anhand des makrogemittelten Regular-Text+Lage-F1 auf den Validierungsdaten ausgewählt und anschließend auf der vorbereiteten Teilmenge von 581 Seiten aus dem zurückgehaltenen KVP10k-Testsatz mit dem veröffentlichten Benchmark-Protokoll bewertet. V4 erreicht für reguläre Paare F1-Werte von 0,392 für Text, 0,446 für Lage und 0,345 für die kombinierte Text- und Lagebewertung. Die Mikro- und Makro-F1-Werte der Entitätsklassifikation betragen 0,792 beziehungsweise 0,772. Die rekonstruierte Mistral-Baseline erreicht auf demselben vorbereiteten Testsatz einen höheren kombinierten Regular-F1-Wert von 0,662. Obwohl die Entitäts- und Paarmetriken nicht direkt vergleichbar sind, deuten die Entitätsergebnisse und die qualitative Fehleranalyse darauf hin, dass die Relationsverknüpfung weiterhin eine wesentliche Einschränkung der diskriminativen Pipeline darstellt.
+Diese Arbeit untersucht die automatische Extraktion von Schlüssel-Wert-Paaren
+(KVP) aus Geschäftsdokumenten. Die Aufgabe besteht darin, Schlüssel- und
+Werttexte, ihre Begrenzungsrahmen und die Beziehungen zu erkennen, aus denen
+strukturierte Einträge entstehen. Die Experimente verwenden vorbereitete Teilmengen von KVP10k, einem
+Open-Vocabulary-Benchmark mit vollständigen Schlüssel-Wert-Paaren (Regular)
+sowie Einträgen, die nur einen Schlüssel oder nur einen Wert enthalten. Zwei
+Ansätze werden mit dem veröffentlichten KVP10k-Evaluator auf derselben
+vorbereiteten Testteilmenge von 581 Seiten verglichen. Das rekonstruierte
+Mistral-7B-Referenzsystem basiert auf der veröffentlichten generativen
+KVP10k-Baseline und erzeugt strukturierte Einträge. Das finale
+LayoutLMv3-basierte diskriminative Span-Modell (V4) kombiniert einen
+vortrainierten LayoutLMv3-Base-Encoder, Token-Klassifikation und Span-basierte
+Verknüpfung. Es verwendet extrahierten Text und Begrenzungsrahmen mit einer
+konstanten leeren visuellen Eingabe und nutzt daher keine dokumentspezifischen
+Bildinformationen. V4 erreicht für Regular-Paare F1-Werte von 0,365 für Text,
+0,491 für Lage und 0,329 für Text+Lage. Das rekonstruierte
+Mistral-7B-Referenzsystem erreicht für Regular-Text+Lage einen F1-Wert von
+0,657. Auf den Validierungsdaten erreicht V4 bei der Entitätsklassifikation auf
+Tokenebene Mikro- und Makro-F1-Werte von 0,813 beziehungsweise 0,795. Die
+Validierungsergebnisse der Entitätsklassifikation und die qualitative Analyse
+gespeicherter Testvorhersagen deuten darauf hin, dass der Übergang von der
+Entitätsklassifikation zur vollständigen Paarextraktion eine wesentliche interne
+Einschränkung darstellt. Da Entitätsklassifikation und Paarextraktion
+unterschiedlich evaluiert werden, kann das niedrigere Ergebnis der
+Paarextraktion nicht allein dem Relationslinker zugeschrieben werden; Fehler in
+Entitätslabels und Spangrenzen können ebenfalls dazu führen, dass Paare nicht
+korrekt extrahiert werden.
 }
 
 \clearpage

@@ -5,13 +5,18 @@ The following listings are excerpts from the implementation used for the
 experiments. They are embedded here so that the appendix remains self-contained
 when the thesis is compiled without the repository's Python source tree.
 
-\section{Evaluation Metrics}
+\section{Normalized Edit Distance}
 \label{app:metrics}
 
 These listings supplement the evaluation protocol in
 Section~\ref{sec:evaluation-protocol}.
 
 \begin{lstlisting}[language=Python,
+  basicstyle=\ttfamily\fontsize{7.5}{8.6}\selectfont,
+  aboveskip=0.25\baselineskip,
+  xleftmargin=22pt,
+  framexleftmargin=19pt,
+  numbersep=6pt,
   caption={Normalized Edit Distance implementation from \texttt{metrics.py}}]
 def normalized_edit_distance(pred: str, target: str) -> float:
     """Return Levenshtein distance normalized by maximum length."""
@@ -38,7 +43,12 @@ def normalized_edit_distance(pred: str, target: str) -> float:
     return dp[m][n] / max(m, n)
 \end{lstlisting}
 
+\section{Intersection over Union}
+
 \begin{lstlisting}[language=Python,
+  xleftmargin=22pt,
+  framexleftmargin=19pt,
+  numbersep=6pt,
   caption={Intersection over Union implementation from \texttt{metrics.py}}]
 def intersection_over_union(box1, box2):
     """Return IoU for boxes in [x_min, y_min, x_max, y_max] form."""
@@ -64,11 +74,18 @@ def intersection_over_union(box1, box2):
 
 This listing supplements the cluster-assignment procedure in
 Section~\ref{subsec:cluster_use}. The following excerpt assumes that the
-prepared dataset, page groups, and training-fitted Stage~2 artifact (including
-its scaler and k-means model) have already been loaded.
+prepared dataset, page groups, and training-fitted annotation-geometry
+clustering artifact (including its scaler and k-means model) have already been
+loaded.
 
 \begin{lstlisting}[language=Python,
-  caption={Assignment of test pages with the frozen Stage~2 scaler and k-means model}]
+  basicstyle=\ttfamily\fontsize{6.5}{7.2}\selectfont,
+  aboveskip=0.25\baselineskip,
+  xleftmargin=22pt,
+  framexleftmargin=19pt,
+  numbersep=6pt,
+  caption={Assignment of test pages with the frozen training-fitted
+  annotation-geometry scaler and k-means model}]
 feature_names = stage2_artifact["feature_names"]
 feature_indices = [
         LAYOUT_FEATURE_NAMES.index(name) for name in feature_names

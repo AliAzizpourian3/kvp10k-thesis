@@ -1,395 +1,407 @@
-\chapter{Implementation}
+\chapter{Implementation and Experimental Setup}
 \label{ch:implementation}
 
-\section{System Architecture}
+\section{Implementation Scope and Ownership}
 \label{sec:system-architecture}
 
-The implementation separates dataset preparation, page-level
-annotation-geometry analysis, model training, prediction export, and benchmark
-evaluation into dedicated scripts under \texttt{code/script}. Shared dataset
-paths, model names, clustering defaults, and evaluation thresholds are defined
-in \texttt{config.py}; run-specific training settings are supplied explicitly
-through command-line arguments in the version-controlled SLURM launch scripts.
-This organization supports the staged workflow used in the thesis: data
-preparation, Stage~2 analysis, Stage~3 baseline evaluation, and Stage~4
-discriminative modeling.
+The implementation contains two model paths. The first is a reconstructed
+Mistral-7B generative reference system based on the published KVP10k
+baseline~\cite{kvp10k,mistral}. It is a local re-implementation, not an exact
+reproduction of the published system. The second path is the
+LayoutLMv3-based discriminative system described in
+Chapter~\ref{ch:methodology}.
 
-% ---------------------------------------------------------------------------
-\section{Data Preprocessing}
+KVP10k, Mistral-7B, the pretrained LayoutLMv3-base encoder, the Hugging Face
+Transformers library, and the released KVP10k evaluator are prior resources.
+The data preparation and input conversion, adapted Mistral prompt and output
+handling, task-specific entity classifier and relation linker, span grouping,
+training procedures, evaluator integration, and diagnostic checks were
+implemented for this thesis. The general LoRA, QLoRA, and scaled-dot-product
+principles are also prior work~\cite{lora,qlora,vaswani2017attention}.
+
+\section{Prepared Data and Split Isolation}
 \label{sec:data-preprocessing}
 
-The data preprocessing pipeline was extended substantially during the thesis
-because the raw KVP10k rows were not directly usable for the Mistral baseline.
-In particular, the learned baseline required page-level document text, bounding
-boxes, and aligned key-value pair supervision in the reconstructed
-KVP10k/LMDX-style prompt and target representation used in Stage~3.
+The preparation pipeline converts the available KVP10k rows into one JSON
+record per usable page. Each record contains extracted page text, bounding
+boxes on a quantised $100\times100$ grid, aligned KVP annotations, the
+LMDX-style document representation, and the generative target. Chapter~3
+describes the official dataset splits and all preparation exclusions.
 
-\subsection{Image Processing}
-\label{sec:image-processing}
+The two model paths use different subsets of the 5{,}389 prepared pages from
+the official training split. The reconstructed Mistral system uses 4{,}985
+pages with non-empty serialised targets; 404 empty-target pages are excluded
+by its training loader. The discriminative path uses fixed manifests containing
+4{,}851 training pages and 538 validation pages. These manifests were produced
+once with seed 42, do not overlap, and remain unchanged for entity pretraining
+and final joint training.
 
-For the Mistral baseline, preprocessing begins from the original PDF source
-referenced by each dataset item. The relevant page is accessed using the
-dataset page number and converted from the dataset's one-indexed page numbering
-to PyMuPDF's zero-indexed page access. Page size is preserved and later mapped
-to a quantised $100 \times 100$ coordinate system for prompt and target
-generation.
+The prepared official-test subset contains 581 pages. It is not part of either
+training set or the discriminative validation set. The bbox-scale-fixed
+discriminative training loaders expose only the fixed training and validation
+manifests. They do not construct a test loader, and test metrics do not
+participate in checkpoint selection or early stopping.
 
-Although the Stage~4 data class supports rendered page images, the reported
-Stage~4 runs did not provide document-image content. With image loading
-disabled, the data class generates a solid-white $224 \times 224$ placeholder.
-The LayoutLMv3 processor maps this image to a constant tensor whose elements are
-all $1.0$. V4 therefore receives identical visual input for every page;
-its document-specific inputs are the extracted text tokens and bounding
-boxes.
+\section{Reconstructed Mistral-7B Reference System}
+\label{sec:mistral-implementation}
 
-\subsection{Text Processing}
+\subsection{Text Extraction and Prompt Input}
 \label{sec:text-processing}
 
-Instead of relying on an external OCR engine, the implementation uses PyMuPDF
-to extract word-level text and bounding boxes directly from the PDF text layer.
-This choice was made for practical deployment reasons on the cluster
-environment, where adding a system OCR dependency would have complicated
-execution. The trade-off is that scanned pages without a text layer cannot
-contribute usable words and are therefore discarded during preparation.
+The local preparation path obtains text and word boxes from the PDF text layer
+with PyMuPDF~\cite{pymupdf}. It does not run the optical character recognition
+pipeline used by the published KVP10k baseline. Pages without a usable text
+layer are therefore absent from the prepared subset.
 
-The extracted words are grouped into line-like units and converted into an
-LMDX-style textual document representation. This representation is later
-embedded into the prompt given to the Mistral model. For the Stage~3
-reconstruction, ground-truth targets are serialised as Python list-of-lists
-strings.
+Extracted words are grouped into line-like blocks. Each block is serialised as
+\texttt{text x1|y1|x2|y2}, where the coordinates are quantised to integers on
+the $100\times100$ page grid. The blocks are inserted into the LMDX-style
+prompt~\cite{lmdx} shown in Figure~\ref{fig:stage3-prompt}.
 
-The generated list-of-lists representation encodes regular pairs as
-key--value entries, unvalued items as single-element entries, and unkeyed items
-as a canonical category label without a bounding box followed by the located
-value. The prediction parser converts these representations into the
-corresponding KVP10k types before benchmark evaluation.
+\begin{figure}[ht]
+\centering
+\begin{minipage}{0.9\textwidth}
+\small
+\begin{verbatim}
+<Document>
+{lmdx_text}
+</Document>
+<Task>
+From the document, extract the text keys and values.
+Please provide the response in the form of a Python list of lists.
+Each inner list should contain exactly two strings: the first string
+is the key and the second string is the value.
+Each key and value should be followed by its bounding box in the
+format: left|top|right|bottom.
+</Task>
+### Response:
+\end{verbatim}
+\end{minipage}
+\caption{Prompt template used by the reconstructed Mistral-7B reference
+system. \texttt{\{lmdx\_text\}} is replaced by the page representation. The
+literal two-string instruction describes paired outputs. The target serializer
+and final parser also support a single located key for an Unvalued item.}
+\label{fig:stage3-prompt}
+\end{figure}
 
-\paragraph{V4: Word-level splitting.}
-Diagnostic analysis (Section~\ref{sec:exp567}) revealed that one line of
-the prepared LMDX-style representation can contain a multi-word text block ---
-such as \texttt{1~lb.\ shelled \$15.00} --- with one bounding box. This is
-problematic for LayoutLMv3, which expects individual words, and for
-ground-truth label generation, because a key-value pair whose key and value
-text reside within the same text block cannot produce distinct entity labels
-or link labels at the block level.
+\subsection{Target Serialisation and Final Parser}
+\label{sec:mistral-prompt-output}
 
-The V4 data pipeline splits each text block into whitespace-separated words and
-estimates horizontal sub-bounding boxes proportional to character count. For
-example, the block \texttt{1~lb.\ shelled \$15.00} with bounding box
-$[x_1, y_1, x_2, y_2]$ is split into four words (\texttt{1},
-\texttt{lb.}, \texttt{shelled}, \texttt{\$15.00}), each assigned a
-horizontal slice of the original bbox. This increased the average word count
-per document from $\sim$35 (block-level) to $\sim$200 (word-level) and
-enabled the entity labels and link labels to reach word-level granularity.
+Target entries are sorted by their vertical and then horizontal entity centres.
+The target is a Python list-of-lists string. A Regular item contains a located
+key string and a located value string. An Unkeyed item contains a canonical
+category string without a box and a located value string. An Unvalued item is
+serialised as a singleton list containing one located key string. Thus, the
+singleton representation used for Unvalued supervision is an explicit
+extension of the literal two-string instruction in the prompt.
 
-\subsection{Layout Encoding}
+The final inference parser uses \texttt{ast.literal\_eval} rather than executing
+generated text. It interprets singleton lists as Unvalued predictions. It
+recognises an Unkeyed prediction when a boxless first string equals one of the
+canonical labels \texttt{name}, \texttt{date}, \texttt{address},
+\texttt{amount}, \texttt{phone}, \texttt{email}, \texttt{website},
+\texttt{year}, \texttt{document type}, \texttt{document title}, and
+\texttt{text}. It also accepts \texttt{implicit} followed by one of these
+labels. A two-element entry whose second string is \texttt{not presented}
+becomes Unvalued. Any other entry with at least two elements becomes Regular;
+elements after the first two are ignored. A final suffix is parsed as a box
+only when it contains four integers. Otherwise, the complete string remains
+plain text without a box. Malformed top-level outputs produce an empty
+prediction list, and malformed entries are counted and skipped.
+
+For each page, inference stores both the raw generated response and the parsed
+\texttt{kvps\_list}. Keeping the raw response permits deterministic re-parsing
+without another model inference run and separates generation errors from
+parser errors.
+
+\subsection{QLoRA Training}
+\label{sec:mistral-training}
+
+The reconstructed reference system fine-tunes
+\texttt{mistralai/Mistral-7B-Instruct-v0.2}~\cite{mistral}. QLoRA loads the
+base model with 4-bit NormalFloat4 quantisation, double quantisation, and
+bfloat16 computation~\cite{qlora}. LoRA adapters use rank $r=4$, scaling
+parameter $\alpha=4$, dropout $0.05$, and no bias~\cite{lora}. They target the
+query, key, value, and output projections and the up and down projections of
+the feed-forward layers.
+
+Training uses the Hugging Face Transformers Trainer
+implementation~\cite{wolf2020transformers}, paged 8-bit
+AdamW~\cite{bitsandbytes}, learning rate
+$5\times10^{-4}$, batch size 1, gradient accumulation over 4 batches, maximum
+sequence length 8{,}192, and seed 0. The 4{,}985 usable prepared training pages
+are processed for a fixed eight epochs. Prompt and padding tokens receive the
+ignore label $-100$, so the causal language-model loss is applied only to the
+serialised response.
+
+No validation or test metric is calculated during this training run. The
+Trainer evaluation strategy is disabled, and there is no metric-based
+checkpoint selection. The final checkpoint saved after the fixed eight-epoch
+schedule is used for the separate inference step.
+
+\subsection{Inference}
+\label{sec:mistral-inference}
+
+Final inference loads the saved adapter checkpoint only after training is
+complete. Each of the 581 prepared test prompts is truncated to at most 8{,}192
+input tokens. Greedy generation uses no sampling and permits at most 2{,}048
+new tokens. The output checks require exactly one raw-response file and one
+parsed-prediction file for every prepared test page before the official
+evaluation wrapper is called.
+
+\section{Discriminative Input Pipeline}
 \label{sec:layout-encoding}
 
-Annotation geometry is fused with extracted words through an
-extracted-text-to-annotation matching step. Bounding boxes are converted into normalised integer coordinates
-on a $100 \times 100$ grid. The resulting aligned entities are then transformed
-into three categories: regular key-value pairs, unkeyed values, and unvalued
-keys. This preprocessing stage also handles repeated annotator copies in
-KVP10k by grouping rows by page identifier and selecting the richest annotation
-set for each unique page.
-
-For Stage~4, bounding box coordinates are further re-normalised to the
-$1000 \times 1000$ LayoutLMv3 convention (integers in $[0, 1000]$) after the
-above deduplication step.
-
-% ---------------------------------------------------------------------------
-\section{Model Implementation}
-\label{sec:model-implementation}
-
-\subsection{LayoutLMv3 Integration}
-\label{sec:layoutlmv3-integration}
-
-Stage~4 uses \texttt{LayoutLMv3KVPModel} for V1 and
-\texttt{LayoutLMv3KVPModelV2} for V2/V4; both wrap the
-\texttt{microsoft/layoutlmv3-base} checkpoint from the HuggingFace Hub.
-The base encoder is loaded in full fp32 precision. No quantisation is applied:
-the 125M-parameter LayoutLMv3-base model fits within the 40\,GB memory
-envelope of the A100 nodes used for Stage~4, unlike the 7B-parameter Mistral
-model that required QLoRA in Stage~3. LayoutLMv3 remains a multimodal
-architecture, but the blank visual placeholders used here carry no
-document-specific image information.
-
-All encoder parameters are unfrozen and participate in fine-tuning. A linear
-learning-rate warmup of 500 steps is used to avoid large gradient updates on
-the pre-trained weights during the first portion of training (see
-Section~\ref{sec:optimisation}).
-
-Tokenisation follows the LayoutLMv3 tokenizer convention: each extracted word
-and its bounding box are passed together, and sub-word tokens inherit the
-bounding box of their parent extracted word. The maximum sequence length is
-capped at 512 tokens. Longer pages are truncated, and content beyond the
-retained sequence is unavailable to the model.
-
-\subsection{Entity Classifier Head}
-\label{sec:entity-classifier-impl}
-
-The entity classification head applies dropout with $p=0.1$ and one linear
-layer independently to each text token output of the encoder. The linear layer
-maps the 768-dimensional token representation to three raw logits
-(\texttt{O}, \texttt{KEY}, \texttt{VALUE}), as described in
-Section~\ref{sec:entity-classifier}.
-
-During Stage~4 training, unweighted cross-entropy is computed over the
-text-token portion of the encoder output. Padding positions are excluded by
-the attention mask.
-The reported V4 configurations do not use entity-class weights.
-
-\subsection{Projected Scaled-Dot-Product Linker Module}
-\label{sec:linker-impl}
-
-The linker module receives key and value representations from the encoder
-hidden states. V1 selects individual token states. V2 and V4 group selected
-tokens into spans and mean-pool their hidden states
-(Section~\ref{sec:span-representation}). During V4 training, ground-truth
-entity labels define the spans; during inference, predicted entity labels
-define them.
-
-Representations are augmented with 8 spatial features
-(Section~\ref{sec:spatial-encoding}) before scoring. The semantic scorer uses
-scaled dot-product attention (Section~\ref{sec:kv-attention}). The earlier
-bilinear implementation produced \texttt{NaN} link losses and was replaced by
-the projected scaled-dot-product scorer.
-
-\paragraph{Teacher forcing and relation supervision.}
-The original predicted-span training used the entity classifier's
-\texttt{argmax} output to form spans while relation labels came from
-ground-truth annotations. Prediction errors therefore caused noisy alignment
-between spans and relation supervision. V4 uses ground-truth spans during
-training and predicted spans during inference. This corrects training-label
-alignment but creates a span-source difference between training and inference.
-
-\paragraph{NaN guard.}
-Before BCE calculation, the implementation applies a validity mask so that
-only link targets within the valid $[0,1]$ range are passed to the loss. Valid
-link logits are additionally clamped to $[-10,10]$. The
-\texttt{pos\_weight} is set to
-$\min(n_{\text{neg}}/n_{\text{pos}},\, 50)$ in V1, V2, and V4.
-
-\paragraph{Memory efficiency.}
-To avoid materialising large expanded tensors, scoring is performed in chunks
-of 8 key rows. A hard cap of 128 key and 128 value candidates per page
-(selected by highest entity-classifier confidence) bounds the worst-case
-linker matrix to $128 \times 128$ in V1. V2 and V4 cap the candidates at 64
-key spans and 64 value spans. If more spans are available, the implementation
-retains those with the highest mean entity confidence.
-
-% ---------------------------------------------------------------------------
-\section{Baseline Evaluation Pipeline}
-\label{sec:baseline-eval-pipeline}
-
-Stage~3 converts KVP10k annotations and generated predictions into the released
-benchmark format, then applies type-aware greedy matching in text-only,
-location-only, and combined modes. Precision and recall are averaged per page
-before F1 is computed. The evaluation used 581 prepared unique test pages; the
-5{,}255 rows in the raw test split are duplicated annotation copies and are not
-the evaluation sample count.
-
-% ---------------------------------------------------------------------------
-\section{Training Pipeline}
-\label{sec:training-pipeline}
-
-The training pipeline for the Mistral baseline (Stage~3) operates only on the
-prepared JSON files in the training split. Each sample contains the prompt
-text, the expected target response, and the aligned ground-truth key-value
-pairs. During tokenisation, prompt tokens are masked in the loss so that
-optimisation is applied only to the response segment. No validation-based early
-stopping or checkpoint selection is used. The model is trained for the fixed
-eight epochs, after which the resulting final model is applied to the held-out
-test pages.
-
-\subsection{Data Loader}
+\subsection{Word and Label Construction}
 \label{sec:data-loader}
 
-For Stage~3 training, the data loader reads page-level JSON files only from the
-prepared training directory. After the fixed eight-epoch training run is
-complete, the prediction path separately reads the prepared test directory to
-generate outputs for final benchmark evaluation. Training samples without
-prompt text or without non-empty supervision are skipped to avoid training on
-degenerate examples. For Stage~4, a
-\texttt{LayoutLMv3PreparedDataset} wraps the same JSON files, parses words and
-bounding boxes from the LMDX representation, creates entity and link labels,
-and tokenizes them to a maximum length of 512. With seed 42 and a validation
-fraction of 0.1, V4 uses 4{,}851 training pages and 538 validation pages; the
-held-out prepared test split contains 581 pages. The reported runs use the
-loader's constant blank visual input rather than a page-image cache.
+The discriminative loader reads the same prepared page records. Each
+multi-word LMDX block is split at whitespace. The original block box is divided
+horizontally according to the character offsets of the resulting words. This
+produces word-level inputs and supports separate labels for words that
+previously shared one block.
 
-\subsection{Training Loop}
+The annotation-to-word alignment labels every matched word as
+\texttt{KEY}, \texttt{VALUE}, or \texttt{O}. The label \texttt{O} denotes a
+token that belongs to neither entity class. A word matches an annotation region
+when the intersection covers at least 50\% of either the annotation box or the
+word box. For each Regular KVP with recovered key and value words, the first
+matched key word and first matched value word define one representative
+word-level relation. The labels are expanded to subword tokens by the
+LayoutLMv3 word-ID mapping and later collapsed to span-pair targets.
+
+\subsection{LayoutLMv3 Coordinate Mapping and Visual Input}
+\label{sec:image-processing}
+
+The prepared word coordinates already use the integer range $[0,100]$. The
+final loader maps each prepared coordinate $c$ to the LayoutLMv3 input grid as
+\[
+  c_{\mathrm{model}}
+  =10\,\operatorname{int}\!\left(\min(100,\max(0,c))\right).
+\]
+It does not divide the prepared coordinates by the PDF image width or height.
+The resulting model-input boxes use $[0,1000]$. In contrast, decoded prediction
+boxes are unions of the original prepared word boxes and remain on the
+$[0,100]$ grid required by the local KVP10k representation.
+
+The maximum text sequence length is 512 tokens. Longer pages are truncated.
+Page-image loading is disabled. The LayoutLMv3 processor instead receives a
+solid-white $224\times224$ RGB placeholder for every page and produces the
+same constant visual tensor. The discriminative models therefore receive
+page-specific text and layout input but no page-specific image content.
+
+\section{Discriminative Model Implementation}
+\label{sec:model-implementation}
+
+\subsection{Components and Development Variants}
+\label{sec:layoutlmv3-integration}
+
+The implementation loads the pretrained
+\texttt{microsoft/layoutlmv3-base} encoder~\cite{layoutlmv3}. V1 adds the
+thesis-specific three-class entity classifier and a token-pair relation linker.
+V2 changes the relation candidates from tokens to contiguous entity spans. V3
+is a linker-only diagnostic that reuses the V2 span architecture, freezes the
+encoder and classifier, and forms candidates from their predicted labels. The
+final LayoutLMv3-based span-level discriminative model (V4) jointly fine-tunes
+the encoder, classifier, and linker. V3 has no separate headline benchmark
+result.
+
+The entity classifier applies dropout with probability $0.1$ and maps each
+768-dimensional text-token representation to three raw class logits in the
+order \texttt{O}, \texttt{KEY}, and \texttt{VALUE}. Softmax converts them to
+class probabilities, and \texttt{argmax} selects the predicted label. Training
+applies unweighted cross-entropy to active text-token positions.
+
+\subsection{Span Construction and Relation Decoding}
+\label{sec:entity-classifier-impl}
+
+The span-level path groups consecutive tokens that have the same non-\texttt{O}
+label. Only the all-zero box $[0,0,0,0]$, used by special and padding
+positions, is excluded. A zero-width or zero-height box is not rejected solely
+for that reason. Each span representation is the mean of its token
+representations, and its output box is the union of the constituent raw word
+boxes.
+
+During V4 training, ground-truth entity labels supply the spans used for
+relation supervision. During validation and inference, predicted entity labels
+supply them. V4 therefore uses teacher-forced span construction during training
+and predicted-span construction at evaluation time.
+
+The linker produces one raw relation logit for every retained candidate pair
+composed of one \texttt{KEY} span and one \texttt{VALUE} span. Sigmoid converts a
+relation logit to a relation probability. For each key span, the decoder selects
+the value span with the largest relation probability and emits the pair only
+when this probability is at least $0.5$. The probability threshold is a
+decoding rule. It is distinct from the binary relation loss and from the
+benchmark precision, recall, and F1 metrics.
+
+\subsection{Numerical Safeguards and Candidate Limits}
+\label{sec:linker-impl}
+
+The relation linker computes candidate-pair logits in chunks of at most eight
+\texttt{KEY} candidates. V1 retains at most 128 \texttt{KEY} tokens and 128
+\texttt{VALUE} tokens per page. The
+span-level variants retain at most 64 key spans and 64 value spans. When a
+limit is exceeded, V1 ranks tokens by their entity-class probability, while
+the span-level path ranks spans by their mean entity-class probability.
+
+The distance calculation and small denominators in the spatial features receive
+an additive $10^{-8}$ term, and the value-to-key area ratio is capped at 50.
+The projected semantic compatibility component is clamped to $[-20,20]$ before it is
+combined with the spatial representation. For the relation loss only, the
+resulting raw relation logits are clamped to $[-10,10]$. Binary relation targets
+outside $[0,1]$ are masked before binary cross-entropy with logits is applied.
+The positive and negative counts are each lower-bounded by 1 before the
+positive-class weight is calculated as the negative-to-positive ratio and
+capped at 50. These operations affect loss stability. They do not replace the inference
+sigmoid or its probability threshold.
+
+The training loop checks entity losses, relation losses, combined losses,
+relation logits, and gradient norms for finite values. Gradient clipping uses
+maximum norm 1.0. These checks stop the run on a non-finite value instead of
+silently continuing.
+
+\section{Discriminative Training and Checkpoint Selection}
+\label{sec:training-pipeline}
+
+\subsection{Entity-Classification Pretraining}
 \label{sec:stage4-training-loop}
 
-\paragraph{Stage~3 (Mistral QLoRA).}
-We used QLoRA with 4-bit NF4 quantisation due to memory constraints on the
-available 40\,GB A100 GPU.
+The first phase trains the LayoutLMv3 encoder and entity classifier while the
+relation linker is disabled. It uses the fixed 4{,}851/538
+training/validation manifests, fp32 precision, batch size 4, gradient
+accumulation over 8 batches, learning rate $5\times10^{-5}$, weight decay
+$0.01$, and seed 42. Each epoch contains 152 optimiser updates, and the first
+152 updates are used for linear warm-up. Early stopping uses patience 3, and
+training runs for at most 10 epochs. Validation uses
+token-level class-aware \texttt{KEY}/\texttt{VALUE} micro F1, which counts a
+\texttt{KEY}-to-\texttt{VALUE} or \texttt{VALUE}-to-\texttt{KEY} error as both
+a false positive for the predicted class and a false negative for the target
+class. Epoch 10 is the selected entity checkpoint. No test data is accessed in
+this phase.
 
-\paragraph{Stage~4a -- Entity Classifier Pre-training.}
-Stage~4a trains the LayoutLMv3 encoder together with the entity classification
-head only, with the linker module disabled ($\lambda = 0$).
-This pre-trains the representation before the more complex
-linking objective is introduced. Training uses fp32 precision
-on an A100 node; no quantisation is required. A per-device batch size of 4 with
-8 gradient-accumulation steps gives an effective batch size of 32. The Stage~4a
-run uses early-stopping patience 3 based on validation entity F1. No reliable
-Stage~4a checkpoint survives. Its historical metric did not penalise
-KEY--VALUE confusion correctly, so Stage~4a has no reportable numerical result.
+\subsection{Final Joint V4 Training}
+\label{sec:v4-joint-training}
 
-\paragraph{Stage~4b -- Joint Fine-tuning.}
-Stage~4b activates the projected scaled-dot-product linker with spatial
-features ($\lambda > 0$). Earlier V1 and V2 development runs were initialized
-from the Stage~4a entity checkpoint.
+Final joint training loads the selected entity encoder and classifier from the
+first phase and creates a fresh, randomly initialised relation linker. It then jointly optimises
+all three components. This separates the entity initialisation from the new
+relation parameters and does not reuse the linker from an earlier joint
+checkpoint.
 
-\paragraph{V4 -- Final corrected training.}
-V4 uses the corrected V2 span-linking architecture, prepared data, seed-42
-split, and final training procedure. It is initialized from
-\path{stage4b_canary_B/best_model/pytorch_model.bin}. Its SHA-256 is
-{\scriptsize\texttt{e86c1c76323b34e2a195d5097f12504f6c2c54a424b3ba0f5af4efb610e9aed1}}.
-Shape-compatible loading transfers 226 state-dictionary entries: 212 encoder,
-2 entity-classifier, and 12 linker entries. Thus, V4 does not isolate a
-randomly initialized linker; it continues from the complete compatible Canary~B
-state.
+V4 uses fp32 precision, batch size 1, gradient accumulation over 8 batches,
+AdamW~\cite{loshchilov2019decoupled}, learning rate $2\times10^{-5}$, weight
+decay $0.01$, and relation-loss weight 5.0. The maximum is 30 epochs. The
+scheduler advances once per optimiser update. With 4{,}851 training
+microbatches, each epoch contains
+$\lceil 4851/8\rceil=607$ optimiser updates. The complete schedule therefore
+contains at most 18{,}210 updates, of which the first 500 are linear warm-up
+updates. The final accumulation window contains three microbatches, so its loss
+is divided by three rather than eight before the optimiser step.
 
-V4 uses batch size 1, gradient accumulation 8, learning rate
-$2\times10^{-5}$, weight decay $0.01$, linker-loss weight 5.0, and a maximum of
-30 epochs. Scheduler length is based on optimizer updates rather than batches:
-607 updates per epoch and at most 18{,}210 updates overall. The 500 warm-up
-steps are counted in the same unit. The decoder applies a fixed
-linker-confidence threshold of $0.5$ when producing pairs. The released
-benchmark then evaluates those pairs using NED $<0.2$ and IoU $\geq0.3$.
-Early stopping has patience 10 and follows official validation Regular
-text+location macro pair F1. Epoch 10 is selected at optimizer step 6{,}070.
-The run completes 20 epochs and 12{,}140 optimizer steps. The first job reaches
-its 24-hour limit after epoch 15, and a second job restores the full state and
-completes epochs 16--20. The two allocations use approximately 31 hours and
-19 minutes of GPU time.
+Checkpoint selection requires a strict improvement in the official validation
+Regular text+location macro pair F1 calculated from predicted spans at relation
+probability threshold $0.5$. Early stopping is permitted from epoch 10 and uses
+patience 5. Test metrics are not used for either decision. Training stops after
+epoch 20, and checkpoint 15 is the validation-selected final joint V4
+checkpoint.
 
-\paragraph{V4 link label generation.}
-Diagnostic analysis of V2 training revealed that the ground-truth link label
-matrix contained a cross-product expansion: for each key-value pair, \emph{all}
-key-word indices were linked to \emph{all} value-word indices, rather than one
-representative pair. This made the token-pair label matrix much denser than
-intended and reduced the ability to distinguish the annotated relation from
-other candidate span pairs after span-level collapse
-(Section~\ref{sec:v2-span-linking}).
+After checkpoint selection was complete, the selected checkpoint was evaluated once on the 581-page test subset.
 
-For each ground-truth KVP for which both a key word and a value word are
-recovered, V4 links the first matched key word to the first matched value word.
-V4 combines this representative-link rule with the word-level splitting
-described in Section~\ref{sec:text-processing}, a bidirectional bounding-box
-overlap criterion ($\geq 50\%$ of either the word or the target region), and a
-relaxed span-grouping filter that excludes only $[0,0,0,0]$ bounding boxes. The
-previous predicate $x_1 < x_2 \wedge y_1 < y_2$ rejected about 48\% of predicted
-key and value tokens because quantised LayoutLMv3 boxes can have zero width or
-zero height.
-In the first 20
-pages of the fixed seed-42 validation subset, the audit contains 79
-ground-truth Regular KVPs. The corrected pipeline recovers 53 representative
-word-level links. Subword expansion produces 453 positive token-pair cells,
-and span-level collapse produces 44 positive span-pair labels. The diagnostic
-is reported in Section~\ref{sec:res567}. These are label-pipeline checks, not
-model-performance metrics.
-
-\subsection{Checkpointing}
+\subsection{Checkpoint State}
 \label{sec:checkpointing}
 
-V4 stores a separate \texttt{pytorch\_model.bin} for evaluation compatibility
-and a complete training-state file containing the
-model, AdamW optimizer, scheduler, gradient scaler, completed epoch, global
-optimizer step, best validation score, early-stopping counter, training
-history, run configuration, and Python, NumPy, PyTorch, and CUDA random states.
+Each completed V4 epoch stores model weights and the complete training state.
+The state contains the optimiser, scheduler, gradient scaler, completed epoch,
+global optimiser step, best validation value, early-stopping counter, training
+history, run configuration, and Python, NumPy, PyTorch, CUDA, and data-loader
+random states. Resume restores this state and checks the saved configuration.
+The selected checkpoint is then reloaded strictly before the training phase is
+closed.
 
-A resumed run may name a checkpoint explicitly or request the newest available
-checkpoint. Automatic selection parses the numeric epoch identifier, avoiding
-lexicographic ordering such as placing checkpoint 9 after checkpoint 10. The
-saved configuration is checked before state restoration so that a resumed run
-cannot silently continue with incompatible settings.
+Exact checkpoint hashes, absolute paths, job identifiers, and hardware
+allocation history remain in the repository run manifests and logs. They are
+not repeated in the main manuscript.
 
-% ---------------------------------------------------------------------------
-\section{Evaluation Protocol}
+\section{Inference and Official Evaluation}
 \label{sec:evaluation-protocol}
 
-We implement a dual-threshold evaluation protocol. V4 checkpoint selection
-uses validation data only. After selection, the chosen checkpoint is evaluated
-on the test set. The test result does not choose the V4 checkpoint.
-Implementation excerpts for both metrics are provided in
-Appendix~\ref{app:metrics}.
+\subsection{Prediction Export}
+\label{sec:baseline-eval-pipeline}
 
-\subsection{Text Matching: NED}
+The Mistral path exports the type-aware predictions produced by the final
+parser. The direct V4 decoder exports Regular linked span pairs. It does not
+convert unmatched spans into singleton predictions. Any separate recovery of
+Unkeyed or Unvalued items is a post-processing variant and is not part of the
+direct Regular output.
+
+For V4, softmax first produces the entity-class probabilities. Predicted
+non-\texttt{O} labels form spans. The linker then produces raw relation logits,
+sigmoid converts them to probabilities, the best value is selected for each
+key, and the fixed $0.5$ probability threshold determines whether a Regular
+pair is emitted. Emitted pairs are ordered by decreasing relation probability
+before their text and boxes are passed to the greedy evaluator.
+
+\subsection{Benchmark Matching}
 \label{sec:ned}
-
-Normalised Edit Distance (NED) measures text accuracy:
-\[
-  \text{NED}(\hat{t}, t) = \frac{\text{Levenshtein}(\hat{t}, t)}{\max(|\hat{t}|, |t|)}
-  \tag{5.1}
-\]
-where $\hat{t}$ is predicted text and $t$ is target text. Threshold:
-$\text{NED} < 0.2$.
-
-\subsection{Location Matching: IoU}
 \label{sec:iou}
 
-Intersection over Union (IoU) measures spatial accuracy:
-\[
-  \text{IoU}(B_p, B_t) = \frac{\text{Area}(B_p \cap B_t)}{\text{Area}(B_p \cup B_t)}
-  \tag{5.2}
-\]
-where $B_p$ is predicted box and $B_t$ is target box. The paper states
-$\text{IoU}>0.3$, but IBM's released evaluator checks
-$\text{IoU}\geq0.3$; reported benchmark results follow the released code.
+The evaluation wrapper converts both model outputs into the released KVP10k
+schema and calls the benchmark-compatible evaluator
+implementation~\cite{kvp10k,kvp10k_repository}. Predicted and target KVP types
+must agree. Greedy matching follows prediction order and assigns each target
+item at most once.
 
-\subsection{Overall Metric: F1 Score}
+For predicted text $\hat{t}$ and target text $t$, Normalised Edit Distance
+is~\cite{levenshtein}
+\[
+  \operatorname{NED}(\hat{t},t)
+  =\frac{\operatorname{Levenshtein}(\hat{t},t)}
+         {\max(1,|\hat{t}|,|t|)} ,
+\]
+and text matches require $\operatorname{NED}<0.2$. For a predicted box $B_p$
+and target box $B_t$, Intersection over Union is~\cite{iou}
+\[
+  \operatorname{IoU}(B_p,B_t)
+  =\frac{\operatorname{Area}(B_p\cap B_t)}
+         {\operatorname{Area}(B_p\cup B_t)} .
+\]
+The KVP10k paper describes a strict threshold, but its released code accepts
+$\operatorname{IoU}\geq0.3$; this thesis follows the released implementation.
+The implementation assigns IoU zero when the union area is zero. A missing or
+malformed box fails the location match instead of causing the evaluator to
+stop.
+
+\subsection{Aggregation}
 \label{sec:f1}
 
-A regular pair matches only if both key and value satisfy
-$\text{NED}<0.2$ and, for combined evaluation, $\text{IoU}\geq0.3$.
-Predicted and ground-truth KVP types must agree, and greedy matching assigns
-each ground-truth item at most once. For each scored page $i$, precision $P_i$
-and recall $R_i$ are computed from pair-level counts. The released evaluator
-then reports
+Text-only, location-only, and text+location metrics are calculated separately
+for Regular, Unkeyed, Unvalued, and All categories. Pages with empty
+ground-truth content after category filtering are excluded from that category's
+macro average. For the remaining $D$ pages, the evaluator reports
 \[
-  \bar P = \frac{1}{D}\sum_{i=1}^{D} P_i, \qquad
-  \bar R = \frac{1}{D}\sum_{i=1}^{D} R_i, \qquad
-  F_1 = \frac{2\bar P\bar R}{\bar P+\bar R},
-  \tag{5.3}
+  \bar P=\frac{1}{D}\sum_{i=1}^{D}P_i,\qquad
+  \bar R=\frac{1}{D}\sum_{i=1}^{D}R_i,\qquad
+  F_1=\frac{2\bar P\bar R}{\bar P+\bar R},
 \]
-where $D$ contains pages with non-empty ground truth after category filtering.
-Text-only, location-only, and combined metrics are reported separately for
-regular, unkeyed, unvalued, and All categories.
+where $P_i$ and $R_i$ are page-level pair precision and recall. The reported
+F1 is therefore the harmonic mean of macro precision and macro recall, not a
+pooled pair-count F1. It is set to zero when $\bar P+\bar R=0$.
 
-% ---------------------------------------------------------------------------
-\section{Code Organisation}
+\section{Code Organisation and Reproducibility}
 \label{sec:code-organisation}
-
-The principal implementation files are:
-\begin{verbatim}
-code/script/
-|-- prepare_data.py                 # PDF text and KVP preparation
-|-- stage4_kvp_dataset.py           # Stage 4 dataset and labels
-|-- layoutlm_model.py               # V1 token linker
-|-- layoutlm_model_v2.py            # V2/V4 span linker
-|-- train_stage4a.py                # Entity-only development training
-|-- train_stage4b_v2.py             # Historical V2/V4 training
-|-- train_stage4b_v5.py             # Final V4 training and full resume
-|-- kvp10k_official_eval.py         # Released benchmark semantics
-|-- export_v5_recovery_analysis.py  # Unchanged singleton recovery
-'-- analyze_v5_qualitative.py       # Final qualitative analysis
-\end{verbatim}
-
-The filenames containing \texttt{v5} are historical implementation identifiers
-retained for provenance and compatibility with existing repository scripts and
-artifacts. The final run reported in this thesis is V4, not an additional
-experiment.
-
-% ---------------------------------------------------------------------------
-\section{Reproducibility}
 \label{sec:reproducibility}
 
-Reproducibility is supported by seeded data splitting, explicit CLI arguments
-in version-controlled SLURM scripts, per-epoch checkpoints, run logs, checkpoint
-hashes, and offline HuggingFace caches on compute nodes. V4 also records the
-run configuration and restores optimizer, scheduler, scaler, history, counters,
-and random states during resume. Data preparation and GPU training
-remain separate steps because source-PDF retrieval is performed before jobs are
-submitted to the offline compute environment.
+The final Mistral path separates page preparation, fixed-epoch training,
+inference with raw-response retention, parsing, and benchmark evaluation. The
+final discriminative path separates the bbox-scale-fixed loader, entity
+pretraining, joint V4 training, bbox-scale audits, prediction export, and
+official evaluation. Version-controlled launch scripts fix the environment and
+run settings for both paths.
+
+Reproducibility records include fixed split manifests, seeds, per-epoch
+checkpoints, complete resume state, configuration fingerprints, source and
+weight hashes, raw predictions, and evaluator outputs. These detailed records
+remain with the implementation artifacts. The main manuscript records the
+scientifically relevant data flow, model configuration, selection rule, and
+evaluation semantics.

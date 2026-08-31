@@ -1,122 +1,92 @@
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-\section{Summary of Contributions}
-\label{sec:summary}
+This thesis studied key--value pair extraction from business documents through
+dataset analysis, a reconstructed generative reference system, and a
+layout-aware discriminative pipeline. It characterised annotation geometry on
+9{,}124 unique coordinate-bearing KVP10k training pages and performed a
+separate exploratory spatial-link audit. It also implemented and evaluated a
+task-specific discriminative pipeline around the pretrained LayoutLMv3 encoder
+and reconstructed a Mistral-7B reference system based on the published KVP10k
+approach. The detailed distinction between thesis contributions and prior
+resources is given in Section~\ref{sec:contributions}.
 
-This thesis studied key--value pair extraction from business documents with a
-generative baseline and a layout-aware discriminative system. Its main
-contributions are:
-
-\begin{enumerate}
-  \item \textbf{Dataset characterisation:} The study characterises 9{,}124 unique
-  coordinate-bearing KVP10k training pages with two weakly separated
-  annotation-geometry clusters and a separate spatial-link audit.
-
-  \item \textbf{Discriminative model:} The study adapts a pretrained
-  LayoutLMv3-base encoder with a token classifier and a span-level relation
-  linker. The final V4 model uses text and bounding boxes with constant blank
-  visual input, so it does not use document-specific image information.
-
-  \item \textbf{Controlled KVP10k evaluation:} The study compares the final corrected V4 with a reconstructed Mistral-7B
-  baseline on the same 581 usable test pages. V4 reaches Regular text+location
-  F1 of $0.345$, compared with $0.662$ for the reconstructed Mistral baseline on the same prepared 581-page test subset.
-
-  \item \textbf{Diagnostic analysis:} The token-to-span progression, corrected
-  entity and pair metrics, cluster evaluation, and qualitative examples suggest
-  that relation linking remains a major limitation of the current pipeline.
-  Because several corrections were applied together, the study does not assign
-  an independent causal effect to linking granularity.
-\end{enumerate}
-
-The dataset and geometry analysis, implementation and evaluation of the
-discriminative LayoutLMv3 pipeline, diagnostic studies, and reported V4
-analyses were carried out as part of this thesis; KVP10k, its released
-benchmark, pretrained LayoutLMv3, and the published Mistral approach are prior
-resources and methods used as foundations and comparison points.
-
-Stage~4a remains a methodological entity-pre-training phase. No reliable
-checkpoint survives, and its historical metric did not penalise KEY--VALUE
-confusion correctly. It therefore has no reportable numerical result.
+The controlled evaluation compared the final LayoutLMv3-based span-level
+discriminative model (V4) with the reconstructed Mistral-7B reference system on
+the same 581 prepared test pages. V4 reaches Regular text+location F1 of
+$0.329$, compared with $0.657$ for the reconstructed reference system. The
+development diagnostics and qualitative analysis examine candidate
+construction, span formation, relation supervision, and relation selection.
+Because several pipeline changes were introduced together, the thesis does not
+assign an isolated causal effect to any one change.
 
 \section{Research Questions Revisited}
 \label{sec:rq_revisited}
 
-\subsection{RQ1: Layout Characteristics}
+\subsection{RQ1: Annotation Geometry}
 
-Page-level clustering identifies two weakly separated annotation-geometry
-regimes. Cluster~0 has a higher box count and broader spatial spread, while
-Cluster~1 has fewer, larger boxes in a more compact region. Two principal
-components explain 52.8\% of the standardised feature variance, and the
-silhouette score is 0.222. These groups should not be interpreted as document genres or text-density
-classes because the clustering is based on annotation geometry. In a separate exploratory audit, linked pairs have a mean normalised
-centre distance of 0.120. This result suggests that spatial relations can be
-useful, but it does not establish a causal requirement.
+KVP10k pages vary in annotation count, box size, and spatial spread. The
+analysis identifies two weakly separated annotation-geometry strata:
+Cluster~0 has more boxes and a broader spatial distribution, while Cluster~1
+has fewer, larger boxes in a more compact region. The silhouette coefficient
+of $0.222$ indicates weak cluster separation. Because the clustering uses
+annotation geometry rather than semantic document labels, these exploratory
+groups must not be interpreted as document genres. The separate spatial-link
+audit reports a mean normalised
+centre distance of $0.120$. These findings motivate relative spatial features
+and geometry-stratified robustness checks, but they do not show that spatial
+features causally improve model performance.
 
-\subsection{RQ2: Discriminative vs.\ Generative}
+\subsection{RQ2: Same-Subset System Comparison}
 
-The final V4 system reaches Regular text+location F1 of $0.345$, while the
-reconstructed Mistral baseline reaches $0.662$ on the same prepared 581-page
-test subset. The reconstructed value is also numerically above the published
-Mistral result of $0.611$, but differences in test coverage, native-text
-extraction, preprocessing, and implementation prevent a direct superiority
-claim. V4 therefore remains below the generative baseline in the controlled
-internal comparison.
+On the same prepared 581-page test subset, the reconstructed Mistral-7B
+reference system reaches Regular text+location F1 of $0.657$, compared with
+$0.329$ for V4. The reconstructed reference system is therefore stronger under
+the shared evaluation protocol. This system-specific result does not establish
+that generative models are generally superior to discriminative models because
+the systems differ in model capacity, training coverage, training objective,
+and output representation.
 
-\subsection{RQ3: Linking Granularity}
+\subsection{RQ3: Development Diagnostics}
 
-V1 uses dense token-level relation candidates, which creates a substantially
-larger candidate space than the later span-level formulation. For illustration,
-100 candidate key tokens and 100 candidate value tokens with about 20 positive
-relations would produce about 10{,}000 candidate pairs and an imbalance of
-roughly $500{:}1$. In the illustrative span-level case, 15 positive links among
-225 candidates give 210 negatives, or approximately $14{:}1$. The V2 results are difficult to interpret because the implementation contained
-a mismatch between predicted spans and ground-truth relation supervision, an
-over-strict bounding-box filter, and cross-product link labels. Final V4 uses
-ground-truth entity spans during training and predicted spans during inference,
-and corrects the bounding-box and link-label pipeline issues. It reaches
-official Regular text+location F1 of $0.345$. Because several procedures change together, the
-experiment does not identify the independent effect of one correction or of
-span-level linking alone.
+V1 forms a dense token-level candidate space, whereas the span-level V2 and V4
+paths are designed to reduce the candidate space and use a unit closer to the
+annotated relation. However, the preserved development paths also differ in
+span source, bounding-box filtering, and relation-label construction. The
+diagnostics therefore do not isolate the causal effect of token-level versus
+span-level linking. They instead show that candidate construction, span
+formation, and relation supervision must be aligned before a granularity
+comparison can be interpreted reliably.
 
 \subsection{RQ4: Success and Failure Factors}
 
-V4 reaches Regular text+location F1 of $0.305$ in Cluster~0 and $0.410$ in
-Cluster~1. Mistral has the opposite order, with $0.679$ and $0.633$. This is an
-association with annotation geometry, not evidence about semantic document
-types. Qualitative cases show correct local links, plausible links to
-neighbouring values, missed short or abbreviated values, and KEY--VALUE
-confusion. These examples are illustrative and are not statistical proof.
+Performance varies descriptively across the annotation-geometry strata: V4 is
+stronger in Cluster~1, while the reconstructed Mistral-7B reference system is
+stronger in Cluster~0. The weak cluster separation and absence of a causal
+intervention prevent attribution to a specific layout feature. The qualitative
+cases identify two failure routes: a missing or merged entity span can remove
+the intended relation from the candidate set, while competing plausible spans
+can lead to an incorrect relation selection.
 
-The corrected V4 token-level entity scores are numerically higher than the
-complete-pair score, although these metrics are not directly comparable.
-Together with the observed wrong-link examples, this suggests that relation
-linking remains a major internal limitation of the current pipeline. Location-only evaluation is less
-restrictive than joint text+location evaluation, so its higher score does not
-mean that text reduces model performance.
+On validation data, V4 reaches token-level entity micro F1 of $0.813$ and
+Regular text+location pair F1 of $0.331$. These metrics use different units,
+but their difference supports the conclusion that the transition from entity
+classification to complete pair extraction is a major internal limitation. It
+does not isolate the linker from upstream label and span errors. The direct V4
+decoder emits Regular pairs only and therefore provides no direct Unkeyed or
+Unvalued coverage.
 
-\section{Practical Implications}
-\label{sec:implications}
+Future work should use controlled ablations that retain the final coordinate
+mapping and fixed data splits while separating span source, bounding-box
+filtering, relation-label construction, and linker design. It should also test
+structured or constrained relation decoding, deliberately selected hard
+negatives, explicit row and column relations, direct Unkeyed and Unvalued
+prediction, and probability calibration. Longer-input, multi-page, and rendered
+document-image experiments are needed to evaluate the remaining input and
+visual limitations.
 
-The direct V4 model emits Regular pairs. The unchanged recovery method adds
-unkeyed and unvalued outputs and raises All text+location F1 from $0.229$ to
-$0.261$. It does not change Regular F1. This provides a low-cost coverage
-extension, but its special-category accuracy remains limited.
-
-The results suggest that relation modeling is an important priority for further
-development. Useful future directions include constrained
-one-to-one matching, hard-negative relation training, explicit row and column
-features, learned unkeyed and unvalued classes, confidence calibration, better
-handling of short values and long documents, and a controlled experiment with
-real document images.
-
-\section{Closing Remarks}
-\label{sec:closing}
-
-V4 is the final corrected LayoutLMv3 experiment in this thesis. It provides
-a controlled result for text-and-layout processing without genuine image
-content. Its official Regular text+location F1 of $0.345$ remains below the
-reconstructed Mistral result. The main diagnostic finding is that correct
-entity predictions do not guarantee correct key--value links. The observed
-wrong-link cases motivate further work on relation modelling and controlled
-evaluation with genuine visual input.
+Overall, the reconstructed Mistral-7B reference system is stronger than V4
+under the shared evaluation protocol. The central scientific takeaway is that
+extracting plausible key and value entities is insufficient for complete KVP
+extraction: the system must also construct the correct spans and select the
+correct relations between them.

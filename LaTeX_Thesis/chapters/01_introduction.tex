@@ -4,21 +4,63 @@
 \section{Motivation}
 \label{sec:motivation}
 
-Business document processing is an important task in enterprise automation, affecting industries from finance to healthcare. Organizations process millions of invoices, forms, and receipts annually, requiring extraction of structured information such as \kvps{} (e.g., ``Invoice Number: 12345'', ``Total: \$137''). Manual processing is time-consuming, error-prone, and costly, motivating the need for automated solutions.
+Business documents such as invoices, forms, and receipts contain information
+that must be converted into structured records. A \gls{kvp} consists of a
+field label, the \emph{key}, and its associated content, the \emph{value}. For
+example, ``Invoice Number'' can be the key and ``12345'' its value. Automatic
+\gls{kvp} extraction must recover this association while retaining the text
+and page location of both elements. It can therefore support automated
+processing and information extraction from business documents~\cite{kvp10k}.
 
-Traditional approaches rely on template matching or rule-based systems, which lack generalization to diverse document layouts and formats. Recent advances in deep learning, particularly multimodal pre-trained models like LayoutLMv3 \cite{layoutlmv3}, offer promising solutions by jointly modeling text, layout, and visual features.
+Template-based and rule-based systems can work for fixed document layouts, but
+their patterns must be adapted when document formats change~\cite{layoutlm,kvp10k}.
+Layout-aware pretrained models instead learn from text and two-dimensional
+layout information and can also process document-image features. LayoutLMv3
+combines these input types in one pretrained document encoder~\cite{layoutlmv3}.
+This thesis uses LayoutLMv3 as the encoder of its discriminative system.
 
-KVP10k provides the benchmark and published Mistral baseline used as the main
-comparison point in this thesis~\cite{kvp10k}, while LayoutLMv3 supplies the
-pretrained document encoder adapted here~\cite{layoutlmv3}. The relation
-component is situated within prior segment- and entity-linking work such as
-SPADE and BROS~\cite{spade,bros}; detailed comparison is provided in
-Chapter~\ref{ch:literature}.
+KVP10k is an open-vocabulary benchmark for \gls{kvp} extraction from 10{,}707
+business-document pages. Open-vocabulary extraction does not restrict
+the keys to a predefined field schema. The dataset provides text-region
+locations, benchmark categories, and key--value relations~\cite{kvp10k}. The
+published KVP10k baseline converts document text and coordinates into a prompt
+and fine-tunes Mistral-7B to generate structured entries containing the type,
+text, and bounding boxes of each prediction~\cite{kvp10k,mistral}. This thesis
+uses that published approach as the basis for a reconstructed Mistral-7B
+reference system.
+
+The discriminative system uses two task-specific components after the
+pretrained encoder. An entity classifier assigns each observed text token to
+\texttt{KEY}, \texttt{VALUE}, or \texttt{O}, where \texttt{O} denotes tokens
+that belong to neither entity class. A relation linker then predicts which
+detected key span is associated with which detected value span.
+This separates entity classification from relation linking. Prior
+document-extraction methods such as Spatial Dependency Parsing for
+Semi-Structured Document Information Extraction (SPADE) and BERT Relying On
+Spatiality (BROS) also model relations between document tokens or
+entities~\cite{spade,bros}. Chapter~\ref{ch:literature} provides the detailed
+comparison.
 
 \section{Problem Statement}
 \label{sec:problem}
 
-Given a business document image, the task is to extract all \kvps{} such that three requirements are met simultaneously: the textual content of each key and value must be recognised correctly (\emph{text accuracy}); the bounding boxes around those text regions must be localised precisely (\emph{location accuracy}); and each key must be associated with its corresponding value (\emph{linking accuracy}). Several factors make this difficult. Documents vary widely in layout, ranging from sparse forms to dense invoices; keys and values may sit close together or far apart on the page; scans are frequently degraded by rotation, occlusion, or other visual noise; and the key--value structure is often implicit rather than explicitly encoded in the layout.
+Given a business-document page and its extracted text regions, the target
+output contains three KVP10k categories. A \emph{Regular} item contains a key,
+a value, their bounding boxes, and their association. An \emph{Unkeyed} item
+contains only a value, while an \emph{Unvalued} item contains only a
+key~\cite{kvp10k}. The benchmark evaluates text-only, location-only, and
+text+location matches. For a Regular item, a prediction is correct only when
+the evaluator can match the associated key and value under the applicable text
+and location criteria.
+
+Several factors make this task difficult. Business documents vary from sparse
+forms to dense invoices, and keys and values can be separated by other content
+or positioned far apart. The key--value association is also often implicit in
+the layout~\cite{layoutlm,kvp10k,spade,bros}.
+
+In this thesis, \emph{annotation geometry} denotes the number, size, and spatial
+distribution of annotated bounding boxes on a page. The page groups obtained
+from these properties are called annotation-geometry regimes.
 
 \section{Research Questions}
 \label{sec:research_questions}
@@ -28,9 +70,13 @@ This thesis addresses the following research questions:
 \begin{enumerate}
     \item \textbf{RQ1}: How does annotation geometry vary across KVP10k pages, and how can this inform model design?
     
-    \item \textbf{RQ2}: How does a LayoutLMv3-based discriminative linker perform on regular \kvp{} extraction compared with a generative baseline?
+    \item \textbf{RQ2}: How does the final LayoutLMv3-based discriminative
+    system perform relative to the reconstructed Mistral-7B reference system
+    on the same prepared KVP10k test subset?
     
-    \item \textbf{RQ3}: What does the experimental progression from token-level to span-level linking reveal about key--value association?
+    \item \textbf{RQ3}: What do the token-level and span-level development
+    diagnostics reveal about relation-candidate construction and the
+    limitations of the training pipeline?
     
     \item \textbf{RQ4}: Which factors characterise model successes and failures across page-level annotation-geometry regimes?
 \end{enumerate}
@@ -43,14 +89,43 @@ This thesis makes the following contributions:
 \begin{enumerate}
     \item \textbf{Dataset Characterisation}: Page-level clustering of annotation-box geometry on 9{,}124 unique coordinate-bearing KVP10k training pages, together with a separate exploratory spatial-link audit and annotation statistics (Chapter~\ref{ch:dataset})
     
-    \item \textbf{Discriminative Model}: Adaptation of a pretrained LayoutLMv3 encoder with a token classifier and a span-level projected scaled-dot-product linker with spatial features for discriminative \kvp{} extraction (Chapters~\ref{ch:methodology} and~\ref{ch:implementation})
+    \item \textbf{Discriminative Model Implementation}: Implementation and
+    task-specific integration of a discriminative \gls{kvp} extraction pipeline
+    built around the pretrained LayoutLMv3-base encoder. The pretrained
+    LayoutLMv3 encoder and the general scaled-dot-product scoring principle are
+    prior work~\cite{layoutlmv3,vaswani2017attention}. The task-specific
+    classifier and linker modules, span-grouping path, training pipeline,
+    integration with the released evaluator, and diagnostic procedures were
+    implemented for this thesis. The final LayoutLMv3-based span-level
+    discriminative model is referred to as V4 throughout this thesis
+    (Chapters~\ref{ch:methodology} and~\ref{ch:implementation})
     
-    \item \textbf{Controlled KVP10k Evaluation}: Comparison of the final corrected discriminative model with a reconstructed Mistral baseline on the same 581 usable test pages. The final V4 model obtains Regular text+location F1 $=0.345$, compared with $0.662$ for the reconstructed Mistral baseline on the same prepared 581-page test subset (Chapter~\ref{ch:exresults})
+    \item \textbf{Controlled KVP10k Evaluation}: Implementation of a Mistral-7B
+    reference system based on the published KVP10k generative baseline and
+    comparison with V4 on the same prepared 581-page test subset. V4 obtains
+    Regular text+location macro F1 of $0.329$, while the reconstructed
+    Mistral-7B reference system obtains $0.657$ on this common subset
+    (Chapter~\ref{ch:exresults})
     
-    \item \textbf{Diagnostic Analysis}: Evidence suggesting that relation linking remains a major limitation, based on the token-to-span experimental progression, corrected entity and pair metrics, page-cluster results, and qualitative errors. Because several corrections were applied together, the study does not claim an isolated causal effect for linking granularity (Chapters~\ref{ch:exresults} and~\ref{ch:discussion})
+    \item \textbf{Diagnostic Analysis}: Validation diagnostics of token-level
+    and span-level candidate construction, bounding-box filtering, and relation
+    supervision, followed by class-aware entity evaluation, cluster-based
+    analysis, and qualitative error analysis for V4. Because the pipeline
+    corrections were applied together, the thesis does not assign an isolated
+    causal effect to linking granularity or to an individual correction
+    (Chapters~\ref{ch:exresults} and~\ref{ch:discussion})
 \end{enumerate}
+
+The dataset and geometry analysis, implementation of the Mistral-7B reference
+system, implementation and evaluation of the discriminative pipeline,
+diagnostic studies, and reported V4 analyses were performed as part of this
+thesis.
+KVP10k and its released evaluator, the pretrained LayoutLMv3 encoder,
+Mistral-7B, and the published KVP10k baseline design are prior resources and
+methods used as foundations and comparison points
+\cite{kvp10k,layoutlmv3,mistral}.
 
 \section{Thesis Structure}
 \label{sec:structure}
 
-The remainder of this thesis is organized as follows. Chapter~\ref{ch:literature} reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training. Chapter~\ref{ch:dataset} presents KVP10k together with page-level annotation-geometry clustering and spatial-link characterization. Chapter~\ref{ch:methodology} describes the model methodology, architecture, training formulation, and inference. Chapter~\ref{ch:implementation} describes the implementation and evaluation protocol, including data preprocessing and the HPC setup. Chapter~\ref{ch:exresults} presents the experiments and results as a sequential experimental progression, moving from the generative baseline through token-level and span-level linking, the V4 pipeline corrections, and the final corrected V4 configuration. Chapter~\ref{ch:discussion} discusses the findings, the generative-versus-discriminative trade-offs, limitations, and future work, and Chapter~\ref{ch:conclusion} summarizes the contributions and conclusions.
+The remainder of this thesis is organized as follows. Chapter~\ref{ch:literature} reviews related work in document understanding, \kvp{} extraction, and multimodal pre-training. Chapter~\ref{ch:dataset} presents KVP10k together with page-level annotation-geometry clustering and spatial-link characterization. Chapter~\ref{ch:methodology} describes the model methodology, architecture, training formulation, and inference. Chapter~\ref{ch:implementation} describes data preprocessing, system implementation, training, inference, and the evaluation protocol. Chapter~\ref{ch:exresults} presents the evaluation scope, reconstructed Mistral-7B reference results, discriminative-model development and diagnostics, final V4 evaluation, and main findings. Chapter~\ref{ch:discussion} discusses the findings, the generative-versus-discriminative trade-offs, limitations, and future work, and Chapter~\ref{ch:conclusion} summarizes the contributions and conclusions.

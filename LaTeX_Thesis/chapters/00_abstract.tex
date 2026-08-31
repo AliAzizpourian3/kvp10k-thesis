@@ -9,5 +9,26 @@
 
 \vspace{0.5cm}
 
-This thesis investigates automatic key-value pair extraction from business documents using generative and layout-aware discriminative approaches. The discriminative system combines a LayoutLMv3-base encoder, token classification, and span-level key-value linking. It uses extracted text and bounding boxes with a constant blank visual input and therefore does not use document-specific image information. The final V4 model is selected on validation Regular text+location macro F1 and evaluated on the prepared 581-page subset of the held-out KVP10k test split using the released benchmark protocol. V4 achieves Regular F1 scores of 0.392 for text, 0.446 for location, and 0.345 for combined text+location matching. Its entity-classification micro and macro F1 scores are 0.792 and 0.772, respectively. The reconstructed Mistral baseline achieves a higher Regular text+location F1 of 0.662 on the same prepared test subset. Although the entity and pair metrics are not directly comparable, the entity results and qualitative errors suggest that relation linking remains a major limitation of the discriminative pipeline.
+This thesis investigates automatic key-value pair (KVP) extraction from
+business documents. The task is to identify key and value text, their bounding
+boxes, and the relations that form structured entries. Experiments use prepared subsets of KVP10k,
+an open-vocabulary benchmark containing complete key-value pairs (Regular) and
+entries with only a key or only a value. Two approaches are compared with the
+released KVP10k evaluator on the same prepared 581-page test subset. The
+reconstructed Mistral-7B reference system is based on the published KVP10k
+generative baseline and generates structured entries. The final
+LayoutLMv3-based span-level discriminative model (V4) combines a pretrained
+LayoutLMv3-base encoder, token classification, and span-level linking. It uses
+extracted text and bounding boxes with a constant blank visual input and
+therefore no document-specific image information. V4 achieves Regular F1 values
+of 0.365 for text, 0.491 for location, and 0.329 for text+location matching. The
+reconstructed Mistral-7B reference system achieves 0.657 for Regular
+text+location matching. On validation data, V4 achieves token-level
+entity-classification micro and macro F1 values of 0.813 and 0.795. The
+validation entity results and qualitative analysis of saved test predictions
+indicate that the transition from entity classification to complete pair
+extraction remains a major internal limitation. Because entity classification
+and pair extraction are evaluated differently, the lower pair result cannot be
+attributed to the relation linker alone; errors in entity labels and span
+boundaries can also cause pair failures.
 \clearpage

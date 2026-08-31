@@ -4,425 +4,281 @@
 \input{chapters/v4_result_values}
 
 % ---------------------------------------------------------------------------
-\section{Overview and Chapter Structure}
+\section{Evaluation Scope and Evidence}
 \label{sec:story-overview}
 % ---------------------------------------------------------------------------
 
-This chapter reports the experiments and results of the thesis. Each experiment
-was motivated by the findings of the previous one, forming a chain from a
-generative baseline to a corrected discriminative model and an assessment of
-where it stands relative to the published KVP10k benchmark.
+This chapter first reports the reconstructed Mistral-7B reference results, then
+summarises the development evidence for the discriminative system, and finally
+evaluates the final LayoutLMv3-based span-level discriminative model (V4).
+Chapter~\ref{ch:methodology} defines the model components and
+Chapter~\ref{ch:implementation} gives the implementation and training setup.
+In brief, V1 forms relation candidates between individual \texttt{KEY} and
+\texttt{VALUE} tokens. V2, V3, and V4 form candidates between contiguous entity
+spans. V3 is a predicted-span diagnostic variant; it has no headline benchmark
+result.
 
-The experiments proceed as follows. We begin with a generative reference
-baseline (Mistral-7B) and then evaluate a layout-aware discriminative approach
-(LayoutLMv3). We investigate two linking granularities and use validation-based diagnostic
-experiments to identify three compounding data-pipeline problems. The final
-corrected V4 combines those pipeline fixes with correct scheduler accounting,
-full-state resumption, class-aware entity metrics, validation pair-F1 checkpoint
-selection, and aligned early stopping.
+The released KVP10k evaluator distinguishes three entry categories. A Regular
+entry contains a key and a value, an Unkeyed entry contains only a value, and an
+Unvalued entry contains only a key. A prediction can match a target only when
+both belong to the same category. Text matching requires normalised edit
+distance (NED) below $0.2$. Location matching uses the released-code criterion
+of intersection over union (IoU) greater than or equal to $0.3$. Text+location
+matching requires both conditions. Matching is greedy and one-to-one.
+Precision and recall are calculated per page and macro-averaged over pages with
+non-empty ground truth for the selected category. F1 is the harmonic mean of
+the two macro averages. Chapter~\ref{ch:implementation},
+Section~\ref{sec:evaluation-protocol}, gives the full evaluation procedure.
 
-V3 was an intermediate diagnostic configuration and has no separate headline
-result; V4 is the final corrected model.
+The direct comparison between the reconstructed Mistral system and V4 uses the
+same 581 prepared pages from the official KVP10k test split. This subset is
+approximately 55\% of the 1{,}051 official test pages because PDF retrieval and native-text
+preparation exclude unavailable files and pages without a usable text layer.
+The preparation flow and split isolation are described in
+Chapter~\ref{ch:dataset} and Section~\ref{sec:data-preprocessing}. Published
+KVP10k results use the coverage reported by Naparstek et al.~\cite{kvp10k} and
+are included only as external context.
 
-\subsection*{Evaluation Setup}
-
-All direct internal benchmark comparisons between the reconstructed Mistral
-baseline and V4 use the same evaluation set:
-\textbf{581 unique test pages}
-from the KVP10k test split (55\% of 1{,}051 unique pages; limited by PDF
-download failures and scanned pages without text layers). The evaluation
-follows IBM's released KVP10k benchmark implementation. Matching is greedy and
-one-to-one, requires equal KVP types, and uses NED $<0.2$ for text. The paper
-describes the location criterion as IoU $>0.3$, whereas the released code uses
-IoU $\geq0.3$; benchmark-comparison results follow the executable code and
-record this discrepancy. Precision and recall are calculated per page and
-macro-averaged over pages with non-empty ground truth after category filtering;
-F1 is the harmonic mean of the two macro averages. Results are reported for
-regular KVPs, unkeyed values, unvalued keys, and their aggregate, under
-text-only, location-only, and combined matching. Pooled regular-link counts
-used during V1--V4 diagnosis are identified separately and are not compared
-directly with the published macro scores; those diagnostics use explicitly
-stated subsets and are not full-test benchmark results. Preprocessing and
-input-text differences are described in Section~\ref{sec:data-preprocessing}.
+Three evidence types occur in this chapter. Final test metrics answer the main
+system-comparison question. Validation results document model development and
+checkpoint selection. Focused diagnostics inspect candidate construction and
+relation supervision; their pooled counts are not page-macro benchmark scores.
+The comparative geometry analysis uses the frozen, training-fitted clustering
+from Section~\ref{sec:layout_clustering}. Those exploratory strata describe annotation geometry and have weak
+separation. They do not represent verified document genres.
 
 % ---------------------------------------------------------------------------
-\section{Experiment 1: Generative Baseline (Mistral-7B QLoRA)}
+\section{Reconstructed Mistral-7B Reference Results}
 \label{sec:exp1}
+\label{sec:res1}
 % ---------------------------------------------------------------------------
 
-\subsection*{Setup}
+The reconstructed reference system and its fixed eight-epoch training,
+inference, parser, and output format are defined in
+Section~\ref{sec:mistral-implementation}. The final clean inference run produces
+predictions for all 581 prepared test pages. No validation or test metric was
+used to select its final training checkpoint.
 
-The starting point of the experimental work is a generative re-implementation
-of the approach used in the KVP10k paper; it is not a strict reproduction.
-Mistral-7B-Instruct-v0.2 is fine-tuned with 4-bit QLoRA (NF4 quantisation,
-LoRA rank $r=4$, $\alpha=4$) on LMDX-formatted document prompts, where each
-line-like text block is represented as \texttt{text x1|y1|x2|y2} in normalised
-coordinates. The model generates KVP predictions as structured text
-output. It is trained for a fixed eight epochs with learning rate
-$5 \times 10^{-4}$ using 4{,}985 prepared pages with non-empty targets. The
-loader skips 404 other prepared pages whose targets are empty. After training
-is complete, the final model generates predictions for the 581 prepared
-held-out test pages, which are then scored with the released KVP10k evaluator.
-
-The exact prompt template is shown in Figure~\ref{fig:stage3-prompt}. It follows
-the LMDX paradigm~\cite{lmdx} used by the KVP10k baseline --- a document
-representation with text-block coordinates followed by a task instruction
-requesting a Python list-of-lists output. The released KVP10k repository
-contains the original prompt implementation. The local template retains its
-document and task structure but adapts the detailed output contract. Regular
-entries contain located key and value strings, Unkeyed entries contain a
-category label and a located value, and Unvalued entries contain one located
-key because no value is present.
-
-Several local settings match the released configuration: LoRA rank $r=4$,
-$\alpha=4$, dropout $0.05$, learning rate $5\times10^{-4}$, seed 0, maximum
-length 8{,}192, eight epochs, batch size 1, and gradient accumulation 4. The
-reconstruction still differs in important ways. Word text and coordinates come
-from PyMuPDF's native text layer rather than Tesseract OCR; pages without a
-usable text layer are excluded; and the resulting train and test subsets
-differ. The released implementation loads the base model in bfloat16 and uses
-PyTorch Lightning with non-8-bit AdamW, whereas the local implementation uses
-4-bit NF4 QLoRA, Hugging Face Trainer, and paged 8-bit AdamW. The LoRA target
-module names and the prompt/output implementation also differ. Finally, the
-local training objective masks prompt tokens and applies the language-model
-loss only to the generated response. This choice reflects the structure of the
-task: the document and instruction serve as conditioning context, whereas the
-structured KVP representation is the prediction target. Applying loss to the
-prompt would also optimise the model to reproduce input tokens that are not
-part of the extraction objective. Response-only supervision therefore
-concentrates the training signal on the output that is evaluated at inference
-time. The released KVP10k implementation instead masks only padding tokens and
-computes loss over both prompt and response tokens. No controlled ablation was
-performed, so the effect of this difference on the final score is not isolated.
-Numerical proximity must therefore be read as an indicative comparison, not
-evidence of strict reproduction.
-
-\begin{figure}[ht]
-\centering
-\begin{minipage}{0.9\textwidth}
-\small
-\begin{verbatim}
-<Document>
-{lmdx_text}
-</Document>
-<Task>
-From the document, extract the text keys and values.
-Please provide the response in the form of a Python list of lists.
-Each inner list should contain exactly two strings: the first string
-is the key and the second string is the value.
-Each key and value should be followed by its bounding box in the
-format: left|top|right|bottom.
-</Task>
-### Response:
-\end{verbatim}
-\end{minipage}
-\caption{Stage~3 LMDX prompt template. \texttt{\{lmdx\_text\}} is replaced by the
-text-block-and-coordinate representation of the page. The literal two-string
-instruction describes paired outputs; the training serializer uses a
-single-string entry for Unvalued items.}
-\label{fig:stage3-prompt}
-\end{figure}
-
-\subsection*{Result 1: Regular-pair and per-cluster performance}
-\label{sec:res1}
+Table~\ref{tab:exp1-overall} reports the final clean Mistral result and the
+published KVP10k result. The local system is based on the published generative
+approach, but it is not an exact reproduction. It uses a different prepared
+subset, PyMuPDF text instead of the published OCR input, and a locally adapted
+training and output pipeline.
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~1: pair-level macro F1 under the released KVP10k benchmark. The reconstructed result uses $n=581$ prepared test pages. Published values are from Naparstek et al.\ (2024)~\cite{kvp10k}, Table~1, and use the evaluation coverage reported in the paper.}
+  \caption{Pair-level macro F1 under the released KVP10k benchmark. The
+  reconstructed Mistral result uses 581 prepared test pages. Published values
+  are from Naparstek et al.~\cite{kvp10k}, Table~1, and use the evaluation
+  coverage reported in that paper.}
   \label{tab:exp1-overall}
   \begin{tabular}{@{}llccc@{}}
     \toprule
     \textbf{Category} & \textbf{System} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
-    Regular  & Published KVP10k baseline & 0.659 & 0.650 & 0.611 \\
-             & Reconstructed Mistral & 0.769 & 0.699 & 0.662 \\
+    Regular  & Published KVP10k Mistral-7B baseline & 0.659 & 0.650 & 0.611 \\
+             & Reconstructed Mistral   & 0.757 & 0.694 & 0.657 \\
     \midrule
-    Unkeyed  & Published KVP10k baseline & 0.601 & 0.653 & 0.584 \\
-             & Reconstructed Mistral & 0.699 & 0.700 & 0.646 \\
+    Unkeyed  & Published KVP10k Mistral-7B baseline & 0.601 & 0.653 & 0.584 \\
+             & Reconstructed Mistral   & 0.681 & 0.693 & 0.635 \\
     \midrule
-    Unvalued & Published KVP10k baseline & 0.601 & 0.618 & 0.588 \\
-             & Reconstructed Mistral & 0.751 & 0.700 & 0.669 \\
+    Unvalued & Published KVP10k Mistral-7B baseline & 0.601 & 0.618 & 0.588 \\
+             & Reconstructed Mistral   & 0.743 & 0.699 & 0.671 \\
     \midrule
-    All      & Published KVP10k baseline & 0.643 & 0.661 & 0.612 \\
-             & Reconstructed Mistral & 0.752 & 0.718 & 0.673 \\
+    All      & Published KVP10k Mistral-7B baseline & 0.643 & 0.661 & 0.612 \\
+             & Reconstructed Mistral   & 0.743 & 0.713 & 0.669 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\noindent\emph{Note:} The $n=581$ subset applies only to the internal Mistral
-and V4 results. The published result is provided for context and does not use
-this internal prepared subset.
-
-On the prepared 581-page test subset, the reconstructed Mistral baseline
-reaches Regular F1 values of $0.769$ for text, $0.699$ for location, and
-$0.662$ for text+location. Unkeyed and Unvalued text+location F1 are $0.646$
-and $0.669$, respectively, yielding an All text+location F1 of $0.673$. These
-values are numerically higher than the published baseline values on the
-corresponding categories. They do not, however, establish superiority over the
-published system under equivalent conditions. The local pipeline evaluates
-only the 581 test pages that survive PDF retrieval and native-text preparation,
-uses PyMuPDF text rather than the OCR-based input used in the paper, and uses an
-adapted prompt/output contract and fine-tuning implementation rather than
-reproducing them exactly.
-
-Final evaluation uses the type-aware output parser, which distinguishes
-regular, unkeyed, and unvalued generated entries before benchmark scoring.
-
-\paragraph{Per-cluster breakdown.}
-\label{sec:stage3-per-cluster}
-The fitted Stage 2 model assigns each coordinate-bearing test page using
-the training-fitted scaler and K-means model. Table~\ref{tab:exp1-cluster}
-recomputes the official regular-pair metrics from saved predictions and ground
-truth; it does not rerun or retrain Mistral.
-
-\begin{table}[ht]
-  \centering
-  \caption{Experiment~1 regular-KVP macro F1 by page-level
-  annotation-geometry cluster. ``Scored'' counts pages with non-empty regular
-  ground truth, following the released benchmark.}
-  \label{tab:exp1-cluster}
-  \begin{tabular}{@{}lrrrr@{}}
-    \toprule
-    \textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text F1} & \textbf{Text+location F1} \\
-    \midrule
-    Cluster 0 (higher count, broad spread) & 319 & 304 & 0.786 & 0.679 \\
-    Cluster 1 (lower count, compact)       & 213 & 179 & 0.739 & 0.633 \\
-    Geometry unavailable                    &  49 &   0 & ---   & ---   \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Regular-pair performance is higher in Cluster~0 than Cluster~1, but the groups
-describe annotation-box geometry rather than text density or document genre. A
-separate pooled unmatched-entity audit gives rates of 39.7\% in Cluster~0 and
-52.5\% in Cluster~1. In this diagnostic, an unmatched prediction is a predicted
-entity with no ground-truth match under NED $<0.5$ and strict IoU $>0.5$.
-Matching does not enforce key--value role equality, and the denominator is all
-predicted entities in the cluster. This diagnostic is not an official
-benchmark metric. The 49 geometry-unavailable prepared pages contain no
-regular ground truth and are therefore excluded from the official per-cluster
-F1 calculation. These pages must not be interpreted as a third performance
-regime. The overall benchmark values in Table~\ref{tab:exp1-overall} are
-unchanged because only the grouping was recomputed.
-
-This output constraint motivates the discriminative model in Experiment~2.
+On the prepared test subset, the reconstructed Mistral system obtains Regular
+F1 values of $0.757$ for text, $0.694$ for location, and $0.657$ for
+text+location. Its All text+location F1 is $0.669$. The values show that the
+local generative reference can recover all three entry categories on the
+prepared pages. Its numerically higher scores than the published rows do not
+establish superiority because the page coverage, extracted input text, and
+implementation differ.
 
 % ---------------------------------------------------------------------------
-\section{Experiment 2: Layout-Aware Entity Classification (Stage 4a)}
+\section{Discriminative-Model Development}
 \label{sec:exp2}
 % ---------------------------------------------------------------------------
 
-\subsection*{Setup}
-
-We introduce LayoutLMv3-base (125M parameters) as the document encoder.
-The reported runs use extracted text and bounding boxes, with no
-document-specific page image content; the image input is a blank placeholder.
-In Stage~4a, the LayoutLMv3 encoder and entity classifier are trained with the
-linker disabled:
-for each token, the model predicts whether it is a Key, Value, or Other token.
-This phase provides an entity-oriented initialization before the more complex
-linking task is introduced.
-
-\subsection*{Result 2: Historical Result Unavailable}
+\subsection{Entity-Classification Initialisation}
 \label{sec:res2}
 
-The original Stage~4a checkpoint no longer survives. Its historical validation
-score was calculated with the legacy entity metric, which did not fully
-penalise confusion between Key and Value labels. Because the saved training
-history contains no predictions or class-aware confusion counts, that score
-cannot be corrected after the fact and is therefore omitted. Stage~4a is
-retained here to document the entity-pretraining phase, but no corrected
-Stage~4a entity result is claimed. Corrected class-aware entity performance is
-reported for the final corrected V4 checkpoint.
+The discriminative development path starts with the linker disabled. The
+LayoutLMv3 encoder and thesis-specific classifier learn the token labels
+\texttt{KEY}, \texttt{VALUE}, and \texttt{O}, where \texttt{O} marks tokens
+outside the two entity classes. The selected entity-pretraining checkpoint is
+epoch~\VFourEntityPretrainEpoch{} and has validation \texttt{KEY}/\texttt{VALUE} micro F1
+\VFourEntityPretrainMicroFOne{}. Test data was not accessed during this phase.
 
-Unlike Mistral, the discriminative model can only predict labels for tokens
-that appear in the document; it has no mechanism for generating text absent
-from the extracted input. It can, however, still assign the wrong label to an
-observed token.
+This result shows that the final input path can learn both entity classes. It
+measures token classification on validation data and does not measure complete
+key--value extraction. The selected encoder and classifier initialise V4; the
+relation linker starts with new weights. Section~\ref{sec:two-phase} describes
+this two-phase procedure.
 
-Experiment~3 introduces relation linking after the entity-classification stage.
-
-% ---------------------------------------------------------------------------
-\section{Experiment 3: Token-Level Linking (V1)}
+\subsection{Token-Level Candidate Construction (V1)}
 \label{sec:exp3}
-% ---------------------------------------------------------------------------
-
-\subsection*{Setup}
-
-We activate the projected scaled-dot-product linker with spatial features, trained jointly with the entity classifier.
-In V1, linking operates at the \textbf{token level}: each key token is scored
-against each value token, producing a dense adjacency matrix of size
-$N_{key} \times N_{value}$. For illustration, a page with $\sim$100 key tokens and
-$\sim$100 value tokens produces $\sim$10{,}000 candidate pairs with
-only $\sim$20 true positives (approximately $500{:}1$ neg:pos). A
-\texttt{pos\_weight} of up to 50 is applied to the binary cross-entropy loss
-to counteract the imbalance. A $\lambda$ sweep over $\{0.5, 1.0, 2.0\}$
-controls the relative weight of the linking objective.
-
-\subsection*{Result 3: Token-level candidates are highly imbalanced}
 \label{sec:res3}
 
-The seed-42 validation diagnostics use the preserved V1/V2 development
-checkpoints only to inspect candidate formation, score distributions, and span
-availability. These are internal diagnostics, not official benchmark results.
-The token-level formulation produces a dense candidate matrix with very few
-positive relations, which motivates span-level linking.
+V1 forms one relation candidate for each retained \texttt{KEY} token and each
+retained \texttt{VALUE} token. If a page contains $N_K$ key tokens and $N_V$
+value tokens, the linker receives $N_KN_V$ token-pair candidates, where $N_K$
+and $N_V$ are the two retained token counts on that page. This product can be
+large while only a small part of the matrix represents annotated relations.
+The loss and class-weighting method are defined in
+Section~\ref{sec:loss-function}.
 
-Experiment~4 groups contiguous key and value tokens into spans to reduce the
-candidate space.
+No valid page-macro benchmark result is retained for V1. Its role in the thesis
+is to identify the dense token-candidate space that motivated span-level
+candidate construction.
 
-% ---------------------------------------------------------------------------
-\section{Experiment 4: Span-Level Linking (V2)}
+\subsection{Span-Level Candidate Construction (V2) and Predicted-Span Diagnostic (V3)}
 \label{sec:exp4}
-% ---------------------------------------------------------------------------
-
-\subsection*{Setup}
-
-In V2, contiguous same-label tokens are grouped into spans, and the linker
-scores key spans against value spans. In the illustrative example above, this
-reduces the candidate space from about 10{,}000 token pairs to 225 span pairs.
-With 15 positive links, the 210 remaining candidates are
-negative, which gives a ratio of approximately $14{:}1$.
-The original V2 implementation warm-started from the best Stage~4a checkpoint,
-but span grouping used \texttt{argmax} predicted entity labels rather than
-ground-truth labels; the effect of this choice is examined in
-Experiments~5--7.
-
-\subsection*{Result 4: Span-level linking requires pipeline diagnosis}
 \label{sec:res4}
 
-The span-level formulation reduces the candidate space, but the validation
-diagnostics still show problems in span availability and relation supervision.
-These findings motivate the focused validation analyses in Experiments~5--7.
+V2 groups contiguous same-label tokens into entity spans before it forms
+relation candidates. With $S_K$ retained key spans and $S_V$ retained value
+spans, the candidate count becomes $S_KS_V$. Here, $S_K$ and $S_V$ are normally
+smaller than $N_K$ and $N_V$. The first V2 path formed training spans from
+predicted entity labels while ground-truth annotations supplied the relation
+labels. A later teacher-forced V2 configuration formed spans from ground-truth
+labels during training and predicted labels during validation. Both V2 paths
+initialised the encoder and classifier with weights from the preceding
+entity-classification run.
+
+V3 loaded the teacher-forced V2 checkpoint, froze the encoder and classifier,
+and trained only the linker with predicted spans. The retained V3 records do
+not support a scoped headline benchmark result, so V3 documents only this
+diagnostic path. V4 uses ground-truth spans during training and predicted spans
+during validation and inference. This difference in span source remains a
+limitation of the final method.
 
 % ---------------------------------------------------------------------------
-\section{Experiments 5--7: Diagnostic Analysis (D1, D2, D3)}
+\section{Diagnostic Pipeline Analysis}
 \label{sec:exp567}
+\label{sec:res567}
 % ---------------------------------------------------------------------------
 
-\subsection*{Setup}
+The following analyses use a preserved V2 checkpoint and 200 documents from
+the fixed validation split. The relation-label audit uses 20 of those documents.
+Each analysis states its unit because logits, word links, token-pair cells, and
+span-pair labels are different quantities.
 
-Three targeted validation diagnostics were used to investigate why V2 remained
-ineffective despite the reduced candidate imbalance:
+\subsection{Relation-Logit and Probability Distribution}
 
-\paragraph{D1 --- Link score distribution.}
-Raw linker logits were extracted from the preserved V2 checkpoint on 200
-documents from the fixed seed-42 validation split. The 1{,}481 candidate-pair
-logits have a median of $-6.93$ and a mean of $-7.59$. Only 36 candidate pairs
-have sigmoid probability at least $0.5$, and only 20 best-per-key predictions
-reach this threshold.
+For a candidate pair $(i,j)$, the linker produces an unbounded relation logit
+$\ell_{ij}$. The sigmoid function converts it to a probability,
+$p_{ij}=\sigma(\ell_{ij})$. The decoder can retain a relation only when its
+probability reaches the fixed threshold of $0.5$. The relation-logit function is
+defined in Section~\ref{sec:kv-attention}.
 
-\paragraph{D2 --- Entity span analysis.}
-This diagnostic compares predicted entity token and span counts before and
-after bounding-box validity filtering in the span grouping function for each
-document.
+Across 1{,}481 historical V2 candidate-pair logits, the median is $-6.93$ and
+the mean is $-7.59$. A median logit of $-6.93$ corresponds to a sigmoid
+probability of approximately $0.001$. Only 36 candidates, or 2.4\%, reach
+$p_{ij}\geq0.5$, and only 20 best-per-key predictions reach that threshold.
+Thus, the checkpoint suppresses most candidate links and produces sparse
+decoded output. This distribution describes the symptom; it does not identify
+its cause or measure the gain from a later correction.
 
-\paragraph{D3 --- Link label audit.}
-This diagnostic traces the full link label generation pipeline from ground-truth
-KVPs through word-level labels, token-level alignment, and span-level collapse.
+\subsection{Bounding-Box Filtering}
 
-\subsection*{Result 5--7: Three Compounding Bugs Identified}
-\label{sec:res567}
+The historical V2 span grouper retained a token only when its box met
+$(x_1<x_2)\wedge(y_1<y_2)$. In that path, the prepared $0$--$100$ coordinates
+were incorrectly rescaled by the page dimensions before they entered the
+model. This extra quantisation could produce zero-width or zero-height
+model-input boxes, which the strict predicate then removed from the candidate
+entities. For
+class $c\in\{\texttt{KEY},\texttt{VALUE}\}$, the diagnostic removal rate is
 
-\paragraph{Bug 1 --- Missing Teacher Forcing.}
-Inspection of the training path showed that the original V2 linker formed spans
-from \texttt{argmax} entity predictions while relation labels came from
-ground-truth annotations. Entity
-errors therefore misaligned the predicted spans and relation supervision.
-\emph{Fix: use ground-truth spans during training and predicted spans during
-inference.} This corrects training-label alignment, although the different span
-sources at training and inference remain a methodological limitation. The
-validation diagnostics also showed that other pipeline defects remained.
+\begin{equation}
+  r_c = 1 - \frac{N_c^{\mathrm{strict}}}{N_c^{\mathrm{before}}},
+\end{equation}
 
-\paragraph{Bug 2 --- Bounding Box Filter (D2).}
-The \texttt{group\_contiguous\_spans} function applied the strict predicate
-$(x_1 < x_2) \wedge (y_1 < y_2)$, but quantisation to the LayoutLMv3
-$[0, 1000]$ coordinate grid can produce valid tokens whose boxes have zero
-width or zero height. Across the 200 validation pages, the predicate removed
-47.5\% of predicted KEY tokens and 48.5\% of predicted VALUE tokens. Only 81
-pages retained both strict key and value spans. \emph{Fix: the corrected
-grouping rule excludes only positions with $[0,0,0,0]$, such as special or
-padding positions.}
+where $N_c^{\mathrm{before}}$ is the number of predicted class-$c$ tokens before
+the predicate and $N_c^{\mathrm{strict}}$ is the retained count. For
+\texttt{KEY}, the counts are 3{,}490 and 1{,}832, so $r_{\texttt{KEY}}=47.5\%$.
+For \texttt{VALUE}, the counts are 12{,}649 and 6{,}514, so
+$r_{\texttt{VALUE}}=48.5\%$. Only 81 of 200 pages retain at least one strict key
+span and one strict value span.
 
-\paragraph{Bug 3 --- Link Label Cross-Product Explosion (D3).}
-The label function \texttt{\_generate\_labels} created a link label for
-\emph{every} key-word index $\times$ \emph{every} value-word index within a
-KVP. This inflated the token-pair label matrix. After span-level collapse,
-this made the span-level supervision much denser than intended and reduced its
-ability to distinguish the annotated relation from other candidate span pairs.
-\emph{Fix: generate one representative word-level link per recovered ground-truth KVP.}
+The predicate therefore removes about half of both predicted entity-token
+types and creates a concrete candidate-construction failure. The final span
+grouper excludes only all-zero special or padding positions. The separate final
+input-coordinate correction is documented in
+Section~\ref{sec:image-processing}. These changes enter the final pipeline
+together, so this diagnostic does not measure the independent performance gain
+from the relaxed predicate.
+
+\subsection{Relation-Label Construction}
+
+For a recovered Regular relation $r$, let $K_r$ be its aligned key-word indices
+and $V_r$ its aligned value-word indices. The historical construction created
+the Cartesian product
+
+\begin{equation}
+  \mathcal{L}^{\mathrm{old}}_r = K_r \times V_r,
+\end{equation}
+
+which marks every key-word and value-word combination as positive. The final
+construction selects one representative aligned word pair for each recovered
+relation. Subword tokenisation can expand one word pair into several positive
+token-pair cells, and span collapse then maps those cells to span-pair labels.
+
+Table~\ref{tab:diagnostic-verification} traces these units for the 20-document
+audit. The sequence is 79 ground-truth Regular pairs, 53 recovered
+representative word links, 453 positive token-pair cells after subword
+expansion, and 44 positive span-pair labels after span collapse.
 
 \begin{table}[ht]
   \centering
-  \caption{Corrected link-label pipeline units for the audit of 20 validation
-  documents.}
+  \caption{Relation-label units in the 20-document validation audit.}
   \label{tab:diagnostic-verification}
-  \begin{tabular}{@{}p{5.2cm}p{4.0cm}r@{}}
+  \begin{tabular}{@{}p{5.8cm}p{3.7cm}r@{}}
     \toprule
     \textbf{Quantity} & \textbf{Unit} & \textbf{Count} \\
     \midrule
-    Ground-truth Regular KVPs & KVP pairs & 79 \\
-    Recovered representative links & Word-level links & 53 \\
+    Ground-truth Regular entries & Key--value pairs & 79 \\
+    Recovered representative relations & Word-level links & 53 \\
     Positive labels after subword expansion & Token-pair cells & 453 \\
     Positive labels after span collapse & Span-pair labels & 44 \\
     \bottomrule
   \end{tabular}
-  \smallskip
-
-  \begin{minipage}{0.92\linewidth}
-    \footnotesize\emph{Note:} One recovered KVP creates one representative
-    word-level link. Tokenisation can expand that link into multiple positive
-    token-pair cells. The 453 cells are therefore not 453
-    ground-truth KVP pairs. Before V4, the cross-product generated much denser
-    positive supervision than intended.
-  \end{minipage}
 \end{table}
 
-Table~\ref{tab:diagnostic-verification} is a diagnostic verification summary,
-not an ablation, and therefore cannot attribute effects to any single
-correction. In V4, all three corrections are applied jointly. The reported V4
-result therefore reflects the jointly corrected pipeline and does not measure
-the independent effect of any one correction.
+The counts show why word links, token-pair cells, and span-pair labels cannot be
+used as interchangeable units. They verify the units produced by the corrected label construction in this
+20-document audit.
+The final V4 lineage combines this construction with the span-filter and
+coordinate corrections, so the evidence cannot assign an independent
+performance effect to one correction.
 
 % ---------------------------------------------------------------------------
-\section{Experiment 8: Final Corrected Model (V4)}
+\section{Final V4 Evaluation}
 \label{sec:exp8}
 % ---------------------------------------------------------------------------
 
-\subsection*{Setup}
+This section is the main evaluation of the final discriminative system. The
+validation Regular text+location macro F1 selected checkpoint~15 before test
+evaluation. The selected checkpoint was then evaluated once on the 581 prepared
+test pages. Test metrics were not used for checkpoint selection or early
+stopping. Table~\ref{tab:v4-results} gives validation and test F1,
+Table~\ref{tab:main-system-comparison} gives the same-page Mistral comparison,
+and the later tables separate entity classification, output coverage, geometry
+strata, and qualitative observations.
 
-The final V4 uses the LayoutLMv3-base encoder, entity classifier, span-level
-projected scaled-dot-product linker with spatial features, prepared data, and
-seed-42 split established during development. It uses batch
-size 1, gradient accumulation 8, learning rate $2\times10^{-5}$, linker-loss
-weight 5.0, maximum 30 epochs, and early-stopping patience 10. No rendered page
-image is loaded. Every sample receives the same constant blank visual input, so
-the experiment does not evaluate document-specific image features.
+\subsection{Validation Selection and Test Result}
 
-The run is warm-started from Canary~B rather than trained from scratch. It
-loads all 226 compatible entries: 212 from the encoder, 2 from the entity
-classifier, and 12 from the linker. Scheduler length is calculated from 607
-optimizer updates per epoch, and the 500 warm-up steps are optimizer steps.
-Each epoch checkpoint contains the full state required for exact resumption.
-
-The V4 decoder uses a fixed linker-confidence threshold of $0.5$ when producing
-key--value pairs. The released evaluator assesses those predictions using NED
-$<0.2$ and IoU $\geq0.3$. Checkpoint selection and early stopping use official
-validation Regular text+location macro pair F1 and only validation data. The
-selected checkpoint is evaluated on the test set after selection. Test results do not affect checkpoint selection.
-
-\subsection*{Result 8: Final V4 checkpoint}
-
-Epoch~\VFourBestEpoch{} has the highest validation Regular text+location F1,
-\VFourValCombinedFOne, and is therefore the selected checkpoint. Table~\ref{tab:v4-results}
-reports its validation and test Regular results. On the test set, V4 obtains
-F1~=\VFourTestTextFOne{} for text, \VFourTestLocationFOne{} for location, and
-\VFourTestCombinedFOne{} for their combination.
+Checkpoint~\VFourBestEpoch{} has validation Regular text+location F1
+\VFourValCombinedFOne{}. Table~\ref{tab:v4-results} reports its Regular
+validation and test results.
 
 \begin{table}[ht]
   \centering
-  \caption{Experiment~8: final V4 Regular macro pair F1 for the
-  validation-selected epoch-10 checkpoint.}
+  \caption{Final V4 Regular macro F1 for validation-selected checkpoint~15.}
   \label{tab:v4-results}
   \begin{tabular}{@{}lcc@{}}
     \toprule
@@ -435,170 +291,242 @@ F1~=\VFourTestTextFOne{} for text, \VFourTestLocationFOne{} for location, and
   \end{tabular}
 \end{table}
 
-For Regular text+location matching, the reconstructed Mistral baseline has
-macro precision $0.661$ and recall $0.663$, indicating a nearly balanced result.
-V4 has precision $0.371$ and recall $0.323$ under the same Regular
-text+location criterion.
+The validation and test values are close in all three matching modes. The test
+text+location F1 is \VFourTestCombinedFOne{}, compared with the selected
+validation value of \VFourValCombinedFOne{}. This agreement does not remove the
+limitations of the prepared subset, but it shows no large validation-to-test
+shift for the selected checkpoint.
 
-Reconstructed Mistral remains stronger, with Regular text+location
-F1~=0.662. The final V4 combines several pipeline, training, and selection
-corrections, so the result does not identify the effect of one correction.
+Joint training completed 20 epochs. Early stopping is permitted from epoch~10
+and uses patience~5. Validation Regular text+location macro F1 selected final
+checkpoint~15. The transferred entity-pretraining checkpoint was selected
+separately at its epoch~10.
 
-\paragraph{Corrected entity metrics.}
-Table~\ref{tab:v4-entity} reports class-aware token metrics. A KEY--VALUE
-confusion contributes a false positive to the predicted class and a false
-negative to the target class. The corrected micro and macro aggregates include
-the KEY and VALUE classes; the \texttt{O} class is excluded from both reported
-aggregates. Entity micro F1 is \VFourEntityMicroFOne{} and macro F1 is
-\VFourEntityMacroFOne{}. These token-level scores are numerically higher than
-the complete-pair score of \VFourTestCombinedFOne{}, although the metrics are
-not directly comparable. Together with the qualitative wrong-link examples,
-the result suggests that relation linking remains a major internal limitation.
+\subsection{Same-Page Comparison with Mistral}
+
+Table~\ref{tab:main-system-comparison} is the main system-level comparison. Both
+rows use the same 581 prepared test pages, the same released evaluator, and the
+Regular category. The Regular metric scores 483 pages that contain non-empty
+Regular ground truth.
 
 \begin{table}[ht]
   \centering
-  \caption{Corrected class-aware V4 entity metrics on the test set.}
+  \caption{Direct Regular comparison on the same 581 prepared test pages.
+  Text+location columns report macro precision, recall, and F1.}
+  \label{tab:main-system-comparison}
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    \textbf{System} & \textbf{Text F1} & \textbf{Location F1} &
+    \textbf{T+L P} & \textbf{T+L R} & \textbf{T+L F1} \\
+    \midrule
+    Reconstructed Mistral & 0.757 & 0.694 & 0.658 & 0.657 & 0.657 \\
+    Final V4              & 0.365 & 0.491 & 0.347 & 0.313 & 0.329 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The reconstructed Mistral system is stronger in all three matching modes. For
+text+location matching, the absolute F1 difference is $0.328$. V4 is lower in
+both precision and recall, so its gap is not caused by only one side of the
+precision--recall trade-off. This comparison answers the main relative performance
+question for the shared prepared subset. It does not extend to the
+published system because that result uses different inputs and page coverage.
+
+\subsection{Entity Classification and Complete-Pair Extraction}
+
+Table~\ref{tab:v4-entity} reports class-aware token metrics for checkpoint~15 on
+the validation split. The micro and macro rows include \texttt{KEY} and
+\texttt{VALUE}; \texttt{O} is excluded. These values are validation evidence
+because the final checkpoint-15 test artifact contains pair predictions but no
+separate token-level entity evaluation.
+
+\begin{table}[ht]
+  \centering
+  \caption{Checkpoint-15 class-aware entity metrics on the validation split.}
   \label{tab:v4-entity}
   \begin{tabular}{@{}lccc@{}}
     \toprule
     \textbf{Aggregation} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\
     \midrule
-    Micro & 0.746 & 0.844 & \VFourEntityMicroFOne \\
-    Macro & 0.724 & 0.8267 & \VFourEntityMacroFOne \\
-    KEY   & 0.667 & 0.783 & \VFourKeyFOne \\
-    VALUE & 0.781 & 0.871 & \VFourValueFOne \\
+    Micro & \VFourEntityMicroPrecision & \VFourEntityMicroRecall & \VFourEntityMicroFOne \\
+    Macro & \VFourEntityMacroPrecision & \VFourEntityMacroRecall & \VFourEntityMacroFOne \\
+    \texttt{KEY}   & \VFourKeyPrecision & \VFourKeyRecall & \VFourKeyFOne \\
+    \texttt{VALUE} & \VFourValuePrecision & \VFourValueRecall & \VFourValueFOne \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-At token level, 803 KEY targets are predicted as VALUE and 584 VALUE targets
-are predicted as KEY. These counts confirm that the corrected calculation
-penalises both directions of class confusion.
+On validation data, token-level entity micro F1 is
+\VFourEntityMicroFOne{}, while Regular text+location pair F1 is
+\VFourValCombinedFOne{}. The units differ: entity F1 evaluates individual
+labelled tokens, while pair F1 requires the entity spans and their relation to
+match. Although the metrics are not directly comparable, the lower complete-pair
+result is consistent with additional errors arising between entity
+classification and complete-pair extraction. Together with the verified cases
+in Table~\ref{tab:v4-qualitative-errors}, this supports the interpretation that
+the entity-to-relation decoding path is a major internal limitation. It does
+not isolate the linker from upstream label and span errors.
 
-\paragraph{Direct output and post-processing recovery.}
-The learned decoder directly emits regular linked pairs. The unchanged
-recovery method then emits unlinked value spans as unkeyed predictions and
-unlinked key spans as unvalued predictions. Table~\ref{tab:v4-recovery} keeps
-the direct and recovered results separate. Recovery does not change any Regular
-prediction or Regular score. It raises All text+location F1 from
-\VFourDirectAllCombinedFOne{} to \VFourRecoveredAllCombinedFOne{} by adding
-special-category coverage.
+\subsection{Direct Output Coverage}
+
+This analysis checks which benchmark categories the direct decoder covers
+before optional post-processing. The checkpoint-15 direct decoder emits only
+Regular linked pairs. Table~\ref{tab:v4-output-coverage} reports the resulting
+category-level test F1.
+The Unkeyed and Unvalued rows are zero because the decoder produces no entries
+in those categories.
 
 \begin{table}[ht]
   \centering
-  \caption{V4 direct and post-processed test macro F1. Post-processing uses the
-  unchanged recovery method and leaves Regular predictions unchanged.}
-  \label{tab:v4-recovery}
-  \begin{tabular}{@{}llccc@{}}
+  \caption{Checkpoint-15 direct-output test macro F1 by category.}
+  \label{tab:v4-output-coverage}
+  \begin{tabular}{@{}lccc@{}}
     \toprule
-    \textbf{Output} & \textbf{Category} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
+    \textbf{Category} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
-    Direct & Regular & 0.392 & 0.446 & 0.345 \\
-    Direct & All     & 0.258 & 0.304 & 0.229 \\
-    \midrule
-    Recovered & Regular  & 0.392 & 0.446 & 0.345 \\
-    Recovered & Unkeyed  & 0.175 & 0.316 & 0.162 \\
-    Recovered & Unvalued & 0.298 & 0.336 & 0.276 \\
-    Recovered & All      & 0.292 & 0.376 & 0.261 \\
+    Regular  & 0.365 & 0.491 & 0.329 \\
+    Unkeyed  & 0.000 & 0.000 & 0.000 \\
+    Unvalued & 0.000 & 0.000 & 0.000 \\
+    All      & 0.234 & 0.334 & 0.214 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\paragraph{Annotation-geometry clusters.}
-Table~\ref{tab:v4-cluster} uses the same frozen cluster assignments as the
-Mistral and V4 analyses. Cluster~1 has higher V4 Regular F1 than Cluster~0 in
-all three modes. The 49 geometry-unavailable pages have no scorable Regular
-ground truth and are excluded rather than assigned a zero performance value.
-The result shows an association with annotation geometry, not a difference
-between semantic document types.
+The All text+location F1 of $0.214$ shows the effect of the missing
+special-category outputs. No checkpoint-15 recovery artifact exists, so this
+chapter cannot quantify whether recovery improves special-category coverage.
+No recovered score is reported. This scope keeps the final V4 values on one
+verified result lineage.
+
+\subsection{Annotation-Geometry Strata}
+\label{sec:stage3-per-cluster}
+
+Table~\ref{tab:exp1-cluster} compares both final systems with the frozen
+annotation-geometry assignments from Chapter~\ref{ch:dataset}. The group metrics
+are derived from saved final per-page evaluator values; no model inference is
+repeated. \emph{Scored} counts pages with non-empty Regular ground truth.
 
 \begin{table}[ht]
   \centering
-  \caption{V4 Regular macro F1 by page-level annotation-geometry cluster.}
-  \label{tab:v4-cluster}
-  \begin{tabular}{@{}lrrrrr@{}}
+  \caption{Regular macro F1 by frozen annotation-geometry stratum.}
+  \label{tab:exp1-cluster}
+  \footnotesize
+  \begin{tabular}{@{}llrrccc@{}}
     \toprule
-    \textbf{Stratum} & \textbf{Assigned} & \textbf{Scored} & \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
+    \textbf{Stratum} & \textbf{System} & \textbf{Assigned} & \textbf{Scored} &
+    \textbf{Text} & \textbf{Location} & \textbf{Text+location} \\
     \midrule
-    Cluster 0 & 319 & 304 & 0.359 & 0.430 & \VFourClusterZeroCombinedFOne \\
-    Cluster 1 & 213 & 179 & 0.444 & 0.468 & \VFourClusterOneCombinedFOne \\
-    Geometry unavailable & 49 & 0 & --- & --- & --- \\
+    Cluster 0 & Mistral & 319 & 304 & 0.783 & 0.703 & 0.673 \\
+              & V4      & 319 & 304 & 0.312 & 0.489 & 0.279 \\
+    \midrule
+    Cluster 1 & Mistral & 213 & 179 & 0.712 & 0.679 & 0.629 \\
+              & V4      & 213 & 179 & 0.453 & 0.492 & 0.412 \\
+    \midrule
+    Geometry unavailable & Both & 49 & 0 & \multicolumn{3}{c}{Not scored} \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\paragraph{Qualitative error analysis.}
-Table~\ref{tab:v4-qualitative-errors} groups selected V4 examples that
-illustrate several error types. They do not provide statistical evidence, and
-semantically ambiguous token annotations require cautious interpretation.
+Mistral is stronger in Cluster~0 than in Cluster~1, while V4 is stronger in
+Cluster~1 than in Cluster~0. V4 location F1 is almost equal across the two
+groups, but its text and text+location results differ. The clusters overlap and
+no causal intervention was made. The pattern is therefore descriptive and does
+not show that one semantic document type is easier than another.
+
+\subsection{Qualitative Check of Saved Predictions}
+
+Table~\ref{tab:v4-qualitative-errors} contains examples checked against the
+saved checkpoint-15 predictions and prepared ground truth. The examples show
+possible behaviours; they do not estimate how often each behaviour occurs.
 
 \begin{table}[ht]
   \centering
-  \caption{Selected V4 qualitative examples.}
+  \caption{Selected examples verified in the saved checkpoint-15 output.}
   \label{tab:v4-qualitative-errors}
-  \begin{tabular}{@{}p{3.0cm}p{2.4cm}p{6.7cm}@{}}
+  \begin{tabular}{@{}
+    >{\raggedright\arraybackslash}p{3.3cm}
+    >{\raggedright\arraybackslash}p{2.6cm}
+    >{\raggedright\arraybackslash}p{9.1cm}
+  @{}}
     \toprule
-    \textbf{Error type} & \textbf{Field} & \textbf{Observation} \\
+    \textbf{Observation} & \textbf{Field} & \textbf{Saved output} \\
     \midrule
-    Correct local link & ``Instructor'' & Linked to the instructor name \\
-    Correct local link & ``Address'' & Linked to a full postal address \\
-    \addlinespace[0.35em]
-    Wrong neighbouring link & ``Zip'' & Linked to ``SPRINGFIELD, VA'' instead of ``22152'' \\
-    Wrong neighbouring link & ``Syscode'' & Linked to an agency name instead of ``0496'' \\
-    \addlinespace[0.35em]
-    Missed short value & ``EDI:'' & Expected link to ``Y'' was missed \\
-    Missed short value & ``Page'' & Expected link to ``37'' was missed \\
-    Missed short value & ``ext.'' & Expected link to ``227'' was missed \\
+    Correct local pair & \texttt{Instructor} & Links to the instructor name \\
+    \addlinespace[2pt]
+    Correct local pair & \texttt{Address} & Links to the full postal address \\
+    \addlinespace[2pt]
+    Competing nearby value & \texttt{Zip} & One candidate links to \texttt{SPRINGFIELD, VA}; a separate candidate links correctly to \texttt{22152} \\
+    \addlinespace[2pt]
+    Missed short pair & \texttt{EDI:} & The expected link to \texttt{Y} is absent \\
+    \addlinespace[2pt]
+    Merged value span & \texttt{Page} & Links to a long value that starts with the expected \texttt{37} \\
+    \addlinespace[2pt]
+    Entity/span merge & \texttt{ext.} & No separate key is predicted; \texttt{ext. 227} occurs inside the value for \texttt{Direct dial:} \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-The token-level review also identifies KEY--VALUE confusion, missed entities,
-and false entity labels on ordinary prose.
-
-\paragraph{Completed run record.}
-Training stops after 20 completed epochs and \VFourCompletedSteps{} optimizer
-steps because ten consecutive epochs do not improve the epoch-10 validation
-score. The selected checkpoint occurs at optimizer step \VFourSelectedSteps{}.
-The two allocated GPU jobs use approximately \VFourTrainingDuration{} in total.
-The first job reaches its 24-hour limit after epoch 15; the second job restores
-the complete checkpoint state and finishes epochs 16--20. The selected weights have SHA-256 \VFourCheckpointHash{}.
+The correct local pairs show that checkpoint~15 can form plausible relations.
+The other cases show competing nearby values, short-field omissions, and merged
+spans. These mechanisms are consistent with the gap between entity recognition
+and complete-pair extraction, but the selected cases do not give an error-rate
+estimate.
 
 % ---------------------------------------------------------------------------
-\section{Summary}
+\section{Main Findings}
 \label{sec:narrative-summary}
 % ---------------------------------------------------------------------------
 
-Table~\ref{tab:full-progression} summarises the experimental and diagnostic
-progression. Published, Mistral, and V4 rows use regular-KVP macro F1
-(text-only / text+location). The entity column reports corrected class-aware
-micro F1; unavailable legacy values are omitted. V1 and V2 are retained as
-validation-diagnostic stages and are not numerically compared with the official
-macro benchmark rows. Published results
-are provided for context. Internal V4 and Mistral results use the same 581
-locally available pages and are directly comparable to each other.
+Table~\ref{tab:full-progression} summarises the evidence by its role, split, and
+unit. This structure separates final test results from development diagnostics.
 
 \begin{table}[ht]
   \centering
-  \caption{Experimental and diagnostic progression.}
+  \caption{Main experimental findings and their evidence scope.}
   \label{tab:full-progression}
   \footnotesize
-  \begin{tabular}{@{}p{3.4cm}p{1.7cm}p{2.8cm}p{5.4cm}@{}}
+  \begin{tabular}{@{}
+    >{\raggedright\arraybackslash}p{5.4cm}
+    >{\raggedright\arraybackslash}p{9.8cm}
+  @{}}
     \toprule
-    \textbf{Model} & \textbf{Corrected entity micro F1} & \textbf{Regular pair F1 (Text / Text+location)} & \textbf{Key Finding} \\
+    \textbf{Evidence and scope} & \textbf{Main finding} \\
     \midrule
-    Published KVP10k baseline     & ---   & 0.659 / 0.611 & Published generative system \\
-    Exp 1: Mistral-7B        & ---   & 0.769 / 0.662 & Re-implementation; final type-aware parser \\
-    Exp 2: Stage~4a (entity pre-training) & \multicolumn{2}{c}{No reportable score} & Checkpoint unavailable; legacy score omitted \\
-    Exp 3: V1 token linking & \multicolumn{2}{c}{Validation diagnostic} & Dense token candidate space \\
-    Exp 4: V2 span linking & \multicolumn{2}{c}{Validation diagnostic} & Span and supervision defects remain \\
-    Exp 5--7: Diagnostics     & \multicolumn{2}{c}{Diagnostic only} & 3 pipeline bugs identified \& fixed \\
-    Exp 8: V4 final model & \VFourEntityMicroFOne & \VFourTestTextFOne{} / \VFourTestCombinedFOne{} & Final corrected LayoutLMv3 model \\
+    \textbf{Reconstructed Mistral}\newline
+    Test, Regular page-macro F1
+      & Text/location/text+location F1 is 0.757/0.694/0.657 \\
+    \addlinespace[3pt]
+    \textbf{Entity initialisation}\newline
+    Validation, token micro F1
+      & \texttt{KEY}/\texttt{VALUE} micro F1 is 0.829 before joint V4 training \\
+    \addlinespace[3pt]
+    \textbf{V1--V3 development}\newline
+    Validation diagnostic counts
+      & Dense token candidates, a span-source mismatch, strict box filtering, and relation-label units guide the final pipeline \\
+    \addlinespace[3pt]
+    \textbf{Final V4}\newline
+    Test, Regular page-macro F1
+      & Text/location/text+location F1 is 0.365/0.491/0.329 \\
+    \addlinespace[3pt]
+    \textbf{V4 entity versus pair}\newline
+    Validation, token and page-macro F1
+      & Entity micro F1 is 0.813; complete text+location pair F1 is 0.331 \\
+    \addlinespace[3pt]
+    \textbf{V4 direct coverage}\newline
+    Test, All page-macro F1
+      & No Unkeyed or Unvalued output; All text+location F1 is 0.214 \\
+    \addlinespace[3pt]
+    \textbf{Geometry strata}\newline
+    Test, Regular page-macro F1 by stratum
+      & The systems have different descriptive cluster patterns; the clusters have weak separation \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-The final V4 combines the corrected data and supervision pipeline with the
-corrected training and validation-based selection procedure. The test result
-does not determine checkpoint selection. Because the corrections were applied
-together, their independent contributions were not isolated.
+The main same-page result is clear: the reconstructed Mistral reference is
+substantially stronger than V4, with Regular text+location F1 of $0.657$ versus
+$0.329$. V4 performs much better on token-level entity classification than on
+complete pair extraction, and its direct decoder does not cover the Unkeyed or
+Unvalued categories. The development diagnostics explain important candidate
+construction and supervision constraints, while the final comparison gives the
+system-level outcome on the shared prepared test subset.

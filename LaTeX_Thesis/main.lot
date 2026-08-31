@@ -1,28 +1,23 @@
-\babel@toc {english}{}\relax 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Flow from the KVP10k release to the subsets used in this thesis. The first row counts raw annotation rows; the other rows count unique pages. ``Not yet split'' means that the preparation step has not yet created an internal validation subset.}}{13}{table.caption.3}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Distinct geometric summary features extracted from each selected page}}{16}{table.caption.5}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Page-level geometry-cluster distribution for $k=2$}}{17}{table.caption.7}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Summary statistics of selected geometry features per cluster (mean\,$\pm $\,std).}}{19}{table.caption.11}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Composition of the exploratory 200-row official-training subset}}{21}{table.caption.12}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Layout features extracted from each document}}{20}{table.caption.19}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Layout cluster distribution for $k=2$ on annotated training pages}}{21}{table.caption.21}%
-\contentsline {table}{\numberline {4.3}{\ignorespaces Annotation statistics for 200-sample subset}}{24}{table.caption.25}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Main hyperparameters for the corrected Mistral baseline.}}{35}{table.caption.39}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Hyperparameters for Stage~4 (LayoutLMv3\,+\,Biaffine Linker).}}{36}{table.caption.41}%
-\contentsline {table}{\numberline {6.3}{\ignorespaces Nearest Neighbour Baseline Results (20-sample validation).}}{36}{table.caption.43}%
-\addvspace {10\p@ }
-\contentsline {table}{\numberline {7.1}{\ignorespaces Stage~3 (Mistral-7B QLoRA) overall results ($n = 581$ test pages).}}{40}{table.caption.47}%
-\contentsline {table}{\numberline {7.2}{\ignorespaces Published KVP10k baseline vs.\ our Stage~3 Mistral baseline.}}{41}{table.caption.48}%
-\contentsline {table}{\numberline {7.3}{\ignorespaces Stage~3 Mistral error analysis by layout cluster ($n = 581$).}}{41}{table.caption.49}%
-\contentsline {table}{\numberline {7.4}{\ignorespaces Stage~4a entity classification results (best epoch).}}{41}{table.caption.50}%
-\contentsline {table}{\numberline {7.5}{\ignorespaces Stage~4b V1 (token-level linking) results.}}{42}{table.caption.51}%
-\contentsline {table}{\numberline {7.6}{\ignorespaces Stage~4b V2 (span-level linking) results.}}{42}{table.caption.54}%
-\contentsline {table}{\numberline {7.7}{\ignorespaces Overall comparison across all stages. Dashes indicate metrics not applicable to that system: the KVP10k baseline and Mistral produce end-to-end KVP predictions without a separate entity-classification head. Mistral's F1 is text\,+\,location (NED\,$<$\,0.2, IoU\,$>$\,0.3).}}{43}{table.caption.56}%
-\contentsline {table}{\numberline {7.8}{\ignorespaces V1 (token-level) vs.\ V2 (span-level) vs.\ V4 (corrected) linking ablation.}}{43}{table.caption.57}%
-\contentsline {table}{\numberline {7.9}{\ignorespaces Link label pipeline verification (20 test documents, 179 GT KVPs).}}{44}{table.caption.58}%
-\contentsline {table}{\numberline {7.10}{\ignorespaces Training time and resource usage.}}{45}{table.caption.59}%
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Pair-level macro F1 under the released KVP10k benchmark. The reconstructed Mistral result uses 581 prepared test pages. Published values are from Naparstek et al.~\blx@tocontentsinit {0}\cite {kvp10k}, Table~1, and use the evaluation coverage reported in that paper.}}{48}{table.caption.24}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Relation-label units in the 20-document validation audit.}}{52}{table.caption.25}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Final V4 Regular macro F1 for validation-selected checkpoint~15.}}{52}{table.caption.26}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Direct Regular comparison on the same 581 prepared test pages. Text+location columns report macro precision, recall, and F1.}}{53}{table.caption.27}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Checkpoint-15 class-aware entity metrics on the validation split.}}{54}{table.caption.28}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Checkpoint-15 direct-output test macro F1 by category.}}{54}{table.caption.29}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Regular macro F1 by frozen annotation-geometry stratum.}}{55}{table.caption.30}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Selected examples verified in the saved checkpoint-15 output.}}{55}{table.caption.31}%
+\contentsline {table}{\numberline {6.9}{\ignorespaces Main experimental findings and their evidence scope.}}{56}{table.caption.32}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

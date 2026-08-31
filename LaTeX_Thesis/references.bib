@@ -13,6 +13,14 @@
     note={arXiv:2405.00505}
 }
 
+@misc{kvp10k_repository,
+    title={{KVP10k}: Dataset Repository},
+    author={{IBM Research}},
+    howpublished={\url{https://github.com/IBM/KVP10k}},
+    year={2024},
+    note={Accessed 29 August 2026}
+}
+
 % ============================================================================
 % MODELS
 % ============================================================================
@@ -92,10 +100,12 @@
 }
 
 @inproceedings{iou,
-    title={Intersection over Union (IoU) for Object Detection},
+    title={Generalized Intersection Over Union: A Metric and a Loss for Bounding Box Regression},
     author={Rezatofighi, Hamid and Tsoi, Nathan and Gwak, JunYoung and Sadeghian, Amir and Reid, Ian and Savarese, Silvio},
     booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-    year={2019}
+    pages={658--666},
+    year={2019},
+    doi={10.1109/CVPR.2019.00075}
 }
 
 % ============================================================================
@@ -118,6 +128,17 @@
     year={2019}
 }
 
+@inproceedings{wolf2020transformers,
+    title={{Transformers}: State-of-the-Art Natural Language Processing},
+    author={Wolf, Thomas and Debut, Lysandre and Sanh, Victor and Chaumond, Julien and Delangue, Cl{\'e}ment and Moi, Anthony and Cistac, Pierric and Rault, Tim and Louf, R{\'e}mi and Funtowicz, Morgan and Davison, Joe and Shleifer, Sam and von Platen, Patrick and Ma, Clara and Jernite, Yacine and Plu, Julien and Xu, Canwen and Le Scao, Teven and Gugger, Sylvain and Drame, Mariama and Lhoest, Quentin and Rush, Alexander M.},
+    booktitle={Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations},
+    pages={38--45},
+    year={2020},
+    publisher={Association for Computational Linguistics},
+    doi={10.18653/v1/2020.emnlp-demos.6},
+    url={https://aclanthology.org/2020.emnlp-demos.6/}
+}
+
 % ============================================================================
 % CLUSTERING
 % ============================================================================
@@ -131,6 +152,38 @@
     pages={100--108},
     year={1979},
     publisher={JSTOR}
+}
+
+@article{rousseeuw1987silhouettes,
+    title={Silhouettes: A Graphical Aid to the Interpretation and Validation of Cluster Analysis},
+    author={Rousseeuw, Peter J.},
+    journal={Journal of Computational and Applied Mathematics},
+    volume={20},
+    pages={53--65},
+    year={1987},
+    doi={10.1016/0377-0427(87)90125-7}
+}
+
+@article{davies1979cluster,
+    title={A Cluster Separation Measure},
+    author={Davies, David L. and Bouldin, Donald W.},
+    journal={IEEE Transactions on Pattern Analysis and Machine Intelligence},
+    volume={PAMI-1},
+    number={2},
+    pages={224--227},
+    year={1979},
+    doi={10.1109/TPAMI.1979.4766909}
+}
+
+@article{calinski1974dendrite,
+    title={A Dendrite Method for Cluster Analysis},
+    author={Cali{\'n}ski, Tadeusz and Harabasz, Jerzy},
+    journal={Communications in Statistics},
+    volume={3},
+    number={1},
+    pages={1--27},
+    year={1974},
+    doi={10.1080/03610927408827101}
 }
 
 @article{pca,
@@ -376,4 +429,61 @@
     booktitle={Advances in Neural Information Processing Systems},
     volume={30},
     year={2017}
+}
+
+@inproceedings{rusinol2013field,
+    author={Rusi{\~n}ol, Mar{\c{c}}al and Benkhelfallah, Tayeb and Poulain d'Andecy, Vincent},
+    title={Field Extraction from Administrative Documents by Incremental Structural Templates},
+    booktitle={2013 12th International Conference on Document Analysis and Recognition},
+    pages={1100--1104},
+    year={2013},
+    doi={10.1109/ICDAR.2013.223}
+}
+
+@inproceedings{schuster2013intellix,
+    author={Schuster, Daniel and Muthmann, Klemens and Esser, Daniel and Schill, Alexander and Berger, Michael and Weidling, Christoph and Aliyev, Kamil and Hofmeier, Andreas},
+    title={Intellix: End-User Trained Information Extraction for Document Archiving},
+    booktitle={2013 12th International Conference on Document Analysis and Recognition},
+    pages={101--105},
+    year={2013},
+    doi={10.1109/ICDAR.2013.28}
+}
+
+@article{lecun1998gradient,
+    author={LeCun, Yann and Bottou, L{\'e}on and Bengio, Yoshua and Haffner, Patrick},
+    title={Gradient-Based Learning Applied to Document Recognition},
+    journal={Proceedings of the IEEE},
+    volume={86},
+    number={11},
+    pages={2278--2324},
+    year={1998},
+    doi={10.1109/5.726791}
+}
+
+@article{hochreiter1997lstm,
+    author={Hochreiter, Sepp and Schmidhuber, J{\"u}rgen},
+    title={Long Short-Term Memory},
+    journal={Neural Computation},
+    volume={9},
+    number={8},
+    pages={1735--1780},
+    year={1997},
+    doi={10.1162/neco.1997.9.8.1735}
+}
+
+@inproceedings{ramshaw1995text,
+    author={Ramshaw, Lance and Marcus, Mitch},
+    title={Text Chunking using Transformation-Based Learning},
+    booktitle={Third Workshop on Very Large Corpora},
+    year={1995},
+    url={https://aclanthology.org/W95-0107/}
+}
+
+@inproceedings{iitcdip,
+    author={Lewis, David D. and Agam, Gady and Argamon, Shlomo and Frieder, Ophir and Grossman, David A. and Heard, Jefferson},
+    title={Building a Test Collection for Complex Document Information Processing},
+    booktitle={Proceedings of the 29th Annual International ACM SIGIR Conference on Research and Development in Information Retrieval},
+    pages={665--666},
+    year={2006},
+    doi={10.1145/1148170.1148307}
 }

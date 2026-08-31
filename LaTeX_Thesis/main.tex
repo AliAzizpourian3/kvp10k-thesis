@@ -187,7 +187,11 @@ Erlangen, den 03.09.2026 \hfill \rule{6cm}{0.4pt}
 % BACK MATTER: abbreviations, LoF, LoT, bibliography
 % ------------------------------------------------------------
 \glsaddall[types={abbreviations}]
-\printunsrtglossary[type=abbreviations]
+\begingroup
+  \let\clearpage\relax
+  \let\cleardoublepage\relax
+  \printunsrtglossary[type=abbreviations]
+\endgroup
 \cleardoublepage
 
 \addcontentsline{toc}{chapter}{\listfigurename}
